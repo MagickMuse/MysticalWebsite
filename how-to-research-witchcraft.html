@@ -23,7 +23,7 @@
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;1,400&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap">
   <link rel="stylesheet" href="styles.css">
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -41,21 +41,20 @@
 <body>
 <a class="skip" href="#main">Skip to main content</a>
 <header class="site">
-  <nav class="wrap nav" aria-label="Main">
-    <ul class="left">
-      <li><a href="manuscript.html">Grimoire</a></li>
-      <li aria-hidden="true"><i class="spark"></i></li>
-      <li><a href="meetup.html">Coven</a></li>
-      <li aria-hidden="true"><i class="spark"></i></li>
-    </ul>
+  <div class="wrap nav">
     <a class="logo" href="index.html">Magick Muse</a>
-    <ul class="right">
-      <li aria-hidden="true"><i class="spark"></i></li>
-      <li><a href="mastery.html" aria-current="page">Blog</a></li>
-      <li aria-hidden="true"><i class="spark"></i></li>
-      <li><a href="story.html">Our Story</a></li>
-    </ul>
-  </nav>
+    <button class="menu" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+    <nav id="site-menu" aria-label="Main">
+      <ul class="left">
+        <li><a href="manuscript.html">Grimoire</a></li>
+        <li><a href="meetup.html">Coven</a></li>
+      </ul>
+      <ul class="right">
+        <li><a href="mastery.html" aria-current="page">Blog</a></li>
+        <li><a href="story.html">Our Story</a></li>
+      </ul>
+    </nav>
+  </div>
 </header>
 <main id="main">
   <article>
