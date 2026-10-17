@@ -1,0 +1,34 @@
+@font-face {
+  font-family: "Phosphor-Light";
+  src:
+    url("./Phosphor-Light.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.ph-light {
+  font-family: "Phosphor-Light";
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  speak: never;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ph-light.ph-cards::before { content: "\e0f8"; }
+.ph-light.ph-drop::before { content: "\e210"; }
+.ph-light.ph-eye::before { content: "\e220"; }
+.ph-light.ph-feather::before { content: "\e9c0"; }
+.ph-light.ph-flask::before { content: "\e79e"; }
+.ph-light.ph-git-branch::before { content: "\e278"; }
+.ph-light.ph-key::before { content: "\e2d6"; }
+.ph-light.ph-leaf::before { content: "\e2da"; }
+.ph-light.ph-magic-wand::before { content: "\e6b6"; }
+.ph-light.ph-moon::before { content: "\e330"; }
+.ph-light.ph-moon-stars::before { content: "\e58e"; }
+.ph-light.ph-planet::before { content: "\e652"; }
+.ph-light.ph-scroll::before { content: "\eb7a"; }
+.ph-light.ph-sketch-logo::before { content: "\e42c"; }
+.ph-light.ph-star-four::before { content: "\e6a4"; }
