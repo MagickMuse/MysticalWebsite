@@ -74,7 +74,6 @@ section { padding-block: clamp(4rem, 9vw, 7.5rem); }
 }
 .script { font-family: var(--script); color: var(--accent-text); font-weight: 400; }
 .lede { font-size: 1.1rem; color: var(--muted); }
-.price { font-size: .85rem; letter-spacing: .04em; font-weight: 500; color: var(--accent-text); }
 
 /* ---------- gold four-point stars ---------- */
 .spark {
