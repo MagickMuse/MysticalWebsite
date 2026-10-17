@@ -54,7 +54,7 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.05; m
 h1 em, h2 em, h3 em { color: var(--accent-text); }
 p { margin: 0; max-width: 62ch; }
 [hidden] { display: none; }
-.wrap { max-width: 1160px; margin-inline: auto; padding-inline: 24px; }
+.wrap { max-width: 1680px; margin-inline: auto; padding-inline: clamp(16px, 4vw, 64px); }
 main { overflow-x: clip; }
 section { padding-block: clamp(4rem, 9vw, 7.5rem); }
 .sr-only {
@@ -171,7 +171,7 @@ header.site {
 .hero h1 { font-size: clamp(3.2rem, 8vw, 6.4rem); }
 .hero h1 em { font-style: italic; }
 .hero h1 .spark { font-size: .45em; }
-.hero-art { position: relative; width: 100%; }
+.hero-art { position: relative; width: 100%; max-width: 600px; justify-self: center; }
 .hero-art .frame { aspect-ratio: 4 / 5; width: 100%; }
 .badge {
   position: absolute; left: -2rem; bottom: 2.5rem; background: var(--bg);
@@ -208,17 +208,16 @@ header.site {
 .more { text-align: center; margin-top: 3.5rem; max-width: none; }
 
 /* ---------- featured ---------- */
-.feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 5rem); align-items: center; }
+.feature-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: clamp(2rem, 6vw, 5rem); align-items: center; }
 .feature-art { position: relative; min-width: 0; }
 .feature-art .stars-float .s1 { font-size: 2rem; top: -1rem; left: -1rem; right: auto; }
 .feature-art .stars-float .s2 { font-size: 1.4rem; top: auto; bottom: 1.5rem; right: -.8rem; }
 .feature-text { display: grid; gap: 1.4rem; min-width: 0; }
-.feature-text h2 { font-size: clamp(2.6rem, 5vw, 4rem); }
 .meta {
   display: flex; flex-wrap: wrap; gap: .5rem 2rem; list-style: none; margin: 0; padding: 0;
   font-size: .72rem; letter-spacing: .2em; text-transform: uppercase;
 }
-.feature-text .meta { justify-content: center; text-align: center; padding-block: 1rem; border-block: 1px solid var(--line); }
+.intro .meta { justify-content: center; padding-block: 1rem; margin-top: .6rem; border-block: 1px solid var(--line); }
 .quote { margin: 0; font-family: var(--display); font-size: 1.5rem; font-style: italic; border-left: 1px solid var(--accent); padding-left: 1.4rem; line-height: 1.35; }
 .quote p { max-width: none; }
 .quote cite { display: block; font-family: var(--body); font-style: normal; font-size: .7rem; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); margin-top: .8rem; }
@@ -235,8 +234,7 @@ a.card { transition: border-color .3s; }
 a.card:hover { border-color: var(--accent); }
 .card .spark { font-size: 1.1rem; }
 .cards .quote { font-size: 1.3rem; }
-.cards.pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@media (max-width: 860px) { .cards, .cards.pairs { grid-template-columns: 1fr; } }
+@media (max-width: 860px) { .cards { grid-template-columns: 1fr; } }
 
 /* grimoire library: 5 / 3 / 2 across */
 .library { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2rem 1.6rem; list-style: none; margin: 0; padding: 0; }
