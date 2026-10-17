@@ -5,8 +5,7 @@
     if (!link || typeof gtag !== 'function') return;
     var href = link.href;
     var type = 'store';
-    if (href.indexOf('/lifetimemanuscript') !== -1) type = 'lifetime';
-    else if (href.indexOf('/monthlymanuscript') !== -1) type = 'monthly';
+    if (href.indexOf('/l/manuscript') !== -1) type = 'manuscript';
     gtag('event', 'click_gumroad', {
       link_type: type,
       link_text: link.textContent.trim() || 'icon',
