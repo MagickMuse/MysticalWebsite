@@ -126,7 +126,6 @@ section { padding-block: clamp(4rem, 9vw, 7.5rem); }
 /* ---------- image frames ---------- */
 .frame { background: var(--frame); position: relative; overflow: hidden; display: grid; place-items: center; }
 .frame img { width: 100%; height: 100%; object-fit: cover; }
-.frame img.top { object-position: 50% 0; }
 .arch { border-radius: 999px 999px 0 0; }
 .shot { border: 1px solid var(--line); box-shadow: 0 30px 60px -30px rgba(46, 31, 32, .45); }
 
