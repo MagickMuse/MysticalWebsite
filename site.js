@@ -64,6 +64,34 @@
     }).observe(hero);
   }
 
+  // Screenshot carousels: swipe/scroll-snap works without JS; this adds arrows and a counter
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  Array.prototype.forEach.call(document.querySelectorAll('.carousel'), function (carousel) {
+    var track = carousel.querySelector('.slides');
+    var slides = track.querySelectorAll('.slide');
+    var nav = carousel.querySelector('.carousel-nav');
+    var count = carousel.querySelector('[data-count]');
+    if (slides.length < 2) return;
+    nav.hidden = false;
+    var pitch = function () { return slides[1].offsetLeft - slides[0].offsetLeft; };
+    var index = function () { return Math.round(track.scrollLeft / pitch()); };
+    nav.addEventListener('click', function (e) {
+      var button = e.target.closest('[data-step]');
+      if (!button) return;
+      var next = (index() + Number(button.getAttribute('data-step')) + slides.length) % slides.length;
+      track.scrollTo({ left: next * pitch(), behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+    var ticking = false;
+    track.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        count.textContent = index() + 1;
+        ticking = false;
+      });
+    });
+  });
+
   // Blog search and topic filter
   var search = document.getElementById('post-search');
   var filter = document.getElementById('post-topic');
