@@ -172,11 +172,12 @@ header.site {
 .hero-art { position: relative; width: 100%; max-width: 600px; justify-self: center; }
 .hero-art .frame { aspect-ratio: 4 / 5; width: 100%; }
 .badge {
-  position: absolute; left: -2rem; bottom: 2.5rem; background: var(--bg);
-  padding: 1rem 1.4rem; border: 1px solid var(--line); text-align: center;
+  position: absolute; left: -2rem; bottom: 2.5rem; background: var(--btn); color: var(--on-btn);
+  padding: 1rem 1.4rem; border: 1px solid var(--gold); text-align: center;
+  box-shadow: 0 20px 40px -20px rgba(28, 20, 21, .5);
 }
 .badge .spark { font-size: .9rem; }
-.badge .script { font-size: 1.9rem; display: block; line-height: 1.2; }
+.badge .script { font-size: 1.9rem; display: block; line-height: 1.2; color: var(--on-btn); }
 @media (max-width: 860px) {
   .hero { grid-template-columns: 1fr; }
   .hero-art { max-width: 420px; }
