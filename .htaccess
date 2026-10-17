@@ -1,3 +1,6 @@
+# NOTE: GitHub Pages ignores .htaccess, so none of these headers or options take effect
+# there. They only apply if the site is served by Apache (e.g. the magickmuse.com host).
+
 # Security Headers
 <IfModule mod_headers.c>
   Header always set X-Frame-Options "DENY"

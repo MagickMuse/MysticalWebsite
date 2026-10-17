@@ -23,7 +23,7 @@
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;1,400&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="vendor/phosphor/light/style.css">
   <script>
@@ -42,21 +42,20 @@
 <body>
 <a class="skip" href="#main">Skip to main content</a>
 <header class="site">
-  <nav class="wrap nav" aria-label="Main">
-    <ul class="left">
-      <li><a href="manuscript.html">Grimoire</a></li>
-      <li aria-hidden="true"><i class="spark"></i></li>
-      <li><a href="meetup.html">Coven</a></li>
-      <li aria-hidden="true"><i class="spark"></i></li>
-    </ul>
+  <div class="wrap nav">
     <a class="logo" href="index.html">Magick Muse</a>
-    <ul class="right">
-      <li aria-hidden="true"><i class="spark"></i></li>
-      <li><a href="mastery.html">Blog</a></li>
-      <li aria-hidden="true"><i class="spark"></i></li>
-      <li><a href="story.html">Our Story</a></li>
-    </ul>
-  </nav>
+    <button class="menu" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+    <nav id="site-menu" aria-label="Main">
+      <ul class="left">
+        <li><a href="manuscript.html">Grimoire</a></li>
+        <li><a href="meetup.html">Coven</a></li>
+      </ul>
+      <ul class="right">
+        <li><a href="mastery.html">Blog</a></li>
+        <li><a href="story.html">Our Story</a></li>
+      </ul>
+    </nav>
+  </div>
 </header>
 <main id="main">
   <section class="wrap">
@@ -87,19 +86,19 @@
 
   <div class="names">
     <ul class="wrap" aria-label="Grimoires in the Manuscript">
-      <li>Astrology Grimoire</li>
+      <li>Astrology</li>
       <li aria-hidden="true"><i class="spark"></i></li>
-      <li>Crystal Grimoire</li>
+      <li>Minerals</li>
       <li aria-hidden="true"><i class="spark"></i></li>
-      <li>Deity &amp; Spirit Grimoire</li>
+      <li>Entities</li>
       <li aria-hidden="true"><i class="spark"></i></li>
-      <li>Plant Grimoire</li>
+      <li>Plants</li>
       <li aria-hidden="true"><i class="spark"></i></li>
-      <li>Tarot Grimoire</li>
+      <li>Cards</li>
       <li aria-hidden="true"><i class="spark"></i></li>
-      <li>Ritual &amp; Spell Grimoire</li>
+      <li>Rituals</li>
       <li aria-hidden="true"><i class="spark"></i></li>
-      <li>Correspondences Grimoire</li>
+      <li>Correspondences</li>
     </ul>
   </div>
 
@@ -140,14 +139,10 @@
     <div class="intro">
       <h2 id="home-praise">What practitioners <span class="script">say</span></h2>
     </div>
-    <div class="cards">
+    <div class="cards pairs">
       <blockquote class="quote">
-        <p>"The moon phase and sign is correct. I just bought my membership and logged in, and saw the moon widget. Checked it against my pro astrology app and it was precisely accurate to the degree, minute, and sign. I can't tell you how much that meant to me. I'm so happy and grateful for this. I feel blessed."</p>
+        <p>"The moon phase and sign is correct. I just bought [the Manuscript] and logged in, and saw the moon widget. Checked it against my pro astrology app and it was precisely accurate to the degree, minute, and sign. I can't tell you how much that meant to me. I'm so happy and grateful for this. I feel blessed."</p>
         <cite>amDevine</cite>
-      </blockquote>
-      <blockquote class="quote">
-        <p>"I bought the blank template and love it! It makes the process of studying so much easier and less intimidating."</p>
-        <cite>Anonymous</cite>
       </blockquote>
       <blockquote class="quote">
         <p>"I have just started scratching the surface and already love your work so much! Something about how everything is SO interlinked makes my 'practically raised by tech' brain so happy, it just feels streamlined!!"</p>
