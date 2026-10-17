@@ -1,8 +1,12 @@
 (function () {
-  // Gumroad click tracking for analytics
+  var SEEN_KEY = 'tmm_popup_seen';
+
+  // Gumroad clicks: analytics event, and never show the exit offer afterwards
   document.addEventListener('click', function (e) {
     var link = e.target.closest('a[href*="themagickmuse.gumroad.com"]');
-    if (!link || typeof gtag !== 'function') return;
+    if (!link) return;
+    try { localStorage.setItem(SEEN_KEY, '1'); } catch (err) {}
+    if (typeof gtag !== 'function') return;
     var href = link.href;
     var type = 'store';
     if (href.indexOf('/l/manuscript') !== -1) type = 'manuscript';
@@ -13,26 +17,51 @@
     });
   });
 
-  // Exit-intent offer: once per visitor, on mouse leaving the top edge or after 90s
+  // Mobile menu
+  var menuButton = document.querySelector('.menu');
+  var menu = document.getElementById('site-menu');
+  if (menuButton && menu) {
+    var setMenu = function (open) {
+      menuButton.setAttribute('aria-expanded', String(open));
+      menu.classList.toggle('open', open);
+    };
+    menuButton.addEventListener('click', function () {
+      setMenu(menuButton.getAttribute('aria-expanded') !== 'true');
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') {
+        setMenu(false);
+        menuButton.focus();
+      }
+    });
+  }
+
+  // Exit-intent offer: desktop pointers only, top-edge exit only, not in the first 20s,
+  // once per visitor, and never after a Gumroad click.
   var offer = document.getElementById('offer');
-  if (offer && typeof offer.showModal === 'function') {
-    var SEEN_KEY = 'tmm_popup_seen';
-    var seen = false;
-    try { seen = !!(sessionStorage.getItem(SEEN_KEY) || localStorage.getItem(SEEN_KEY)); } catch (e) {}
-    if (!seen) {
-      var shown = false;
-      var show = function () {
-        if (shown) return;
-        shown = true;
-        try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) {}
-        offer.showModal();
-      };
-      document.addEventListener('mouseleave', function (e) { if (e.clientY < 10) show(); });
-      setTimeout(show, 90000);
-    }
+  var desktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (offer && desktop && typeof offer.showModal === 'function') {
+    var seen = function () {
+      try { return !!(sessionStorage.getItem(SEEN_KEY) || localStorage.getItem(SEEN_KEY)); } catch (e) { return true; }
+    };
+    var armedAt = Date.now() + 20000;
+    document.addEventListener('mouseleave', function (e) {
+      if (e.clientY >= 10 || Date.now() < armedAt || offer.open || seen()) return;
+      try { localStorage.setItem(SEEN_KEY, '1'); } catch (err) {}
+      offer.showModal();
+    });
     offer.addEventListener('click', function (e) {
       if (e.target === offer || e.target.closest('[data-close]')) offer.close();
     });
+  }
+
+  // Mobile buy bar: appears once the hero has scrolled out of view
+  var buybar = document.getElementById('buybar');
+  var hero = document.querySelector('.hero');
+  if (buybar && hero && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      buybar.classList.toggle('shown', !entries[0].isIntersecting);
+    }).observe(hero);
   }
 
   // Blog search and topic filter
