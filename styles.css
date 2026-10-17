@@ -235,10 +235,13 @@ a.card:hover { border-color: var(--accent); }
 @media (max-width: 860px) { .cards { grid-template-columns: 1fr; } }
 
 /* grimoire library: 5 / 3 / 2 across */
-.library { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2rem 1.6rem; list-style: none; margin: 0; padding: 0; }
+.library { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2rem 1.6rem; max-width: 1200px; list-style: none; margin: 0 auto; padding: 0; }
 .grimoire { display: grid; gap: .6rem; align-content: start; justify-items: center; text-align: center; text-decoration: none; }
 .grimoire .frame { width: 100%; }
-.grimoire .frame { aspect-ratio: 3 / 4; transition: transform .4s ease; }
+.grimoire .frame { aspect-ratio: 1; transition: transform .4s ease; }
+.grimoire .frame > * { grid-area: 1 / 1; }
+.grimoire .frame::after { content: ""; position: absolute; inset: 0; background: var(--frame); opacity: .82; }
+.grimoire .frame .ph-light, .grimoire .frame .glyph { position: relative; z-index: 1; }
 .grimoire .ph-light { font-size: 2.6rem; color: var(--on-btn); }
 .grimoire .glyph { width: 2.6rem; height: 2.6rem; color: var(--on-btn); }
 a.grimoire:hover .frame { transform: translateY(-6px); }
