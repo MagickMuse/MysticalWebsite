@@ -335,7 +335,7 @@ select.field { flex: 0 1 240px; }
 .prose a:not(.btn) { color: var(--accent-text); text-underline-offset: 3px; }
 .prose ul { padding-left: 1.4rem; }
 .prose li + li { margin-top: .5rem; }
-.prose .signature { font-family: var(--display); font-style: italic; font-size: 1.4rem; }
+.signature { font-family: var(--display); font-style: italic; font-size: 1.4rem; }
 mark { background: none; color: var(--accent-text); font-weight: 400; }
 .stars { list-style: none; padding-left: 0; }
 .prose .stars { padding-left: 0; }
