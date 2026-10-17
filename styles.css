@@ -265,6 +265,8 @@ a.grimoire:hover .frame { transform: translateY(-6px); }
 .posts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3rem 2.4rem; }
 .post { display: grid; gap: .9rem; align-content: start; }
 .post .frame { aspect-ratio: 4 / 3; }
+.post a.frame img { transition: transform .4s ease; }
+.post a.frame:hover img { transform: scale(1.04); }
 .post h3 { font-size: 1.6rem; }
 .post p { color: var(--muted); font-size: .95rem; }
 .post .link { justify-self: start; }
@@ -364,6 +366,15 @@ select.field { flex: 0 1 240px; }
 .article-head .lede { text-align: center; }
 .article-head .meta { justify-content: center; color: var(--muted); }
 .article-art { position: relative; width: min(100%, 420px); margin: 3rem auto 0; }
+.article-top { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: clamp(2rem, 6vw, 5rem); align-items: center; max-width: 1200px; margin-inline: auto; }
+.article-top .article-art { margin: 0; }
+.article-top .article-head { justify-items: start; text-align: left; margin: 0; }
+.article-top .article-head .lede { text-align: left; }
+.article-top .article-head .meta { justify-content: flex-start; }
+@media (max-width: 860px) {
+  .article-top { grid-template-columns: 1fr; }
+  .article-top .article-art { width: min(100%, 360px); margin-inline: auto; }
+}
 .article-art .frame { aspect-ratio: 4 / 5; }
 .prose { max-width: 65ch; margin-inline: auto; padding-top: clamp(3rem, 7vw, 5rem); font-size: 1.06rem; }
 .prose > * + * { margin-top: 1.3rem; }
@@ -472,5 +483,5 @@ footer.site { padding-block: 4rem 2.5rem; border-top: 1px solid var(--line); }
   .marquee { width: auto; animation: none; }
   .marquee ul { flex: 1; flex-wrap: wrap; justify-content: center; white-space: normal; padding-inline: 24px; row-gap: .6rem; }
   .marquee ul[aria-hidden="true"], .marquee li:last-child { display: none; }
-  .grimoire .frame, .btn, a.card, .buybar, .carousel-nav button { transition: none; }
+  .grimoire .frame, .btn, a.card, .buybar, .carousel-nav button, .post a.frame img { transition: none; }
 }
