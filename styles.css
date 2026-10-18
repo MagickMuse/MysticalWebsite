@@ -288,7 +288,6 @@ section.tight { padding-block: clamp(2.5rem, 5vw, 4rem); }
 .courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem clamp(2rem, 4vw, 3.5rem); max-width: 1200px; margin-inline: auto; }
 .course { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); gap: clamp(1.4rem, 3vw, 2rem); align-items: center; }
 .course .frame { aspect-ratio: 4 / 5; }
-.course .glyph { width: 2.8rem; height: 2.8rem; color: var(--on-btn); }
 .course-text { display: grid; gap: .6rem; justify-items: start; }
 .course-text h3 { font-size: clamp(1.8rem, 3vw, 2.3rem); }
 .course-text .actions { margin-top: .4rem; }
