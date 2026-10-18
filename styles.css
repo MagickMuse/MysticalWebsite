@@ -383,6 +383,8 @@ section.tight { padding-block: clamp(2.5rem, 5vw, 4rem); }
 .article-head h1 { font-size: clamp(2.8rem, 7vw, 5rem); }
 .article-head .lede { text-align: center; }
 .article-head .meta { justify-content: center; color: var(--muted); }
+.article-head .meta a { display: inline-block; padding-block: 14px; margin-block: -14px; color: inherit; text-underline-offset: 3px; }
+.article-head .meta a:hover { color: var(--accent-text); }
 .article-art { position: relative; width: min(100%, 420px); margin: 3rem auto 0; }
 .article-top { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: clamp(2rem, 6vw, 5rem); align-items: center; max-width: 1200px; margin-inline: auto; }
 .article-top .article-art { margin: 0; }
