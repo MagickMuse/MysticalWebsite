@@ -1,359 +1,372 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Magick Muse</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap">
-<style>
-/* Layout: soft editorial author site — airy split hero, arched image frames, centered section intros, generous whitespace */
-:root {
-  --bg: #f7f1ec;
-  --surface: #efe4dc;
-  --ink: #3a2e2c;
-  --muted: #8a7670;
-  --accent: #b88378;
-  --line: #e2d3c9;
-  --gold: #c09a4e;
-  --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C12.9 8.2 15.8 11.1 24 12 15.8 12.9 12.9 15.8 12 24 11.1 15.8 8.2 12.9 0 12 8.2 11.1 11.1 8.2 12 0Z'/%3E%3C/svg%3E");
-  --frame: linear-gradient(160deg, #e8d3c8 0%, #d9b9ad 55%, #c9a195 100%);
-  --display: "Cormorant", "Cormorant Garamond", Georgia, serif;
-  --body: "Jost", "Helvetica Neue", Arial, sans-serif;
-  --script: "Pinyon Script", "Brush Script MT", cursive;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #1f1a19; --surface: #2a2321; --ink: #f1e6df; --muted: #b3a097;
-    --accent: #d7a497; --line: #3d3330; --gold: #dcb96d;
-    --frame: linear-gradient(160deg, #4a3833 0%, #5e443d 55%, #6f5048 100%);
-    color-scheme: dark;
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-nbBdGM04lrgdMJq57pnsBPi1/HSQ9f3P7tdsBKAfDj8=' 'sha256-/Pp8jRM4DkmNirYTjUf8l9DbufSTYqWMkiE9268C8rE=' https://*.googletagmanager.com; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.unsplash.com https://images.pexels.com https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="google-site-verification" content="sGNCHaN7FyM9XNpVW4JOatRXMUf2DCktar3FvZSES8A" />
+  <title>Digital Grimoire for Witches | The Magick Muse</title>
+  <meta name="description" content="A living digital grimoire for witches: 20,000+ pages of cross-linked research on crystals, deities, plants, astrology, ritual, tarot, and more." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="The Magick Muse" />
+  <meta property="og:title" content="Digital Grimoire for Witches | The Magick Muse" />
+  <meta property="og:description" content="A living digital grimoire for witches: 20,000+ pages of cross-linked research on crystals, deities, plants, astrology, ritual, tarot, and more." />
+  <meta property="og:url" content="https://magickmuse.com/" />
+  <link rel="canonical" href="https://magickmuse.com/" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1606503479977-3568c9d5c94e?q=80&w=1200&auto=format&fit=crop" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Digital Grimoire for Witches | The Magick Muse" />
+  <meta name="twitter:description" content="A living digital grimoire for witches: 20,000+ pages of cross-linked research on crystals, deities, plants, astrology, ritual, tarot, and more." />
+  <meta name="twitter:image" content="https://images.unsplash.com/photo-1606503479977-3568c9d5c94e?q=80&w=1200&auto=format&fit=crop" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://magickmuse.com/#org",
+        "name": "The Magick Muse",
+        "url": "https://magickmuse.com/",
+        "logo": "https://magickmuse.com/icon-512.png",
+        "email": "TheMagickMuse.co@gmail.com",
+        "sameAs": [
+          "https://www.pinterest.com/themagickmuseco/",
+          "https://www.instagram.com/the_magick_muse/",
+          "https://www.tiktok.com/@the.magick.muse",
+          "https://themagickmuse.gumroad.com/",
+          "https://discord.com/invite/PBr2BtCpxk"
+        ],
+        "description": "The Magick Muse makes The Magick Manuscript, a living digital grimoire in Notion: 15 cross-linked witchcraft grimoires and 20,000+ pages of research sourced from published books, plus free guides, beginner courses, and a Discord community.",
+        "founder": {
+          "@type": "Person",
+          "name": "Avelynn",
+          "url": "https://magickmuse.com/story.html"
+        },
+        "knowsAbout": [
+          "Witchcraft",
+          "Grimoires",
+          "Digital grimoire",
+          "Book of shadows",
+          "Magickal correspondences",
+          "Tarot",
+          "Runes",
+          "Crystals",
+          "Herbalism",
+          "Astrology",
+          "Deity work",
+          "Ancestor veneration",
+          "Protection magick"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://magickmuse.com/#site",
+        "name": "The Magick Muse",
+        "url": "https://magickmuse.com/",
+        "publisher": {
+          "@id": "https://magickmuse.com/#org"
+        }
+      }
+    ]
   }
-}
-:root[data-theme="dark"] {
-  --bg: #1f1a19; --surface: #2a2321; --ink: #f1e6df; --muted: #b3a097;
-  --accent: #d7a497; --line: #3d3330; --gold: #dcb96d;
-  --frame: linear-gradient(160deg, #4a3833 0%, #5e443d 55%, #6f5048 100%);
-  color-scheme: dark;
-}
-
-* { box-sizing: border-box; }
-
-/* gold four-point stars */
-.spark {
-  display: inline-block; width: 1em; height: 1em; flex: none; vertical-align: middle;
-  background: var(--gold);
-  -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat;
-}
-.twinkle { animation: twinkle 4s ease-in-out infinite; }
-.twinkle.d2 { animation-delay: 1.3s; }
-.twinkle.d3 { animation-delay: 2.6s; }
-@keyframes twinkle { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .55; transform: scale(.8); } }
-@media (prefers-reduced-motion: reduce) { .twinkle { animation: none; } }
-.intro .eyebrow { display: inline-flex; align-items: center; gap: .9rem; }
-.intro .eyebrow::before, .intro .eyebrow::after {
-  content: ""; width: .8rem; height: .8rem; background: var(--gold);
-  -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat;
-}
-.star-rule { display: flex; align-items: center; gap: 1rem; color: var(--gold); }
-.star-rule::before, .star-rule::after { content: ""; flex: 1; height: 1px; background: var(--line); }
-.stars-float { position: absolute; inset: 0; pointer-events: none; }
-.stars-float .spark { position: absolute; }
-html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body {
-  background: var(--bg); color: var(--ink);
-  font-family: var(--body); font-weight: 300; font-size: 1rem; line-height: 1.7;
-}
-.wrap { max-width: 1160px; margin-inline: auto; padding-inline: 24px; }
-a { color: inherit; }
-a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-
-h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.05; margin: 0; text-wrap: balance; }
-.eyebrow {
-  font-size: .72rem; letter-spacing: .28em; text-transform: uppercase;
-  color: var(--accent); font-weight: 500; margin: 0;
-}
-.script { font-family: var(--script); color: var(--accent); font-weight: 400; }
-p { margin: 0; max-width: 62ch; }
-
-.btn {
-  display: inline-block; text-decoration: none; font-family: var(--body);
-  font-size: .75rem; letter-spacing: .22em; text-transform: uppercase; font-weight: 500;
-  padding: 1rem 2rem; border: 1px solid var(--ink); background: var(--ink); color: var(--bg);
-  transition: background .3s, color .3s; cursor: pointer;
-}
-.btn:hover { background: transparent; color: var(--ink); }
-.btn.ghost { background: transparent; color: var(--ink); }
-.btn.ghost:hover { background: var(--ink); color: var(--bg); }
-.link { font-size: .75rem; letter-spacing: .22em; text-transform: uppercase; font-weight: 500;
-  text-decoration: none; border-bottom: 1px solid var(--accent); padding-bottom: 4px; }
-
-/* placeholder image frames */
-.ph {
-  background: var(--frame); position: relative; overflow: hidden;
-  display: grid; place-items: center; max-width: 100%;
-}
-.ph span {
-  font-size: .65rem; letter-spacing: .25em; text-transform: uppercase;
-  color: rgba(255,255,255,.85); font-weight: 500;
-}
-.arch { border-radius: 999px 999px 0 0; }
-
-/* nav */
-header.site {
-  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
-  background: color-mix(in srgb, var(--bg) 92%, transparent);
-  backdrop-filter: blur(8px); border-bottom: 1px solid var(--line);
-}
-.nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1.6rem; padding-block: 1.1rem; }
-.logo { font-family: var(--display); font-size: 1.6rem; font-style: italic; text-decoration: none; letter-spacing: .02em; white-space: nowrap; }
-.nav .logo { font-size: 2rem; text-align: center; }
-.nav ul { display: flex; align-items: center; gap: 1.4rem; list-style: none; margin: 0; padding: 0; }
-.nav ul.left { justify-content: flex-end; }
-.nav ul.right { justify-content: flex-start; }
-.nav ul .spark { font-size: .6rem; }
-.nav ul a { text-decoration: none; font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; font-weight: 400; }
-.nav ul a:hover { color: var(--accent); }
-@media (max-width: 760px) { .nav { grid-template-columns: 1fr; } .nav ul { display: none; } }
-
-section { padding-block: clamp(4rem, 9vw, 7.5rem); }
-
-/* hero */
-.hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: clamp(2rem, 6vw, 5rem); align-items: center; }
-.hero-text { display: grid; gap: 1.6rem; min-width: 0; }
-.hero h1 { font-size: clamp(3.2rem, 8vw, 6.4rem); }
-.hero h1 em { font-style: italic; color: var(--accent); }
-.hero .lede { font-size: 1.1rem; color: var(--muted); }
-.hero .actions { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
-.hero-art { position: relative; }
-.hero-art .ph { aspect-ratio: 4 / 5; width: 100%; }
-.hero-art .badge {
-  position: absolute; left: -2rem; bottom: 2.5rem; background: var(--bg);
-  padding: 1rem 1.4rem; border: 1px solid var(--line); text-align: center;
-}
-.hero-art .badge .script { font-size: 1.9rem; display: block; line-height: 1; }
-.hero-art .badge small { font-size: .65rem; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
-@media (max-width: 860px) {
-  .hero { grid-template-columns: 1fr; }
-  .hero-art { max-width: 420px; }
-  .hero-art .badge { left: 1rem; }
-}
-
-/* section intro */
-.intro { display: grid; gap: .9rem; justify-items: center; text-align: center; margin-bottom: 3.5rem; }
-.intro h2 { font-size: clamp(2.4rem, 5vw, 3.6rem); }
-.intro p { color: var(--muted); }
-
-/* featured book */
-.featured { background: var(--surface); }
-.feature-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(2rem, 6vw, 5rem); align-items: center; }
-.cover { aspect-ratio: 2 / 3; width: 100%; max-width: 360px; box-shadow: 0 30px 60px -30px rgba(58,46,44,.45); justify-self: center; }
-.feature-text { display: grid; gap: 1.4rem; min-width: 0; }
-.feature-text h2 { font-size: clamp(2.6rem, 5vw, 4rem); font-style: italic; }
-.meta { display: flex; flex-wrap: wrap; gap: .5rem 2rem; font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
-.quote { font-family: var(--display); font-size: 1.5rem; font-style: italic; border-left: 1px solid var(--accent); padding-left: 1.4rem; line-height: 1.35; }
-.quote cite { display: block; font-family: var(--body); font-style: normal; font-size: .7rem; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); margin-top: .8rem; }
-.retailers { display: flex; flex-wrap: wrap; gap: .8rem; }
-@media (max-width: 860px) { .feature-grid { grid-template-columns: 1fr; } }
-
-/* books */
-.books { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2rem; }
-.book { display: grid; gap: .8rem; text-decoration: none; }
-.book .ph { aspect-ratio: 2 / 3; transition: transform .4s ease; }
-.book:hover .ph { transform: translateY(-6px); }
-.book h3 { font-size: 1.5rem; }
-.book small { font-size: .68rem; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
-@media (max-width: 900px) { .books { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (prefers-reduced-motion: reduce) { .book .ph { transition: none; } }
-
-/* about */
-.about { display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(2rem, 6vw, 5rem); align-items: center; }
-.about .ph { aspect-ratio: 3 / 4; width: 100%; max-width: 440px; }
-.about-text { display: grid; gap: 1.4rem; min-width: 0; }
-.about-text h2 { font-size: clamp(2.4rem, 5vw, 3.6rem); }
-.about-text .script { font-size: 2.6rem; line-height: 1; }
-@media (max-width: 860px) { .about { grid-template-columns: 1fr; } }
-
-/* journal */
-.posts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.4rem; }
-.post { display: grid; gap: .9rem; align-content: start; }
-.post .ph { aspect-ratio: 4 / 3; }
-.post h3 { font-size: 1.6rem; }
-.post p { color: var(--muted); font-size: .95rem; }
-@media (max-width: 860px) { .posts { grid-template-columns: 1fr; } }
-
-/* newsletter */
-.letter { background: var(--surface); text-align: center; }
-.letter-inner { display: grid; gap: 1.2rem; justify-items: center; max-width: 640px; margin-inline: auto; }
-.letter h2 { font-size: clamp(2.4rem, 5vw, 3.6rem); }
-.letter p { color: var(--muted); }
-.signup { display: flex; flex-wrap: wrap; gap: .8rem; width: 100%; margin-top: 1rem; }
-.signup input {
-  flex: 1 1 240px; min-width: 0; padding: 1rem 1.2rem; border: 1px solid var(--line);
-  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: .95rem;
-}
-.signup .btn { flex: 0 0 auto; }
-.note { font-size: .8rem; color: var(--accent); min-height: 1.4em; }
-
-/* footer */
-footer { padding-block: 4rem 2.5rem; border-top: 1px solid var(--line); }
-.foot { display: grid; gap: 2rem; justify-items: center; text-align: center; }
-.foot .logo { font-size: 2.4rem; }
-.foot ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem 2rem; list-style: none; padding: 0; margin: 0; }
-.foot ul a { text-decoration: none; font-size: .7rem; letter-spacing: .22em; text-transform: uppercase; }
-.foot small { font-size: .72rem; color: var(--muted); letter-spacing: .05em; }
-</style>
-<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+  </script>
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="alternate" type="application/rss+xml" title="Magick Mastery" href="feed.xml">
+  <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
+  <link rel="preload" href="fonts/jost-300.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/cormorant-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/cormorant-400-italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/jost-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {analytics_storage: 'denied', ad_storage: 'denied'});
+  </script>
+  <script>
+    gtag('js', new Date());
+    gtag('config', 'G-0DV5GLQV05');
+  </script>
+  <script src="cookie-consent.js" defer></script>
+  <script src="site.js" defer></script>
 </head>
 <body>
+<a class="skip" href="#main">Skip to main content</a>
 <header class="site">
-  <nav class="wrap nav" aria-label="Main">
-    <ul class="left">
-      <li><a href="#books">Books</a></li>
-      <li aria-hidden="true"><i class="spark"></i></li>
-      <li><a href="#about">About</a></li>
-      <li aria-hidden="true"><i class="spark"></i></li>
-    </ul>
-    <a class="logo" href="#top">Magick Muse</a>
-    <ul class="right">
-      <li aria-hidden="true"><i class="spark"></i></li>
-      <li><a href="#journal">Journal</a></li>
-      <li aria-hidden="true"><i class="spark"></i></li>
-      <li><a href="#newsletter">Newsletter</a></li>
-    </ul>
-  </nav>
+  <div class="wrap nav">
+    <a class="logo" href="index.html">Magick Muse</a>
+    <button class="menu" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+    <nav id="site-menu" aria-label="Main">
+      <ul class="left">
+        <li><a href="grimoires.html"><span>Manuscript</span><small>the grimoire</small></a></li>
+        <li><a href="meetup.html"><span>Muses</span><small>the coven</small></a></li>
+      </ul>
+      <ul class="right">
+        <li><a href="mastery.html"><span>Mastery</span><small>guides &amp; courses</small></a></li>
+        <li><a href="story.html"><span>Mythos</span><small>our story</small></a></li>
+      </ul>
+    </nav>
+  </div>
 </header>
-
-<main id="top">
+<main id="main">
   <section class="wrap">
     <div class="hero">
       <div class="hero-text">
-        <p class="eyebrow">Author &middot; Your Genre</p>
-        <h1>Stories about <em>your theme</em> go here <i class="spark twinkle" style="font-size:.45em" aria-hidden="true"></i></h1>
-        <p class="lede">A short line introducing who you are and the kind of books you write. Keep it to one or two sentences so it reads at a glance.</p>
+        <p class="eyebrow">A Living Digital Grimoire</p>
+        <h1>The Magick <em>Manuscript</em> <i class="spark twinkle" aria-hidden="true"></i></h1>
+        <p class="lede">One home for everything you're learning, and everything you haven't asked yet.<br>20,000 pages of researched, cross-linked magick, all searchable in one place.</p>
         <div class="actions">
-          <a class="btn" href="#books">Explore the books</a>
-          <a class="link" href="#about">Meet the author</a>
+          <a class="btn" href="https://themagickmuse.gumroad.com/l/manuscript" target="_blank" rel="noopener">Get the Manuscript</a>
+          <a class="link" href="grimoires.html">Peek Inside the Manuscript</a>
         </div>
       </div>
       <div class="hero-art">
-        <div class="ph arch"><span>Author photo</span></div>
+        <div class="frame arch"><img src="https://images.pexels.com/photos/7978847/pexels-photo-7978847.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=840&h=1050" srcset="https://images.pexels.com/photos/7978847/pexels-photo-7978847.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=480&h=600 480w, https://images.pexels.com/photos/7978847/pexels-photo-7978847.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=840&h=1050 840w, https://images.pexels.com/photos/7978847/pexels-photo-7978847.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=1200&h=1500 1200w" sizes="(max-width: 860px) 420px, 600px" alt="A leather-bound book with a wand lying beside it" width="840" height="1050" fetchpriority="high"></div>
         <div class="stars-float" aria-hidden="true">
-          <i class="spark twinkle" style="font-size:2.6rem;top:-1.2rem;right:-.6rem"></i>
-          <i class="spark twinkle d2" style="font-size:1.2rem;top:2.4rem;right:-1.6rem"></i>
-          <i class="spark twinkle d3" style="font-size:1rem;top:38%;left:-1.4rem"></i>
+          <i class="spark twinkle s1"></i>
+          <i class="spark twinkle d2 s2"></i>
+          <i class="spark twinkle d3 s3"></i>
         </div>
         <div class="badge">
-          <i class="spark" style="font-size:.9rem" aria-hidden="true"></i>
-          <span class="script">New release</span>
-          <small>Coming Season 2027</small>
+          <i class="spark" aria-hidden="true"></i>
+          <span class="script">Always growing</span>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="featured" id="featured">
-    <div class="wrap feature-grid">
-      <div style="position:relative;justify-self:center;width:100%;max-width:360px">
-        <div class="ph cover"><span>Book cover</span></div>
-        <div class="stars-float" aria-hidden="true">
-          <i class="spark twinkle" style="font-size:2rem;top:-1rem;left:-1rem"></i>
-          <i class="spark twinkle d2" style="font-size:1.4rem;bottom:1.5rem;right:-.8rem"></i>
-        </div>
+  <div class="names">
+    <div class="marquee">
+      <ul aria-label="Grimoires in the Manuscript">
+        <li>Astrology Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+        <li>Crystal Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+        <li>Deity &amp; Spirit Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+        <li>Plant Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+        <li>Tarot Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+        <li>Ritual &amp; Spell Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+        <li>Correspondences Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+      </ul>
+      <ul aria-hidden="true">
+        <li>Astrology Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+        <li>Crystal Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+        <li>Deity &amp; Spirit Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+        <li>Plant Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+        <li>Tarot Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+        <li>Ritual &amp; Spell Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+        <li>Correspondences Grimoire</li>
+        <li aria-hidden="true"><i class="spark"></i></li>
+      </ul>
+    </div>
+  </div>
+
+  <section class="alt" aria-labelledby="home-featured">
+    <div class="wrap">
+      <div class="intro">
+        <p class="eyebrow labelled">The Magick Manuscript</p>
+        <h2 id="home-featured">Your practice deserves <em>a proper home.</em></h2>
+        <ul class="meta">
+          <li>20,000+ Total Pages</li>
+          <li>15 Grimoires</li>
+          <li>170+ Guide Pages</li>
+          <li>950+ Coven Members</li>
+          <li>200k+ Additions &amp; Edits</li>
+        </ul>
       </div>
-      <div class="feature-text">
-        <p class="eyebrow">Featured novel</p>
-        <h2>Book Title</h2>
-        <div class="meta"><span>Series name, Book One</span><span>000 pages</span><span>Publisher</span></div>
-        <p>Your book's back-cover blurb goes here. Two or three short paragraphs work best: the setup, the stakes, and the hook that makes a reader want to start chapter one.</p>
-        <blockquote class="quote">&ldquo;A short review pull quote from a reader or fellow author.&rdquo;<cite>Reviewer name, Publication</cite></blockquote>
-        <div class="retailers">
-          <a class="btn" href="#">Buy the book</a>
-          <a class="btn ghost" href="#">Read an excerpt</a>
+      <div class="feature-grid">
+        <div class="feature-art">
+          <img class="shot" src="assets/grimoire-selection-screenshot-1200.webp" srcset="assets/grimoire-selection-screenshot-700.webp 700w, assets/grimoire-selection-screenshot-1200.webp 1200w" sizes="(max-width: 860px) 100vw, 60vw" alt="All 15 grimoires listed with descriptions and The Index" width="1200" height="680" loading="lazy">
+          <div class="stars-float" aria-hidden="true">
+            <i class="spark twinkle s1"></i>
+            <i class="spark twinkle d2 s2"></i>
+          </div>
+        </div>
+        <div class="feature-text">
+          <p>Most practitioners are piecing together their craft from a dozen scattered sources: Reddit threads of uncertain origin, books that contradict each other, notes buried in apps they'll never open again. The knowledge is out there. Getting to it is the problem.</p>
+          <p>The Magick Manuscript is one living Notion database: 15 cross-linked grimoires, every entry sourced from reputable published scholarship, all searchable in one place. I stopped wishing something like this existed and built it myself.</p>
+          <div class="actions">
+            <a class="btn" href="https://themagickmuse.gumroad.com/l/manuscript" target="_blank" rel="noopener">Get the Manuscript</a>
+            <a class="btn ghost" href="grimoires.html">Peek inside</a>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="wrap" id="books">
+  <section class="wrap" aria-labelledby="home-praise">
     <div class="intro">
-      <p class="eyebrow">The library</p>
-      <h2>All <span class="script">books</span></h2>
-      <p>A sentence about your backlist, series, or reading order.</p>
+      <h2 id="home-praise">What practitioners <span class="script">say</span></h2>
     </div>
-    <div class="books">
-      <a class="book" href="#"><div class="ph"><span>Cover</span></div><small>Book one</small><h3>Book Title</h3></a>
-      <a class="book" href="#"><div class="ph"><span>Cover</span></div><small>Book two</small><h3>Book Title</h3></a>
-      <a class="book" href="#"><div class="ph"><span>Cover</span></div><small>Book three</small><h3>Book Title</h3></a>
-      <a class="book" href="#"><div class="ph"><span>Cover</span></div><small>Novella</small><h3>Book Title</h3></a>
+    <div class="cards">
+      <blockquote class="quote">
+        <p>"Oh boy, I just opened the notion template a couple of hours ago!! WOW!! It must have taken forever to build, it's way more detailed than I was expecting. Very quickly fell down the rabbit hole. I even found info on things I didn't know I wanted to know. Definitely my #1 source for research and info from now on. Well worth the money. Thank you!!!"</p>
+        <cite>GamingGranLiza</cite>
+      </blockquote>
+      <blockquote class="quote">
+        <p>"The moon phase and sign is correct. I just bought [the Manuscript] and logged in, and saw the moon widget. Checked it against my pro astrology app and it was precisely accurate to the degree, minute, and sign. I can't tell you how much that meant to me. I'm so happy and grateful for this. I feel blessed."</p>
+        <cite>amDevine</cite>
+      </blockquote>
+      <blockquote class="quote">
+        <p>"I have just started scratching the surface and already love your work so much! Something about how everything is SO interlinked makes my 'practically raised by tech' brain so happy, it just feels streamlined!!"</p>
+        <cite>Blue Moth</cite>
+      </blockquote>
     </div>
   </section>
 
-  <section class="wrap" id="about">
+  <section class="alt" id="grimoires" aria-labelledby="home-library">
+    <div class="wrap">
+      <div class="intro">
+        <p class="eyebrow labelled">Inside the Manuscript</p>
+        <h2 id="home-library">15 Grimoires. <em>One searchable system.</em></h2>
+        <p>From crystals and plants to deities, tarot, runes, dreams, rituals, and timing: fifteen cross-linked grimoires spanning 20,000 pages, all searchable in one place.</p>
+      </div>
+      <ul class="library">
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/11236317/pexels-photo-11236317.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M238,80A62,62,0,0,0,132.18,36.14L62.1,105.41a13.94,13.94,0,0,0-4.1,9.9v74.21L27.76,219.76a6,6,0,1,0,8.48,8.48L66.48,198h74.21a13.94,13.94,0,0,0,9.9-4.1l0,0,68.83-69.63h0l.39-.4A61.6,61.6,0,0,0,238,80ZM140.64,44.64a50,50,0,0,1,72,69.36H150.48l37.76-37.76a6,6,0,0,0-8.48-8.48l-48,48h0L118,129.52V67ZM70,115.31a2,2,0,0,1,.56-1.39l35.44-35v62.63l-36,36Zm72.09,70.11a2,2,0,0,1-1.4.58H78.48l37.76-37.75h0L138.48,126h62.35Z"/></svg></div><small>261 pages</small><h3>Animals</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/25324418/pexels-photo-25324418.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M243.39,61.68c-7.24-12.48-27-15-57.24-7.49A93.92,93.92,0,0,0,34.05,128a94.5,94.5,0,0,0,.9,13c-21.86,22.38-29.56,40.78-22.29,53.32,4.5,7.76,14,11.69,27.86,11.69a116.38,116.38,0,0,0,25-3.16c1.45-.32,2.92-.68,4.41-1a93.95,93.95,0,0,0,151.19-86.89c12.65-13,21.11-25.32,23.86-35.6C246.76,72.53,246.24,66.59,243.39,61.68ZM128,46a82.12,82.12,0,0,1,80.19,64.94c-16,15.3-38.14,31.67-63.3,46.12C117.49,172.82,92.79,183,72.85,188.6A82,82,0,0,1,128,46ZM23,188.3c-3.52-6.07,2.31-18.56,15-33a94,94,0,0,0,21.07,36.62C39.42,195.74,26.39,194.08,23,188.3ZM128,210a81.41,81.41,0,0,1-43.35-12.45c20.68-6.71,43.56-17.06,66.22-30.08,22.83-13.12,43.13-27.67,59.05-41.91,0,.81.06,1.62.06,2.44A82.08,82.08,0,0,1,128,210ZM233.35,76.21c-1.88,7-7.28,15.49-15.36,24.61a93.92,93.92,0,0,0-21.1-36.7c15.82-3.05,32-3.49,36.12,3.58C234.2,69.75,234.31,72.62,233.35,76.21Z"/></svg></div><small>132 pages</small><h3>Astrology</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/16594830/pexels-photo-16594830.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M184,74H40A14,14,0,0,0,26,88V200a14,14,0,0,0,14,14H184a14,14,0,0,0,14-14V88A14,14,0,0,0,184,74Zm2,126a2,2,0,0,1-2,2H40a2,2,0,0,1-2-2V88a2,2,0,0,1,2-2H184a2,2,0,0,1,2,2ZM230,56V176a6,6,0,0,1-12,0V56a2,2,0,0,0-2-2H64a6,6,0,0,1,0-12H216A14,14,0,0,1,230,56Z"/></svg></div><small>502 pages</small><h3>Cards</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/53367/cobweb-morgentau-dew-dewdrop-53367.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M230,64a30,30,0,1,0-36,29.4V112a10,10,0,0,1-10,10H96a21.84,21.84,0,0,0-10,2.42v-31a30,30,0,1,0-12,0v69.2a30,30,0,1,0,12,0V144a10,10,0,0,1,10-10h88a22,22,0,0,0,22-22V93.4A30.05,30.05,0,0,0,230,64ZM62,64A18,18,0,1,1,80,82,18,18,0,0,1,62,64ZM98,192a18,18,0,1,1-18-18A18,18,0,0,1,98,192ZM200,82a18,18,0,1,1,18-18A18,18,0,0,1,200,82Z"/></svg></div><small>1,684 pages</small><h3>Correspondences</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/11643390/pexels-photo-11643390.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M238,96a6,6,0,0,1-6,6H214v18a6,6,0,0,1-12,0V102H184a6,6,0,0,1,0-12h18V72a6,6,0,0,1,12,0V90h18A6,6,0,0,1,238,96ZM144,54h10V64a6,6,0,0,0,12,0V54h10a6,6,0,0,0,0-12H166V32a6,6,0,0,0-12,0V42H144a6,6,0,0,0,0,12Zm71.25,100.28a6,6,0,0,1,1.07,6A94,94,0,1,1,95.76,39.68a6,6,0,0,1,7.94,6.79A90.11,90.11,0,0,0,192,154a90.9,90.9,0,0,0,17.53-1.7A6,6,0,0,1,215.25,154.28Zm-14.37,11.34q-4.42.38-8.88.38A102.12,102.12,0,0,1,90,64q0-4.45.38-8.88a82,82,0,1,0,110.5,110.5Z"/></svg></div><small>4,450 pages</small><h3>Dreams</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/10994546/pexels-photo-10994546.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M245.48,125.57c-.34-.78-8.66-19.23-27.24-37.81C201,70.54,171.38,50,128,50S55,70.54,37.76,87.76c-18.58,18.58-26.9,37-27.24,37.81a6,6,0,0,0,0,4.88c.34.77,8.66,19.22,27.24,37.8C55,185.47,84.62,206,128,206s73-20.53,90.24-37.75c18.58-18.58,26.9-37,27.24-37.8A6,6,0,0,0,245.48,125.57ZM128,194c-31.38,0-58.78-11.42-81.45-33.93A134.77,134.77,0,0,1,22.69,128,134.56,134.56,0,0,1,46.55,95.94C69.22,73.42,96.62,62,128,62s58.78,11.42,81.45,33.94A134.56,134.56,0,0,1,233.31,128C226.94,140.21,195,194,128,194Zm0-112a46,46,0,1,0,46,46A46.06,46.06,0,0,0,128,82Zm0,80a34,34,0,1,1,34-34A34,34,0,0,1,128,162Z"/></svg></div><small>2,506 pages</small><h3>Entities</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/16926698/pexels-photo-16926698.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M215.15,40.85A78,78,0,0,0,86.2,121.31l-56.1,56.1a13.94,13.94,0,0,0-4.1,9.9V216a14,14,0,0,0,14,14H72a6,6,0,0,0,6-6V206H96a6,6,0,0,0,6-6V182h18a6,6,0,0,0,4.24-1.76l10.45-10.44A77.59,77.59,0,0,0,160,174h.1A78,78,0,0,0,215.15,40.85ZM226,98.16c-1.12,35.16-30.67,63.8-65.88,63.84a65.93,65.93,0,0,1-24.51-4.67,6,6,0,0,0-6.64,1.26L117.51,170H96a6,6,0,0,0-6,6v18H72a6,6,0,0,0-6,6v18H40a2,2,0,0,1-2-2V187.31a2,2,0,0,1,.58-1.41l58.83-58.83a6,6,0,0,0,1.26-6.64A65.61,65.61,0,0,1,94,95.92C94,60.71,122.68,31.16,157.83,30A66,66,0,0,1,226,98.16ZM190,76a10,10,0,1,1-10-10A10,10,0,0,1,190,76Z"/></svg></div><small>568 pages</small><h3>Materials</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/15081674/pexels-photo-15081674.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M244.52,100.05l-56-64A6,6,0,0,0,184,34H72a6,6,0,0,0-4.52,2l-56,64a6,6,0,0,0,.13,8l112,120a6,6,0,0,0,8.78,0l112-120A6,6,0,0,0,244.52,100.05ZM75.94,110l34.6,86.49L29.81,110Zm91.2,0L128,207.84,88.86,110ZM92,98l36-48,36,48Zm88.06,12h46.13l-80.73,86.49Zm46.72-12H179L140,46h41.28ZM74.72,46H116L77,98H29.22Z"/></svg></div><small>736 pages</small><h3>Minerals</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/9898737/pexels-photo-9898737.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M172.53,49.06a252.86,252.86,0,0,0-41.09-38,6,6,0,0,0-6.88,0,252.86,252.86,0,0,0-41.09,38C56.34,80.26,42,113.09,42,144a86,86,0,0,0,172,0C214,113.09,199.66,80.26,172.53,49.06ZM128,218a74.09,74.09,0,0,1-74-74c0-59.62,59-108.93,74-120.51C143,35.07,202,84.38,202,144A74.09,74.09,0,0,1,128,218Zm53.92-65A55.58,55.58,0,0,1,137,197.92a7,7,0,0,1-1,.08,6,6,0,0,1-1-11.92c17.38-2.92,32.13-17.68,35.08-35.08a6,6,0,1,1,11.84,2Z"/></svg></div><small>295 pages</small><h3>Oils</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/20431430/pexels-photo-20431430.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M221.45,40.19a6,6,0,0,0-5.64-5.64C140.43,30.11,80.14,52.71,54.53,95c-17.44,28.79-16.76,62.8,1.79,96.2L35.76,211.76a6,6,0,1,0,8.48,8.48L64.8,199.68c17.27,9.59,34.7,14.41,51.49,14.41A85.38,85.38,0,0,0,161,201.47C203.29,175.86,225.88,115.57,221.45,40.19Zm-66.66,151c-24.08,14.58-52.64,14.37-81.13-.39l90.59-90.59a6,6,0,0,0-8.48-8.48L65.18,182.34c-14.76-28.49-15-57-.39-81.13,22.68-37.43,76.63-57.8,145-54.95C212.59,114.58,192.22,168.54,154.79,191.21Z"/></svg></div><small>803 pages</small><h3>Plants</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/32354626/pexels-photo-32354626.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M220,200.8,158,97.48V38h10a6,6,0,0,0,0-12H88a6,6,0,0,0,0,12H98V97.48L36,200.8A14,14,0,0,0,48,222H208a14,14,0,0,0,12-21.2ZM109.15,102.23a6,6,0,0,0,.85-3.09V38h36V99.14a6,6,0,0,0,.85,3.09l39.65,66.08c-12.41,3.16-30.86,3-55.79-9.66-16.94-8.58-33-12.8-47.83-12.64ZM209.72,209a2,2,0,0,1-1.74,1H48a2,2,0,0,1-1.71-3l29-48.41c14.89-2.08,31.68,1.55,49.94,10.79C144,178.8,159.67,182,172.42,182A67.89,67.89,0,0,0,192.89,179l16.8,28A2,2,0,0,1,209.72,209Z"/></svg></div><small>1,301 pages</small><h3>Recipes</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/5696724/pexels-photo-5696724.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M246,152a6,6,0,0,1-6,6H222v18a6,6,0,0,1-12,0V158H192a6,6,0,0,1,0-12h18V128a6,6,0,0,1,12,0v18h18A6,6,0,0,1,246,152ZM56,70H74V88a6,6,0,0,0,12,0V70h18a6,6,0,0,0,0-12H86V40a6,6,0,0,0-12,0V58H56a6,6,0,0,0,0,12ZM184,194H174V184a6,6,0,0,0-12,0v10H152a6,6,0,0,0,0,12h10v10a6,6,0,0,0,12,0V206h10a6,6,0,0,0,0-12ZM217.9,78.59,78.58,217.9a14,14,0,0,1-19.8,0L38.09,197.21a14,14,0,0,1,0-19.8L177.41,38.1a14,14,0,0,1,19.8,0L217.9,58.79A14,14,0,0,1,217.9,78.59ZM167.51,112,144,88.49,46.58,185.9a2,2,0,0,0,0,2.83l20.69,20.68a2,2,0,0,0,2.82,0h0Zm41.9-44.73L188.73,46.59a2,2,0,0,0-2.83,0L152.48,80,176,103.52,209.41,70.1A2,2,0,0,0,209.41,67.27Z"/></svg></div><small>5,287 pages</small><h3>Rituals</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.unsplash.com/photo-1627806951929-b12533350dc8?q=70&w=400&h=400&auto=format&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M98,136a6,6,0,0,1,6-6h64a6,6,0,0,1,0,12H104A6,6,0,0,1,98,136Zm6-26h64a6,6,0,0,0,0-12H104a6,6,0,0,0,0,12Zm126,82a30,30,0,0,1-30,30H88a30,30,0,0,1-30-30V64a18,18,0,0,0-36,0c0,6.76,5.58,11.19,5.64,11.23A6,6,0,1,1,20.4,84.8C20,84.48,10,76.85,10,64A30,30,0,0,1,40,34H176a30,30,0,0,1,30,30V170h10a6,6,0,0,1,3.6,1.2C220,171.52,230,179.15,230,192Zm-124,0c0-6.76-5.59-11.19-5.64-11.23A6,6,0,0,1,104,170h90V64a18,18,0,0,0-18-18H64a29.82,29.82,0,0,1,6,18V192a18,18,0,0,0,36,0Zm112,0a14.94,14.94,0,0,0-4.34-10H115.88A24.83,24.83,0,0,1,118,192a29.87,29.87,0,0,1-6,18h88A18,18,0,0,0,218,192Z"/></svg></div><small>139 pages</small><h3>Runes</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/3050270/pexels-photo-3050270.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M228.81,114.89,164.5,91.5,141.11,27.19a13.95,13.95,0,0,0-26.22,0L91.5,91.5,27.19,114.89a13.95,13.95,0,0,0,0,26.22L91.5,164.5l23.39,64.31a13.95,13.95,0,0,0,26.22,0L164.5,164.5l64.31-23.39a13.95,13.95,0,0,0,0-26.22Zm-4.1,15-66.94,24.34a6,6,0,0,0-3.59,3.59l-24.34,66.94a2,2,0,0,1-3.68,0l-24.34-66.94a6,6,0,0,0-3.59-3.59L31.29,129.84a2,2,0,0,1,0-3.68l66.94-24.34a6,6,0,0,0,3.59-3.59l24.34-66.94a2,2,0,0,1,3.68,0l24.34,66.94a6,6,0,0,0,3.59,3.59l66.94,24.34a2,2,0,0,1,0,3.68Z"/></svg></div><small>470 pages</small><h3>Symbols</h3></a></li>
+        <li><a class="grimoire" href="grimoires.html#grimoires"><div class="frame arch"><img src="https://images.pexels.com/photos/20419151/pexels-photo-20419151.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M232.13,143.64a6,6,0,0,0-6-1.49A90.07,90.07,0,0,1,113.86,29.85a6,6,0,0,0-7.49-7.48A102.88,102.88,0,0,0,54.48,58.68,102,102,0,0,0,197.32,201.52a102.88,102.88,0,0,0,36.31-51.89A6,6,0,0,0,232.13,143.64Zm-42,48.29a90,90,0,0,1-126-126A90.9,90.9,0,0,1,99.65,37.66,102.06,102.06,0,0,0,218.34,156.35,90.9,90.9,0,0,1,190.1,191.93Z"/></svg></div><small>758 pages</small><h3>Timing</h3></a></li>
+      </ul>
+      <p class="more"><a class="btn" href="grimoires.html">Explore All 15 Grimoires</a></p>
+    </div>
+  </section>
+
+  <section class="wrap" aria-labelledby="home-pillars">
+    <div class="intro">
+      <p class="eyebrow labelled">One Connected Ecosystem</p>
+      <h2 id="home-pillars">The Magick Muse <em>offers 3 pillars</em></h2>
+    </div>
+    <div class="cards">
+      <a class="card" href="grimoires.html">
+        <h3>Magick <em>Manuscript</em></h3>
+        <p>The living database itself: 15 interconnected grimoires, 20,000 pages of magickal research, updated continuously.</p>
+      </a>
+      <a class="card" href="mastery.html">
+        <h3>Magick <em>Mastery</em></h3>
+        <p>Guides, courses, and free articles that help you use what you're learning. Study deeply, apply confidently.</p>
+      </a>
+      <a class="card" href="meetup.html">
+        <h3>Magick <em>Muses</em></h3>
+        <p>A community space for shared practice. Discussion, Discord, and practitioners who take the craft as seriously as you do.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="wrap" id="about" aria-labelledby="home-about">
     <div class="about">
-      <div class="ph arch"><span>Portrait</span></div>
+      <div class="frame arch"><img src="https://images.pexels.com/photos/6178714/pexels-photo-6178714.jpeg?auto=compress&cs=tinysrgb&w=880&h=1173&fit=crop" alt="Books and grimoire research" width="880" height="1173" loading="lazy"></div>
       <div class="about-text">
-        <p class="eyebrow"><i class="spark" style="font-size:.9rem;margin-right:.5rem" aria-hidden="true"></i>About the author</p>
-        <h2>Hello, I'm <span class="script">Your Name</span></h2>
-        <p>Your bio goes here. Where you write from, what drew you to stories, and a personal detail or two readers will remember.</p>
-        <p>A second paragraph for awards, agents, or what you're working on next.</p>
-        <div><a class="link" href="#">Read the full story</a></div>
+        <p class="eyebrow inline-star">Behind <span class="script">the manuscript</span></p>
+        <h2 id="home-about">What began as a <em>personal grimoire</em></h2>
+        <p>What started as my own private notes spiralled into something far larger: a meticulously researched, cross-referenced database that reflects the relationships between every aspect of magickal practice. I'm neurodivergent, and this work became a deep special interest. I needed to see how every part of the craft connects in order to truly understand it.</p>
+        <p>Every entry is drawn from reputable published sources: books by established scholars and practitioners in witchcraft, folklore, and occult studies. The depth of traditional research, made searchable for a modern practice.</p>
+        <p>My personal practice is rooted in plant work, herbs, candles, tarot, runes, and crystals, with a strong focus on protection magick. Every entry in the Manuscript reflects something I have personally researched and, in most cases, used. My husband handles the technical architecture. I handle the research. Together we built the resource we couldn't find anywhere else.</p>
+        <p class="note">The information within the Magick Manuscript is researched and compiled from reputable published sources, because your practice deserves a foundation you can trust.</p>
+        <div><a class="link" href="story.html">Read Our Story</a></div>
       </div>
     </div>
   </section>
 
-  <section class="wrap" id="journal">
+  <section class="wrap" id="writing" aria-labelledby="home-journal">
     <div class="intro">
-      <p class="eyebrow">From the desk</p>
-      <h2>The <span class="script">journal</span></h2>
+      <p class="eyebrow labelled">Magick Mastery</p>
+      <h2 id="home-journal">Guides from <span class="script">the Curator</span></h2>
     </div>
     <div class="posts">
-      <article class="post"><div class="ph"><span>Image</span></div><p class="eyebrow">Category</p><h3>Post title goes here</h3><p>One or two lines of excerpt to tempt the click.</p><a class="link" href="#">Read more</a></article>
-      <article class="post"><div class="ph"><span>Image</span></div><p class="eyebrow">Category</p><h3>Post title goes here</h3><p>One or two lines of excerpt to tempt the click.</p><a class="link" href="#">Read more</a></article>
-      <article class="post"><div class="ph"><span>Image</span></div><p class="eyebrow">Category</p><h3>Post title goes here</h3><p>One or two lines of excerpt to tempt the click.</p><a class="link" href="#">Read more</a></article>
+      <article class="post">
+        <a class="frame" href="protection-magick-for-beginners.html" tabindex="-1" aria-hidden="true"><img src="https://images.unsplash.com/photo-1553986782-9f6de60b51b4?q=80&w=600&h=450&auto=format&fit=crop" alt="Protection magick candles and crystals" width="600" height="450" loading="lazy"></a>
+        <p class="eyebrow">Protection</p>
+        <h3>Protection Magick for Beginners</h3>
+        <p>Before you manifest anything, protect what you have. Shields, wards, banishing, and the small daily habits that make a protection practice hold.</p>
+        <a class="link" href="protection-magick-for-beginners.html">Read more<span class="sr-only">: Protection Magick for Beginners</span></a>
+      </article>
+      <article class="post">
+        <a class="frame" href="what-to-include-in-a-grimoire.html" tabindex="-1" aria-hidden="true"><img src="https://images.unsplash.com/photo-1621788901272-bd0fa052e402?q=80&w=600&h=450&auto=format&fit=crop" alt="Open grimoire with handwritten notes" width="600" height="450" loading="lazy"></a>
+        <p class="eyebrow">Grimoire</p>
+        <h3>What to Put in Your Grimoire</h3>
+        <p>A grimoire and a Book of Shadows aren't the same thing. A tour of the sections inside The Magick Manuscript, and how to decide what goes in yours.</p>
+        <a class="link" href="what-to-include-in-a-grimoire.html">Read more<span class="sr-only">: What to Put in Your Grimoire</span></a>
+      </article>
+      <article class="post">
+        <a class="frame" href="how-to-find-reliable-witchcraft-information.html" tabindex="-1" aria-hidden="true"><img src="https://images.unsplash.com/photo-1501290741922-b56c0d0884af?q=80&w=600&h=450&auto=format&fit=crop" alt="Open book with light streaming through the pages" width="600" height="450" loading="lazy"></a>
+        <p class="eyebrow">Foundations</p>
+        <h3>How to Spot Witchcraft Misinformation</h3>
+        <p>Black tourmaline protects, or it's dangerous, or it needs a full moon first. Sorting real knowledge from confident guesswork, one red flag at a time.</p>
+        <a class="link" href="how-to-find-reliable-witchcraft-information.html">Read more<span class="sr-only">: How to Spot Witchcraft Misinformation</span></a>
+      </article>
+    </div>
+    <p class="more"><a class="btn ghost" href="mastery.html">See all blogs</a></p>
+  </section>
+
+  <section class="cta" aria-labelledby="home-cta">
+    <div class="wrap cta-inner">
+      <div class="star-rule" aria-hidden="true"><i class="spark twinkle big"></i></div>
+      <p class="eyebrow">20,000 pages. 1 price.</p>
+      <h2 id="home-cta">Your practice has been waiting for a resource this <em>reliable.</em></h2>
+      <a class="btn" href="https://themagickmuse.gumroad.com/l/manuscript" target="_blank" rel="noopener">Get the Manuscript</a>
     </div>
   </section>
 
-  <section class="letter" id="newsletter">
-    <div class="wrap">
-      <div class="letter-inner">
-        <div class="star-rule" aria-hidden="true" style="width:100%"><i class="spark" style="font-size:.7rem"></i><i class="spark twinkle" style="font-size:1.4rem"></i><i class="spark" style="font-size:.7rem"></i></div>
-        <p class="eyebrow">Newsletter</p>
-        <h2>Letters from <span class="script">the desk</span></h2>
-        <p>Invite readers to sign up for release news, bonus chapters, and behind-the-scenes notes.</p>
-        <form class="signup" id="signup">
-          <label for="email" class="eyebrow" style="position:absolute;left:-9999px">Email address</label>
-          <input id="email" type="email" placeholder="Your email address" required>
-          <button class="btn" type="submit">Subscribe</button>
-        </form>
-        <p class="note" id="note" aria-live="polite"></p>
-      </div>
-    </div>
-  </section>
 </main>
-
-<footer>
+<footer class="site">
   <div class="wrap foot">
-    <div class="star-rule" aria-hidden="true" style="width:min(320px,100%)"><i class="spark" style="font-size:1.1rem"></i></div>
-    <a class="logo" href="#top">Magick Muse</a>
-    <ul>
-      <li><a href="#">Instagram</a></li>
-      <li><a href="#">TikTok</a></li>
-      <li><a href="#">Goodreads</a></li>
-      <li><a href="#">Contact</a></li>
+    <div class="star-rule" aria-hidden="true"><i class="spark big"></i></div>
+    <a class="logo" href="index.html">Magick Muse</a>
+    <nav aria-label="Footer">
+      <ul>
+        <li><a href="grimoires.html"><span>Manuscript</span><small>the grimoire</small></a></li>
+        <li><a href="meetup.html"><span>Muses</span><small>the coven</small></a></li>
+        <li><a href="mastery.html"><span>Mastery</span><small>guides &amp; courses</small></a></li>
+        <li><a href="story.html"><span>Mythos</span><small>our story</small></a></li>
+      </ul>
+    </nav>
+    <ul class="social">
+      <li><a href="https://www.pinterest.com/themagickmuseco/" target="_blank" rel="noopener" aria-label="Pinterest"><span class="icon pinterest" aria-hidden="true"></span></a></li>
+      <li><a href="https://www.instagram.com/the_magick_muse/" target="_blank" rel="noopener" aria-label="Instagram"><span class="icon instagram" aria-hidden="true"></span></a></li>
+      <li><a href="https://www.tiktok.com/@the.magick.muse" target="_blank" rel="noopener" aria-label="TikTok"><span class="icon tiktok" aria-hidden="true"></span></a></li>
+      <li><a href="https://themagickmuse.gumroad.com/" target="_blank" rel="noopener" aria-label="Gumroad"><span class="icon gumroad" aria-hidden="true"></span></a></li>
+      <li><a href="https://discord.com/invite/PBr2BtCpxk" target="_blank" rel="noopener" aria-label="Discord"><span class="icon discord" aria-hidden="true"></span></a></li>
     </ul>
-    <small>&copy; 2026 Magick Muse. All rights reserved.</small>
+    <p class="email"><a href="mailto:TheMagickMuse.co@gmail.com">TheMagickMuse.co@gmail.com</a></p>
+    <p class="legal"><a href="privacy-policy.html">Privacy Policy</a></p>
+    <small>&copy; 2026 The Magick Muse. All rights reserved.</small>
   </div>
 </footer>
-
-<script>
-document.getElementById('signup').addEventListener('submit', function (e) {
-  e.preventDefault();
-  document.getElementById('note').textContent = 'Placeholder form. Connect your newsletter service here.';
-});
-</script>
-
+<dialog class="offer" id="offer" aria-labelledby="offer-title">
+  <button class="close" type="button" data-close aria-label="Close">&times;</button>
+  <p class="eyebrow labelled">Before you go</p>
+  <h2 id="offer-title">A gift <em>for the seeker.</em></h2>
+  <p>Take 10% off The Magick Manuscript: 15 cross-linked grimoires and 20,000+ pages of research, all sourced from published books.</p>
+  <p class="promo">SEEKER10</p>
+  <a class="btn" href="https://themagickmuse.gumroad.com/l/manuscript/SEEKER10" target="_blank" rel="noopener" data-close>Get 10% off</a>
+  <small>The code is applied automatically at checkout.</small>
+</dialog>
 </body>
 </html>
