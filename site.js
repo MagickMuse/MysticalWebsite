@@ -177,9 +177,14 @@
         card.hidden = !show;
         if (show) visible++;
       });
+      empty.textContent = filter.value
+        ? 'No ' + filter.value + ' posts match that search. Try All Topics.'
+        : 'No posts containing those keywords exist at the moment.';
       empty.hidden = visible > 0;
     };
     search.addEventListener('input', apply);
+    // Results filter as you type, so Enter shouldn't submit the form and reload the page
+    search.form.addEventListener('submit', function (e) { e.preventDefault(); });
     filter.addEventListener('change', apply);
   }
 })();
