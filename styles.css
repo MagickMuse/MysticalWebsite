@@ -283,12 +283,12 @@ select.field { flex: 0 1 240px; }
 .empty { text-align: center; margin-inline: auto; color: var(--muted); }
 
 /* ---------- courses ---------- */
-.course { display: grid; grid-template-columns: minmax(0, 280px) minmax(0, 1fr); gap: clamp(2rem, 6vw, 4.5rem); align-items: center; max-width: 1000px; margin-inline: auto; }
+.courses { display: grid; gap: clamp(3rem, 6vw, 4.5rem); max-width: 1000px; margin-inline: auto; }
+.course { display: grid; grid-template-columns: minmax(0, 280px) minmax(0, 1fr); gap: clamp(2rem, 6vw, 4.5rem); align-items: center; }
 .course .frame { aspect-ratio: 4 / 5; }
 .course .glyph { width: 4rem; height: 4rem; color: var(--on-btn); }
 .course-text { display: grid; gap: 1rem; justify-items: start; }
 .course-text h3 { font-size: clamp(2.2rem, 4vw, 3rem); }
-.course-note { font-family: var(--display); font-style: italic; font-size: 1.2rem; color: var(--accent-text); }
 .card .link { justify-self: start; }
 @media (max-width: 760px) {
   .course { grid-template-columns: 1fr; justify-items: center; }
