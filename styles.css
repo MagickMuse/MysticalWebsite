@@ -283,17 +283,20 @@ select.field { flex: 0 1 240px; }
 .empty { text-align: center; margin-inline: auto; color: var(--muted); }
 
 /* ---------- courses ---------- */
-.courses { display: grid; gap: clamp(3rem, 6vw, 4.5rem); max-width: 1000px; margin-inline: auto; }
-.course { display: grid; grid-template-columns: minmax(0, 280px) minmax(0, 1fr); gap: clamp(2rem, 6vw, 4.5rem); align-items: center; }
+section.tight { padding-block: clamp(2.5rem, 5vw, 4rem); }
+.tight .intro { margin-bottom: 2rem; }
+.courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem clamp(2rem, 4vw, 3.5rem); max-width: 1200px; margin-inline: auto; }
+.course { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); gap: clamp(1.4rem, 3vw, 2rem); align-items: center; }
 .course .frame { aspect-ratio: 4 / 5; }
-.course .glyph { width: 4rem; height: 4rem; color: var(--on-btn); }
-.course-text { display: grid; gap: 1rem; justify-items: start; }
-.course-text h3 { font-size: clamp(2.2rem, 4vw, 3rem); }
+.course .glyph { width: 2.8rem; height: 2.8rem; color: var(--on-btn); }
+.course-text { display: grid; gap: .6rem; justify-items: start; }
+.course-text h3 { font-size: clamp(1.8rem, 3vw, 2.3rem); }
+.course-text .actions { margin-top: .4rem; }
+.course-text .btn { padding-inline: 1.4rem; }
+.price { font-family: var(--display); font-size: 1.6rem; line-height: 1; color: var(--accent-text); }
 .card .link { justify-self: start; }
-@media (max-width: 760px) {
-  .course { grid-template-columns: 1fr; justify-items: center; }
-  .course .frame { width: min(100%, 240px); }
-}
+@media (max-width: 900px) { .courses { grid-template-columns: 1fr; max-width: 560px; } }
+@media (max-width: 480px) { .course { grid-template-columns: 110px minmax(0, 1fr); } }
 
 /* ---------- stats ---------- */
 .stats {
