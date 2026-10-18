@@ -154,9 +154,14 @@
     var cards = Array.prototype.slice.call(document.querySelectorAll('#post-grid .post'));
     var empty = document.getElementById('post-empty');
     var topics = [];
+    // A card can sit under several topics (data-topics, primary first); its eyebrow shows the primary one
+    var topicsOf = function (card) {
+      return card.dataset.topics ? card.dataset.topics.split('|') : [card.querySelector('.eyebrow').textContent.trim()];
+    };
     cards.forEach(function (card) {
-      var topic = card.querySelector('.eyebrow').textContent.trim();
-      if (topics.indexOf(topic) === -1) topics.push(topic);
+      topicsOf(card).forEach(function (topic) {
+        if (topics.indexOf(topic) === -1) topics.push(topic);
+      });
     });
     topics.sort().forEach(function (topic) {
       var option = document.createElement('option');
@@ -167,9 +172,8 @@
       var q = search.value.trim().toLowerCase();
       var visible = 0;
       cards.forEach(function (card) {
-        var text = (card.textContent + ' ' + (card.dataset.keywords || '')).toLowerCase();
-        var topic = card.querySelector('.eyebrow').textContent.trim();
-        var show = (!q || text.indexOf(q) !== -1) && (!filter.value || topic === filter.value);
+        var text = (card.textContent + ' ' + (card.dataset.keywords || '') + ' ' + (card.dataset.topics || '')).toLowerCase();
+        var show = (!q || text.indexOf(q) !== -1) && (!filter.value || topicsOf(card).indexOf(filter.value) !== -1);
         card.hidden = !show;
         if (show) visible++;
       });
