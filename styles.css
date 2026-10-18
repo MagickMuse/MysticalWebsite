@@ -147,7 +147,8 @@ header.site {
   content: ""; width: .6rem; height: .6rem; flex: none; background: var(--gold);
   -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat;
 }
-.nav ul a { text-decoration: none; font-size: .78rem; letter-spacing: .22em; text-transform: uppercase; font-weight: 400; white-space: nowrap; }
+.nav ul a { display: grid; justify-items: center; text-decoration: none; font-size: .78rem; letter-spacing: .22em; text-transform: uppercase; font-weight: 400; white-space: nowrap; line-height: 1.5; }
+.nav ul a small { font-family: var(--display); font-style: italic; font-size: .95rem; letter-spacing: .02em; text-transform: none; color: var(--muted); line-height: 1.1; }
 .nav ul a:hover, .nav ul a[aria-current="page"] { color: var(--accent-text); }
 .menu {
   display: none; grid-column: 3; grid-row: 1; justify-self: end; min-width: 44px; min-height: 44px; padding: .5rem .9rem;
@@ -160,7 +161,7 @@ header.site {
   .nav nav.open { display: grid; }
   .nav ul, .nav ul.left, .nav ul.right { grid-column: 1; flex-direction: column; gap: 0; }
   .nav ul.left li::after, .nav ul.right li::before { display: none; }
-  .nav ul a { display: flex; align-items: center; min-height: 44px; }
+  .nav ul a { align-content: center; min-height: 52px; }
 }
 
 /* ---------- hero ---------- */
