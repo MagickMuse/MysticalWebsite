@@ -513,6 +513,25 @@ footer.site { padding-block: 4rem 2.5rem; border-top: 1px solid var(--line); }
   body:has(.buybar) footer.site { padding-bottom: 6rem; }
 }
 
+/* ---------- motion: scroll reveals, arch reveals, page transitions ---------- */
+[data-reveal="rise"] {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity .8s ease var(--delay, 0ms), transform .8s cubic-bezier(.2, .7, .2, 1) var(--delay, 0ms);
+}
+[data-reveal="rise"].in { opacity: 1; transform: none; }
+/* arched photos "draw open" from the bottom; the wide final inset keeps floating stars visible */
+[data-reveal="arch"] {
+  clip-path: inset(100% -20% -20% -20%);
+  transition: clip-path 1.2s cubic-bezier(.65, 0, .35, 1) var(--delay, 0ms);
+}
+[data-reveal="arch"].in { clip-path: inset(-20% -20% -20% -20%); }
+.stats strong, .intro .meta li { font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .35s; }
+  header.site { view-transition-name: site-header; }
+}
+
 /* ---------- reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

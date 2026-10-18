@@ -64,8 +64,63 @@
     }).observe(hero);
   }
 
-  // Screenshot carousels: swipe/scroll-snap works without JS; this adds arrows and a counter
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Scroll reveals, arch "draw open" reveals and count-up numbers.
+  // Only content that starts below the first screen is animated, so nothing visible on load is hidden.
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    var belowFold = function (el) { return el.getBoundingClientRect().top > window.innerHeight; };
+    // Fully clipped arches don't register as visible, so each element is watched through an
+    // unclipped stand-in (its parent for arches, itself otherwise).
+    var waiting = new Map();
+    var revealIn = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        (waiting.get(entry.target) || []).forEach(function (el) { el.classList.add('in'); });
+        waiting.delete(entry.target);
+        revealIn.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    var mark = function (selector, kind) {
+      Array.prototype.forEach.call(document.querySelectorAll(selector), function (el) {
+        if (el.hasAttribute('data-reveal') || !belowFold(el)) return;
+        var siblings = Array.prototype.filter.call(el.parentNode.children, function (c) { return c.matches(selector); });
+        el.setAttribute('data-reveal', kind);
+        el.style.setProperty('--delay', Math.min(siblings.indexOf(el), 5) * 90 + 'ms');
+        var watch = kind === 'arch' ? el.parentNode : el;
+        if (!waiting.has(watch)) { waiting.set(watch, []); revealIn.observe(watch); }
+        waiting.get(watch).push(el);
+      });
+    };
+    mark('.about .frame.arch, .course .frame.arch, .library .frame.arch, .feature-art', 'arch');
+    mark('main .intro, .cards > *, .posts > .post, .library > li, .course, .chapter, .stats > li, .faq, .carousel, .about-text, .feature-text, .cta-inner, .link-list > li', 'rise');
+
+    var counters = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        counters.unobserve(entry.target);
+        var el = entry.target;
+        var match = el.textContent.match(/^(\s*)([\d,]+)(.*)$/);
+        if (!match) return;
+        var target = parseInt(match[2].replace(/,/g, ''), 10);
+        var comma = match[2].indexOf(',') !== -1;
+        el.style.minWidth = el.getBoundingClientRect().width + 'px';
+        var start = performance.now();
+        var step = function (now) {
+          var t = Math.min((now - start) / 1400, 1);
+          var value = Math.round(target * (1 - Math.pow(1 - t, 3)));
+          el.textContent = match[1] + (comma ? value.toLocaleString('en-US') : value) + match[3];
+          if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+    }, { threshold: 0.6 });
+    Array.prototype.forEach.call(document.querySelectorAll('.stats strong, .intro .meta li'), function (el) {
+      if (belowFold(el) && /^\s*\d/.test(el.textContent)) counters.observe(el);
+    });
+  }
+
+  // Screenshot carousels: swipe/scroll-snap works without JS; this adds arrows and a counter
   Array.prototype.forEach.call(document.querySelectorAll('.carousel'), function (carousel) {
     var track = carousel.querySelector('.slides');
     var slides = track.querySelectorAll('.slide');
