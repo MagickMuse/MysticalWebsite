@@ -11,14 +11,14 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://magickmuse.com/meetup.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://magickmuse.com/mastery.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://magickmuse.com/meetup.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://magickmuse.com/story.html</loc>
@@ -26,27 +26,22 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://magickmuse.com/protection-magick-for-beginners.html</loc>
+    <loc>https://magickmuse.com/astrology-for-witches.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://magickmuse.com/meditation-for-witches-beginners.html</loc>
+    <loc>https://magickmuse.com/essential-witch-tools-for-beginners.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://magickmuse.com/what-to-do-with-your-first-tarot-deck.html</loc>
+    <loc>https://magickmuse.com/herbalism-for-witches.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://magickmuse.com/what-is-a-correspondence-in-witchcraft.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://magickmuse.com/what-is-shadow-work-witchcraft.html</loc>
+    <loc>https://magickmuse.com/how-my-witchcraft-practice-has-changed.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -56,12 +51,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://magickmuse.com/witchcraft-books-for-beginners.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://magickmuse.com/what-to-include-in-a-grimoire.html</loc>
+    <loc>https://magickmuse.com/how-to-dispose-of-a-spell.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -76,7 +66,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://magickmuse.com/essential-witch-tools-for-beginners.html</loc>
+    <loc>https://magickmuse.com/how-to-work-with-ancestors-witchcraft.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -91,22 +81,62 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://magickmuse.com/how-to-work-with-ancestors-witchcraft.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://magickmuse.com/how-to-dispose-of-a-spell.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://magickmuse.com/how-my-witchcraft-practice-has-changed.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://magickmuse.com/law-of-similars-witchcraft.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://magickmuse.com/links.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://magickmuse.com/meditation-for-witches-beginners.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://magickmuse.com/privacy-policy.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://magickmuse.com/protection-magick-for-beginners.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://magickmuse.com/runes-for-beginners.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://magickmuse.com/what-is-a-correspondence-in-witchcraft.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://magickmuse.com/what-is-divination-witchcraft.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://magickmuse.com/what-is-shadow-work-witchcraft.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://magickmuse.com/what-to-do-with-your-first-tarot-deck.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://magickmuse.com/what-to-include-in-a-grimoire.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://magickmuse.com/witchcraft-books-for-beginners.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
