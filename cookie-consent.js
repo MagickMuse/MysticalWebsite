@@ -33,5 +33,12 @@
     if (typeof gtag === 'function') {
       gtag('consent', 'update', { analytics_storage: 'granted', ad_storage: 'denied' });
     }
+    // Google's tag is only downloaded once a visitor has accepted analytics cookies.
+    if (!document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) {
+      var tag = document.createElement('script');
+      tag.async = true;
+      tag.src = 'https://www.googletagmanager.com/gtag/js?id=G-0DV5GLQV05';
+      document.head.appendChild(tag);
+    }
   }
 })();
