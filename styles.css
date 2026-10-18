@@ -430,7 +430,10 @@ footer.site { padding-block: 4rem 2.5rem; border-top: 1px solid var(--line); }
 .foot ul a { display: inline-grid; justify-items: center; align-content: center; min-height: 44px; text-decoration: none; font-size: .78rem; letter-spacing: .22em; text-transform: uppercase; }
 .foot ul a:hover { color: var(--accent-text); }
 .foot .email { font-size: .9rem; color: var(--muted); }
-.foot .email a { display: inline-flex; align-items: center; min-height: 44px; }
+.foot .email a, .foot .legal a { display: inline-flex; align-items: center; min-height: 44px; }
+.foot .legal { margin-top: -1.6rem; font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; }
+.foot .legal a { color: var(--muted); text-decoration: none; }
+.foot .legal a:hover { color: var(--accent-text); }
 .foot small { font-size: .72rem; color: var(--muted); letter-spacing: .05em; }
 .social { display: flex; justify-content: center; gap: 1.4rem; list-style: none; padding: 0; margin: 0; }
 .social a { display: grid; place-items: center; min-width: 44px; min-height: 44px; color: var(--ink); }
