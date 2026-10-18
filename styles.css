@@ -234,7 +234,10 @@ a.card { transition: border-color .3s; }
 a.card:hover { border-color: var(--accent); }
 .card .spark { font-size: 1.1rem; }
 .cards .quote { font-size: 1.3rem; }
-@media (max-width: 860px) { .cards { grid-template-columns: 1fr; } }
+.cards.pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 960px; margin-inline: auto; }
+.card .btn { justify-self: start; margin-top: .4rem; }
+.diy-quote { max-width: 720px; margin: 3rem auto 0; }
+@media (max-width: 860px) { .cards, .cards.pairs { grid-template-columns: 1fr; } }
 
 /* grimoire library: 5 / 3 / 2 across */
 .library { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2rem 1.6rem; max-width: 1200px; list-style: none; margin: 0 auto; padding: 0; }
