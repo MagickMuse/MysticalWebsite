@@ -396,6 +396,12 @@ mark { background: none; color: var(--accent-text); font-weight: 400; }
 }
 .callout { display: grid; gap: 1.2rem; justify-items: start; padding: 2rem; background: var(--surface); border-top: 1px solid var(--gold); }
 .prose > .callout { margin-top: 3rem; }
+.author { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 1.4rem; align-items: start; padding-top: 2rem; border-top: 1px solid var(--line); }
+.prose > .author { margin-top: 3.5rem; }
+.author img { border-radius: 50%; border: 1px solid var(--gold); }
+.author div { display: grid; gap: .4rem; justify-items: start; }
+.author-name { font-family: var(--display); font-size: 1.6rem; line-height: 1.1; }
+.author-name + p { color: var(--muted); }
 .disclaimer { font-size: .85rem; font-style: italic; color: var(--muted); }
 .back { text-align: center; padding-top: 0; }
 
