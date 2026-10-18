@@ -14,7 +14,7 @@
   banner.setAttribute('role', 'region');
   banner.setAttribute('aria-label', 'Cookie consent');
   banner.innerHTML = '<p>We use cookies to understand how visitors use this site (Google Analytics). ' +
-    'No personal data is sold. <a href="/privacy-policy.html">Privacy Policy</a></p>' +
+    'No personal data is sold. <a href="privacy-policy.html">Privacy Policy</a></p>' +
     '<div class="actions">' +
     '<button class="btn ghost" type="button" data-choice="denied">Decline</button>' +
     '<button class="btn" type="button" data-choice="granted">Accept</button>' +
