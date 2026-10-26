@@ -436,6 +436,7 @@ mark { background: none; color: var(--accent-text); font-weight: 400; }
 .link-list { display: grid; gap: 1rem; width: min(100%, 440px); margin-inline: auto; list-style: none; padding: 0; }
 .link-list .btn { display: block; width: 100%; }
 .link-list small { display: block; font-size: .78rem; letter-spacing: .02em; text-transform: none; font-weight: 300; margin-top: .2rem; }
+.link-list > li[data-reveal="rise"] { opacity: 1; transform: none; transition: none; }
 
 /* ---------- 404 ---------- */
 .code { font-family: var(--script); font-size: clamp(5rem, 18vw, 9rem); line-height: 1; color: var(--accent-text); }
