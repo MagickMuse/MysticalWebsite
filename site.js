@@ -95,6 +95,17 @@
     mark('.about .frame.arch, .course .frame.arch, .library .frame.arch, .feature-art', 'arch');
     mark('main .intro, .cards > *, .posts > .post, .library > li, .course, .chapter, .stats > li, .faq, .carousel, .about-text, .feature-text, .cta-inner, .link-list > li', 'rise');
 
+    // Re-stagger library grimoire items by column so each row fades in one at a time
+    (function () {
+      var items = document.querySelectorAll('.library > li[data-reveal]');
+      if (!items.length) return;
+      var colCount = window.matchMedia('(max-width: 640px)').matches ? 2
+                   : window.matchMedia('(max-width: 1000px)').matches ? 3 : 5;
+      Array.prototype.forEach.call(items, function (el, i) {
+        el.style.setProperty('--delay', (i % colCount) * 90 + 'ms');
+      });
+    }());
+
     var counters = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
