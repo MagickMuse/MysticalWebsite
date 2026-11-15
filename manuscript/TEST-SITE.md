@@ -61,17 +61,15 @@ Copy its full path (File Manager shows it at the top). This is `DATA_FOLDER`. Ke
 *Where: dashboard.stripe.com → turn on **Test mode** (toggle at the top) for everything below*
 
 1.  **API key:** Developers → API keys → copy the **Secret key** (`sk_test_…`).
-2.  **Manuscript prices:** Product catalog → Add product "The Magick Manuscript".
-    - Price 1: **\$333, one-time** → copy its id (`price_…`). This is lifetime access, as it was on Gumroad.
-    - Optional price 2: a **monthly recurring** price, only if Avelynn wants a monthly plan. Otherwise leave monthly out of the settings and only Lifetime shows.
+2.  **Manuscript price:** Product catalog → Add product "The Magick Manuscript".
+    - Price: **\$333, one-time** → copy its id (`price_…`). This is lifetime access, as it was on Gumroad.
 
     Shop products (courses, templates) need nothing in Stripe; their prices come from `manuscript/products.php`.
 3.  **Webhook:** Developers → Webhooks → Add endpoint
     - URL: `https://test.magickmuse.com/manuscript/stripe-webhook`
     - Events: `checkout.session.completed`, `invoice.paid`, `charge.refunded`, `customer.subscription.updated`, `customer.subscription.deleted`
     - Copy the endpoint's **Signing secret** (`whsec_…`).
-4.  **Customer portal:** Settings → Billing → Customer portal → activate (lets monthly members cancel or change cards themselves).
-5.  **SEEKER10:** Product catalog → Coupons → new coupon "10% off" → add a promotion code `SEEKER10`.
+4.  **SEEKER10:** Product catalog → Coupons → new coupon "10% off" → add a promotion code `SEEKER10`.
 
 ## 7. Email for sign-in links
 
@@ -96,7 +94,7 @@ Nobody has a password; people sign in from a link that's emailed to them, so ema
 | `grimoires`             | Leave as is: Begin Here, Correspondence and Timing to start                                                                             |
 | `stripe_secret_key`     | `sk_test_…`                                                                                                                             |
 | `stripe_webhook_secret` | `whsec_…`                                                                                                                               |
-| `plans`                 | Put the lifetime `price_…` id in `lifetime`. For no monthly plan, set the monthly `'price' => ''`.                                      |
+| `plans` | Put the $333 lifetime `price_…` id in `lifetime`. That's the only plan. |
 | `product_links`         | The real Google Classroom links and Notion "duplicate" links for each product (Avelynn has these). They show only in buyers' libraries. |
 | `mail_from`, `smtp_*`   | The mailbox from step 7: host `smtp.hostinger.com`, port `465`, its address and password                                                |
 | `admins`                | Avelynn's email, plus yours if you want dashboard access. Only these emails can see the dashboard.                                      |

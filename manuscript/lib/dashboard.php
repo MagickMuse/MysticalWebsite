@@ -101,12 +101,13 @@ function dash_overview(): void
         isset($members['monthly']) ? $members['monthly'] . ' monthly' : '',
         isset($members['lifetime']) ? $members['lifetime'] . ' lifetime' : '',
         isset($members['comp']) ? $members['comp'] . ' gifted / from Gumroad' : '',
+        isset($members['']) ? $members[''] . ' former monthly (until paid date)' : '',
     ])) ?: 'none yet';
 
     $tiles = '<div class="tiles">'
         . stat_tile('Revenue, last 30 days', e(money($rev30, cur())), delta($rev30, $revPrev))
         . stat_tile('This month so far', e(money($revMonth, cur())), e(gmdate('F')))
-        . stat_tile('Monthly recurring revenue', e(money($mrr, cur())), 'from active monthly members')
+        . ($mrr > 0 || !empty(config('plans')['monthly']['price']) ? stat_tile('Monthly recurring revenue', e(money($mrr, cur())), 'from active monthly members') : '')
         . stat_tile('Active members', number_format($activeTotal), e($breakdown))
         . stat_tile('New members, 30 days', number_format($new30), delta($new30, $newPrev) . ($cancel30 ? ' · ' . $cancel30 . ' canceled' : ''))
         . stat_tile('Email sign-ups', number_format($leads), number_format($leads30) . ' in the last 30 days')

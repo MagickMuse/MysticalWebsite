@@ -50,12 +50,12 @@ return [
     // with events: checkout.session.completed, invoice.paid, charge.refunded,
     // customer.subscription.updated, customer.subscription.deleted. Paste its signing secret here.
     'stripe_webhook_secret' => 'whsec_xxx',
-    // Price ids (Dashboard → Product catalog). Leave a price empty to hide that plan,
-    // e.g. if the Manuscript is only sold as lifetime access (as it was on Gumroad, $333).
+    // The Manuscript is sold as lifetime access for $333 (Stripe → Product catalog → one-time price).
     'plans' => [
         // amount_label is only what the page shows; the real price is the Stripe price.
         'lifetime' => ['price' => 'price_yyy', 'label' => 'Lifetime', 'amount_label' => '$333', 'blurb' => 'One payment. Every update ever made, and every one to come.', 'mode' => 'payment'],
-        'monthly'  => ['price' => 'price_xxx', 'label' => 'Monthly',  'amount_label' => '',     'blurb' => 'Full access, cancel anytime.', 'mode' => 'subscription'],
+        // A monthly plan could be added later, e.g.:
+        // 'monthly' => ['price' => 'price_…', 'label' => 'Monthly', 'amount_label' => '$__/month', 'blurb' => 'Full access, cancel anytime.', 'mode' => 'subscription'],
     ],
 
     // ---------- Shop (replaces Gumroad) ----------

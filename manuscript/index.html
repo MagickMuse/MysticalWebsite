@@ -125,10 +125,9 @@
   <p class="where">dashboard.stripe.com → turn on <strong>Test mode</strong> (toggle at the top) for everything below</p>
   <ol>
     <li><strong>API key:</strong> Developers → API keys → copy the <strong>Secret key</strong> (<code>sk_test_…</code>).</li>
-    <li><strong>Manuscript prices:</strong> Product catalog → Add product "The Magick Manuscript".
+    <li><strong>Manuscript price:</strong> Product catalog → Add product "The Magick Manuscript".
       <ul>
-        <li>Price 1: <strong>$333, one-time</strong> → copy its id (<code>price_…</code>). This is lifetime access, as it was on Gumroad.</li>
-        <li>Optional price 2: a <strong>monthly recurring</strong> price, only if Avelynn wants a monthly plan. Otherwise leave monthly out of the settings and only Lifetime shows.</li>
+        <li>Price: <strong>$333, one-time</strong> → copy its id (<code>price_…</code>). This is lifetime access, as it was on Gumroad.</li>
       </ul>
       Shop products (courses, templates) need nothing in Stripe; their prices come from <code>manuscript/products.php</code>.</li>
     <li><strong>Webhook:</strong> Developers → Webhooks → Add endpoint
@@ -137,7 +136,6 @@
         <li>Events: <code>checkout.session.completed</code>, <code>invoice.paid</code>, <code>charge.refunded</code>, <code>customer.subscription.updated</code>, <code>customer.subscription.deleted</code></li>
         <li>Copy the endpoint's <strong>Signing secret</strong> (<code>whsec_…</code>).</li>
       </ul></li>
-    <li><strong>Customer portal:</strong> Settings → Billing → Customer portal → activate (lets monthly members cancel or change cards themselves).</li>
     <li><strong>SEEKER10:</strong> Product catalog → Coupons → new coupon "10% off" → add a promotion code <code>SEEKER10</code>.</li>
   </ol>
 </section>
@@ -165,7 +163,7 @@
     <tr><td><code>grimoires</code></td><td>Leave as is: Begin Here, Correspondence and Timing to start</td></tr>
     <tr><td><code>stripe_secret_key</code></td><td><code>sk_test_…</code></td></tr>
     <tr><td><code>stripe_webhook_secret</code></td><td><code>whsec_…</code></td></tr>
-    <tr><td><code>plans</code></td><td>Put the lifetime <code>price_…</code> id in <code>lifetime</code>. For no monthly plan, set the monthly <code>'price' =&gt; ''</code>.</td></tr>
+    <tr><td><code>plans</code></td><td>Put the $333 lifetime <code>price_…</code> id in <code>lifetime</code>. That's the only plan.</td></tr>
     <tr><td><code>product_links</code></td><td>The real Google Classroom links and Notion "duplicate" links for each product (Avelynn has these). They show only in buyers' libraries.</td></tr>
     <tr><td><code>mail_from</code>, <code>smtp_*</code></td><td>The mailbox from step 7: host <code>smtp.hostinger.com</code>, port <code>465</code>, its address and password</td></tr>
     <tr><td><code>admins</code></td><td>Avelynn's email, plus yours if you want dashboard access. Only these emails can see the dashboard.</td></tr>
