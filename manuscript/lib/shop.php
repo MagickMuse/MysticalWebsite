@@ -1,0 +1,221 @@
+<?php
+declare(strict_types=1);
+
+/*
+ * The shop: courses, templates and free downloads, sold through Stripe and delivered in a
+ * signed-in "library". Products are listed in the config file (see config.sample.php).
+ * Files to deliver go in {data_dir}/products/{product-slug}/, outside the public website.
+ */
+
+function products(): array { return config('products', []); }
+
+function product(string $slug): ?array
+{
+    $p = products()[$slug] ?? null;
+    return $p ? $p + ['slug' => $slug] : null;
+}
+
+function money(int $cents, string $currency = 'usd'): string
+{
+    $sym = ['usd' => '$', 'eur' => '€', 'gbp' => '£', 'cad' => 'CA$', 'aud' => 'A$'][strtolower($currency)] ?? strtoupper($currency) . ' ';
+    return $sym . number_format($cents / 100, $cents % 100 ? 2 : 0);
+}
+
+function price_label(array $p): string
+{
+    if (!empty($p['free'])) return 'Free';
+    $s = money((int) $p['price_cents'], config('currency', 'usd'));
+    return !empty($p['pay_what_you_want']) ? "$s+" : $s;
+}
+
+function product_image(array $p): string
+{
+    if (empty($p['image'])) return '<div class="frame arch shop-art"><i class="spark big" aria-hidden="true"></i></div>';
+    $src = preg_match('~^https?://~', $p['image']) ? $p['image'] : site_url($p['image']);
+    return '<div class="frame arch shop-art"><img src="' . e($src) . '" alt="" loading="lazy"></div>';
+}
+
+function product_files(string $slug): array
+{
+    $dir = config('data_dir') . '/products/' . basename($slug);
+    if (!is_dir($dir)) return [];
+    return array_values(array_filter(scandir($dir), fn($f) => $f[0] !== '.' && is_file("$dir/$f")));
+}
+
+function route_shop(array $parts, string $method): void
+{
+    $a = $parts[0] ?? '';
+    match (true) {
+        $a === '' => view_shop(),
+        $a === 'library' => view_library(),
+        $a === 'thanks' => view_shop_thanks(),
+        $a === 'download' => shop_download($parts[1] ?? '', $parts[2] ?? ''),
+        $a === 'claim' && $method === 'POST' => do_claim(),
+        $a === 'buy' && $method === 'POST' => do_buy(),
+        product($a) !== null && count($parts) === 1 => view_product(product($a)),
+        default => not_found(),
+    };
+}
+
+function view_shop(): void
+{
+    $cards = '';
+    foreach (products() as $slug => $p) {
+        $p['slug'] = $slug;
+        if (!empty($p['hidden'])) continue;
+        $cards .= '<a class="card shop-card" href="' . e(site_url('shop/' . $slug)) . '">' . product_image($p)
+            . '<h3>' . e($p['name']) . '</h3><p>' . e($p['tagline'] ?? '') . '</p><p class="price">' . e(price_label($p)) . '</p></a>';
+    }
+    // The Manuscript itself leads the shop.
+    $ms = '<a class="card shop-card featured" href="' . e(url('join')) . '"><div class="frame arch shop-art"><img src="' . e(site_url('assets/grimoire-selection-screenshot-700.webp')) . '" alt="" loading="lazy"></div>'
+        . '<h3>The Magick Manuscript</h3><p>15 cross-linked grimoires, 20,000+ pages, growing weekly.</p><p class="price">Membership</p></a>';
+    layout('Shop', <<<HTML
+<section class="mm-hero">
+  <p class="eyebrow labelled">The Magick Muse</p>
+  <h1>The <em>Shop</em></h1>
+  <p class="lede">Courses, grimoire templates and the Manuscript. Everything you buy stays in your library, ready whenever you are.</p>
+</section>
+<section class="cards shop-grid">$ms$cards</section>
+HTML, ['index' => true, 'description' => 'Witchcraft courses, grimoire templates and The Magick Manuscript from The Magick Muse.']);
+}
+
+function view_product(array $p): void
+{
+    $email = current_email();
+    $csrf = e(csrf_token());
+    $slug = e($p['slug']);
+    $desc = '';
+    foreach (preg_split('/\n\s*\n/', trim((string) ($p['description'] ?? ''))) as $para) {
+        if ($para !== '') $desc .= '<p>' . nl2br(e(trim($para)), false) . '</p>';
+    }
+    $includes = '';
+    if (!empty($p['includes'])) {
+        $includes = '<ul class="includes">' . implode('', array_map(fn($i) => '<li class="inline-star">' . e($i) . '</li>', $p['includes'])) . '</ul>';
+    }
+
+    if ($email && owns($email, $p['slug'])) {
+        $action = '<p class="notice">You own this. <a href="' . e(site_url('shop/library')) . '">Open your library</a></p>';
+    } elseif (!empty($p['free'])) {
+        $action = '<form class="mm-form buy" method="post" action="' . e(site_url('shop/claim')) . '">'
+            . "<input type=\"hidden\" name=\"csrf\" value=\"$csrf\"><input type=\"hidden\" name=\"product\" value=\"$slug\">"
+            . '<label for="claim-email">Where should we send it?</label><input id="claim-email" type="email" name="email" autocomplete="email" required value="' . e($email) . '">'
+            . '<button class="btn" type="submit">Send it to me free</button><p class="small">You’ll also hear from The Magick Muse now and then. Unsubscribe anytime.</p></form>';
+    } else {
+        $min = (int) $p['price_cents'];
+        $amount = !empty($p['pay_what_you_want'])
+            ? '<label for="amount">Pay what you can (minimum ' . e(money($min)) . ')</label><div class="amount"><span aria-hidden="true">$</span><input id="amount" name="amount" type="number" inputmode="decimal" min="' . ($min / 100) . '" step="1" value="' . ($min / 100) . '" required></div>'
+            : '';
+        $action = '<form class="mm-form buy" method="post" action="' . e(site_url('shop/buy')) . '">'
+            . "<input type=\"hidden\" name=\"csrf\" value=\"$csrf\"><input type=\"hidden\" name=\"product\" value=\"$slug\">"
+            . $amount . '<button class="btn" type="submit">' . (!empty($p['pay_what_you_want']) ? 'Buy now' : 'Buy for ' . e(price_label($p))) . '</button>'
+            . '<p class="small">Secure checkout by Stripe. Discount code? Enter it at checkout.</p></form>';
+    }
+    layout($p['name'], '<article class="product">' . product_image($p) . '<div class="product-text"><p class="eyebrow">' . e($p['kind'] ?? 'The Magick Muse') . '</p>'
+        . '<h1>' . e($p['name']) . '</h1><p class="price big">' . e(price_label($p)) . '</p>'
+        . '<div class="mm-prose">' . $desc . '</div>' . $includes . $action . '</div></article>',
+        ['index' => true, 'description' => $p['tagline'] ?? '']);
+}
+
+function do_buy(): void
+{
+    check_csrf();
+    $slug = (string) ($_POST['product'] ?? '');
+    $amount = isset($_POST['amount']) ? (int) round((float) $_POST['amount'] * 100) : null;
+    redirect(create_product_checkout($slug, $amount, current_email()));
+}
+
+function do_claim(): void
+{
+    check_csrf();
+    $p = product((string) ($_POST['product'] ?? ''));
+    $email = strtolower(trim((string) ($_POST['email'] ?? '')));
+    if (!$p || empty($p['free'])) { not_found(); return; }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { view_product($p); return; }
+    if (!throttle('claim', 5, 900)) { layout('Slow down', '<section class="mm-empty"><h1>Too many tries</h1><p class="lede">Please wait a few minutes.</p></section>'); return; }
+
+    db()->prepare('INSERT OR IGNORE INTO leads (email, product, created_at) VALUES (?, ?, ?)')->execute([$email, $p['slug'], now()]);
+    grant($email, $p['slug'], 'free');
+    // Delivered by email, which also confirms the address is real.
+    $link = url('auth?token=' . issue_login_token($email) . '&next=' . rawurlencode('/shop/library'));
+    send_mail($email, 'Your ' . $p['name'] . ' is here',
+        "Thank you for picking up {$p['name']}.\n\nOpen your library to get it:\n$link\n\nThe link signs you in and works for 30 minutes. After that, sign in any time at " . site_url('shop/library') . "\n\nThe Magick Muse",
+        '<p>Thank you for picking up <strong>' . e($p['name']) . '</strong>.</p><p><a href="' . e($link) . '">Open your library</a> to get it.</p><p>The link signs you in and works for 30 minutes. After that, sign in any time at ' . e(site_url('shop/library')) . '.</p><p>The Magick Muse</p>');
+    layout('Check your email', '<section class="mm-hero narrow"><p class="eyebrow labelled">On its way</p><h1>Check your <em>inbox</em></h1><p class="lede">We sent ' . e($p['name']) . ' to ' . e($email) . '. If it isn’t there in a few minutes, look in spam or promotions.</p></section>', ['private' => true]);
+}
+
+function view_shop_thanks(): void
+{
+    $sid = (string) ($_GET['session_id'] ?? '');
+    $slug = null;
+    if (preg_match('/^cs_[A-Za-z0-9_]+$/', $sid)) {
+        try {
+            $s = stripe('GET', 'checkout/sessions/' . $sid);
+            $email = $s['customer_details']['email'] ?? null;
+            if (($s['status'] ?? '') === 'complete' && $email) {
+                // Normally the webhook records it; doing it here too means no waiting.
+                handle_stripe_event(['id' => 'thanks_' . $sid, 'type' => 'checkout.session.completed', 'data' => ['object' => $s]]);
+                sign_in($email);
+                $slug = $s['metadata']['product'] ?? null;
+            }
+        } catch (Throwable $ex) {
+            error_log('[shop] thanks: ' . $ex->getMessage());
+        }
+    }
+    redirect(site_url('shop/library' . ($slug ? '?new=' . rawurlencode($slug) : '')));
+}
+
+function view_library(): void
+{
+    $email = current_email();
+    if (!$email) {
+        view_login('<p class="notice">Sign in with the email you bought with to open your library.</p>', '/shop/library');
+        return;
+    }
+    $st = db()->prepare('SELECT product, created_at FROM purchases WHERE email = ? ORDER BY created_at DESC');
+    $st->execute([$email]);
+    $owned = $st->fetchAll();
+    $new = (string) ($_GET['new'] ?? '');
+
+    $items = '';
+    if (has_access()) {
+        $items .= '<li class="lib-item"><div><h3>The Magick Manuscript</h3><p class="small">Full member access</p></div><div class="lib-links"><a class="btn" href="' . e(url()) . '">Open the Manuscript</a></div></li>';
+    }
+    foreach ($owned as $o) {
+        $p = product($o['product']);
+        if (!$p) continue;
+        $links = '';
+        foreach ($p['links'] ?? [] as $label => $href) {
+            $links .= '<a class="btn" href="' . e($href) . '" target="_blank" rel="noopener">' . e($label) . '</a>';
+        }
+        foreach (product_files($p['slug']) as $f) {
+            $links .= '<a class="btn ghost" href="' . e(site_url('shop/download/' . rawurlencode($p['slug']) . '/' . rawurlencode($f))) . '">Download ' . e($f) . '</a>';
+        }
+        $badge = $new === $p['slug'] ? '<span class="tag">Just added</span>' : '';
+        $items .= '<li class="lib-item"><div><h3>' . e($p['name']) . " $badge</h3>"
+            . (!empty($p['instructions']) ? '<p class="small">' . e($p['instructions']) . '</p>' : '')
+            . '</div><div class="lib-links">' . ($links ?: '<span class="small">Delivery details coming soon.</span>') . '</div></li>';
+    }
+    $thanks = $new ? '<p class="notice">Thank you! Your purchase is below, and a receipt from Stripe is in your email.</p>' : '';
+    $body = $items
+        ? '<ul class="library">' . $items . '</ul>'
+        : '<p class="lede">Nothing here yet. <a href="' . e(site_url('shop')) . '">Visit the shop</a>.</p>';
+    layout('Your library', '<section class="lib"><p class="eyebrow labelled">' . e($email) . '</p><h1>Your <em>library</em></h1>' . $thanks . $body
+        . '<p class="small"><a href="' . e(url('account')) . '">Account &amp; billing</a></p></section>', ['private' => true]);
+}
+
+function shop_download(string $slug, string $file): void
+{
+    $email = current_email();
+    $file = basename($file);
+    $path = config('data_dir') . '/products/' . basename($slug) . '/' . $file;
+    if (!$email || !(owns($email, $slug) || is_admin($email)) || $file === '' || $file[0] === '.' || !is_file($path)) {
+        not_found();
+        return;
+    }
+    header('Content-Type: application/octet-stream');
+    header('Content-Disposition: attachment; filename="' . str_replace('"', '', $file) . '"');
+    header('Content-Length: ' . filesize($path));
+    header('Cache-Control: private, no-store');
+    header('X-Content-Type-Options: nosniff');
+    readfile($path);
+}

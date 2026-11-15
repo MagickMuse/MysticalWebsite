@@ -19,3 +19,9 @@ Options -Indexes
 
 # Hide server signature
 ServerSignature Off
+
+# The shop (/shop, /shop/library, /shop/<product>) is served by the Manuscript app.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^shop(/.*)?$ manuscript/index.php [L,QSA]
+</IfModule>

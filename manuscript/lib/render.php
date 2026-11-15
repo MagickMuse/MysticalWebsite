@@ -168,25 +168,6 @@ function breadcrumbs(array $page): string
     return $html . '</ol></nav>';
 }
 
-function teaser(array $page): string
-{
-    $n = (int) config('teaser_chars', 320);
-    if ($n <= 0 || !$page['plain']) return '';
-    $t = mb_substr($page['plain'], 0, $n);
-    if (mb_strlen($page['plain']) > $n) $t = preg_replace('/\s+\S*$/u', '', $t) . '…';
-    return '<p class="teaser">' . e($t) . '</p>';
-}
-
-function paywall(): string
-{
-    $signin = current_email()
-        ? '<p class="small">Signed in as ' . e(current_email()) . '. Your membership is not active. <a href="' . e(url('account')) . '">See your account</a>.</p>'
-        : '<p class="small">Already a member? <a href="' . e(url('login')) . '">Sign in</a></p>';
-    return '<aside class="paywall"><i class="spark big twinkle" aria-hidden="true"></i><h2>This page lives inside <em>the Manuscript</em></h2>'
-        . '<p>Members can read every entry, follow every cross-link, and search 20,000+ pages of researched magick.</p>'
-        . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a></div>' . $signin . '</aside>';
-}
-
 // ------------------------------------------------------------------ layout
 
 function layout(string $title, string $body, array $opt = []): void
@@ -215,10 +196,10 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=1">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=3">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=1" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=3" defer></script>
 </head>
 <body class="mm">
 <a class="skip" href="#main">Skip to main content</a>
@@ -238,11 +219,13 @@ function layout(string $title, string $body, array $opt = []): void
     </nav>
   </div>
   <div class="wrap mm-bar">
+    <?php if (has_access()): ?>
     <form class="mm-search" action="<?= e(url('search')) ?>" method="get" role="search">
       <label class="sr-only" for="mm-q">Search the Manuscript</label>
       <input id="mm-q" type="search" name="q" value="<?= $q ?>" placeholder="Search the Manuscript: protection, rose quartz, Hekate…">
       <button class="btn" type="submit">Search</button>
     </form>
+    <?php endif ?>
     <p class="mm-acct"><?= $acct ?></p>
   </div>
 </header>

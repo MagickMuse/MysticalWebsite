@@ -58,7 +58,7 @@ function migrate(PDO $pdo): void
         aka         TEXT,                       -- alternate names, searched too
         tags_json   TEXT,                       -- select / multi-select / text properties to show
         body_html   TEXT,
-        plain       TEXT,                       -- body as text, for search + teasers
+        plain       TEXT,                       -- body as text, for search
         sort        INTEGER DEFAULT 0,
         notion_edited TEXT,
         imported_at TEXT,
@@ -95,6 +95,38 @@ function migrate(PDO $pdo): void
         token_hash TEXT PRIMARY KEY,
         email      TEXT NOT NULL,
         expires_at INTEGER NOT NULL
+    );
+
+    -- Every sale: Stripe checkouts, subscription renewals, and history imported from Gumroad.
+    CREATE TABLE IF NOT EXISTS payments (
+        id          TEXT PRIMARY KEY,           -- Stripe session/invoice id, or gumroad:<sale id>
+        email       TEXT NOT NULL,
+        product     TEXT NOT NULL,              -- product slug, or "membership-monthly" / "membership-lifetime"
+        amount_cents INTEGER NOT NULL,
+        currency    TEXT NOT NULL DEFAULT 'usd',
+        refunded_cents INTEGER NOT NULL DEFAULT 0,
+        source      TEXT NOT NULL,              -- stripe | gumroad
+        intent      TEXT,                       -- Stripe payment_intent, to match refunds
+        created_at  TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS payments_created ON payments(created_at);
+    CREATE INDEX IF NOT EXISTS payments_intent ON payments(intent);
+
+    -- Who owns which shop product (courses, templates, freebies).
+    CREATE TABLE IF NOT EXISTS purchases (
+        email      TEXT NOT NULL,
+        product    TEXT NOT NULL,
+        source     TEXT NOT NULL,               -- stripe | free | gumroad | gift
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (email, product)
+    );
+
+    -- Emails collected by free products.
+    CREATE TABLE IF NOT EXISTS leads (
+        email      TEXT NOT NULL,
+        product    TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (email, product)
     );
 
     CREATE TABLE IF NOT EXISTS stripe_events (

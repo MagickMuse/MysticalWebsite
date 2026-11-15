@@ -8,7 +8,7 @@ function start_session(): void
     session_name('mm_session');
     session_set_cookie_params([
         'lifetime' => 60 * 60 * 24 * 60,          // stay signed in for 60 days
-        'path'     => parse_url(config('base_url'), PHP_URL_PATH) ?: '/',
+        'path'     => '/',                   // shared by the wiki and the /shop pages
         'secure'   => $secure,
         'httponly' => true,
         'samesite' => 'Lax',
@@ -76,6 +76,27 @@ function upsert_member(string $email, array $fields): void
         $vals = implode(', ', array_map(fn($k) => ":$k", array_keys($fields)));
         db()->prepare("INSERT INTO members ($cols) VALUES ($vals)")->execute($fields);
     }
+}
+
+function owns(string $email, string $product): bool
+{
+    $st = db()->prepare('SELECT 1 FROM purchases WHERE email = ? AND product = ?');
+    $st->execute([strtolower($email), $product]);
+    return (bool) $st->fetchColumn();
+}
+
+function grant(string $email, string $product, string $source): void
+{
+    db()->prepare('INSERT OR IGNORE INTO purchases (email, product, source, created_at) VALUES (?, ?, ?, ?)')
+        ->execute([strtolower(trim($email)), $product, $source, now()]);
+}
+
+/** Has this email bought or been given anything at all (so it may receive a sign-in link)? */
+function is_customer(string $email): bool
+{
+    $st = db()->prepare('SELECT 1 FROM purchases WHERE email = ? LIMIT 1');
+    $st->execute([strtolower($email)]);
+    return (bool) $st->fetchColumn() || member_row($email) !== null;
 }
 
 // ---------- magic-link sign in ----------
