@@ -288,3 +288,4 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .terms .mm-prose { margin-top: 1rem; font-size: .92rem; color: var(--muted); }
 .community { gap: 1.6rem; }
 .refund { margin-top: -.4rem; }
+.plans.single { grid-template-columns: minmax(0, 420px); justify-content: center; }

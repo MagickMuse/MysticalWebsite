@@ -305,6 +305,7 @@ function view_join(): void
             . '<label class="agree"><input type="checkbox" name="agree" value="1" required> I agree to the <a href="#terms">Terms of Access</a></label>'
             . '<button class="btn" type="submit">Choose ' . e($plan['label']) . '</button></form>';
     }
+    $planClass = substr_count($plans, '<form') > 1 ? 'pairs' : 'single';
     $highlights = '';
     foreach ($copy['highlights'] as [$title, $text]) {
         $highlights .= '<li><strong>' . e($title) . '</strong> ' . e($text) . '</li>';
@@ -323,7 +324,7 @@ function view_join(): void
   $note
   $codeNote
 </section>
-<section class="cards pairs plans">$plans</section>
+<section class="cards plans $planClass">$plans</section>
 <p class="center small">Secure checkout by Stripe. After paying you're signed in straight away. Already a member? <a href="$login">Sign in</a></p>
 <section class="join-copy">
   <div class="mm-prose">$desc</div>
@@ -439,7 +440,8 @@ function view_account(): void
         $m['status'] === 'active' => 'Monthly member, renews ' . e(substr((string) $m['paid_through'], 0, 10)),
         default => 'Membership ' . e($m['status']) . ($m['paid_through'] ? ', access until ' . e(substr($m['paid_through'], 0, 10)) : ''),
     };
-    $billing = $m && $m['stripe_customer']
+    // Billing management is only for subscriptions; lifetime buyers get their Stripe receipt by email.
+    $billing = $m && $m['stripe_customer'] && $m['plan'] === 'monthly' && $m['status'] !== 'canceled'
         ? '<form method="post" action="' . e(url('account')) . '"><input type="hidden" name="csrf" value="' . $csrf . '"><button class="btn ghost" type="submit">Manage billing</button></form>' : '';
     $join = has_access() ? '' : '<a class="btn" href="' . e(url('join')) . '">Become a member</a>';
     $logout = e(url('logout'));

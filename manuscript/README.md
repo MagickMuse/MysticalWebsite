@@ -13,11 +13,11 @@ hosting, no database server to set up, and nothing to install. Stripe takes the 
   "Connections" (Protection → Hekate → Rosemary…), plus links back from every page that points here.
 - **Search** across titles, alternate names and full text, with suggestions as you type and a
   filter by grimoire.
-- **Paywall:** Stripe Checkout for monthly and lifetime plans. Everyone signs in with an emailed
-  link (no passwords). Canceled monthly members keep access until the end of the period they paid for.
+- **Paywall:** lifetime access for $333 through Stripe Checkout (a monthly plan can be switched on
+  later in the config). Everyone signs in with an emailed link (no passwords).
 - **Shop:** fixed-price and pay-what-you-want products, free downloads that collect emails, files and
   links delivered in the buyer's library, discount codes (made in Stripe → Product catalog → Coupons).
-- **Dashboard:** revenue (30 days, this month, all time), monthly recurring revenue, active members,
+- **Dashboard:** revenue (30 days, this month, all time), active members,
   new and canceled members, sales by product, refunds, email sign-ups, and CSV downloads.
 - **Importer:** pulls straight from Notion, including images, and can be re-run any time to pick up new pages.
 
@@ -42,13 +42,12 @@ Upload `manuscript/config.sample.php` there, rename it to **`manuscript-config.p
 | `notion_token` | notion.so/profile/integrations → **New integration** (internal) → copy the secret. Then in Notion open **The Magick Manuscript** → ••• → **Connections** → add the integration. |
 | `grimoires` | Already filled in for the first ones. Add a line for each grimoire as it moves over. The id is the 32-character code at the end of the grimoire's Notion URL. |
 | `stripe_secret_key` | Stripe Dashboard → Developers → API keys. Start with the **test** key (`sk_test_…`). |
-| `plans` → `price` | Stripe → Product catalog → create "The Magick Manuscript" with a **monthly recurring** price and a **one-time** price. Copy each `price_…` id. |
+| `plans` → `price` | Stripe → Product catalog → create "The Magick Manuscript" with a **$333 one-time** price. Copy its `price_…` id. |
 | `stripe_webhook_secret` | Stripe → Developers → Webhooks → **Add endpoint** `https://magickmuse.com/manuscript/stripe-webhook`, events `checkout.session.completed`, `invoice.paid`, `charge.refunded`, `customer.subscription.updated`, `customer.subscription.deleted`. Copy its `whsec_…` secret. |
 | `products` | Already filled in with the four Gumroad products. Replace each `REPLACE-ME` link with the real Notion/course link, and check prices. Files to deliver (PDFs etc.) go on the server in `manuscript-data/products/<product-slug>/`. |
 | `mail_from`, `smtp_*` | A Hostinger email account (e.g. hello@magickmuse.com). Host `smtp.hostinger.com`, port `465`, the mailbox's address and password. |
 | `admins` | The email(s) that can open the dashboard. Nobody else can see it. |
 
-Also turn on Stripe → Settings → **Customer portal**, so monthly members can cancel or update their card themselves.
 
 ### 3. Import from Notion
 Over SSH (hPanel → Advanced → SSH Access):
