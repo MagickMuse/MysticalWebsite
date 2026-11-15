@@ -31,4 +31,99 @@
       empty.hidden = shown !== 0;
     });
   });
+
+  // Live search suggestions
+  var form = document.querySelector('.mm-search');
+  var box = document.getElementById('mm-q');
+  if (form && box) {
+    var list = document.createElement('ul');
+    list.className = 'suggest';
+    list.id = 'mm-suggest';
+    list.setAttribute('role', 'listbox');
+    list.hidden = true;
+    form.appendChild(list);
+    box.setAttribute('autocomplete', 'off');
+    box.setAttribute('aria-controls', 'mm-suggest');
+    box.setAttribute('aria-autocomplete', 'list');
+    var timer, seq = 0, active = -1;
+    var endpoint = form.getAttribute('action').replace(/search$/, 'suggest');
+    var links = function () { return list.querySelectorAll('a'); };
+    var close = function () { list.hidden = true; active = -1; box.setAttribute('aria-expanded', 'false'); };
+    var mark = function (i) {
+      var a = links();
+      a.forEach(function (el, j) { el.setAttribute('aria-selected', String(j === i)); });
+      active = i;
+    };
+    box.addEventListener('input', function () {
+      clearTimeout(timer);
+      var q = box.value.trim();
+      if (q.length < 2) { close(); return; }
+      timer = setTimeout(function () {
+        var mine = ++seq;
+        fetch(endpoint + '?q=' + encodeURIComponent(q), { credentials: 'same-origin' })
+          .then(function (r) { return r.json(); })
+          .then(function (rows) {
+            if (mine !== seq) return;
+            list.textContent = '';
+            rows.forEach(function (r) {
+              var li = document.createElement('li');
+              var a = document.createElement('a');
+              a.href = r.url;
+              a.setAttribute('role', 'option');
+              a.textContent = (r.icon ? r.icon + ' ' : '') + r.title;
+              if (r.where) { var s = document.createElement('small'); s.textContent = r.where; a.appendChild(s); }
+              li.appendChild(a);
+              list.appendChild(li);
+            });
+            var all = document.createElement('li');
+            all.className = 'all';
+            var aa = document.createElement('a');
+            aa.href = form.getAttribute('action') + '?q=' + encodeURIComponent(q);
+            aa.textContent = rows.length ? 'Search all pages for “' + q + '”' : 'No titles match. Search all text for “' + q + '”';
+            all.appendChild(aa);
+            list.appendChild(all);
+            list.hidden = false;
+            active = -1;
+            box.setAttribute('aria-expanded', 'true');
+          })
+          .catch(close);
+      }, 160);
+    });
+    box.addEventListener('keydown', function (e) {
+      if (list.hidden) return;
+      var a = links();
+      if (e.key === 'ArrowDown') { e.preventDefault(); mark(Math.min(active + 1, a.length - 1)); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); mark(Math.max(active - 1, -1)); }
+      else if (e.key === 'Enter' && active >= 0) { e.preventDefault(); location.href = a[active].href; }
+      else if (e.key === 'Escape') { close(); }
+    });
+    document.addEventListener('click', function (e) { if (!form.contains(e.target)) close(); });
+  }
+
+  // Chart hover tooltips (dashboard)
+  document.querySelectorAll('.chart-wrap').forEach(function (wrap) {
+    var tip = document.createElement('div');
+    tip.className = 'chart-tip';
+    tip.hidden = true;
+    wrap.appendChild(tip);
+    wrap.querySelectorAll('[data-tip]').forEach(function (hit) {
+      hit.addEventListener('mouseenter', function () {
+        var parts = hit.getAttribute('data-tip').split('|');
+        tip.textContent = '';
+        var s = document.createElement('strong');
+        s.textContent = parts.shift();
+        tip.appendChild(s);
+        parts.forEach(function (p) { tip.appendChild(document.createTextNode(p)); tip.appendChild(document.createElement('br')); });
+        tip.hidden = false;
+      });
+      hit.addEventListener('mousemove', function (e) {
+        var r = wrap.getBoundingClientRect();
+        var x = e.clientX - r.left + 14;
+        if (x + tip.offsetWidth > r.width) x = e.clientX - r.left - tip.offsetWidth - 14;
+        tip.style.left = x + 'px';
+        tip.style.top = Math.max(0, e.clientY - r.top - tip.offsetHeight / 2) + 'px';
+      });
+      hit.addEventListener('mouseleave', function () { tip.hidden = true; });
+    });
+  });
 })();

@@ -6,6 +6,8 @@ require __DIR__ . '/lib/auth.php';
 require __DIR__ . '/lib/render.php';
 require __DIR__ . '/lib/mail.php';
 require __DIR__ . '/lib/stripe.php';
+require __DIR__ . '/lib/shop.php';
+require __DIR__ . '/lib/dashboard.php';
 
 // Path relative to the wiki's base, e.g. "correspondence/protection".
 $base = parse_url(config('base_url'), PHP_URL_PATH) ?: '';
@@ -39,7 +41,10 @@ function route(array $parts, string $method): void
         case 'logout':        if ($method === 'POST') { check_csrf(); sign_out(); } redirect(url()); return;
         case 'account':       $method === 'POST' ? do_billing() : view_account(); return;
         case 'stripe-webhook': stripe_webhook(); return;
-        case 'admin':         $method === 'POST' ? do_admin() : view_admin(); return;
+        case 'admin':         redirect(url('dashboard')); return;
+        case 'dashboard':     route_dashboard(array_slice($parts, 1), $method); return;
+        case 'shop':          route_shop(array_slice($parts, 1), $method); return;
+        case 'suggest':       search_suggest(trim((string) ($_GET['q'] ?? ''))); return;
     }
     if (count($parts) === 1) {
         $g = grimoire_root($first);
@@ -58,6 +63,7 @@ function route(array $parts, string $method): void
 
 function view_home(): void
 {
+    if (!has_access()) { view_gate(); return; }
     $grimoires = db()->query("SELECT * FROM pages WHERE kind = 'grimoire'")->fetchAll();
     $order = array_keys(config('grimoires', []));
     $rank = array_flip($order);
@@ -74,7 +80,7 @@ function view_home(): void
     if (!$grimoires) {
         $cards = '<p class="lede">Nothing has been moved over yet. Run the importer (see README) to bring grimoires in from Notion.</p>';
     }
-    $join = has_access() ? '' : '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a><a class="link" href="' . e(url('login')) . '">Member sign in</a></div>';
+    $join = '';
     layout('The Magick Manuscript', <<<HTML
 <section class="mm-hero">
   <p class="eyebrow labelled">A Living Digital Grimoire</p>
@@ -83,13 +89,43 @@ function view_home(): void
   $join
 </section>
 <section class="g-cards cards">$cards</section>
-HTML, ['index' => true, 'description' => 'The Magick Manuscript: a members-only, cross-linked digital grimoire by The Magick Muse.']);
+HTML, ['private' => true]);
+}
+
+/** What non-members see in place of the Manuscript: no titles, lists or previews. */
+function view_gate(?array $locked = null): void
+{
+    $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
+    $signin = current_email()
+        ? '<p class="small">Signed in as ' . e(current_email()) . ', but this email has no active membership. <a href="' . e(url('account')) . '">See your account</a></p>'
+        : '<p class="small">Already a member? <a href="' . e(url('login') . '?next=' . rawurlencode((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH))) . '">Sign in</a></p>';
+    $join = e(url('join'));
+    $heading = $locked ? 'This page lives inside <em>the Manuscript</em>' : 'The Magick <em>Manuscript</em>';
+    if ($locked) http_response_code(403);
+    layout($locked ? 'Members only' : 'The Magick Manuscript', <<<HTML
+<section class="mm-hero narrow gate">
+  <p class="eyebrow labelled">Members only</p>
+  <h1>$heading</h1>
+  <p class="lede">Fifteen cross-linked grimoires and {$total} pages of researched magick, open to members. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>
+  <div class="actions"><a class="btn" href="{$join}">Become a member</a></div>
+  $signin
+</section>
+HTML, ['index' => !$locked, 'description' => 'The Magick Manuscript: a members-only, cross-linked digital grimoire by The Magick Muse.']);
+}
+
+/** Pages listed in config "public_pages" can be read by anyone. */
+function is_public_page(array $p): bool
+{
+    $list = config('public_pages', []);
+    return in_array($p['id'], array_map('normalize_id', $list), true)
+        || in_array($p['grimoire'] . '/' . $p['slug'], $list, true)
+        || ($p['kind'] === 'grimoire' && in_array($p['grimoire'], $list, true));
 }
 
 function view_page(array $p): void
 {
-    $access = has_access();
-    $isPublic = in_array($p['kind'], ['grimoire', 'collection'], true);
+    $access = has_access() || is_public_page($p);
+    if (!$access) { view_gate($p); return; }
     $crumbs = $p['kind'] === 'grimoire' ? '' : breadcrumbs($p);
     $g = $p['kind'] === 'grimoire' ? $p : grimoire_root($p['grimoire']);
     $eyebrow = $p['kind'] === 'grimoire' ? 'The Magick Manuscript' : ($g['title'] ?? '');
@@ -110,54 +146,102 @@ function view_page(array $p): void
     }
     $head .= '</header>';
 
-    $cover = $p['cover'] && ($access || $isPublic) ? '<div class="pg-cover"><img src="' . e(media_url($p['cover'])) . '" alt=""></div>' : '';
+    $cover = $p['cover'] ? '<div class="pg-cover"><img src="' . e(media_url($p['cover'])) . '" alt=""></div>' : '';
 
     if ($p['kind'] === 'collection') {
         $body = ($p['plain'] ? '<p class="lede">' . e($p['plain']) . '</p>' : '') . entry_list(entries_of($p['id']), true);
-    } elseif ($access || $p['kind'] === 'grimoire') {
+    } else {
         $gallery = '';
-        if ($images && $access) {
+        if ($images) {
             $gallery = '<div class="gallery">' . implode('', array_map(fn($f) => '<figure><img src="' . e(media_url($f)) . '" alt="' . e($p['title']) . '" loading="lazy"></figure>', $images)) . '</div>';
         }
         // Landing pages: intro text is public, the guide pages it links to are for members.
         $body = $gallery . '<div class="mm-prose">' . resolve_links((string) $p['body_html']) . '</div>';
-        if ($access && $p['kind'] !== 'grimoire') $body .= connections_html(connections($p));
-        if (!$access && $p['kind'] === 'grimoire') $body .= paywall();
-    } else {
-        $body = teaser($p) . paywall();
+        if ($p['kind'] !== 'grimoire') $body .= connections_html(connections($p));
     }
-    layout($p['title'], '<article class="pg pg-' . e($p['kind']) . '">' . $cover . $head . $body . '</article>', ['private' => $access]);
+    layout($p['title'], '<article class="pg pg-' . e($p['kind']) . '">' . $cover . $head . $body . '</article>', ['private' => true]);
+}
+
+/** Turns what someone typed into an FTS5 query where every word is a prefix match ("rose qua" → Rose Quartz). */
+function fts_query(string $q): string
+{
+    $terms = preg_split('/\s+/u', preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $q), -1, PREG_SPLIT_NO_EMPTY);
+    return implode(' ', array_map(fn($t) => '"' . str_replace('"', '', $t) . '"*', array_slice($terms, 0, 8)));
 }
 
 function view_search(string $q): void
 {
     if ($q === '') redirect(url());
-    // Each word becomes a prefix match, so "rose qua" finds Rose Quartz.
-    $terms = preg_split('/\s+/u', preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $q), -1, PREG_SPLIT_NO_EMPTY);
-    $match = implode(' ', array_map(fn($t) => '"' . str_replace('"', '', $t) . '"*', $terms));
+    if (!has_access()) { view_gate(['search']); return; }
+    $g = (string) ($_GET['g'] ?? '');
+    $match = fts_query($q);
     $rows = [];
     if ($match !== '') {
-        $st = db()->prepare("SELECT p.id, p.slug, p.grimoire, p.kind, p.title, p.icon, p.aka, p.parent_id,
+        $sql = "SELECT p.id, p.slug, p.grimoire, p.kind, p.title, p.icon, p.aka, p.parent_id,
                 snippet(search, 3, '<mark>', '</mark>', '…', 24) AS snip
             FROM search JOIN pages p ON p.id = search.id
-            WHERE search MATCH ? ORDER BY bm25(search, 0, 12.0, 6.0, 1.0) LIMIT 80");
-        $st->execute(["{title aka plain} : $match"]);
+            WHERE search MATCH ?" . ($g !== '' ? ' AND p.grimoire = ?' : '') . "
+            ORDER BY bm25(search, 0, 12.0, 6.0, 1.0) LIMIT 100";
+        $st = db()->prepare($sql);
+        $st->execute($g !== '' ? ["{title aka plain} : $match", $g] : ["{title aka plain} : $match"]);
         $rows = $st->fetchAll();
     }
-    $access = has_access();
+    // How many hits in each grimoire, for the filter.
+    $counts = [];
+    if ($match !== '') {
+        $st = db()->prepare("SELECT p.grimoire, COUNT(*) n FROM search JOIN pages p ON p.id = search.id WHERE search MATCH ? GROUP BY p.grimoire");
+        $st->execute(["{title aka plain} : $match"]);
+        $counts = $st->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
     $parents = page_index(array_column($rows, 'parent_id'));
     $list = '';
     foreach ($rows as $r) {
         $where = $parents[$r['parent_id']]['title'] ?? '';
         // Snippet text is escaped, then our own <mark> tags are restored.
-        $snip = $access ? str_replace(['&lt;mark&gt;', '&lt;/mark&gt;'], ['<mark>', '</mark>'], e($r['snip'])) : '';
+        $snip = str_replace(['&lt;mark&gt;', '&lt;/mark&gt;'], ['<mark>', '</mark>'], e($r['snip']));
         $list .= '<li><a href="' . e(page_url($r)) . '">' . icon_html($r['icon']) . '<strong>' . e($r['title']) . '</strong></a>'
-            . ($where ? '<small>' . e($where) . '</small>' : '') . ($snip ? '<p>' . $snip . '</p>' : '') . '</li>';
+            . ($where ? '<small>' . e($where) . '</small>' : '') . ($r['aka'] ? '<small class="aka-s">Also: ' . e($r['aka']) . '</small>' : '') . ($snip ? '<p>' . $snip . '</p>' : '') . '</li>';
+    }
+    $chips = '';
+    if (count($counts) > 1 || $g !== '') {
+        $roots = page_index(array_map(fn($k) => grimoire_root($k)['id'] ?? '', array_keys($counts)));
+        $titles = [];
+        foreach ($roots as $r) $titles[$r['grimoire']] = $r['title'];
+        $base = url('search?q=' . rawurlencode($q));
+        $chips = '<nav class="filters" aria-label="Filter by grimoire"><a class="chip" href="' . e($base) . '"' . ($g === '' ? ' aria-current="true"' : '') . '>All <small>' . array_sum($counts) . '</small></a>';
+        arsort($counts);
+        foreach ($counts as $slug => $n) {
+            $chips .= '<a class="chip" href="' . e($base . '&g=' . rawurlencode($slug)) . '"' . ($g === $slug ? ' aria-current="true"' : '') . '>' . e($titles[$slug] ?? $slug) . ' <small>' . $n . '</small></a>';
+        }
+        $chips .= '</nav>';
     }
     $count = count($rows);
-    $body = '<section class="mm-results"><p class="eyebrow">Search</p><h1>' . ($count ? ($count >= 80 ? '80+' : $count) . ' results for <em>' . e($q) . '</em>' : 'Nothing found for <em>' . e($q) . '</em>') . '</h1>'
-        . ($count ? '<ol class="results">' . $list . '</ol>' : '<p class="lede">Try another spelling, or a related word.</p>') . '</section>';
+    $shown = $count >= 100 ? '100+' : (string) $count;
+    $body = '<section class="mm-results"><p class="eyebrow">Search</p><h1>' . ($count ? $shown . ' results for <em>' . e($q) . '</em>' : 'Nothing found for <em>' . e($q) . '</em>') . '</h1>'
+        . $chips
+        . ($count ? '<ol class="results">' . $list . '</ol>' : '<p class="lede">Try another spelling, a shorter word, or a related term.</p>')
+        . '</section>';
     layout('Search: ' . $q, $body, ['private' => true]);
+}
+
+/** Live suggestions for the search box: page titles and alternate names only. */
+function search_suggest(string $q): void
+{
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: private, max-age=60');
+    $match = fts_query($q);
+    if (!has_access() || mb_strlen($q) < 2 || $match === '') { echo '[]'; return; }
+    $st = db()->prepare("SELECT p.id, p.slug, p.grimoire, p.kind, p.title, p.icon, p.parent_id FROM search JOIN pages p ON p.id = search.id
+        WHERE search MATCH ? ORDER BY bm25(search, 0, 10.0, 4.0, 0.0) LIMIT 8");
+    $st->execute(["{title aka} : $match"]);
+    $rows = $st->fetchAll();
+    $parents = page_index(array_column($rows, 'parent_id'));
+    echo json_encode(array_map(fn($r) => [
+        'title' => $r['title'],
+        'url' => page_url($r),
+        'where' => $parents[$r['parent_id']]['title'] ?? '',
+        'icon' => ($r['icon'] && !str_starts_with($r['icon'], 'file:')) ? $r['icon'] : '',
+    ], $rows), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 }
 
 function serve_media(string $file): void
@@ -165,12 +249,8 @@ function serve_media(string $file): void
     $file = basename($file);
     $path = config('data_dir') . '/media/' . $file;
     if (!preg_match('/^[a-z0-9-]+\.(jpe?g|png|gif|webp|svg|avif)$/', $file) || !is_file($path)) { http_response_code(404); exit; }
-    // Covers and icons of grimoire and database pages are public; everything else is for members.
-    if (!has_access()) {
-        $owner = substr($file, 0, 32);
-        $p = page_by_id($owner);
-        if (!$p || !in_array($p['kind'], ['grimoire', 'collection'], true)) { http_response_code(403); exit; }
-    }
+    // Members only, except images that appear on a page listed in public_pages.
+    if (!has_access() && !media_is_public($file)) { http_response_code(403); exit; }
     $types = ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp', 'svg' => 'image/svg+xml', 'avif' => 'image/avif'];
     header('Content-Type: ' . $types[pathinfo($file, PATHINFO_EXTENSION)]);
     header('Content-Length: ' . filesize($path));
@@ -178,6 +258,17 @@ function serve_media(string $file): void
     header("Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'");
     header('X-Content-Type-Options: nosniff');
     readfile($path);
+}
+
+function media_is_public(string $file): bool
+{
+    foreach (config('public_pages', []) as $ref) {
+        $p = preg_match('/^[0-9a-f-]{32,36}$/i', $ref) ? page_by_id($ref)
+            : (str_contains($ref, '/') ? find_page(...explode('/', $ref, 2)) : grimoire_root($ref));
+        if ($p && (str_contains((string) $p['body_html'], $file) || $p['cover'] === $file || $p['icon'] === 'file:' . $file
+            || str_contains((string) $p['tags_json'], $file))) return true;
+    }
+    return false;
 }
 
 /** /go/<notion-id>: old Notion links (Discord posts, bookmarks) land on the right wiki page. */
@@ -254,22 +345,34 @@ function view_welcome(): void
     layout('Welcome', '<section class="mm-hero narrow"><p class="eyebrow labelled">Welcome, seeker</p><h1>The Manuscript <em>is open to you</em></h1>' . $msg . '</section>', ['private' => true]);
 }
 
-function view_login(string $notice = ''): void
+/** Only same-site paths may be used as a post-login destination. */
+function safe_next(?string $next): string
 {
+    $next = (string) $next;
+    return preg_match('~^/(?![/\\\\])[^\s]*$~', $next) ? $next : (parse_url(config('base_url'), PHP_URL_PATH) ?: '/');
+}
+
+function view_login(string $notice = '', ?string $next = null): void
+{
+    $next = safe_next($next ?? ($_GET['next'] ?? $_POST['next'] ?? null));
     $csrf = e(csrf_token());
     $action = e(url('login'));
+    $nextAttr = e($next);
     layout('Sign in', <<<HTML
 <section class="mm-hero narrow">
-  <p class="eyebrow labelled">Members</p>
-  <h1>Sign in to <em>the Manuscript</em></h1>
+  <p class="eyebrow labelled">Welcome back</p>
+  <h1>Sign <em>in</em></h1>
   $notice
+  <div class="signin">
   <form class="mm-form" method="post" action="$action">
     <input type="hidden" name="csrf" value="$csrf">
+    <input type="hidden" name="next" value="$nextAttr">
     <label for="email">Your email</label>
     <input id="email" name="email" type="email" autocomplete="email" required>
     <button class="btn" type="submit">Email me a sign-in link</button>
-    <p class="small">No password needed. The link works once and expires in 30 minutes.</p>
+    <p class="small">No password needed. Use the email you bought with. The link works once and expires in 30 minutes.</p>
   </form>
+  </div>
 </section>
 HTML, ['private' => true]);
 }
@@ -277,26 +380,28 @@ HTML, ['private' => true]);
 function do_login(): void
 {
     check_csrf();
+    $next = safe_next($_POST['next'] ?? null);
     $email = strtolower(trim((string) ($_POST['email'] ?? '')));
-    $ok = '<p class="notice">If that email belongs to a member, a sign-in link is on its way. Check your inbox (and spam).</p>';
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { view_login('<p class="notice error">That email doesn’t look right.</p>'); return; }
-    if (!throttle('login', 5, 900)) { view_login('<p class="notice error">Too many tries. Please wait a few minutes.</p>'); return; }
-    // Only members and admins get a link; everyone sees the same message so emails can't be probed.
-    if (member_row($email) || is_admin($email)) {
-        $link = url('auth?token=' . issue_login_token($email));
-        send_mail($email, 'Your sign-in link for the Magick Manuscript',
-            "Open this link to sign in to the Magick Manuscript:\n\n$link\n\nIt works once and expires in 30 minutes. If you didn't ask for it, ignore this email.",
-            '<p>Open this link to sign in to the Magick Manuscript:</p><p><a href="' . e($link) . '">Sign in to the Manuscript</a></p><p>It works once and expires in 30 minutes. If you didn’t ask for it, ignore this email.</p>');
+    $ok = '<p class="notice">If that email has bought anything from The Magick Muse, a sign-in link is on its way. Check your inbox (and spam).</p>';
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { view_login('<p class="notice error">That email doesn’t look right.</p>', $next); return; }
+    if (!throttle('login', 5, 900)) { view_login('<p class="notice error">Too many tries. Please wait a few minutes.</p>', $next); return; }
+    // Only customers and admins get a link; everyone sees the same message so emails can't be probed.
+    if (is_customer($email) || is_admin($email)) {
+        $link = url('auth?token=' . issue_login_token($email) . '&next=' . rawurlencode($next));
+        send_mail($email, 'Your sign-in link for The Magick Muse',
+            "Open this link to sign in:\n\n$link\n\nIt works once and expires in 30 minutes. If you didn't ask for it, ignore this email.",
+            '<p>Open this link to sign in to The Magick Muse:</p><p><a href="' . e($link) . '">Sign in</a></p><p>It works once and expires in 30 minutes. If you didn’t ask for it, ignore this email.</p>');
     }
-    view_login($ok);
+    view_login($ok, $next);
 }
 
 function do_auth(string $token): void
 {
+    $next = safe_next($_GET['next'] ?? null);
     $email = preg_match('/^[0-9a-f]{48}$/', $token) ? redeem_login_token($token) : null;
-    if (!$email) { view_login('<p class="notice error">That link has expired or was already used. Request a new one below.</p>'); return; }
+    if (!$email) { view_login('<p class="notice error">That link has expired or was already used. Request a new one below.</p>', $next); return; }
     sign_in($email);
-    redirect(url());
+    redirect($next);
 }
 
 function view_account(): void
@@ -318,13 +423,14 @@ function view_account(): void
     $join = has_access() ? '' : '<a class="btn" href="' . e(url('join')) . '">Become a member</a>';
     $logout = e(url('logout'));
     $email = e($email);
-    $admin = is_admin(current_email()) ? '<a class="link" href="' . e(url('admin')) . '">Members admin</a>' : '';
+    $admin = is_admin(current_email()) ? '<a class="link" href="' . e(url('dashboard')) . '">Dashboard</a>' : '';
+    $library = '<a class="link" href="' . e(site_url('shop/library')) . '">Your library</a>';
     layout('Account', <<<HTML
 <section class="mm-hero narrow">
   <p class="eyebrow labelled">Account</p>
   <h1><em>{$email}</em></h1>
   <p class="lede">$status</p>
-  <div class="actions">$join $billing $admin
+  <div class="actions">$join $billing $library $admin
     <form method="post" action="$logout"><input type="hidden" name="csrf" value="$csrf"><button class="link as-button" type="submit">Sign out</button></form>
   </div>
 </section>
@@ -344,60 +450,13 @@ function stripe_webhook(): void
     $payload = (string) file_get_contents('php://input');
     $event = verify_webhook($payload, (string) ($_SERVER['HTTP_STRIPE_SIGNATURE'] ?? ''));
     if (!$event) { http_response_code(400); exit('bad signature'); }
-    handle_stripe_event($event);
+    try {
+        handle_stripe_event($event);
+    } catch (Throwable $ex) {
+        error_log('[manuscript] stripe webhook ' . ($event['type'] ?? '') . ': ' . $ex->getMessage());
+        http_response_code(500); // Stripe will retry
+        exit('retry');
+    }
     http_response_code(200);
     echo 'ok';
-}
-
-// ------------------------------------------------------------------ admin
-
-function view_admin(string $notice = ''): void
-{
-    if (!is_admin()) { not_found(); return; }
-    $rows = db()->query('SELECT * FROM members ORDER BY created_at DESC')->fetchAll();
-    $active = count(array_filter($rows, fn($r) => $r['status'] === 'active'));
-    $tr = '';
-    foreach ($rows as $r) {
-        $tr .= '<tr><td>' . e($r['email']) . '</td><td>' . e($r['plan']) . '</td><td>' . e($r['status']) . '</td><td>' . e(substr((string) $r['paid_through'], 0, 10)) . '</td><td>' . e($r['note']) . '</td><td>' . e(substr($r['created_at'], 0, 10)) . '</td></tr>';
-    }
-    $csrf = e(csrf_token());
-    $action = e(url('admin'));
-    $last = db()->query('SELECT MAX(imported_at) FROM pages')->fetchColumn() ?: 'never';
-    $pages = (int) db()->query('SELECT COUNT(*) FROM pages')->fetchColumn();
-    layout('Members', <<<HTML
-<section class="admin">
-  <p class="eyebrow">Curator</p>
-  <h1>Members <em>($active active)</em></h1>
-  <p class="small">$pages pages in the wiki · last import $last UTC</p>
-  $notice
-  <form class="mm-form inline" method="post" action="$action">
-    <input type="hidden" name="csrf" value="$csrf">
-    <label for="add">Give someone access (existing Gumroad member, gift, collaborator)</label>
-    <textarea id="add" name="emails" rows="3" placeholder="one email per line"></textarea>
-    <label for="plan">Access</label>
-    <select id="plan" name="plan"><option value="comp">Lifetime (complimentary / moved from Gumroad)</option><option value="revoke">Remove access</option></select>
-    <input name="note" placeholder="Note, e.g. Gumroad lifetime" aria-label="Note">
-    <button class="btn" type="submit">Save</button>
-  </form>
-  <div class="table-wrap"><table><tr><th>Email</th><th>Plan</th><th>Status</th><th>Paid through</th><th>Note</th><th>Joined</th></tr>$tr</table></div>
-</section>
-HTML, ['private' => true]);
-}
-
-function do_admin(): void
-{
-    if (!is_admin()) { not_found(); return; }
-    check_csrf();
-    $n = 0;
-    foreach (preg_split('/[\s,;]+/', (string) ($_POST['emails'] ?? ''), -1, PREG_SPLIT_NO_EMPTY) as $email) {
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) continue;
-        if (($_POST['plan'] ?? '') === 'revoke') {
-            upsert_member($email, ['status' => 'canceled', 'paid_through' => null]);
-            db()->prepare("UPDATE members SET plan = NULL WHERE email = ?")->execute([strtolower($email)]);
-        } else {
-            upsert_member($email, ['plan' => 'comp', 'status' => 'active', 'paid_through' => null, 'note' => mb_substr((string) ($_POST['note'] ?? ''), 0, 200)]);
-        }
-        $n++;
-    }
-    view_admin("<p class=\"notice\">Updated $n " . ($n === 1 ? 'member' : 'members') . '.</p>');
 }

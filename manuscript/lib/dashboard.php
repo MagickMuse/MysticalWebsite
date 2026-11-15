@@ -1,0 +1,373 @@
+<?php
+declare(strict_types=1);
+
+/*
+ * Private dashboard for the curator (emails listed in config "admins").
+ * Sales and members, from Stripe webhooks plus any history imported from Gumroad.
+ */
+
+function route_dashboard(array $parts, string $method): void
+{
+    if (!is_admin()) {
+        current_email() ? not_found() : view_login('<p class="notice">Sign in to see your dashboard.</p>', '/' . trim((string) parse_url(url('dashboard'), PHP_URL_PATH), '/'));
+        return;
+    }
+    $tab = $parts[0] ?? '';
+    match (true) {
+        $tab === '' => dash_overview(),
+        $tab === 'members' && $method === 'POST' => dash_members_post(),
+        $tab === 'members' => dash_members(),
+        $tab === 'sales' => dash_sales(),
+        $tab === 'emails' => dash_leads(),
+        $tab === 'export' => dash_export($parts[1] ?? ''),
+        default => not_found(),
+    };
+}
+
+function dash_layout(string $active, string $title, string $body): void
+{
+    $tabs = '';
+    foreach (['' => 'Overview', 'sales' => 'Sales', 'members' => 'Members', 'emails' => 'Email sign-ups'] as $k => $label) {
+        $cur = $k === $active ? ' aria-current="page"' : '';
+        $tabs .= '<li><a href="' . e(url('dashboard' . ($k ? "/$k" : ''))) . "\"$cur>" . e($label) . '</a></li>';
+    }
+    layout($title . ' · Dashboard', '<section class="dash"><header class="dash-head"><p class="eyebrow labelled">Curator’s dashboard</p><h1>' . $title . '</h1>'
+        . '<nav class="dash-tabs" aria-label="Dashboard"><ul>' . $tabs . '</ul></nav></header>' . $body . '</section>', ['private' => true]);
+}
+
+function cur(): string { return config('currency', 'usd'); }
+
+/** Net revenue (after refunds) in cents between two UTC datetimes. */
+function revenue(string $from, string $to, ?string $kind = null): int
+{
+    $sql = 'SELECT COALESCE(SUM(amount_cents - refunded_cents), 0) FROM payments WHERE created_at >= ? AND created_at < ?';
+    if ($kind === 'membership') $sql .= " AND product LIKE 'membership-%'";
+    if ($kind === 'shop') $sql .= " AND product NOT LIKE 'membership-%'";
+    $st = db()->prepare($sql);
+    $st->execute([$from, $to]);
+    return (int) $st->fetchColumn();
+}
+
+function product_name(string $slug): string
+{
+    return match ($slug) {
+        'membership-monthly' => 'Manuscript · monthly',
+        'membership-lifetime' => 'Manuscript · lifetime',
+        default => product($slug)['name'] ?? ucwords(str_replace('-', ' ', $slug)),
+    };
+}
+
+function stat_tile(string $label, string $value, string $note = ''): string
+{
+    return '<div class="tile"><p class="tile-label">' . e($label) . '</p><p class="tile-value">' . $value . '</p>' . ($note ? '<p class="tile-note">' . $note . '</p>' : '') . '</div>';
+}
+
+function delta(int $now, int $before): string
+{
+    if ($before === 0) return $now > 0 ? 'new this period' : 'no change';
+    $pct = (int) round(($now - $before) / $before * 100);
+    $arrow = $pct > 0 ? '▲' : ($pct < 0 ? '▼' : '■');
+    return '<span class="delta">' . $arrow . ' ' . abs($pct) . '%</span> vs previous 30 days';
+}
+
+// ------------------------------------------------------------------ overview
+
+function dash_overview(): void
+{
+    $now = now();
+    $d30 = gmdate('Y-m-d H:i:s', time() - 30 * 86400);
+    $d60 = gmdate('Y-m-d H:i:s', time() - 60 * 86400);
+    $month = gmdate('Y-m-01 00:00:00');
+
+    $rev30 = revenue($d30, $now);
+    $revPrev = revenue($d60, $d30);
+    $revMonth = revenue($month, $now);
+    $revAll = revenue('0000', '9999');
+
+    $members = db()->query("SELECT plan, COUNT(*) n FROM members WHERE status = 'active' OR (paid_through IS NOT NULL AND paid_through >= " . db()->quote($now) . ") GROUP BY plan")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $activeTotal = array_sum($members);
+    // Monthly recurring revenue: each active monthly member's latest subscription payment.
+    $mrr = (int) db()->query("SELECT COALESCE(SUM(amt), 0) FROM (
+            SELECT (SELECT amount_cents FROM payments p WHERE p.email = m.email AND p.product = 'membership-monthly' ORDER BY created_at DESC LIMIT 1) AS amt
+            FROM members m WHERE m.plan = 'monthly' AND m.status = 'active')")->fetchColumn();
+    $q = fn(string $sql, array $args) => (function () use ($sql, $args) { $st = db()->prepare($sql); $st->execute($args); return (int) $st->fetchColumn(); })();
+    $new30 = $q('SELECT COUNT(*) FROM members WHERE created_at >= ?', [$d30]);
+    $newPrev = $q('SELECT COUNT(*) FROM members WHERE created_at >= ? AND created_at < ?', [$d60, $d30]);
+    $cancel30 = $q("SELECT COUNT(*) FROM members WHERE status = 'canceled' AND updated_at >= ?", [$d30]);
+    $leads = $q('SELECT COUNT(DISTINCT email) FROM leads', []);
+    $leads30 = $q('SELECT COUNT(DISTINCT email) FROM leads WHERE created_at >= ?', [$d30]);
+
+    $breakdown = implode(' · ', array_filter([
+        isset($members['monthly']) ? $members['monthly'] . ' monthly' : '',
+        isset($members['lifetime']) ? $members['lifetime'] . ' lifetime' : '',
+        isset($members['comp']) ? $members['comp'] . ' gifted / from Gumroad' : '',
+    ])) ?: 'none yet';
+
+    $tiles = '<div class="tiles">'
+        . stat_tile('Revenue, last 30 days', e(money($rev30, cur())), delta($rev30, $revPrev))
+        . stat_tile('This month so far', e(money($revMonth, cur())), e(gmdate('F')))
+        . stat_tile('Monthly recurring revenue', e(money($mrr, cur())), 'from active monthly members')
+        . stat_tile('Active members', number_format($activeTotal), e($breakdown))
+        . stat_tile('New members, 30 days', number_format($new30), delta($new30, $newPrev) . ($cancel30 ? ' · ' . $cancel30 . ' canceled' : ''))
+        . stat_tile('Email sign-ups', number_format($leads), number_format($leads30) . ' in the last 30 days')
+        . stat_tile('All-time revenue', e(money($revAll, cur())), 'after refunds, including Gumroad history')
+        . '</div>';
+
+    // Last 12 months
+    $months = [];
+    for ($i = 11; $i >= 0; $i--) {
+        $start = gmdate('Y-m-01', strtotime(gmdate('Y-m-01') . " -$i months"));
+        $end = gmdate('Y-m-01', strtotime("$start +1 month"));
+        $months[] = [
+            'label' => gmdate('M', strtotime($start)),
+            'long' => gmdate('F Y', strtotime($start)),
+            'membership' => revenue("$start 00:00:00", "$end 00:00:00", 'membership'),
+            'shop' => revenue("$start 00:00:00", "$end 00:00:00", 'shop'),
+            'members' => $q('SELECT COUNT(*) FROM members WHERE created_at >= ? AND created_at < ?', ["$start 00:00:00", "$end 00:00:00"]),
+        ];
+    }
+
+    // Top products, last 90 days
+    $st = db()->prepare('SELECT product, COUNT(*) n, SUM(amount_cents - refunded_cents) cents FROM payments WHERE created_at >= ? GROUP BY product ORDER BY cents DESC');
+    $st->execute([gmdate('Y-m-d H:i:s', time() - 90 * 86400)]);
+    $rows = '';
+    foreach ($st->fetchAll() as $r) {
+        $rows .= '<tr><td>' . e(product_name($r['product'])) . '</td><td class="num">' . (int) $r['n'] . '</td><td class="num">' . e(money((int) $r['cents'], cur())) . '</td></tr>';
+    }
+    $top = '<div class="dash-card"><h2>By product <small>last 90 days</small></h2>'
+        . ($rows ? '<div class="table-wrap"><table><tr><th>Product</th><th class="num">Sales</th><th class="num">Revenue</th></tr>' . $rows . '</table></div>' : '<p class="small">No sales yet.</p>') . '</div>';
+
+    $recent = dash_sales_table(8);
+
+    dash_layout('', 'Overview', $tiles
+        . '<div class="dash-grid">'
+        . '<div class="dash-card wide"><h2>Revenue by month</h2>' . revenue_chart($months) . '</div>'
+        . '<div class="dash-card"><h2>New members by month</h2>' . members_chart($months) . '</div>'
+        . $top
+        . '<div class="dash-card wide"><h2>Latest sales <a class="small" href="' . e(url('dashboard/sales')) . '">See all</a></h2>' . $recent . '</div>'
+        . '</div>');
+}
+
+/** Stacked monthly bars: Manuscript memberships + shop. Server-rendered SVG, hover tips via wiki.js. */
+function revenue_chart(array $months): string
+{
+    $W = 720; $H = 260; $padL = 56; $padB = 28; $padT = 12; $padR = 8;
+    $max = max(1, ...array_map(fn($m) => $m['membership'] + $m['shop'], $months));
+    $step = nice_step($max / 100);
+    $top = (int) round(ceil(($max / 100) / $step) * $step * 100);
+    $plotH = $H - $padB - $padT;
+    $slot = ($W - $padL - $padR) / count($months);
+    $bw = min(36, $slot * 0.62);
+    $y = fn(float $c) => $padT + $plotH - $c / $top * $plotH;
+
+    $svg = '<svg class="chart" viewBox="0 0 ' . $W . ' ' . $H . '" role="img" aria-label="Revenue by month for the last 12 months, Manuscript membership and shop">';
+    for ($v = 0; $v <= $top; $v += $step * 100) {
+        $yy = round($y($v), 1);
+        $svg .= '<line class="grid" x1="' . $padL . '" x2="' . ($W - $padR) . '" y1="' . $yy . '" y2="' . $yy . '"/>'
+            . '<text class="axis" x="' . ($padL - 8) . '" y="' . ($yy + 4) . '" text-anchor="end">' . e(money((int) round($v), cur())) . '</text>';
+    }
+    foreach ($months as $i => $m) {
+        $cx = $padL + $slot * $i + $slot / 2;
+        $x = round($cx - $bw / 2, 1);
+        $base = $y(0);
+        $hM = $base - $y($m['membership']);
+        $hS = $base - $y($m['shop']);
+        $gap = ($hM > 0 && $hS > 0) ? 2 : 0;
+        // Membership on the baseline, shop stacked above it with a 2px gap; the top segment gets the rounded end.
+        $topIsShop = $hS > 0;
+        if ($hM > 0) $svg .= bar_path($x, $base - $hM, $bw, $hM, !$topIsShop, 'series-1');
+        if ($hS > 0) $svg .= bar_path($x, $base - $hM - $gap - $hS, $bw, $hS, true, 'series-2');
+        $tip = $m['long'] . '|Manuscript: ' . money($m['membership'], cur()) . '|Shop: ' . money($m['shop'], cur()) . '|Total: ' . money($m['membership'] + $m['shop'], cur());
+        $svg .= '<rect class="hit" x="' . round($padL + $slot * $i, 1) . '" y="' . $padT . '" width="' . round($slot, 1) . '" height="' . $plotH . '" data-tip="' . e($tip) . '"/>';
+        $svg .= '<text class="axis" x="' . round($cx, 1) . '" y="' . ($H - 8) . '" text-anchor="middle">' . e($m['label']) . '</text>';
+    }
+    $svg .= '<line class="baseline" x1="' . $padL . '" x2="' . ($W - $padR) . '" y1="' . $y(0) . '" y2="' . $y(0) . '"/></svg>';
+
+    $legend = '<ul class="legend"><li><span class="key series-1"></span>Manuscript membership</li><li><span class="key series-2"></span>Shop (courses, templates)</li></ul>';
+    $table = '<details class="chart-table"><summary>Show as table</summary><div class="table-wrap"><table><tr><th>Month</th><th class="num">Manuscript</th><th class="num">Shop</th><th class="num">Total</th></tr>';
+    foreach ($months as $m) {
+        $table .= '<tr><td>' . e($m['long']) . '</td><td class="num">' . e(money($m['membership'], cur())) . '</td><td class="num">' . e(money($m['shop'], cur())) . '</td><td class="num">' . e(money($m['membership'] + $m['shop'], cur())) . '</td></tr>';
+    }
+    return $legend . '<div class="chart-wrap">' . $svg . '</div>' . $table . '</table></div></details>';
+}
+
+function members_chart(array $months): string
+{
+    $W = 360; $H = 260; $padL = 32; $padB = 28; $padT = 12; $padR = 4;
+    $max = max(1, ...array_column($months, 'members'));
+    $step = nice_step((float) $max);
+    $top = (int) (ceil($max / $step) * $step);
+    $plotH = $H - $padB - $padT;
+    $slot = ($W - $padL - $padR) / count($months);
+    $bw = min(18, $slot * 0.6);
+    $y = fn(float $v) => $padT + $plotH - $v / $top * $plotH;
+    $svg = '<svg class="chart" viewBox="0 0 ' . $W . ' ' . $H . '" role="img" aria-label="New members by month for the last 12 months">';
+    for ($v = 0; $v <= $top; $v += $step) {
+        $yy = round($y($v), 1);
+        $svg .= '<line class="grid" x1="' . $padL . '" x2="' . ($W - $padR) . '" y1="' . $yy . '" y2="' . $yy . '"/><text class="axis" x="' . ($padL - 6) . '" y="' . ($yy + 4) . '" text-anchor="end">' . $v . '</text>';
+    }
+    foreach ($months as $i => $m) {
+        $cx = $padL + $slot * $i + $slot / 2;
+        $h = $y(0) - $y($m['members']);
+        if ($h > 0) $svg .= bar_path(round($cx - $bw / 2, 1), $y(0) - $h, $bw, $h, true, 'series-1');
+        $svg .= '<rect class="hit" x="' . round($padL + $slot * $i, 1) . '" y="' . $padT . '" width="' . round($slot, 1) . '" height="' . $plotH . '" data-tip="' . e($m['long'] . '|New members: ' . $m['members']) . '"/>';
+        if ($i % 2 === 1) $svg .= '<text class="axis" x="' . round($cx, 1) . '" y="' . ($H - 8) . '" text-anchor="middle">' . e($m['label']) . '</text>';
+    }
+    $svg .= '<line class="baseline" x1="' . $padL . '" x2="' . ($W - $padR) . '" y1="' . $y(0) . '" y2="' . $y(0) . '"/></svg>';
+    $table = '<details class="chart-table"><summary>Show as table</summary><div class="table-wrap"><table><tr><th>Month</th><th class="num">New members</th></tr>';
+    foreach ($months as $m) $table .= '<tr><td>' . e($m['long']) . '</td><td class="num">' . (int) $m['members'] . '</td></tr>';
+    return '<div class="chart-wrap">' . $svg . '</div>' . $table . '</table></div></details>';
+}
+
+/** A bar with 4px rounded corners on its top end only (anchored flat on the baseline). */
+function bar_path(float $x, float $y, float $w, float $h, bool $round, string $class): string
+{
+    $r = $round ? min(4, $h, $w / 2) : 0;
+    $x2 = $x + $w; $yb = $y + $h;
+    $d = $r > 0
+        ? "M$x,$yb V" . ($y + $r) . " Q$x,$y " . ($x + $r) . ",$y H" . ($x2 - $r) . " Q$x2,$y $x2," . ($y + $r) . " V$yb Z"
+        : "M$x,$yb V$y H$x2 V$yb Z";
+    return '<path class="bar ' . $class . '" d="' . $d . '"/>';
+}
+
+function nice_step(float $max): float
+{
+    if ($max <= 0) return 1;
+    $raw = $max / 4;
+    $mag = 10 ** floor(log10($raw));
+    foreach ([1, 2, 2.5, 5, 10] as $m) if ($raw <= $m * $mag) return max(1, $m * $mag);
+    return 10 * $mag;
+}
+
+// ------------------------------------------------------------------ sales
+
+function dash_sales_table(int $limit, int $offset = 0): string
+{
+    $st = db()->prepare('SELECT * FROM payments ORDER BY created_at DESC LIMIT ? OFFSET ?');
+    $st->execute([$limit, $offset]);
+    $rows = '';
+    foreach ($st->fetchAll() as $p) {
+        $ref = $p['refunded_cents'] > 0 ? ' <span class="tag">refunded ' . e(money((int) $p['refunded_cents'], $p['currency'])) . '</span>' : '';
+        $src = $p['source'] === 'gumroad' ? ' <span class="tag">Gumroad</span>' : '';
+        $rows .= '<tr><td>' . e(substr($p['created_at'], 0, 10)) . '</td><td>' . e($p['email']) . '</td><td>' . e(product_name($p['product'])) . $src . '</td><td class="num">' . e(money((int) $p['amount_cents'], $p['currency'])) . $ref . '</td></tr>';
+    }
+    return $rows ? '<div class="table-wrap"><table><tr><th>Date</th><th>Customer</th><th>Product</th><th class="num">Amount</th></tr>' . $rows . '</table></div>' : '<p class="small">No sales yet.</p>';
+}
+
+function dash_sales(): void
+{
+    $page = max(1, (int) ($_GET['page'] ?? 1));
+    $total = (int) db()->query('SELECT COUNT(*) FROM payments')->fetchColumn();
+    $pages = max(1, (int) ceil($total / 100));
+    $nav = $pages > 1 ? '<p class="small">Page ' . $page . ' of ' . $pages
+        . ($page > 1 ? ' · <a href="?page=' . ($page - 1) . '">Newer</a>' : '') . ($page < $pages ? ' · <a href="?page=' . ($page + 1) . '">Older</a>' : '') . '</p>' : '';
+    dash_layout('sales', 'Sales', '<p class="dash-actions"><a class="btn ghost" href="' . e(url('dashboard/export/sales.csv')) . '">Download CSV</a> <span class="small">' . number_format($total) . ' sales. Stripe sends a receipt for every sale, and refunds are made from the Stripe dashboard.</span></p>'
+        . '<div class="dash-card wide">' . dash_sales_table(100, ($page - 1) * 100) . $nav . '</div>');
+}
+
+// ------------------------------------------------------------------ members
+
+function dash_members(string $notice = ''): void
+{
+    $filter = (string) ($_GET['q'] ?? '');
+    $sql = 'SELECT m.*, (SELECT COALESCE(SUM(amount_cents - refunded_cents), 0) FROM payments p WHERE p.email = m.email) AS spent FROM members m';
+    $args = [];
+    if ($filter !== '') { $sql .= ' WHERE m.email LIKE ?'; $args[] = '%' . $filter . '%'; }
+    $st = db()->prepare($sql . ' ORDER BY m.created_at DESC LIMIT 500');
+    $st->execute($args);
+    $tr = '';
+    foreach ($st->fetchAll() as $r) {
+        $plan = ['monthly' => 'Monthly', 'lifetime' => 'Lifetime', 'comp' => 'Gifted / Gumroad'][$r['plan']] ?? '—';
+        $status = $r['status'] === 'active' ? 'Active' : ucfirst(str_replace('_', ' ', $r['status'])) . ($r['paid_through'] && $r['paid_through'] >= now() ? ' (access until ' . substr($r['paid_through'], 0, 10) . ')' : '');
+        $tr .= '<tr><td>' . e($r['email']) . '</td><td>' . e($plan) . '</td><td>' . e($status) . '</td><td class="num">' . e(money((int) $r['spent'], cur())) . '</td><td>' . e(substr($r['created_at'], 0, 10)) . '</td><td>' . e($r['note']) . '</td></tr>';
+    }
+    $csrf = e(csrf_token());
+    $action = e(url('dashboard/members'));
+    $qv = e($filter);
+    $export = e(url('dashboard/export/members.csv'));
+    $productOptions = '';
+    foreach (products() as $slug => $p) {
+        $productOptions .= '<option value="product:' . e($slug) . '">' . e($p['name']) . '</option>';
+    }
+    dash_layout('members', 'Members', $notice . <<<HTML
+<div class="dash-grid">
+<div class="dash-card wide">
+  <form class="dash-filter" method="get" action="$action"><label class="sr-only" for="mq">Find a member</label><input id="mq" name="q" type="search" value="$qv" placeholder="Find by email"><button class="btn ghost" type="submit">Find</button></form>
+  <div class="table-wrap"><table><tr><th>Email</th><th>Plan</th><th>Status</th><th class="num">Spent</th><th>Joined</th><th>Note</th></tr>$tr</table></div>
+  <p class="dash-actions"><a class="btn ghost" href="$export">Download CSV</a></p>
+</div>
+<div class="dash-card">
+  <h2>Give or remove access</h2>
+  <form class="mm-form" method="post" action="$action">
+    <input type="hidden" name="csrf" value="$csrf">
+    <label for="emails">Emails, one per line</label>
+    <textarea id="emails" name="emails" rows="4" required></textarea>
+    <label for="what">Access</label>
+    <select id="what" name="what">
+      <option value="comp">Manuscript, lifetime (gift / moved from Gumroad)</option>
+      $productOptions
+      <option value="revoke">Remove Manuscript access</option>
+    </select>
+    <input name="note" placeholder="Note (optional)" aria-label="Note">
+    <button class="btn" type="submit">Save</button>
+  </form>
+</div>
+</div>
+HTML);
+}
+
+function dash_members_post(): void
+{
+    check_csrf();
+    $what = (string) ($_POST['what'] ?? '');
+    $n = 0;
+    foreach (preg_split('/[\s,;]+/', (string) ($_POST['emails'] ?? ''), -1, PREG_SPLIT_NO_EMPTY) as $email) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) continue;
+        if ($what === 'revoke') {
+            upsert_member($email, ['status' => 'canceled', 'paid_through' => null]);
+        } elseif ($what === 'comp') {
+            upsert_member($email, ['plan' => 'comp', 'status' => 'active', 'paid_through' => null, 'note' => mb_substr((string) ($_POST['note'] ?? ''), 0, 200)]);
+        } elseif (str_starts_with($what, 'product:') && product(substr($what, 8))) {
+            grant($email, substr($what, 8), 'gift');
+        } else {
+            continue;
+        }
+        $n++;
+    }
+    dash_members('<p class="notice">Updated ' . $n . ' ' . ($n === 1 ? 'person' : 'people') . '.</p>');
+}
+
+// ------------------------------------------------------------------ leads + export
+
+function dash_leads(): void
+{
+    $rows = db()->query('SELECT email, GROUP_CONCAT(product, \', \') products, MIN(created_at) first FROM leads GROUP BY email ORDER BY first DESC LIMIT 500')->fetchAll();
+    $tr = '';
+    foreach ($rows as $r) {
+        $names = implode(', ', array_map('product_name', explode(', ', $r['products'])));
+        $tr .= '<tr><td>' . e($r['email']) . '</td><td>' . e($names) . '</td><td>' . e(substr($r['first'], 0, 10)) . '</td></tr>';
+    }
+    dash_layout('emails', 'Email sign-ups', '<p class="dash-actions"><a class="btn ghost" href="' . e(url('dashboard/export/emails.csv')) . '">Download CSV</a> <span class="small">People who picked up a free download. Import the CSV into your email tool to write to them.</span></p>'
+        . '<div class="dash-card wide">' . ($tr ? '<div class="table-wrap"><table><tr><th>Email</th><th>Downloaded</th><th>First seen</th></tr>' . $tr . '</table></div>' : '<p class="small">No sign-ups yet.</p>') . '</div>');
+}
+
+function dash_export(string $file): void
+{
+    [$sql, $name] = match ($file) {
+        'sales.csv' => ['SELECT created_at, email, product, amount_cents / 100.0 AS amount, refunded_cents / 100.0 AS refunded, currency, source, id FROM payments ORDER BY created_at DESC', 'sales'],
+        'members.csv' => ['SELECT email, plan, status, paid_through, created_at, note FROM members ORDER BY created_at DESC', 'members'],
+        'emails.csv' => ['SELECT email, product, created_at FROM leads ORDER BY created_at DESC', 'email-signups'],
+        default => [null, null],
+    };
+    if (!$sql) { not_found(); return; }
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="magick-muse-' . $name . '-' . gmdate('Y-m-d') . '.csv"');
+    header('Cache-Control: private, no-store');
+    $out = fopen('php://output', 'w');
+    $first = true;
+    foreach (db()->query($sql, PDO::FETCH_ASSOC) as $row) {
+        if ($first) { fputcsv($out, array_keys($row)); $first = false; }
+        // Stop spreadsheet apps from treating a cell as a formula.
+        fputcsv($out, array_map(fn($v) => is_string($v) && preg_match('/^[=+\-@]/', $v) ? "'" . $v : $v, $row));
+    }
+}

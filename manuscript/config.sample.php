@@ -45,13 +45,75 @@ return [
     // Dashboard → Developers → API keys. Use test keys (sk_test_...) until you are ready.
     'stripe_secret_key'     => 'sk_test_xxx',
     // Dashboard → Developers → Webhooks → add endpoint {base_url}/stripe-webhook
-    // with events: checkout.session.completed, customer.subscription.updated,
-    // customer.subscription.deleted. Paste its signing secret here.
+    // with events: checkout.session.completed, invoice.paid, charge.refunded,
+    // customer.subscription.updated, customer.subscription.deleted. Paste its signing secret here.
     'stripe_webhook_secret' => 'whsec_xxx',
     // Price ids (Dashboard → Product catalog). Leave one empty to hide that plan.
     'plans' => [
         'monthly'  => ['price' => 'price_xxx', 'label' => 'Monthly',  'blurb' => 'Full access, cancel anytime', 'mode' => 'subscription'],
         'lifetime' => ['price' => 'price_yyy', 'label' => 'Lifetime', 'blurb' => 'One payment, yours forever',  'mode' => 'payment'],
+    ],
+
+    // ---------- Shop (replaces Gumroad) ----------
+    'currency' => 'usd',
+    // One entry per product. Prices are in cents. Files to deliver go on the server in
+    // manuscript-data/products/<product-slug>/ (any PDFs, zips…). "links" appear as buttons in
+    // the buyer's library, e.g. a Notion "duplicate" link or a course page.
+    'products' => [
+        'witchcraft-101' => [
+            'name' => 'Witchcraft 101',
+            'kind' => 'Course',
+            'tagline' => 'A self-paced beginner course in seven units.',
+            'description' => "What witchcraft is, tools and altars, correspondences, spiritual hygiene, shadow work, spell preparation, and casting a spell.\n\nWork through it at your own pace. It's yours to keep.",
+            'includes' => ['7 units', 'Self-paced', 'Lifetime access'],
+            'price_cents' => 1000,
+            'image' => 'assets/ritual-grimoire-home-700.webp',
+            'links' => ['Open the course' => 'https://www.notion.so/REPLACE-ME'],
+        ],
+        'witchcraft-111' => [
+            'name' => 'Witchcraft 111',
+            'kind' => 'Course',
+            'tagline' => 'Seven units: divination, astrology, herbalism, ancestors, deities, runes, crystals.',
+            'description' => "The next step after Witchcraft 101, in seven self-paced units.",
+            'includes' => ['7 units', 'Self-paced', 'Pay what you can'],
+            'price_cents' => 2000,
+            'pay_what_you_want' => true,
+            'image' => 'assets/tarot-grimoire-700.webp',
+            'links' => ['Open the course' => 'https://www.notion.so/REPLACE-ME'],
+        ],
+        'blank-grimoire' => [
+            'name' => 'The Blank Grimoire',
+            'kind' => 'Notion template',
+            'tagline' => "Blank versions of 14 of the Manuscript's grimoires, ready for your own entries.",
+            'description' => "Start with the Manuscript's structure and fill it with your own research.",
+            'price_cents' => 1000,
+            'pay_what_you_want' => true,
+            'image' => 'assets/plant-grimoire-home-700.webp',
+            'links' => ['Duplicate the template' => 'https://www.notion.so/REPLACE-ME'],
+            'instructions' => 'Open the link while signed in to Notion, then click Duplicate (top right).',
+        ],
+        'crystal-grimoire' => [
+            'name' => 'Blank Crystal Grimoire',
+            'kind' => 'Free Notion template',
+            'tagline' => 'Try the structure before you commit: a blank Crystal grimoire to start filling in today.',
+            'description' => 'A free blank Notion template, the same structure the Manuscript uses for crystals.',
+            'free' => true,
+            'image' => 'assets/crystal-grimoire-700.webp',
+            'links' => ['Duplicate the template' => 'https://www.notion.so/REPLACE-ME'],
+            'instructions' => 'Open the link while signed in to Notion, then click Duplicate (top right).',
+        ],
+    ],
+
+    // For importing your Gumroad sales history (cli/gumroad-import.php):
+    // words in the Gumroad product name => what it becomes here.
+    'gumroad_products' => [
+        // Checked top to bottom, first match wins. Run the import with --dry-run first to check.
+        'monthly'        => 'membership-monthly',    // e.g. "The Magick Manuscript - Monthly"
+        'manuscript'     => 'membership-lifetime',
+        'witchcraft 101' => 'witchcraft-101',
+        'witchcraft 111' => 'witchcraft-111',
+        'blank grimoire' => 'blank-grimoire',
+        'crystal'        => 'crystal-grimoire',
     ],
 
     // ---------- Email (login links) ----------
@@ -62,9 +124,11 @@ return [
     'smtp_user'      => '',
     'smtp_pass'      => '',
 
-    // Emails that can see the admin page ({base_url}/admin).
+    // Emails that can see the private dashboard ({base_url}/dashboard). Only these.
     'admins' => ['you@example.com'],
 
-    // Non-members see the first N characters of an entry before the paywall (0 = titles only).
-    'teaser_chars' => 320,
+    // The whole Manuscript is members-only. To open a few pages to everyone, list them here,
+    // as a Notion page id or as "grimoire/page-slug" from the wiki address, e.g.
+    //   'public_pages' => ['begin-here/what-is-magick', '71d0d5fb571147849802c3446fbb8c58'],
+    'public_pages' => [],
 ];
