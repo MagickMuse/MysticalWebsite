@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Test site setup · The Magick Manuscript</title>
+  <!-- This page is only for GitHub Pages. On the real server, /manuscript/ is served by index.php instead. -->
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .guide { max-width: 860px; margin-inline: auto; padding-block: clamp(2.5rem, 6vw, 5rem); display: grid; gap: 2.2rem; }
+    .guide h1 { font-size: clamp(2.6rem, 6vw, 4.2rem); }
+    .guide h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); display: flex; gap: .8rem; align-items: baseline; }
+    .guide h2 .n { font-family: var(--body); font-size: .8rem; letter-spacing: .2em; color: var(--accent-text); border: 1px solid var(--accent); border-radius: 999px; min-width: 2rem; height: 2rem; display: inline-grid; place-items: center; flex: none; transform: translateY(-.3rem); }
+    .guide h3 { font-size: 1.35rem; margin-top: .4rem; }
+    .guide section { display: grid; gap: 1rem; padding-top: 2rem; border-top: 1px solid var(--line); }
+    .guide p, .guide li { max-width: 72ch; }
+    .guide ol, .guide ul { padding-left: 1.3rem; margin: 0; display: grid; gap: .55rem; }
+    .guide code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .86em; background: var(--surface); padding: .1em .35em; border: 1px solid var(--line); overflow-wrap: anywhere; }
+    .guide pre { margin: 0; background: var(--surface); border: 1px solid var(--line); padding: 1rem 1.2rem; overflow-x: auto; font-size: .85rem; line-height: 1.6; }
+    .guide pre code { background: none; border: 0; padding: 0; }
+    .where { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+    .box { padding: 1.2rem 1.4rem; border: 1px solid var(--line); background: var(--surface); display: grid; gap: .6rem; }
+    .box.warn { border-left: 3px solid var(--accent); }
+    .box strong { font-weight: 500; }
+    .checks { list-style: none; padding: 0 !important; }
+    .checks li { display: flex; gap: .7rem; align-items: baseline; }
+    .checks input { accent-color: var(--accent); transform: translateY(.1rem); flex: none; }
+    .table-wrap { overflow-x: auto; }
+    .guide table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+    .guide th, .guide td { border: 1px solid var(--line); padding: .55rem .75rem; text-align: left; vertical-align: top; }
+    .guide th { background: var(--surface); font-weight: 400; }
+    .toc { columns: 2; column-gap: 2rem; }
+    @media (max-width: 640px) { .toc { columns: 1; } }
+  </style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap nav">
+    <a class="logo" href="../index.html">Magick Muse</a>
+  </div>
+</header>
+<main class="wrap">
+<article class="guide">
+
+<header style="display:grid;gap:1rem">
+  <p class="eyebrow labelled">For the web wizard</p>
+  <h1>Setting up the <em>test site</em></h1>
+  <p class="lede">A private copy of the new Manuscript wiki, shop and dashboard at <strong>test.magickmuse.com</strong>, using Stripe's test mode so no real money moves. The real magickmuse.com isn't touched. About an hour, most of it waiting for the Notion import.</p>
+  <div class="box">
+    <p><strong>What you're installing:</strong> the <code>manuscript-wiki</code> branch of <a href="https://github.com/MagickMuse/MysticalWebsite/tree/manuscript-wiki">MagickMuse/MysticalWebsite</a>. It's the existing static site plus a PHP app in <code>manuscript/</code> (members-only wiki, <code>/shop</code>, sign-in by emailed link, Stripe checkout, private dashboard). It needs PHP 8.1+ with SQLite. No database server, Composer or Node.</p>
+    <p><strong>Full reference:</strong> <a href="https://github.com/MagickMuse/MysticalWebsite/blob/manuscript-wiki/manuscript/README.md">manuscript/README.md</a> on the branch. This page is the test-site walkthrough.</p>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">Create the subdomain</a></li>
+    <li><a href="#s2">Deploy the branch</a></li>
+    <li><a href="#s3">PHP version</a></li>
+    <li><a href="#s4">Private data folder</a></li>
+    <li><a href="#s5">Notion key</a></li>
+    <li><a href="#s6">Stripe in test mode</a></li>
+    <li><a href="#s7">Email for sign-in links</a></li>
+    <li><a href="#s8">The settings file</a></li>
+    <li><a href="#s9">Import from Notion</a></li>
+    <li><a href="#s10">Try everything</a></li>
+    <li><a href="#s11">Updating &amp; going live</a></li>
+  </ol>
+</header>
+
+<div class="box warn">
+  <p><strong>Two rules that matter.</strong></p>
+  <ol>
+    <li>The data folder (the database of paid pages and the downloaded images) must be <strong>outside every <code>public_html</code></strong>, or it could be downloaded by anyone. The app refuses to start if it isn't, and tells you why.</li>
+    <li>The repository is <strong>public</strong>. Never commit the settings file, API keys, or delivery links. They only ever live on the server.</li>
+  </ol>
+</div>
+
+<section id="s1">
+  <h2><span class="n">1</span>Create the subdomain</h2>
+  <p class="where">hPanel → Domains → Subdomains</p>
+  <ol>
+    <li>Create <code>test</code> on <code>magickmuse.com</code>.</li>
+    <li>Note the <strong>folder</strong> hPanel gives it. It's usually something like <code>/home/u123456789/domains/magickmuse.com/public_html/test</code>. You'll need this path in the steps below; this page calls it <code>TEST_FOLDER</code>.</li>
+    <li>Make sure SSL is on for it (hPanel → Security → SSL), so it opens on <code>https://test.magickmuse.com</code>.</li>
+  </ol>
+</section>
+
+<section id="s2">
+  <h2><span class="n">2</span>Deploy the branch</h2>
+  <p class="where">hPanel → Advanced → Git</p>
+  <ol>
+    <li>Repository: <code>https://github.com/MagickMuse/MysticalWebsite.git</code> (public, so no deploy key needed)</li>
+    <li>Branch: <code>manuscript-wiki</code></li>
+    <li>Install path: the subdomain's folder, e.g. <code>public_html/test</code>. Git deploy needs the folder <strong>empty</strong>, so delete hPanel's default <code>default.php</code> or <code>index.html</code> first.</li>
+    <li>Click <strong>Create</strong>, then <strong>Deploy</strong>.</li>
+  </ol>
+  <p>Check: <code>https://test.magickmuse.com</code> shows the normal homepage, and <code>https://test.magickmuse.com/manuscript/</code> says "The Manuscript is not configured yet". That's expected at this point.</p>
+  <p><em>No Git option on the plan?</em> On GitHub switch to the <code>manuscript-wiki</code> branch → Code → Download ZIP, then upload and extract it into the subdomain folder with File Manager. Upload the files <em>inside</em> the zip's top folder, not the folder itself.</p>
+</section>
+
+<section id="s3">
+  <h2><span class="n">3</span>PHP version</h2>
+  <p class="where">hPanel → Advanced → PHP Configuration</p>
+  <p>Choose <strong>PHP 8.2 or newer</strong>. Under PHP extensions, make sure <code>pdo_sqlite</code>, <code>sqlite3</code>, <code>curl</code> and <code>mbstring</code> are ticked (they normally are). <code>intl</code> is nice to have, for tidier page addresses from accented titles.</p>
+</section>
+
+<section id="s4">
+  <h2><span class="n">4</span>Private data folder</h2>
+  <p class="where">hPanel → Files → File Manager</p>
+  <p>Create a folder <strong>outside</strong> <code>public_html</code>, next to it, for example:</p>
+  <pre><code>/home/u123456789/domains/magickmuse.com/manuscript-data-test</code></pre>
+  <p>Copy its full path (File Manager shows it at the top). This is <code>DATA_FOLDER</code>. Keep the test site's data separate from the real site's later <code>manuscript-data</code>, so testing never mixes with real members.</p>
+</section>
+
+<section id="s5">
+  <h2><span class="n">5</span>Notion key</h2>
+  <ol>
+    <li>Go to <a href="https://www.notion.so/profile/integrations">notion.so/profile/integrations</a> → <strong>New integration</strong>. Type: Internal, workspace: the Manuscript's, name: "Manuscript wiki". Capabilities: <strong>Read content</strong> only.</li>
+    <li>Copy the <strong>Internal Integration Secret</strong> (starts with <code>ntn_</code>).</li>
+    <li>In Notion, open <strong>The Magick Manuscript</strong> page → <strong>•••</strong> (top right) → <strong>Connections</strong> → add "Manuscript wiki". This gives it read access to everything underneath.</li>
+  </ol>
+</section>
+
+<section id="s6">
+  <h2><span class="n">6</span>Stripe in test mode</h2>
+  <p class="where">dashboard.stripe.com → turn on <strong>Test mode</strong> (toggle at the top) for everything below</p>
+  <ol>
+    <li><strong>API key:</strong> Developers → API keys → copy the <strong>Secret key</strong> (<code>sk_test_…</code>).</li>
+    <li><strong>Manuscript prices:</strong> Product catalog → Add product "The Magick Manuscript".
+      <ul>
+        <li>Price 1: <strong>$333, one-time</strong> → copy its id (<code>price_…</code>). This is lifetime access, as it was on Gumroad.</li>
+        <li>Optional price 2: a <strong>monthly recurring</strong> price, only if Avelynn wants a monthly plan. Otherwise leave monthly out of the settings and only Lifetime shows.</li>
+      </ul>
+      Shop products (courses, templates) need nothing in Stripe; their prices come from <code>manuscript/products.php</code>.</li>
+    <li><strong>Webhook:</strong> Developers → Webhooks → Add endpoint
+      <ul>
+        <li>URL: <code>https://test.magickmuse.com/manuscript/stripe-webhook</code></li>
+        <li>Events: <code>checkout.session.completed</code>, <code>invoice.paid</code>, <code>charge.refunded</code>, <code>customer.subscription.updated</code>, <code>customer.subscription.deleted</code></li>
+        <li>Copy the endpoint's <strong>Signing secret</strong> (<code>whsec_…</code>).</li>
+      </ul></li>
+    <li><strong>Customer portal:</strong> Settings → Billing → Customer portal → activate (lets monthly members cancel or change cards themselves).</li>
+    <li><strong>SEEKER10:</strong> Product catalog → Coupons → new coupon "10% off" → add a promotion code <code>SEEKER10</code>.</li>
+  </ol>
+</section>
+
+<section id="s7">
+  <h2><span class="n">7</span>Email for sign-in links</h2>
+  <p class="where">hPanel → Emails</p>
+  <p>Nobody has a password; people sign in from a link that's emailed to them, so email has to work. Create a mailbox such as <code>hello@magickmuse.com</code> (or use an existing one) and note its password. Hostinger's mail server is <code>smtp.hostinger.com</code>, port <code>465</code>.</p>
+</section>
+
+<section id="s8">
+  <h2><span class="n">8</span>The settings file</h2>
+  <p class="where">File Manager → <code>TEST_FOLDER/manuscript/</code></p>
+  <ol>
+    <li>Copy <code>config.sample.php</code> to <strong><code>config.local.php</code></strong> in the same folder. (The app blocks this file from ever being downloaded, and Git deploys leave it alone because it's ignored.)</li>
+    <li>Edit <code>config.local.php</code> and set:</li>
+  </ol>
+  <div class="table-wrap"><table>
+    <tr><th>Setting</th><th>Test-site value</th></tr>
+    <tr><td><code>base_url</code></td><td><code>https://test.magickmuse.com/manuscript</code></td></tr>
+    <tr><td><code>site_url</code></td><td><code>https://test.magickmuse.com</code></td></tr>
+    <tr><td><code>data_dir</code></td><td>Uncomment it and use <code>DATA_FOLDER</code> from step 4. <strong>Required</strong> for the test site.</td></tr>
+    <tr><td><code>app_secret</code></td><td>Any long random text, at least 40 characters. Over SSH: <code>php -r "echo bin2hex(random_bytes(32));"</code></td></tr>
+    <tr><td><code>notion_token</code></td><td>The <code>ntn_…</code> secret from step 5</td></tr>
+    <tr><td><code>grimoires</code></td><td>Leave as is: Begin Here, Correspondence and Timing to start</td></tr>
+    <tr><td><code>stripe_secret_key</code></td><td><code>sk_test_…</code></td></tr>
+    <tr><td><code>stripe_webhook_secret</code></td><td><code>whsec_…</code></td></tr>
+    <tr><td><code>plans</code></td><td>Put the lifetime <code>price_…</code> id in <code>lifetime</code>. For no monthly plan, set the monthly <code>'price' =&gt; ''</code>.</td></tr>
+    <tr><td><code>product_links</code></td><td>The real Google Classroom links and Notion "duplicate" links for each product (Avelynn has these). They show only in buyers' libraries.</td></tr>
+    <tr><td><code>mail_from</code>, <code>smtp_*</code></td><td>The mailbox from step 7: host <code>smtp.hostinger.com</code>, port <code>465</code>, its address and password</td></tr>
+    <tr><td><code>admins</code></td><td>Avelynn's email, plus yours if you want dashboard access. Only these emails can see the dashboard.</td></tr>
+  </table></div>
+  <p>Check: <code>https://test.magickmuse.com/manuscript/</code> now shows the "Members only" page. If it shows a "Setup problem" message instead, the data folder is inside <code>public_html</code>; fix <code>data_dir</code>.</p>
+</section>
+
+<section id="s9">
+  <h2><span class="n">9</span>Import from Notion</h2>
+  <p class="where">hPanel → Advanced → SSH Access, then connect with the details shown there</p>
+<pre><code>cd TEST_FOLDER        # e.g. cd ~/domains/magickmuse.com/public_html/test
+php manuscript/cli/import.php begin-here correspondence</code></pre>
+  <p>It prints progress as it goes. Notion only allows about 3 requests a second, so expect roughly <strong>1–2 minutes per 100 entries</strong> the first time. If it stops (closed laptop, dropped connection), just run the same command again; it carries on and skips what's already done.</p>
+  <p>To bring in more grimoires, add each one to <code>grimoires</code> in the settings (its id is the 32-character code at the end of its Notion address) and run <code>php manuscript/cli/import.php</code> with its name.</p>
+  <p><em>No SSH on the plan?</em> hPanel → Advanced → Cron Jobs → a custom job running <code>php TEST_FOLDER/manuscript/cli/import.php</code> once, a few minutes from now. It's safe for it to overlap with itself, because a second copy exits straight away.</p>
+</section>
+
+<section id="s10">
+  <h2><span class="n">10</span>Try everything</h2>
+  <p>Stripe test card: <code>4242 4242 4242 4242</code>, any future date, any CVC and postcode. Tick each one as it works:</p>
+  <ul class="checks">
+    <li><input type="checkbox" id="c1"><label for="c1">Signed out, <code>/manuscript/</code>, a grimoire, an entry and search all show only "Members only". No text, titles or images.</label></li>
+    <li><input type="checkbox" id="c2"><label for="c2">Avelynn signs in at <code>/manuscript/login</code> with her admin email, the link arrives, and <code>/manuscript/dashboard</code> opens.</label></li>
+    <li><input type="checkbox" id="c3"><label for="c3">With another email, <code>/manuscript/join</code> → Lifetime → test card → back on the site, signed in, entries readable, cross-links ("Connections") work.</label></li>
+    <li><input type="checkbox" id="c4"><label for="c4">That sale appears on the dashboard.</label></li>
+    <li><input type="checkbox" id="c5"><label for="c5"><code>/manuscript/join?code=SEEKER10</code> shows "Code SEEKER10 will be applied" and Stripe shows 10% off.</label></li>
+    <li><input type="checkbox" id="c6"><label for="c6"><code>/shop/witchcraft-101</code> → buy → it appears in <code>/shop/library</code> with its course link.</label></li>
+    <li><input type="checkbox" id="c7"><label for="c7"><code>/shop/crystal-grimoire</code> → enter an email → the email arrives with a library link, and the address shows under Dashboard → Email sign-ups.</label></li>
+    <li><input type="checkbox" id="c8"><label for="c8">Refund the Witchcraft 101 test payment in Stripe → it disappears from that buyer's library and shows as refunded on the dashboard.</label></li>
+    <li><input type="checkbox" id="c9"><label for="c9">Search as a member: typing "prot" suggests Protection. Results can be filtered by grimoire.</label></li>
+    <li><input type="checkbox" id="c10"><label for="c10">Optional: Gumroad export → <code>php manuscript/cli/gumroad-import.php sales.csv --dry-run</code> lists every product it recognised.</label></li>
+  </ul>
+  <p>If something fails: the error log is in hPanel → Advanced → Error Logs (lines start with <code>[manuscript]</code>), and Stripe shows each webhook delivery and its response under Developers → Webhooks.</p>
+</section>
+
+<section id="s11">
+  <h2><span class="n">11</span>Updating &amp; going live</h2>
+  <h3>Getting new changes onto the test site</h3>
+  <p>hPanel → Advanced → Git → <strong>Deploy</strong> (or turn on auto-deploy). Settings and data are untouched.</p>
+  <h3>Going live, once everything above works</h3>
+  <ol>
+    <li>Merge <code>manuscript-wiki</code> into <code>main</code> and deploy magickmuse.com as usual. The site's buttons switch from Gumroad to <code>/manuscript/join</code> and <code>/shop</code> at that moment, so do the next steps straight away.</li>
+    <li>Put a settings file at <code>public_html/manuscript/config.local.php</code> for the real site: <code>https://magickmuse.com</code> addresses, its own <code>data_dir</code> (e.g. <code>…/manuscript-data</code>), a new <code>app_secret</code>, and Stripe <strong>live</strong> keys, live price ids and a live webhook pointing at <code>https://magickmuse.com/manuscript/stripe-webhook</code>. Recreate SEEKER10 in live mode.</li>
+    <li>Run the import for the real site, then the Gumroad import (README step 4), so existing buyers keep their access.</li>
+    <li>Add a weekly Cron Job running the importer, so new Notion pages appear on the wiki.</li>
+    <li>Delete the test subdomain, its Git deployment, and <code>manuscript-data-test</code>.</li>
+  </ol>
+</section>
+
+<p class="where" style="text-align:center;padding-top:1rem">Questions about the code: it's all in <code>manuscript/</code> on the branch, with comments.</p>
+</article>
+</main>
+</body>
+</html>

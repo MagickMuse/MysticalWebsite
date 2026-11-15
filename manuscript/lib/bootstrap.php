@@ -24,6 +24,17 @@ function config(?string $key = null, $default = null)
         }
         $cfg['base_url'] = rtrim($cfg['base_url'] ?? '', '/');
         $cfg['data_dir'] = rtrim($cfg['data_dir'] ?? (dirname(MM_ROOT, 2) . '/manuscript-data'), '/');
+        // Safety: the database and paid images must never sit inside the public website folder.
+        $web = realpath((string) ($_SERVER['DOCUMENT_ROOT'] ?? '')) ?: '';
+        $dataParent = realpath(dirname($cfg['data_dir'])) ?: dirname($cfg['data_dir']);
+        $dataPath = rtrim($dataParent, '/') . '/' . basename($cfg['data_dir']);
+        $inWeb = ($web !== '' && $web !== '/' && str_starts_with($dataPath . '/', rtrim($web, '/') . '/'))
+            || preg_match('~/(public_html|htdocs|httpdocs|www)(/|$)~', $dataPath);   // e.g. a test subdomain inside the main site's folder
+        if ($inWeb && empty($cfg['allow_data_in_webroot'])) {
+            http_response_code(500);
+            exit("Setup problem: 'data_dir' ($dataPath) is inside the public website folder ($web), where it could be downloaded. "
+                . "Set 'data_dir' in the config to a folder outside public_html (see manuscript/README.md).\n");
+        }
     }
     return $key === null ? $cfg : ($cfg[$key] ?? $default);
 }
