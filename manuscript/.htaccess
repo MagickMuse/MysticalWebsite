@@ -1,0 +1,16 @@
+# The Magick Manuscript wiki: every request goes through index.php,
+# except the public CSS/JS in assets/. Code, config and data are never served directly.
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(lib|cli|templates)(/|$) - [F,L]
+  RewriteRule ^(config\.local\.php|config\.sample\.php|README\.md)$ - [F,L]
+  RewriteCond %{REQUEST_URI} !/assets/(wiki\.css|wiki\.js)$
+  RewriteRule ^ index.php [L,QSA]
+</IfModule>
+
+<FilesMatch "^(config\.local\.php|.*\.sqlite.*)$">
+  Require all denied
+</FilesMatch>
