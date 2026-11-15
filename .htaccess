@@ -25,3 +25,8 @@ ServerSignature Off
   RewriteEngine On
   RewriteRule ^shop(/.*)?$ manuscript/index.php [L,QSA]
 </IfModule>
+
+# Never serve the Manuscript's private settings or data, wherever they end up.
+<FilesMatch "^(manuscript-config\.php|config\.local\.php|.*\.sqlite.*)$">
+  Require all denied
+</FilesMatch>

@@ -11,6 +11,8 @@
 return [
     // Public URL of the wiki, no trailing slash.
     'base_url' => 'https://magickmuse.com/manuscript',
+    // The main website's address (for the shop pages, styles and menu links).
+    'site_url' => 'https://magickmuse.com',
 
     // Where the database and downloaded images live. Keep this OUTSIDE public_html
     // so the paid content can never be downloaded directly and Git deploys never touch it.
