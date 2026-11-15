@@ -1,0 +1,7 @@
+# Never commit the paid content, member data, or secrets. This repository is public.
+config.local.php
+manuscript-config.php
+data/
+manuscript-data/
+*.sqlite
+*.sqlite-*
