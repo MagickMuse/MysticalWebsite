@@ -7,7 +7,40 @@ declare(strict_types=1);
  * Files to deliver go in {data_dir}/products/{product-slug}/, outside the public website.
  */
 
-function products(): array { return config('products', []); }
+/** Catalog from products.php, plus private delivery links and any overrides from the config. */
+function products(): array
+{
+    static $all = null;
+    if ($all !== null) return $all;
+    $all = require MM_ROOT . '/products.php';
+    foreach (config('products', []) as $slug => $over) $all[$slug] = array_merge($all[$slug] ?? [], $over);
+    foreach (config('product_links', []) as $slug => $links) {
+        if (isset($all[$slug])) $all[$slug]['links'] = $links;
+    }
+    return $all;
+}
+
+function short_name(array $p): string { return $p['short_name'] ?? $p['name']; }
+
+/** Product descriptions are our own copy, but still limited to simple formatting tags. */
+function safe_html(string $html): string
+{
+    $html = strip_tags($html, '<p><br><h2><h3><ul><ol><li><strong><em><hr><a>');
+    $html = preg_replace('/<(p|br|h2|h3|ul|ol|li|strong|em|hr)\b[^>]*>/i', '<$1>', $html);
+    return preg_replace_callback('/<a\b[^>]*>/i', function ($m) {
+        $href = preg_match('/href="([^"]*)"/i', $m[0], $h) ? html_entity_decode($h[1]) : '';
+        if (!preg_match('~^(https?://|/)~', $href)) $href = '#';
+        $ext = str_starts_with($href, 'http') && !str_contains($href, (string) parse_url(config('base_url'), PHP_URL_HOST));
+        return '<a href="' . e($href) . '"' . ($ext ? ' rel="noopener" target="_blank"' : '') . '>';
+    }, $html);
+}
+
+function community_links(): string
+{
+    $discord = (string) config('discord_url', 'https://discord.com/invite/PBr2BtCpxk');
+    return '<div class="actions community"><a class="link" href="' . e($discord) . '" target="_blank" rel="noopener">Join our Discord coven</a>'
+        . '<a class="link" href="' . e(site_url('story.html')) . '">Curious about the Curator?</a></div>';
+}
 
 function product(string $slug): ?array
 {
@@ -64,7 +97,7 @@ function view_shop(): void
         $p['slug'] = $slug;
         if (!empty($p['hidden'])) continue;
         $cards .= '<a class="card shop-card" href="' . e(site_url('shop/' . $slug)) . '">' . product_image($p)
-            . '<h3>' . e($p['name']) . '</h3><p>' . e($p['tagline'] ?? '') . '</p><p class="price">' . e(price_label($p)) . '</p></a>';
+            . '<h3>' . e(short_name($p)) . '</h3><p>' . e($p['tagline'] ?? '') . '</p><p class="price">' . e(price_label($p)) . '</p></a>';
     }
     // The Manuscript itself leads the shop.
     $ms = '<a class="card shop-card featured" href="' . e(url('join')) . '"><div class="frame arch shop-art"><img src="' . e(site_url('assets/grimoire-selection-screenshot-700.webp')) . '" alt="" loading="lazy"></div>'
@@ -84,15 +117,13 @@ function view_product(array $p): void
     $email = current_email();
     $csrf = e(csrf_token());
     $slug = e($p['slug']);
-    $desc = '';
-    foreach (preg_split('/\n\s*\n/', trim((string) ($p['description'] ?? ''))) as $para) {
-        if ($para !== '') $desc .= '<p>' . nl2br(e(trim($para)), false) . '</p>';
-    }
+    $desc = safe_html((string) ($p['description_html'] ?? ''));
     $includes = '';
     if (!empty($p['includes'])) {
         $includes = '<ul class="includes">' . implode('', array_map(fn($i) => '<li class="inline-star">' . e($i) . '</li>', $p['includes'])) . '</ul>';
     }
 
+    $code = preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($_GET['code'] ?? ''));
     if ($email && owns($email, $p['slug'])) {
         $action = '<p class="notice">You own this. <a href="' . e(site_url('shop/library')) . '">Open your library</a></p>';
     } elseif (!empty($p['free'])) {
@@ -106,13 +137,17 @@ function view_product(array $p): void
             ? '<label for="amount">Pay what you can (minimum ' . e(money($min)) . ')</label><div class="amount"><span aria-hidden="true">$</span><input id="amount" name="amount" type="number" inputmode="decimal" min="' . ($min / 100) . '" step="1" value="' . ($min / 100) . '" required></div>'
             : '';
         $action = '<form class="mm-form buy" method="post" action="' . e(site_url('shop/buy')) . '">'
-            . "<input type=\"hidden\" name=\"csrf\" value=\"$csrf\"><input type=\"hidden\" name=\"product\" value=\"$slug\">"
+            . "<input type=\"hidden\" name=\"csrf\" value=\"$csrf\"><input type=\"hidden\" name=\"product\" value=\"$slug\"><input type=\"hidden\" name=\"code\" value=\"" . e($code) . '">'
+            . ($code ? '<p class="notice">Code <strong>' . e($code) . '</strong> will be applied at checkout.</p>' : '')
             . $amount . '<button class="btn" type="submit">' . (!empty($p['pay_what_you_want']) ? 'Buy now' : 'Buy for ' . e(price_label($p))) . '</button>'
             . '<p class="small">Secure checkout by Stripe. Discount code? Enter it at checkout.</p></form>';
     }
-    layout($p['name'], '<article class="product">' . product_image($p) . '<div class="product-text"><p class="eyebrow">' . e($p['kind'] ?? 'The Magick Muse') . '</p>'
-        . '<h1>' . e($p['name']) . '</h1><p class="price big">' . e(price_label($p)) . '</p>'
-        . '<div class="mm-prose">' . $desc . '</div>' . $includes . $action . '</div></article>',
+    $refund = !empty($p['refund_policy']) ? '<p class="small refund">' . e($p['refund_policy']) . '</p>' : '';
+    $full = $p['name'] !== short_name($p) ? '<p class="aka">' . e(trim(preg_replace('/^[^:✧]*[:✧]/u', '', $p['name']))) . '</p>' : '';
+    layout(short_name($p), '<article class="product">' . product_image($p) . '<div class="product-text"><p class="eyebrow">' . e($p['kind'] ?? 'The Magick Muse') . '</p>'
+        . '<h1>' . e(short_name($p)) . '</h1>' . $full . '<p class="price big">' . e(price_label($p)) . '</p>'
+        . $includes . $action . $refund
+        . '<div class="mm-prose product-desc">' . $desc . '</div>' . community_links() . '</div></article>',
         ['index' => true, 'description' => $p['tagline'] ?? '']);
 }
 
@@ -121,7 +156,7 @@ function do_buy(): void
     check_csrf();
     $slug = (string) ($_POST['product'] ?? '');
     $amount = isset($_POST['amount']) ? (int) round((float) $_POST['amount'] * 100) : null;
-    redirect(create_product_checkout($slug, $amount, current_email()));
+    redirect(create_product_checkout($slug, $amount, current_email(), (string) ($_POST['code'] ?? '')));
 }
 
 function do_claim(): void
@@ -137,10 +172,11 @@ function do_claim(): void
     grant($email, $p['slug'], 'free');
     // Delivered by email, which also confirms the address is real.
     $link = url('auth?token=' . issue_login_token($email) . '&next=' . rawurlencode('/shop/library'));
-    send_mail($email, 'Your ' . $p['name'] . ' is here',
-        "Thank you for picking up {$p['name']}.\n\nOpen your library to get it:\n$link\n\nThe link signs you in and works for 30 minutes. After that, sign in any time at " . site_url('shop/library') . "\n\nThe Magick Muse",
-        '<p>Thank you for picking up <strong>' . e($p['name']) . '</strong>.</p><p><a href="' . e($link) . '">Open your library</a> to get it.</p><p>The link signs you in and works for 30 minutes. After that, sign in any time at ' . e(site_url('shop/library')) . '.</p><p>The Magick Muse</p>');
-    layout('Check your email', '<section class="mm-hero narrow"><p class="eyebrow labelled">On its way</p><h1>Check your <em>inbox</em></h1><p class="lede">We sent ' . e($p['name']) . ' to ' . e($email) . '. If it isn’t there in a few minutes, look in spam or promotions.</p></section>', ['private' => true]);
+    $nm = short_name($p);
+    send_mail($email, 'Your ' . $nm . ' is here',
+        "Thank you for picking up {$nm}.\n\nOpen your library to get it:\n$link\n\nThe link signs you in and works for 30 minutes. After that, sign in any time at " . site_url('shop/library') . "\n\nThe Magick Muse",
+        '<p>Thank you for picking up <strong>' . e($nm) . '</strong>.</p><p><a href="' . e($link) . '">Open your library</a> to get it.</p><p>The link signs you in and works for 30 minutes. After that, sign in any time at ' . e(site_url('shop/library')) . '.</p><p>The Magick Muse</p>');
+    layout('Check your email', '<section class="mm-hero narrow"><p class="eyebrow labelled">On its way</p><h1>Check your <em>inbox</em></h1><p class="lede">We sent ' . e($nm) . ' to ' . e($email) . '. If it isn’t there in a few minutes, look in spam or promotions.</p></section>', ['private' => true]);
 }
 
 function view_shop_thanks(): void
@@ -191,7 +227,7 @@ function view_library(): void
             $links .= '<a class="btn ghost" href="' . e(site_url('shop/download/' . rawurlencode($p['slug']) . '/' . rawurlencode($f))) . '">Download ' . e($f) . '</a>';
         }
         $badge = $new === $p['slug'] ? '<span class="tag">Just added</span>' : '';
-        $items .= '<li class="lib-item"><div><h3>' . e($p['name']) . " $badge</h3>"
+        $items .= '<li class="lib-item"><div><h3>' . e(short_name($p)) . " $badge</h3>"
             . (!empty($p['instructions']) ? '<p class="small">' . e($p['instructions']) . '</p>' : '')
             . '</div><div class="lib-links">' . ($links ?: '<span class="small">Delivery details coming soon.</span>') . '</div></li>';
     }

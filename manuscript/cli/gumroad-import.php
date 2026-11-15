@@ -16,6 +16,7 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 require __DIR__ . '/../lib/bootstrap.php';
 require __DIR__ . '/../lib/auth.php';
 require __DIR__ . '/../lib/stripe.php';
+require __DIR__ . '/../lib/shop.php';
 
 $file = $argv[1] ?? '';
 $dry = in_array('--dry-run', $argv, true);
@@ -76,7 +77,7 @@ while (($row = fgetcsv($fh)) !== false) {
         $monthly[$email] = max($monthly[$email] ?? 0, $when);
     } else {
         grant($email, $slug, 'gumroad');
-        if (!empty(config('products')[$slug]['free'])) {
+        if (!empty(products()[$slug]['free'])) {
             db()->prepare('INSERT OR IGNORE INTO leads (email, product, created_at) VALUES (?, ?, ?)')->execute([$email, $slug, gmdate('Y-m-d H:i:s', $when)]);
         }
     }

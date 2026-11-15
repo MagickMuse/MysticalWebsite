@@ -464,7 +464,6 @@ footer.site { padding-block: 4rem 2.5rem; border-top: 1px solid var(--line); }
 .icon.pinterest { --icon: url("icons/pinterest.svg"); }
 .icon.instagram { --icon: url("icons/instagram.svg"); }
 .icon.tiktok { --icon: url("icons/tiktok.svg"); }
-.icon.gumroad { --icon: url("icons/gumroad.svg"); }
 .icon.discord { --icon: url("icons/discord.svg"); }
 
 /* ---------- offer popup ---------- */

@@ -176,7 +176,10 @@ function layout(string $title, string $body, array $opt = []): void
     header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'");
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: strict-origin-when-cross-origin');
-    if (!empty($opt['private'])) header('Cache-Control: private, no-store');
+    // Anything shown to a signed-in person must never be stored by a cache and shown to someone else.
+    if (!empty($opt['private']) || current_email()) header('Cache-Control: private, no-store');
+    else header('Cache-Control: public, max-age=300');
+    header('Vary: Cookie');
 
     $email = current_email();
     $acct = $email
@@ -196,10 +199,10 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=3">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=4">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=3" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=4" defer></script>
 </head>
 <body class="mm">
 <a class="skip" href="#main">Skip to main content</a>

@@ -23,7 +23,7 @@ function stripe(string $method, string $path, array $params = []): array
     return $data;
 }
 
-function create_checkout(string $planKey, ?string $email): string
+function create_checkout(string $planKey, ?string $email, string $code = ''): string
 {
     $plan = config('plans')[$planKey] ?? null;
     if (!$plan || empty($plan['price'])) throw new InvalidArgumentException('Unknown plan');
@@ -38,13 +38,30 @@ function create_checkout(string $planKey, ?string $email): string
     if ($plan['mode'] === 'payment') $params['customer_creation'] = 'always';
     if ($plan['mode'] === 'subscription') $params['subscription_data'] = ['metadata' => ['plan' => $planKey]];
     if ($email) $params['customer_email'] = $email;
-    return stripe('POST', 'checkout/sessions', $params)['url'];
+    return stripe('POST', 'checkout/sessions', apply_code($params, $code))['url'];
+}
+
+/** A discount code from a link (e.g. ?code=SEEKER10) is applied for the buyer, if it exists in Stripe. */
+function apply_code(array $params, string $code): array
+{
+    $code = preg_replace('/[^A-Za-z0-9_-]/', '', $code);
+    if ($code === '') return $params;
+    try {
+        $found = stripe('GET', 'promotion_codes', ['code' => $code, 'active' => 'true', 'limit' => 1])['data'][0]['id'] ?? null;
+    } catch (Throwable $ex) {
+        $found = null;
+    }
+    if ($found) {
+        unset($params['allow_promotion_codes']); // Stripe allows one or the other
+        $params['discounts'] = [['promotion_code' => $found]];
+    }
+    return $params;
 }
 
 /** Checkout for a shop product. $amountCents is only used for pay-what-you-want products. */
-function create_product_checkout(string $slug, ?int $amountCents, ?string $email): string
+function create_product_checkout(string $slug, ?int $amountCents, ?string $email, string $code = ''): string
 {
-    $p = config('products')[$slug] ?? null;
+    $p = products()[$slug] ?? null;
     if (!$p || !empty($p['free'])) throw new InvalidArgumentException('Unknown product');
     $min = (int) ($p['price_cents'] ?? 0);
     $amount = !empty($p['pay_what_you_want']) ? max($min, (int) $amountCents) : $min;
@@ -56,7 +73,7 @@ function create_product_checkout(string $slug, ?int $amountCents, ?string $email
             'price_data' => [
                 'currency' => config('currency', 'usd'),
                 'unit_amount' => $amount,
-                'product_data' => ['name' => $p['name']],
+                'product_data' => ['name' => $p['short_name'] ?? $p['name']],
             ],
         ]],
         'success_url' => site_url('shop/thanks?session_id={CHECKOUT_SESSION_ID}'),
@@ -67,7 +84,7 @@ function create_product_checkout(string $slug, ?int $amountCents, ?string $email
         'payment_intent_data' => ['metadata' => ['product' => $slug]],
     ];
     if ($email) $params['customer_email'] = $email;
-    return stripe('POST', 'checkout/sessions', $params)['url'];
+    return stripe('POST', 'checkout/sessions', apply_code($params, $code))['url'];
 }
 
 function record_payment(array $row): void
