@@ -48,72 +48,38 @@ return [
     // with events: checkout.session.completed, invoice.paid, charge.refunded,
     // customer.subscription.updated, customer.subscription.deleted. Paste its signing secret here.
     'stripe_webhook_secret' => 'whsec_xxx',
-    // Price ids (Dashboard → Product catalog). Leave one empty to hide that plan.
+    // Price ids (Dashboard → Product catalog). Leave a price empty to hide that plan,
+    // e.g. if the Manuscript is only sold as lifetime access (as it was on Gumroad, $333).
     'plans' => [
-        'monthly'  => ['price' => 'price_xxx', 'label' => 'Monthly',  'blurb' => 'Full access, cancel anytime', 'mode' => 'subscription'],
-        'lifetime' => ['price' => 'price_yyy', 'label' => 'Lifetime', 'blurb' => 'One payment, yours forever',  'mode' => 'payment'],
+        // amount_label is only what the page shows; the real price is the Stripe price.
+        'lifetime' => ['price' => 'price_yyy', 'label' => 'Lifetime', 'amount_label' => '$333', 'blurb' => 'One payment. Every update ever made, and every one to come.', 'mode' => 'payment'],
+        'monthly'  => ['price' => 'price_xxx', 'label' => 'Monthly',  'amount_label' => '',     'blurb' => 'Full access, cancel anytime.', 'mode' => 'subscription'],
     ],
 
     // ---------- Shop (replaces Gumroad) ----------
     'currency' => 'usd',
-    // One entry per product. Prices are in cents. Files to deliver go on the server in
-    // manuscript-data/products/<product-slug>/ (any PDFs, zips…). "links" appear as buttons in
-    // the buyer's library, e.g. a Notion "duplicate" link or a course page.
-    'products' => [
-        'witchcraft-101' => [
-            'name' => 'Witchcraft 101',
-            'kind' => 'Course',
-            'tagline' => 'A self-paced beginner course in seven units.',
-            'description' => "What witchcraft is, tools and altars, correspondences, spiritual hygiene, shadow work, spell preparation, and casting a spell.\n\nWork through it at your own pace. It's yours to keep.",
-            'includes' => ['7 units', 'Self-paced', 'Lifetime access'],
-            'price_cents' => 1000,
-            'image' => 'assets/ritual-grimoire-home-700.webp',
-            'links' => ['Open the course' => 'https://www.notion.so/REPLACE-ME'],
-        ],
-        'witchcraft-111' => [
-            'name' => 'Witchcraft 111',
-            'kind' => 'Course',
-            'tagline' => 'Seven units: divination, astrology, herbalism, ancestors, deities, runes, crystals.',
-            'description' => "The next step after Witchcraft 101, in seven self-paced units.",
-            'includes' => ['7 units', 'Self-paced', 'Pay what you can'],
-            'price_cents' => 2000,
-            'pay_what_you_want' => true,
-            'image' => 'assets/tarot-grimoire-700.webp',
-            'links' => ['Open the course' => 'https://www.notion.so/REPLACE-ME'],
-        ],
-        'blank-grimoire' => [
-            'name' => 'The Blank Grimoire',
-            'kind' => 'Notion template',
-            'tagline' => "Blank versions of 14 of the Manuscript's grimoires, ready for your own entries.",
-            'description' => "Start with the Manuscript's structure and fill it with your own research.",
-            'price_cents' => 1000,
-            'pay_what_you_want' => true,
-            'image' => 'assets/plant-grimoire-home-700.webp',
-            'links' => ['Duplicate the template' => 'https://www.notion.so/REPLACE-ME'],
-            'instructions' => 'Open the link while signed in to Notion, then click Duplicate (top right).',
-        ],
-        'crystal-grimoire' => [
-            'name' => 'Blank Crystal Grimoire',
-            'kind' => 'Free Notion template',
-            'tagline' => 'Try the structure before you commit: a blank Crystal grimoire to start filling in today.',
-            'description' => 'A free blank Notion template, the same structure the Manuscript uses for crystals.',
-            'free' => true,
-            'image' => 'assets/crystal-grimoire-700.webp',
-            'links' => ['Duplicate the template' => 'https://www.notion.so/REPLACE-ME'],
-            'instructions' => 'Open the link while signed in to Notion, then click Duplicate (top right).',
-        ],
+    // Product names, prices and descriptions live in manuscript/products.php (public).
+    // The links buyers get in their library are private, so they live here instead:
+    'product_links' => [
+        'witchcraft-101'   => ['Open the course in Google Classroom' => 'https://classroom.google.com/c/REPLACE-ME'],
+        'witchcraft-111'   => ['Open the course in Google Classroom' => 'https://classroom.google.com/c/REPLACE-ME'],
+        'blank-grimoire'   => ['Duplicate the template' => 'https://www.notion.so/REPLACE-ME'],
+        'crystal-grimoire' => ['Duplicate the template' => 'https://www.notion.so/REPLACE-ME'],
     ],
+    // Files to deliver (PDFs, zips…) go on the server in manuscript-data/products/<product-slug>/.
+
+    'discord_url' => 'https://discord.com/invite/PBr2BtCpxk',
 
     // For importing your Gumroad sales history (cli/gumroad-import.php):
     // words in the Gumroad product name => what it becomes here.
     'gumroad_products' => [
         // Checked top to bottom, first match wins. Run the import with --dry-run first to check.
-        'monthly'        => 'membership-monthly',    // e.g. "The Magick Manuscript - Monthly"
-        'manuscript'     => 'membership-lifetime',
-        'witchcraft 101' => 'witchcraft-101',
-        'witchcraft 111' => 'witchcraft-111',
-        'blank grimoire' => 'blank-grimoire',
-        'crystal'        => 'crystal-grimoire',
+        'monthly'              => 'membership-monthly',
+        'magick manuscript'    => 'membership-lifetime',   // "The Magick Manuscript ✦ 20,000+ Entries…"
+        'witchcraft 101'       => 'witchcraft-101',
+        'witchcraft 111'       => 'witchcraft-111',
+        'blank interconnected' => 'blank-grimoire',        // "Blank Interconnected 14 Grimoires ✧ Notion Template Framework"
+        'crystal grimoire'     => 'crystal-grimoire',      // "Free Blank Crystal Grimoire ✧ Notion Starter Database"
     ],
 
     // ---------- Email (login links) ----------

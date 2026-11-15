@@ -53,7 +53,7 @@ function product_name(string $slug): string
     return match ($slug) {
         'membership-monthly' => 'Manuscript · monthly',
         'membership-lifetime' => 'Manuscript · lifetime',
-        default => product($slug)['name'] ?? ucwords(str_replace('-', ' ', $slug)),
+        default => ($pr = product($slug)) ? short_name($pr) : ucwords(str_replace('-', ' ', $slug)),
     };
 }
 
@@ -287,7 +287,7 @@ function dash_members(string $notice = ''): void
     $export = e(url('dashboard/export/members.csv'));
     $productOptions = '';
     foreach (products() as $slug => $p) {
-        $productOptions .= '<option value="product:' . e($slug) . '">' . e($p['name']) . '</option>';
+        $productOptions .= '<option value="product:' . e($slug) . '">' . e(short_name($p)) . '</option>';
     }
     dash_layout('members', 'Members', $notice . <<<HTML
 <div class="dash-grid">

@@ -46,17 +46,15 @@ function route(array $parts, string $method): void
         case 'shop':          route_shop(array_slice($parts, 1), $method); return;
         case 'suggest':       search_suggest(trim((string) ($_GET['q'] ?? ''))); return;
     }
-    if (count($parts) === 1) {
-        $g = grimoire_root($first);
-        $g ? view_page($g) : not_found();
-        return;
-    }
-    if (count($parts) === 2) {
-        $p = find_page($parts[0], $parts[1]);
-        $p ? view_page($p) : not_found();
-        return;
-    }
-    not_found();
+    $p = match (count($parts)) {
+        1 => grimoire_root($first),
+        2 => find_page($parts[0], $parts[1]),
+        default => null,
+    };
+    if ($p) { view_page($p); return; }
+    // Visitors get the same members-only page whether or not something exists at this address,
+    // so the Manuscript's contents can't be mapped out by guessing URLs.
+    has_access() ? not_found() : view_gate(['locked' => true]);
 }
 
 // ------------------------------------------------------------------ reading
@@ -276,7 +274,8 @@ function go_notion(string $id): void
 {
     $id = NotionImporterLinks::idFrom($id);
     $p = $id ? page_by_id($id) : null;
-    $p ? redirect(page_url($p), 301) : not_found();
+    if ($p && (has_access() || is_public_page($p))) redirect(page_url($p), 301);
+    $p ? view_gate($p) : (has_access() ? not_found() : view_gate(['locked' => true]));
 }
 
 final class NotionImporterLinks
@@ -292,32 +291,54 @@ final class NotionImporterLinks
 
 function view_join(): void
 {
+    $copy = require MM_ROOT . '/manuscript-copy.php';
+    $code = preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($_GET['code'] ?? ''));
+    $csrf = e(csrf_token());
     $plans = '';
     foreach (config('plans', []) as $key => $plan) {
         if (empty($plan['price'])) continue;
         $plans .= '<form class="card plan" method="post" action="' . e(url('checkout')) . '">'
-            . '<input type="hidden" name="csrf" value="' . e(csrf_token()) . '"><input type="hidden" name="plan" value="' . e($key) . '">'
-            . '<h3>' . e($plan['label']) . '</h3><p>' . e($plan['blurb'] ?? '') . '</p>'
+            . '<input type="hidden" name="csrf" value="' . $csrf . '"><input type="hidden" name="plan" value="' . e($key) . '"><input type="hidden" name="code" value="' . e($code) . '">'
+            . '<h3>' . e($plan['label']) . '</h3>'
+            . (!empty($plan['amount_label']) ? '<p class="price big">' . e($plan['amount_label']) . '</p>' : '')
+            . '<p>' . e($plan['blurb'] ?? '') . '</p>'
+            . '<label class="agree"><input type="checkbox" name="agree" value="1" required> I agree to the <a href="#terms">Terms of Access</a></label>'
             . '<button class="btn" type="submit">Choose ' . e($plan['label']) . '</button></form>';
     }
+    $highlights = '';
+    foreach ($copy['highlights'] as [$title, $text]) {
+        $highlights .= '<li><strong>' . e($title) . '</strong> ' . e($text) . '</li>';
+    }
     $login = e(url('login'));
-    $note = has_access() ? '<p class="lede">You already have full access. <a href="' . e(url()) . '">Open the Manuscript</a>.</p>' : '';
-    layout('Join', <<<HTML
+    $note = has_access() ? '<p class="notice">You already have full access. <a href="' . e(url()) . '">Open the Manuscript</a>.</p>' : '';
+    $codeNote = $code ? '<p class="notice">Code <strong>' . e($code) . '</strong> will be applied at checkout.</p>' : '';
+    $desc = safe_html($copy['description_html']);
+    $terms = safe_html($copy['terms_html']);
+    $community = community_links();
+    layout('Join the Manuscript', <<<HTML
 <section class="mm-hero narrow">
   <p class="eyebrow labelled">Membership</p>
-  <h1>Enter <em>the Manuscript</em></h1>
-  <p class="lede">Every grimoire, every entry, every cross-link, and every page added from here on. Payment is handled securely by Stripe.</p>
+  <h1>The Magick <em>Manuscript</em></h1>
+  <p class="lede">20,000+ entries · 15 cross-linked grimoires · an interactive digital grimoire that never stops growing.</p>
   $note
+  $codeNote
 </section>
 <section class="cards pairs plans">$plans</section>
-<p class="center small">After paying you'll get an email link to sign in. Already a member? <a href="$login">Sign in</a></p>
-HTML);
+<p class="center small">Secure checkout by Stripe. After paying you're signed in straight away. Already a member? <a href="$login">Sign in</a></p>
+<section class="join-copy">
+  <div class="mm-prose">$desc</div>
+  <ul class="highlights">$highlights</ul>
+  $community
+  <details class="terms" id="terms"><summary>Terms of Access</summary><div class="mm-prose">$terms</div></details>
+</section>
+HTML, ['index' => true, 'description' => 'Join The Magick Manuscript: 20,000+ pages of cross-linked, sourced witchcraft reference across 15 grimoires.']);
 }
 
 function do_checkout(): void
 {
     check_csrf();
-    redirect(create_checkout((string) ($_POST['plan'] ?? ''), current_email()));
+    if (empty($_POST['agree'])) redirect(url('join') . '#terms');
+    redirect(create_checkout((string) ($_POST['plan'] ?? ''), current_email(), (string) ($_POST['code'] ?? '')));
 }
 
 function view_welcome(): void

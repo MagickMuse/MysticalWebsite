@@ -274,3 +274,17 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .chart-table summary { cursor: pointer; font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
 .chart-table .table-wrap { margin-top: .8rem; }
 @media (forced-colors: active) { .chart .bar { fill: CanvasText; } .chart .bar.series-2 { fill: GrayText; } }
+
+/* join page + product copy */
+.agree { display: flex; gap: .5rem; align-items: baseline; font-size: .85rem; color: var(--muted); }
+.agree input { accent-color: var(--accent); }
+.join-copy { max-width: 760px; margin: clamp(3rem, 7vw, 5rem) auto 0; display: grid; gap: 2rem; }
+.join-copy .mm-prose, .product-desc { padding-top: 0; margin: 0; max-width: none; }
+.product-desc h2, .product-desc h3 { margin-top: 1.8rem; }
+.highlights { list-style: none; margin: 0; padding: 1.6rem; display: grid; gap: .8rem; border: 1px solid var(--line); background: var(--surface); }
+.highlights li { padding-left: 1.4rem; position: relative; }
+.highlights li::before { content: ""; position: absolute; left: 0; top: .45rem; width: .7rem; height: .7rem; background: var(--gold); -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
+.terms summary { cursor: pointer; font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; }
+.terms .mm-prose { margin-top: 1rem; font-size: .92rem; color: var(--muted); }
+.community { gap: 1.6rem; }
+.refund { margin-top: -.4rem; }

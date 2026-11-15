@@ -1,16 +1,17 @@
 (function () {
   var SEEN_KEY = 'tmm_popup_seen';
 
-  // Gumroad clicks: analytics event, and never show the exit offer afterwards
+  // Shop / join clicks: analytics event, and never show the exit offer afterwards
   document.addEventListener('click', function (e) {
-    var link = e.target.closest('a[href*="themagickmuse.gumroad.com"]');
+    var link = e.target.closest('a[href^="/shop"], a[href^="/manuscript/join"]');
     if (!link) return;
     try { localStorage.setItem(SEEN_KEY, '1'); } catch (err) {}
     if (typeof gtag !== 'function') return;
-    var href = link.href;
+    var href = link.getAttribute('href');
     var type = 'store';
-    if (href.indexOf('/l/manuscript') !== -1) type = 'manuscript';
-    gtag('event', 'click_gumroad', {
+    if (href.indexOf('/manuscript/join') === 0) type = 'manuscript';
+    else if (href.indexOf('/shop/') === 0) type = href.split('/')[2] || 'store';
+    gtag('event', 'click_shop', {
       link_type: type,
       link_text: link.textContent.trim() || 'icon',
       page_path: location.pathname
@@ -37,7 +38,7 @@
   }
 
   // Exit-intent offer: desktop pointers only, top-edge exit only, not in the first 20s,
-  // once per visitor, and never after a Gumroad click.
+  // once per visitor, and never after a shop click.
   var offer = document.getElementById('offer');
   var desktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   if (offer && desktop && typeof offer.showModal === 'function') {
