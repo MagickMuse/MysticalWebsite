@@ -40,7 +40,7 @@ return [
     // The Manuscript is sold as lifetime access for $333 (Stripe → Product catalog → one-time price).
     'plans' => [
         // amount_label is only what the page shows; the real price is the Stripe price.
-        'lifetime' => ['price' => 'price_yyy', 'label' => 'Lifetime', 'amount_label' => '$333', 'blurb' => 'One payment. Every update ever made, and every one to come.', 'mode' => 'payment'],
+        'lifetime' => ['price' => 'price_yyy', 'label' => 'Manuscript access', 'amount_label' => '$333', 'blurb' => 'One payment. Every update ever made, and every one to come.', 'mode' => 'payment'],
         // A monthly plan could be added later, e.g.:
         // 'monthly' => ['price' => 'price_…', 'label' => 'Monthly', 'amount_label' => '$__/month', 'blurb' => 'Full access, cancel anytime.', 'mode' => 'subscription'],
     ],

@@ -303,7 +303,7 @@ function view_join(): void
             . (!empty($plan['amount_label']) ? '<p class="price big">' . e($plan['amount_label']) . '</p>' : '')
             . '<p>' . e($plan['blurb'] ?? '') . '</p>'
             . '<label class="agree"><input type="checkbox" name="agree" value="1" required> I agree to the <a href="#terms">Terms of Access</a></label>'
-            . '<button class="btn" type="submit">Choose ' . e($plan['label']) . '</button></form>';
+            . '<button class="btn" type="submit">' . e($plan['button'] ?? 'Get access') . '</button></form>';
     }
     $planClass = substr_count($plans, '<form') > 1 ? 'pairs' : 'single';
     $highlights = '';
@@ -435,7 +435,7 @@ function view_account(): void
     $status = match (true) {
         is_admin($email) && !$m => 'Curator (admin) access',
         !$m => 'No membership on this email',
-        $m['plan'] === 'lifetime' => 'Lifetime member',
+        $m['plan'] === 'lifetime' => 'Member: full Manuscript access',
         $m['plan'] === 'comp' => 'Member (complimentary)',
         $m['status'] === 'active' => 'Monthly member, renews ' . e(substr((string) $m['paid_through'], 0, 10)),
         default => 'Membership ' . e($m['status']) . ($m['paid_through'] ? ', access until ' . e(substr($m['paid_through'], 0, 10)) : ''),

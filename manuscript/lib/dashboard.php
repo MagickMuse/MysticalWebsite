@@ -52,7 +52,7 @@ function product_name(string $slug): string
 {
     return match ($slug) {
         'membership-monthly' => 'Manuscript · monthly',
-        'membership-lifetime' => 'Manuscript · lifetime',
+        'membership-lifetime' => 'Manuscript access',
         default => ($pr = product($slug)) ? short_name($pr) : ucwords(str_replace('-', ' ', $slug)),
     };
 }
@@ -99,7 +99,7 @@ function dash_overview(): void
 
     $breakdown = implode(' · ', array_filter([
         isset($members['monthly']) ? $members['monthly'] . ' monthly' : '',
-        isset($members['lifetime']) ? $members['lifetime'] . ' lifetime' : '',
+        isset($members['lifetime']) ? $members['lifetime'] . ' paid' : '',
         isset($members['comp']) ? $members['comp'] . ' gifted / from Gumroad' : '',
         isset($members['']) ? $members[''] . ' former monthly (until paid date)' : '',
     ])) ?: 'none yet';
@@ -278,7 +278,7 @@ function dash_members(string $notice = ''): void
     $st->execute($args);
     $tr = '';
     foreach ($st->fetchAll() as $r) {
-        $plan = ['monthly' => 'Monthly', 'lifetime' => 'Lifetime', 'comp' => 'Gifted / Gumroad'][$r['plan']] ?? '—';
+        $plan = ['monthly' => 'Monthly', 'lifetime' => 'Paid', 'comp' => 'Gifted / Gumroad'][$r['plan']] ?? '—';
         $status = $r['status'] === 'active' ? 'Active' : ucfirst(str_replace('_', ' ', $r['status'])) . ($r['paid_through'] && $r['paid_through'] >= now() ? ' (access until ' . substr($r['paid_through'], 0, 10) . ')' : '');
         $tr .= '<tr><td>' . e($r['email']) . '</td><td>' . e($plan) . '</td><td>' . e($status) . '</td><td class="num">' . e(money((int) $r['spent'], cur())) . '</td><td>' . e(substr($r['created_at'], 0, 10)) . '</td><td>' . e($r['note']) . '</td></tr>';
     }
@@ -305,7 +305,7 @@ function dash_members(string $notice = ''): void
     <textarea id="emails" name="emails" rows="4" required></textarea>
     <label for="what">Access</label>
     <select id="what" name="what">
-      <option value="comp">Manuscript, lifetime (gift / moved from Gumroad)</option>
+      <option value="comp">Manuscript access (gift / moved from Gumroad)</option>
       $productOptions
       <option value="revoke">Remove Manuscript access</option>
     </select>
