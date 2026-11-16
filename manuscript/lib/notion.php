@@ -388,6 +388,8 @@ final class NotionImporter
                 $src = $d['synced_from']['block_id'] ?? null;
                 return $src ? $this->renderChildren($src, $ctx) : $this->kids($b, $ctx);
             case 'child_page':
+                // Pages about using Notion (e.g. "Plant Grimoire Guide") stay behind, links and all.
+                if (preg_match((string) config('skip_pages', '/\\bgrimoire guide\\b/i'), (string) ($d['title'] ?? ''))) return '';
                 $cid = normalize_id($b['id']);
                 $ctx['children'][] = ['page', $cid];
                 return '<p class="page-link"><a data-mm-id="' . $cid . '">' . e($d['title'] ?? 'Untitled') . '</a></p>';

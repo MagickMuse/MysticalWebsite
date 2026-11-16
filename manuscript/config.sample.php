@@ -30,6 +30,10 @@ return [
     'notion_token' => 'ntn_xxx',
     // The list of grimoires to import is in manuscript/grimoires.php.
 
+    // Notion pages the importer leaves behind (title pattern). Default: the "… Grimoire Guide" pages,
+    // which are about using Notion.
+    // 'skip_pages' => '/\\bgrimoire guide\\b/i',
+
     // ---------- Stripe paywall ----------
     // Dashboard → Developers → API keys. Use test keys (sk_test_...) until you are ready.
     'stripe_secret_key'     => 'sk_test_xxx',
