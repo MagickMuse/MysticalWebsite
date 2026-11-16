@@ -569,3 +569,9 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
   filter: drop-shadow(0 0 8px rgba(255, 236, 180, 1)) drop-shadow(0 0 2px #fff6d8); }
 .sparkle.small { width: 12px; height: 12px; margin: -6px 0 0 -6px; }
 .sparkle.big { width: 34px; height: 34px; margin: -17px 0 0 -17px; }
+
+/* cut-out pictures (transparent PNGs) stand whole on the page with a soft glow behind them */
+.pg-cover.cutout { display: flex; justify-content: center; align-items: flex-end; max-height: none; border-radius: 0; padding: 1rem 0 .4rem;
+  background: radial-gradient(ellipse 45% 55% at 50% 58%, color-mix(in srgb, var(--surface) 90%, var(--gold) 10%) 0%, transparent 72%); }
+.pg-cover.cutout img { width: auto; height: auto; max-width: min(100%, 520px); max-height: 320px; object-fit: contain; filter: drop-shadow(0 16px 14px rgba(46, 31, 32, .2)); }
+@media (max-width: 640px) { .pg-cover.cutout img { max-height: 240px; } }

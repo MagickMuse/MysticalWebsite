@@ -174,7 +174,8 @@ function view_page(array $p): void
     // Grimoires use their photo from the website; other pages use their own cover, if any.
     $photo = $p['kind'] === 'grimoire' ? grimoire_photo($p['grimoire'], 1600, 640) : null;
     $cover = $photo ? '<div class="pg-cover arch-banner"><img src="' . e($photo) . '" alt="" width="1600" height="640"></div>' : '';
-    if (!$photo) $cover = $p['cover'] ? '<div class="pg-cover"><img src="' . e(media_url($p['cover'])) . '" alt=""></div>' : '';
+    // Cut-out pictures (transparent PNGs, like the Animal Grimoire's) are shown whole, standing on the page, not cropped into the arch.
+    if (!$photo) $cover = $p['cover'] ? '<div class="pg-cover' . (is_cutout($p['cover']) ? ' cutout' : '') . '"><img src="' . e(media_url($p['cover'])) . '" alt=""></div>' : '';
 
     {
         $gallery = '';
@@ -198,6 +199,14 @@ function view_page(array $p): void
         $body = $panel . $gallery . '<div class="mm-prose">' . $bodyHtml . '</div>';
     }
     layout($p['title'], '<article class="pg pg-' . e($p['kind']) . '">' . $cover . $head . $body . '</article>', ['private' => true, 'protect' => true, 'peek' => $peek]);
+}
+
+/** True for a PNG with transparency (colour type with alpha), read from the file's header. */
+function is_cutout(string $file): bool
+{
+    if (!str_ends_with(strtolower($file), '.png')) return false;
+    $h = @file_get_contents(config('data_dir') . '/media/' . basename($file), false, null, 0, 26);
+    return $h !== false && strlen($h) === 26 && in_array(ord($h[25]), [4, 6], true);
 }
 
 /** Turns what someone typed into an FTS5 query where every word is a prefix match ("rose qua" → Rose Quartz). */
