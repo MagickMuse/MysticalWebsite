@@ -72,7 +72,7 @@ while (($row = fgetcsv($fh)) !== false) {
     if ($refunded) continue;
 
     if ($slug === 'membership-lifetime') {
-        upsert_member($email, ['plan' => 'comp', 'status' => 'active', 'paid_through' => null, 'note' => 'Gumroad lifetime']);
+        upsert_member($email, ['plan' => 'comp', 'status' => 'active', 'paid_through' => null, 'note' => 'Moved from Gumroad']);
     } elseif ($slug === 'membership-monthly') {
         $monthly[$email] = max($monthly[$email] ?? 0, $when);
     } else {
