@@ -10,7 +10,9 @@ declare(strict_types=1);
  * Re-running only re-downloads pages edited in Notion since the last run.
  */
 /** Thrown when the importer's time budget runs out; everything saved so far stays, and the next run continues. */
-final class ImportPaused extends RuntimeException {}
+final class NotionError extends RuntimeException {}
+
+class ImportPaused extends RuntimeException {}
 
 final class NotionImporter
 {
@@ -42,9 +44,81 @@ final class NotionImporter
 
     public function stats(): array { return $this->stats; }
 
+    /**
+     * Links that point at a page not on the site are usually to an archived or trashed duplicate in Notion.
+     * Each one is matched to the live entry in the same grimoire: same name, the name in its "also known as",
+     * singular/plural, or a longer name that starts with it ("Tonka Bean" → "Tonka"). Only a single clear match is used.
+     */
+    public function linkDuplicates(): void
+    {
+        $missing = db()->query('SELECT DISTINCT r.to_id FROM relations r LEFT JOIN pages p ON p.id = r.to_id WHERE p.id IS NULL')->fetchAll(PDO::FETCH_COLUMN);
+        foreach (db()->query("SELECT body_html FROM pages WHERE body_html LIKE '%data-mm-id%'") as $r) {
+            preg_match_all('/data-mm-id="([0-9a-f]{32})"/', $r['body_html'], $m);
+            $missing = array_merge($missing, $m[1]);
+        }
+        $missing = array_values(array_unique($missing));
+        if (!$missing) return;
+        $have = array_flip(db()->query('SELECT id FROM pages')->fetchAll(PDO::FETCH_COLUMN));
+        $done = array_flip(db()->query('SELECT id FROM aliases WHERE to_id IS NOT NULL')->fetchAll(PDO::FETCH_COLUMN)); // the rest are checked again
+        $save = db()->prepare('INSERT OR REPLACE INTO aliases (id, to_id, title) VALUES (?, ?, ?)');
+        $linked = 0;
+        foreach ($missing as $id) {
+            if (isset($have[$id]) || isset($done[$id])) continue;
+            try {
+                $page = $this->call('GET', "/pages/$id", null, '2025-09-03');
+            } catch (NotionError $ex) {
+                if ($ex->getCode() === 404 || $ex->getCode() === 400) { $save->execute([$id, null, null]); continue; } // private or outside the Manuscript
+                throw $ex;
+            }
+            $title = $this->pageTitle($page);
+            $to = null;
+            if (!empty($page['is_archived']) || !empty($page['in_trash']) || !empty($page['archived'])) {
+                $db = normalize_id((string) ($page['parent']['database_id'] ?? ''));
+                $st = db()->prepare('SELECT grimoire FROM pages WHERE id = ?');
+                $st->execute([$db]);
+                $g = $st->fetchColumn();
+                $manual = (array) config('duplicates', ['Coatlicue' => 'entity/coatlique']);
+                if (isset($manual[$title])) {
+                    [$mg, $ms] = explode('/', $manual[$title], 2) + [1 => ''];
+                    $q = db()->prepare('SELECT id FROM pages WHERE grimoire = ? AND slug = ?');
+                    $q->execute([$mg, $ms]);
+                    $to = $q->fetchColumn() ?: null;
+                } else {
+                    $to = $g ? self::liveCopy($g, $title, $id) : null;
+                }
+            }
+            $save->execute([$id, $to, $title]);
+            if ($to) $linked++;
+        }
+        ($this->log)("Archived duplicates: $linked links now go to the live entry.");
+    }
+
+    private static function liveCopy(string $grimoire, string $title, string $id): ?string
+    {
+        $norm = fn(string $t) => trim(preg_replace('/[^a-z0-9]+/', ' ', mb_strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', $t) ?: $t)));
+        $one = fn(string $t) => preg_replace('/(ies)$/', 'y', preg_replace('/(?<=[^s])s$/', '', $t));
+        $want = $norm($title);
+        if ($want === '') return null;
+        $st = db()->prepare("SELECT id, title, aka FROM pages WHERE grimoire = ? AND kind = 'entry' AND id != ?");
+        $st->execute([$grimoire, $id]);
+        $rows = $st->fetchAll();
+        $tests = [
+            fn($r) => $norm($r['title']) === $want,
+            fn($r) => in_array($want, array_map($norm, preg_split('/[,;]/', (string) $r['aka'])), true),
+            fn($r) => $one($norm($r['title'])) === $one($want),
+            fn($r) => str_starts_with($want . ' ', $norm($r['title']) . ' ') || str_starts_with($norm($r['title']), $want . ' '),
+        ];
+        foreach ($tests as $test) {
+            $hits = array_values(array_filter($rows, $test));
+            if (count($hits) === 1) return $hits[0]['id'];
+            if (count($hits) > 1) return null; // more than one: don't guess
+        }
+        return null;
+    }
+
     // ------------------------------------------------------------------ HTTP
 
-    private function call(string $method, string $path, ?array $body = null): array
+    private function call(string $method, string $path, ?array $body = null, string $version = '2022-06-28'): array
     {
         for ($attempt = 1; ; $attempt++) {
             // Notion allows ~3 requests per second.
@@ -60,7 +134,7 @@ final class NotionImporter
                 CURLOPT_HEADER => true,
                 CURLOPT_HTTPHEADER => [
                     'Authorization: Bearer ' . $this->token,
-                    'Notion-Version: 2022-06-28',
+                    'Notion-Version: ' . $version,
                     'Content-Type: application/json',
                 ],
             ]);
@@ -79,7 +153,7 @@ final class NotionImporter
                 sleep($retry);
                 continue;
             }
-            throw new RuntimeException("Notion $method $path → $code " . ($data['message'] ?? ''));
+            throw new NotionError("Notion $method $path → $code " . ($data['message'] ?? ''), $code);
         }
     }
 

@@ -102,6 +102,14 @@ function page_index(array $ids): array
         $st->execute($chunk);
         foreach ($st->fetchAll() as $p) $out[$p['id']] = $p + ['url' => page_url($p)];
     }
+    // Archived duplicates in Notion stand in for their live entry.
+    $gone = array_values(array_diff($ids, array_keys($out)));
+    foreach (array_chunk($gone, 500) as $chunk) {
+        $place = implode(',', array_fill(0, count($chunk), '?'));
+        $st = db()->prepare("SELECT a.id AS alias, p.id, p.slug, p.grimoire, p.kind, p.title, p.icon, p.parent_id FROM aliases a JOIN pages p ON p.id = a.to_id WHERE a.id IN ($place)");
+        $st->execute($chunk);
+        foreach ($st->fetchAll() as $p) { $a = $p['alias']; unset($p['alias']); $out[$a] = $p + ['url' => page_url($p)]; }
+    }
     return $out;
 }
 
@@ -214,8 +222,9 @@ function connections(array $page): array
     $st->execute([$page['id']]);
     $rows = $st->fetchAll();
 
-    $st = db()->prepare('SELECT r.from_id, p.parent_id FROM relations r JOIN pages p ON p.id = r.from_id WHERE r.to_id = ?');
-    $st->execute([$page['id']]);
+    $st = db()->prepare('SELECT r.from_id, p.parent_id FROM relations r JOIN pages p ON p.id = r.from_id
+        WHERE r.to_id = ? OR r.to_id IN (SELECT id FROM aliases WHERE to_id = ?)');
+    $st->execute([$page['id'], $page['id']]);
     $back = $st->fetchAll();
 
     $idx = page_index(array_merge(array_column($rows, 'to_id'), array_column($back, 'from_id'), array_column($back, 'parent_id')));
@@ -223,9 +232,10 @@ function connections(array $page): array
     $out = [];
     $shown = [];
     foreach ($rows as $r) {
-        if (!isset($idx[$r['to_id']]) || $r['to_id'] === $page['id']) continue;
-        $out[trim($r['prop'])][$r['to_id']] = $idx[$r['to_id']];
-        $shown[$r['to_id']] = true;
+        $t = $idx[$r['to_id']] ?? null;
+        if (!$t || $t['id'] === $page['id']) continue;
+        $out[trim($r['prop'])][$t['id']] = $t;
+        $shown[$t['id']] = true;
     }
     // Backlinks that the outgoing relations did not already cover, grouped by their database.
     // A group with the same name as a relation (e.g. "Correspondences") joins that relation's row.

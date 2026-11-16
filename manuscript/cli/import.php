@@ -51,6 +51,9 @@ foreach ($grimoires as $slug => $id) {
         echo '! ' . $slug . ': ' . $ex->getMessage() . "\n";
     }
 }
+if (!$paused && !in_array('--guides-only', $args, true)) {
+    try { $importer->linkDuplicates(); } catch (Throwable $ex) { echo '! archived duplicates: ' . $ex->getMessage() . "\n"; }
+}
 $s = $importer->stats();
 if ($paused) {
     printf("PAUSED after %.0f minutes: everything so far is saved. Run the import again to continue where it stopped.\n", (microtime(true) - $start) / 60);

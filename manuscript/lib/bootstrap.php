@@ -103,6 +103,13 @@ function migrate(PDO $pdo): void
     );
     CREATE INDEX IF NOT EXISTS content.relations_to ON relations(to_id);
 
+    -- Archived or trashed duplicates in Notion, pointed at the live entry (to_id NULL: checked, no live copy found).
+    CREATE TABLE IF NOT EXISTS content.aliases (
+        id      TEXT PRIMARY KEY,
+        to_id   TEXT,
+        title   TEXT
+    );
+
     CREATE VIRTUAL TABLE IF NOT EXISTS content.search USING fts5(id UNINDEXED, title, aka, plain, tokenize = 'porter unicode61 remove_diacritics 2');
 
     CREATE TABLE IF NOT EXISTS members (

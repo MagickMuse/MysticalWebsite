@@ -99,5 +99,7 @@ return [
 
     // The sneak peek: one page visitors can read in full at {base_url}/sneak-peek. Its links open the join pop-up.
     // Same forms as above; set to '' to turn it off.
+    // Archived duplicates in Notion that the importer can't match by name: archived title => 'grimoire/slug' of the live entry.
+    // 'duplicates' => ['Coatlicue' => 'entity/coatlique'],
     'sneak_peek' => 'correspondence/protection',
 ];
