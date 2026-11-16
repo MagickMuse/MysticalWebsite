@@ -492,7 +492,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 
 /* ---------- the Manuscript home: one row of grimoire spines, in the site's colours ---------- */
 .carousel { position: relative; max-width: 1200px; margin: 0 auto; padding: 0 2.6rem; }
-.car-track { display: flex; align-items: flex-end; gap: 6px; justify-content: safe center; height: 340px; padding: 24px 4px 0; overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth; scroll-snap-type: x proximity; scrollbar-width: none; }
+.car-track { display: flex; align-items: flex-end; gap: 6px; justify-content: safe center; height: 340px; padding: 24px 4px 0; overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .car-track::-webkit-scrollbar { display: none; }
 .ledge { height: 14px; margin: 0 1.8rem; border-radius: 3px; background: linear-gradient(180deg, var(--surface), var(--line)); box-shadow: 0 10px 18px -10px rgba(46, 31, 32, .45); }
 .car-btn { position: absolute; top: 46%; width: 40px; height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--accent-text); font: 400 1.6rem/1 var(--display); cursor: pointer; display: grid; place-items: center; z-index: 5; transition: border-color .2s, opacity .2s; }
@@ -502,8 +502,8 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .carousel.fits .car-btn { visibility: hidden; }
 
 /* tones from the website: burgundy, rose, ink, gold, blush */
-.bk { --bc: #7a1f2b; --ink-on: #f1d9a0; position: relative; flex: none; display: block; width: 58px; height: 300px; border-radius: 3px 3px 2px 2px; text-decoration: none;
-  scroll-snap-align: center; overflow: hidden; transition: width .45s cubic-bezier(.2,.7,.2,1), transform .35s, box-shadow .35s;
+.bk { --bc: #7a1f2b; --ink-on: #f1d9a0; --room: 214px; position: relative; flex: none; display: block; width: 58px; height: 300px; border-radius: 3px 3px 2px 2px; text-decoration: none;
+  overflow: hidden; transition: width .45s cubic-bezier(.2,.7,.2,1), transform .35s, box-shadow .35s;
   box-shadow: 0 14px 22px -14px rgba(46, 31, 32, .6); }
 .bk.t1 { --bc: #7a1f2b; } .bk.t2 { --bc: #9c4a4f; } .bk.t3 { --bc: #2e1f20; } .bk.t4 { --bc: #a07a2c; } .bk.t5 { --bc: #c99a92; --ink-on: #3a2224; }
 .bk .spine { position: absolute; inset: 0; transition: opacity .3s;
@@ -513,9 +513,10 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .band.bottom { bottom: 18px; box-shadow: 0 -6px 0 -0.5px color-mix(in srgb, var(--gold) 60%, transparent); }
 .bk-title { position: absolute; top: 34px; bottom: 52px; left: 0; right: 0; display: flex; align-items: center; justify-content: center;
   writing-mode: vertical-rl; text-orientation: upright; /* letters stacked upright, one under another */
-  font-family: var(--display); font-weight: 600; font-size: 1.12rem; line-height: 1; letter-spacing: .02em; text-transform: uppercase; color: var(--ink-on); white-space: nowrap; overflow: hidden; }
-.bk-title.long { font-size: .98rem; letter-spacing: 0; }
-.bk-title.xlong { font-size: .8rem; letter-spacing: -.04em; top: 22px; bottom: 52px; }
+  /* each letter takes about 1.12em, so the title shrinks to fit the room on the spine */
+  font-family: var(--display); font-weight: 600; line-height: 1; letter-spacing: 0; text-transform: uppercase; color: var(--ink-on); white-space: nowrap;
+  font-size: min(1.12rem, calc(var(--room) / (var(--n, 8) * 1.12))); }
+.bk-title.n3 { --n: 3; } .bk-title.n4 { --n: 4; } .bk-title.n5 { --n: 5; } .bk-title.n6 { --n: 6; } .bk-title.n7 { --n: 7; } .bk-title.n8 { --n: 8; } .bk-title.n9 { --n: 9; } .bk-title.n10 { --n: 10; } .bk-title.n11 { --n: 11; } .bk-title.n12 { --n: 12; } .bk-title.n13 { --n: 13; } .bk-title.n14 { --n: 14; } .bk-title.n15 { --n: 15; } .bk-title.n16 { --n: 16; }
 .bk-star { position: absolute; left: 50%; bottom: 32px; width: 14px; height: 14px; margin-left: -7px; background: var(--gold); -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
 .bk.t4 .band, .bk.t4 .bk-star { background: #f3e2b4; }
 
@@ -527,12 +528,12 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .cover-title { position: absolute; top: 22px; left: 16px; right: 16px; z-index: 3; text-align: center; font-family: var(--display); font-size: 1.55rem; line-height: 1.1; color: var(--ink-on); }
 .cover-title::after { content: ""; display: block; width: 12px; height: 12px; margin: .45rem auto 0; background: var(--gold); -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
 .cover-sub { position: absolute; bottom: 20px; left: 0; right: 0; z-index: 3; text-align: center; font-size: .66rem; letter-spacing: .2em; text-transform: uppercase; color: #f6efe8; }
-.bk:hover, .bk:focus-visible { width: 220px; transform: translateY(-10px); box-shadow: 0 24px 34px -16px rgba(46, 31, 32, .7); }
-.bk:hover .spine, .bk:focus-visible .spine { opacity: 0; }
-.bk:hover .cover, .bk:focus-visible .cover { opacity: 1; }
+.car-track:not([data-ready]) .bk:hover, .bk.open, .bk:focus-visible { width: 220px; transform: translateY(-10px); box-shadow: 0 24px 34px -16px rgba(46, 31, 32, .7); }
+.car-track:not([data-ready]) .bk:hover .spine, .bk.open .spine, .bk:focus-visible .spine { opacity: 0; }
+.car-track:not([data-ready]) .bk:hover .cover, .bk.open .cover, .bk:focus-visible .cover { opacity: 1; }
 .bk:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 @media (hover: none) { .car-track { height: 320px; } }
-@media (max-width: 640px) { .carousel { padding: 0 .4rem; } .car-btn { display: none; } .car-track { height: 300px; } .bk { height: 260px; width: 50px; } .bk:hover, .bk:focus-visible { width: 190px; } .bk .cover { width: 190px; } }
+@media (max-width: 640px) { .carousel { padding: 0 .4rem; } .car-btn { display: none; } .car-track { height: 320px; } .bk { height: 280px; width: 50px; --room: 194px; } .car-track:not([data-ready]) .bk:hover, .bk.open, .bk:focus-visible { width: 190px; } .bk .cover { width: 190px; } }
 
 /* ---------- visitors: the join pop-up and the sneak peek note ---------- */
 .join-pop { width: min(520px, calc(100vw - 2rem)); padding: 2.4rem 2rem 1.8rem; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); text-align: center;

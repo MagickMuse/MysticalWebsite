@@ -25,7 +25,7 @@ function real_book(array $g, int $n, int $i): string
     $inside = grimoire_summary($g);
     $photo = grimoire_photo($g['grimoire'], 440, 600);
     $tone = 't' . (1 + $i % 5); // burgundy, rose, ink, gold, blush, in turn
-    $len = mb_strlen($label) > 12 ? ' xlong' : (mb_strlen($label) > 9 ? ' long' : '');
+    $len = ' n' . max(3, min(16, mb_strlen($label))); // letters on the spine, so the title can size itself to fit
     return '<a class="bk ' . $tone . '" href="' . e(page_url($g)) . '"'
         . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '')) . '"'
         . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'

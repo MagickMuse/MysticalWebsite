@@ -219,6 +219,8 @@
     if (e.key === 'Escape') document.querySelectorAll('.col-filter[open]').forEach(function (d) { d.open = false; d.querySelector('summary').focus(); });
   });
 
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   // Visitors: anything inside the Manuscript (a book, a connection, a link) opens the join pop-up,
   // except the pages anyone can read. Runs first (capture), so the book animation never starts for them.
   (function () {
@@ -255,19 +257,61 @@
     }
     btns.forEach(function (b) { b.addEventListener('click', function () { track.scrollBy({ left: +b.getAttribute('data-car') * track.clientWidth * 0.8, behavior: 'smooth' }); }); });
     track.addEventListener('scroll', sync, { passive: true }); track.addEventListener('transitionend', sync); window.addEventListener('resize', sync); sync();
+
+    // Hover opens a book to its cover. If that cover would be cut off at the edge of the row, the row glides
+    // just far enough to show all of it. While the row is moving, covers stay as they are (no flicker).
+    if (!(window.matchMedia && window.matchMedia('(hover: hover)').matches)) return;
+    track.setAttribute('data-ready', '');
+    var current = null, moving = false, stopT = 0, lastX = -1, lastY = -1;
+    function open(bk) {
+      if (bk === current) return;
+      if (current) current.classList.remove('open');
+      current = bk;
+      if (!bk) return;
+      bk.classList.add('open');
+      var wide = parseFloat(getComputedStyle(bk.querySelector('.cover')).width) || 220, pad = 16;
+      var left = bk.offsetLeft - track.offsetLeft, right = left + wide;
+      var view0 = track.scrollLeft, view1 = view0 + track.clientWidth, to = null;
+      if (right > view1 - pad) to = right - track.clientWidth + pad;
+      else if (left < view0 + pad) to = left - pad;
+      if (to !== null) track.scrollTo({ left: Math.max(0, to), behavior: reduceMotion ? 'auto' : 'smooth' });
+    }
+    function under() { var el = lastX < 0 ? null : document.elementFromPoint(lastX, lastY); return el && track.contains(el) ? el.closest('.bk') : null; }
+    track.addEventListener('pointermove', function (e) { lastX = e.clientX; lastY = e.clientY; if (!moving) open(e.target.closest('.bk')); });
+    track.addEventListener('pointerleave', function () { lastX = -1; if (!moving) open(null); });
+    track.addEventListener('scroll', function () {
+      moving = true; clearTimeout(stopT);
+      stopT = setTimeout(function () { moving = false; open(under()); }, 140);
+    }, { passive: true });
   });
 
   // Grimoire carousel: lift the book out from its cover, open it, then go in.
-  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html) e.innerHTML = html; return e; }
   function esc(t) { var d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
   document.addEventListener('click', function (e) {
     var book = e.target.closest('.carousel .bk');
     if (!book || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0 || reduceMotion || !document.body.animate) return;
     e.preventDefault();
+    visibleArea(function (v) { openBook(book, v); });
+  });
+  // The part of the page actually on screen. Usually the window, but when the page sits in a tall frame
+  // (as in a preview), only part of it is visible, and the book should open in the middle of that part.
+  function visibleArea(done) {
+    var all = { x: window.innerWidth / 2, y: window.innerHeight / 2, h: window.innerHeight };
+    if (!window.IntersectionObserver) { done(all); return; }
+    var called = false, finish = function (v) { if (!called) { called = true; done(v); } };
+    var io = new IntersectionObserver(function (entries) {
+      io.disconnect();
+      var r = entries[0] && entries[0].intersectionRect;
+      finish(r && r.height > 40 ? { x: r.left + r.width / 2, y: r.top + r.height / 2, h: r.height } : all);
+    });
+    io.observe(document.documentElement);
+    setTimeout(function () { io.disconnect(); finish(all); }, 120);
+  }
+  function openBook(book, v) {
     var href = book.href;
     var r = book.getBoundingClientRect();
-    var W = Math.min(300, window.innerWidth * 0.42), H = W * 1.42, T = 46;
+    var W = Math.min(300, window.innerWidth * 0.42, v.h * 0.6), H = W * 1.42, T = 46;
     var color = getComputedStyle(book).getPropertyValue('--bc'), inkOn = getComputedStyle(book).getPropertyValue('--ink-on');
 
     var veil = el('div', 'book-veil'), stage = el('div', 'book-stage'), wrap = el('div', 'b3d-wrap'), box = el('div', 'b3d');
@@ -290,7 +334,9 @@
 
     // Start exactly over the book in the row.
     var s0 = fromCover ? r.width / W : r.height / H, cx0 = r.left + r.width / 2, cy0 = r.top + r.height / 2;
-    var cx1 = window.innerWidth / 2, cy1 = window.innerHeight / 2;
+    // Open in the middle of the visible screen; the open book (cover + pages, 2W wide) is centred, so the spine sits at the middle.
+    var cx1 = v.x, cy1 = v.y;
+    stage.style.perspectiveOrigin = v.x + 'px ' + v.y + 'px';
     wrap.style.width = W + 'px'; wrap.style.height = H + 'px'; wrap.style.transformOrigin = '50% 50%';
     var at = function (cx, cy, sc, dz) { return 'translate(' + (cx - W / 2) + 'px,' + (cy - H / 2) + 'px) translateZ(' + (dz || 0) + 'px) scale(' + sc + ')'; };
     box.style.transform = turn0;
@@ -315,7 +361,7 @@
       })
       .then(function () { setTimeout(function () { location.href = href; }, 180); })
       .catch(function () { location.href = href; });
-  });
+  }
   // Coming back with the browser's Back button: put the row back as it was.
   window.addEventListener('pageshow', function () {
     document.querySelectorAll('.book-stage, .book-veil').forEach(function (n) { n.remove(); });
