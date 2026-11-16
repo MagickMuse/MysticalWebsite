@@ -92,6 +92,7 @@ function route_shop(array $parts, string $method): void
 
 function view_shop(): void
 {
+    record_view('route:/shop');
     $cards = '';
     foreach (products() as $slug => $p) {
         $p['slug'] = $slug;
@@ -114,6 +115,7 @@ HTML, ['index' => true, 'description' => 'Witchcraft courses, grimoire templates
 
 function view_product(array $p): void
 {
+    record_view('route:/shop/' . $p['slug']);
     $email = current_email();
     $csrf = e(csrf_token());
     $slug = e($p['slug']);

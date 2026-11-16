@@ -193,7 +193,7 @@ function layout(string $title, string $body, array $opt = []): void
 
     $email = current_email();
     $acct = $email
-        ? '<a href="' . e(url('account')) . '">Account</a>'
+        ? (has_access() ? '<a href="' . e(url('saved')) . '"><span aria-hidden="true">★</span> Saved</a><span class="dot" aria-hidden="true">·</span>' : '') . '<a href="' . e(url('account')) . '">Account</a>'
         : '<a href="' . e(url('login')) . '">Sign in</a>';
     $q = e($_GET['q'] ?? '');
     $robots = !empty($opt['index']) ? 'index, follow' : 'noindex, nofollow';
@@ -209,12 +209,12 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=5">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=7">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=5" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=7" defer></script>
 </head>
-<body class="mm">
+<body class="mm<?= !empty($opt['protect']) && !is_admin() ? ' no-copy' : '' ?>">
 <a class="skip" href="#main">Skip to main content</a>
 <header class="site">
   <div class="wrap nav">

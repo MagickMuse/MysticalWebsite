@@ -156,6 +156,31 @@ function migrate(PDO $pdo): void
         PRIMARY KEY (email, product)
     );
 
+    -- Page views per day (members reading the Manuscript, plus visits to the join and shop pages).
+    CREATE TABLE IF NOT EXISTS page_views (
+        page_id TEXT NOT NULL,                  -- Manuscript page id, or "route:/shop/…" for other pages
+        day     TEXT NOT NULL,                  -- YYYY-MM-DD (UTC)
+        views   INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (page_id, day)
+    );
+    -- Who read what, per day, as an anonymous fingerprint, to count different readers.
+    CREATE TABLE IF NOT EXISTS page_readers (
+        page_id TEXT NOT NULL,
+        day     TEXT NOT NULL,
+        reader  TEXT NOT NULL,
+        PRIMARY KEY (page_id, day, reader)
+    );
+    CREATE INDEX IF NOT EXISTS page_readers_day ON page_readers(day);
+
+    -- Pages members have starred to come back to.
+    CREATE TABLE IF NOT EXISTS bookmarks (
+        email      TEXT NOT NULL,
+        page_id    TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (email, page_id)
+    );
+    CREATE INDEX IF NOT EXISTS bookmarks_page ON bookmarks(page_id);
+
     CREATE TABLE IF NOT EXISTS stripe_events (
         id TEXT PRIMARY KEY,
         received_at TEXT NOT NULL

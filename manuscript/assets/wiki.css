@@ -180,7 +180,6 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .admin .table-wrap { margin-top: 1.4rem; }
 
 /* members-only reading: discourage casual copying (not a real protection, just friction) */
-.pg-entry .mm-prose, .pg-guide .mm-prose { -webkit-user-select: text; }
 @media print { .pg-entry, .pg-guide { display: none; } }
 
 /* ---------- search suggestions + filters ---------- */
@@ -289,3 +288,47 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .community { gap: 1.6rem; }
 .refund { margin-top: -.4rem; }
 .plans.single { grid-template-columns: minmax(0, 420px); justify-content: center; }
+
+/* ---------- save / saved pages ---------- */
+.pg-title { display: flex; flex-wrap: wrap; gap: .8rem 1.4rem; align-items: center; justify-content: space-between; }
+.save-form { margin: 0; }
+.save-btn { display: inline-flex; align-items: center; gap: .5rem; padding: .55rem 1.1rem; min-height: 44px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--ink); font: 400 .78rem/1 var(--body); letter-spacing: .18em; text-transform: uppercase; cursor: pointer; transition: border-color .2s, background .2s; }
+.save-btn:hover { border-color: var(--accent); }
+.save-btn[aria-pressed="true"] { border-color: var(--gold); background: var(--surface); }
+.save-star { font-size: 1.1rem; letter-spacing: 0; color: var(--gold); line-height: 1; }
+.mm-acct { display: flex; gap: .6rem; align-items: center; }
+.mm-acct .dot { color: var(--gold); }
+.saved { max-width: 920px; margin-inline: auto; display: grid; gap: 1.6rem; }
+.saved h1 { font-size: clamp(2.6rem, 6vw, 4rem); }
+.saved-group h2 { font-size: 1.7rem; padding-bottom: .6rem; border-bottom: 1px solid var(--line); margin-bottom: .6rem; }
+.saved-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.saved-list li { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .55rem 0; border-bottom: 1px solid var(--line); }
+.saved-list a { display: inline-flex; align-items: center; gap: .6rem; text-decoration: none; font-family: var(--display); font-size: 1.35rem; }
+.saved-list a:hover { color: var(--accent-text); }
+.saved-list form { margin: 0; }
+.saved-list .as-button { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; min-height: 0; }
+
+/* ---------- dashboard: page ranking ---------- */
+.rank { list-style: none; margin: 0; padding: 0; display: grid; }
+.rank li { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: .9rem; align-items: center; padding: .6rem 0; border-bottom: 1px solid var(--line); }
+.rank-n { font-family: var(--display); font-size: 1.1rem; color: var(--muted); text-align: right; }
+.rank-main { display: grid; gap: .35rem; min-width: 0; }
+.rank-name { display: flex; flex-wrap: wrap; gap: .2rem .7rem; align-items: baseline; }
+.rank-name a { display: inline-flex; gap: .4rem; align-items: center; text-decoration: none; }
+.rank-name a:hover { color: var(--accent-text); }
+.rank-name small { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.rank-bar { width: 100%; height: 6px; display: block; }
+.rank-bar .track { fill: var(--chart-grid); }
+.rank-bar .fill { fill: var(--series-1); }
+.rank-v { display: grid; justify-items: end; font-size: .85rem; color: var(--muted); }
+.rank-v strong { color: var(--ink); font-weight: 500; }
+.rank-v small { font-size: .75rem; }
+.rank.plain li { grid-template-columns: 1.6rem minmax(0, 1fr) auto; }
+
+/* ---------- copy protection on Manuscript pages (members; the curator is exempt) ---------- */
+.no-copy .mm-main { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.no-copy .mm-main input, .no-copy .mm-main textarea { -webkit-user-select: text; user-select: text; }
+.no-copy .mm-main img { -webkit-user-drag: none; pointer-events: none; }
+.no-copy .mm-main a img { pointer-events: auto; }
+@media print { .no-copy main, .no-copy footer { display: none !important; } body.no-copy::after { content: "The Magick Manuscript is for members to read online and can't be printed."; } }
+.mm-toast { position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%); z-index: 70; background: var(--ink); color: var(--bg); padding: .75rem 1.2rem; font-size: .9rem; box-shadow: 0 12px 30px -12px rgba(0,0,0,.5); }

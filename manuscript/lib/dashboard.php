@@ -19,6 +19,7 @@ function route_dashboard(array $parts, string $method): void
         $tab === 'members' => dash_members(),
         $tab === 'sales' => dash_sales(),
         $tab === 'emails' => dash_leads(),
+        $tab === 'pages' => dash_pages(),
         $tab === 'export' => dash_export($parts[1] ?? ''),
         default => not_found(),
     };
@@ -27,7 +28,7 @@ function route_dashboard(array $parts, string $method): void
 function dash_layout(string $active, string $title, string $body): void
 {
     $tabs = '';
-    foreach (['' => 'Overview', 'sales' => 'Sales', 'members' => 'Members', 'emails' => 'Email sign-ups'] as $k => $label) {
+    foreach (['' => 'Overview', 'pages' => 'Pages', 'sales' => 'Sales', 'members' => 'Members', 'emails' => 'Email sign-ups'] as $k => $label) {
         $cur = $k === $active ? ' aria-current="page"' : '';
         $tabs .= '<li><a href="' . e(url('dashboard' . ($k ? "/$k" : ''))) . "\"$cur>" . e($label) . '</a></li>';
     }
@@ -139,12 +140,17 @@ function dash_overview(): void
         . ($rows ? '<div class="table-wrap"><table><tr><th>Product</th><th class="num">Sales</th><th class="num">Revenue</th></tr>' . $rows . '</table></div>' : '<p class="small">No sales yet.</p>') . '</div>';
 
     $recent = dash_sales_table(8);
+    $popular = popular_pages(7, 5);
+    $popularCard = '<div class="dash-card"><h2>Most read <small>last 7 days</small></h2>'
+        . ($popular ? page_rank_list($popular, false) : '<p class="small">No reading yet this week.</p>')
+        . '<p><a class="small" href="' . e(url('dashboard/pages')) . '">All pages</a></p></div>';
 
     dash_layout('', 'Overview', $tiles
         . '<div class="dash-grid">'
         . '<div class="dash-card wide"><h2>Revenue by month</h2>' . revenue_chart($months) . '</div>'
         . '<div class="dash-card"><h2>New members by month</h2>' . members_chart($months) . '</div>'
         . $top
+        . $popularCard
         . '<div class="dash-card wide"><h2>Latest sales <a class="small" href="' . e(url('dashboard/sales')) . '">See all</a></h2>' . $recent . '</div>'
         . '</div>');
 }
@@ -371,4 +377,105 @@ function dash_export(string $file): void
         // Stop spreadsheet apps from treating a cell as a formula.
         fputcsv($out, array_map(fn($v) => is_string($v) && preg_match('/^[=+\-@]/', $v) ? "'" . $v : $v, $row));
     }
+}
+
+// ------------------------------------------------------------------ page views
+
+/** Most-viewed pages over the last $days days (0 = all time). */
+function popular_pages(int $days, int $limit, bool $manuscriptOnly = true): array
+{
+    $since = $days ? gmdate('Y-m-d', time() - ($days - 1) * 86400) : '0000-00-00';
+    $where = $manuscriptOnly ? "AND v.page_id NOT LIKE 'route:%'" : "AND v.page_id LIKE 'route:%'";
+    $st = db()->prepare("SELECT v.page_id, SUM(v.views) views,
+            (SELECT COUNT(DISTINCT r.reader) FROM page_readers r WHERE r.page_id = v.page_id AND r.day >= :since_r) readers,
+            (SELECT COUNT(*) FROM bookmarks b WHERE b.page_id = v.page_id) saves
+        FROM page_views v WHERE v.day >= :since $where
+        GROUP BY v.page_id ORDER BY views DESC LIMIT " . (int) $limit);
+    $st->execute(['since' => $since, 'since_r' => $since]);
+    return $st->fetchAll();
+}
+
+function plural(int $n, string $word): string { return $n === 1 ? $word : $word . 's'; }
+
+function route_label(string $id): string
+{
+    $r = substr($id, 6);
+    return match (true) {
+        $r === 'members-only' => 'Members-only screen (shown to visitors)',
+        $r === '/manuscript/' => 'Manuscript home (visitors)',
+        $r === '/manuscript/join' => 'Join page',
+        $r === '/shop' => 'Shop',
+        str_starts_with($r, '/shop/') => 'Shop: ' . (($pr = product(substr($r, 6))) ? short_name($pr) : substr($r, 6)),
+        default => $r,
+    };
+}
+
+/** Ranked list with a bar for each page's views (bars drawn as SVG: the page's style rules allow no inline styles). */
+function page_rank_list(array $rows, bool $full): string
+{
+    if (!$rows) return '<p class="small">No views in this period yet.</p>';
+    $idx = page_index(array_filter(array_column($rows, 'page_id'), fn($id) => !str_starts_with($id, 'route:')));
+    $max = max(1, ...array_map(fn($r) => (int) $r['views'], $rows));
+    $out = '<ol class="rank">';
+    foreach ($rows as $i => $r) {
+        $p = $idx[$r['page_id']] ?? null;
+        if (str_starts_with($r['page_id'], 'route:')) {
+            $name = e(route_label($r['page_id'])); $where = '';
+        } elseif ($p) {
+            $g = grimoire_root($p['grimoire']);
+            $name = '<a href="' . e($p['url']) . '">' . icon_html($p['icon'], 'chip-icon') . e($p['title']) . '</a>';
+            $where = $p['kind'] === 'grimoire' ? '' : e($g['title'] ?? '');
+        } else {
+            $name = '<span class="small">(page no longer in the Manuscript)</span>'; $where = '';
+        }
+        $w = round((int) $r['views'] / $max * 100, 1);
+        $out .= '<li><span class="rank-n">' . ($i + 1) . '</span><div class="rank-main"><div class="rank-name">' . $name
+            . ($where ? '<small>' . $where . '</small>' : '') . '</div>'
+            . '<svg class="rank-bar" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true"><rect class="track" width="100" height="6" rx="3"/><rect class="fill" width="' . $w . '" height="6" rx="3"/></svg></div>'
+            . '<span class="num rank-v"><span><strong>' . number_format((int) $r['views']) . '</strong> ' . plural((int) $r['views'], 'view') . '</span>'
+            . ($full ? '<small>' . number_format((int) $r['readers']) . ' ' . plural((int) $r['readers'], 'reader') . ' · ' . number_format((int) $r['saves']) . ' saved</small>' : '') . '</span></li>';
+    }
+    return $out . '</ol>';
+}
+
+function dash_pages(): void
+{
+    $days = (int) ($_GET['days'] ?? 30);
+    if (!in_array($days, [7, 30, 365, 0], true)) $days = 30;
+    $since = $days ? gmdate('Y-m-d', time() - ($days - 1) * 86400) : '0000-00-00';
+    $q = function (string $sql) use ($since) { $st = db()->prepare($sql); $st->execute([$since]); return (int) $st->fetchColumn(); };
+    $views = $q("SELECT COALESCE(SUM(views), 0) FROM page_views WHERE day >= ? AND page_id NOT LIKE 'route:%'");
+    $readers = $q("SELECT COUNT(DISTINCT reader) FROM page_readers WHERE day >= ? AND page_id NOT LIKE 'route:%'");
+    $pagesRead = $q("SELECT COUNT(DISTINCT page_id) FROM page_views WHERE day >= ? AND page_id NOT LIKE 'route:%'");
+    $saves = (int) db()->query('SELECT COUNT(*) FROM bookmarks')->fetchColumn();
+
+    $chips = '<nav class="filters" aria-label="Period">';
+    foreach ([7 => 'Last 7 days', 30 => 'Last 30 days', 365 => 'Last year', 0 => 'All time'] as $d => $label) {
+        $chips .= '<a class="chip" href="' . e(url('dashboard/pages?days=' . $d)) . '"' . ($d === $days ? ' aria-current="true"' : '') . '>' . $label . '</a>';
+    }
+    $chips .= '</nav>';
+    $tiles = '<div class="tiles">'
+        . stat_tile('Manuscript page views', number_format($views))
+        . stat_tile('Different readers', number_format($readers), 'members who opened at least one page')
+        . stat_tile('Pages read', number_format($pagesRead), 'different pages opened')
+        . stat_tile('Pages saved', number_format($saves), 'stars across all members, all time')
+        . '</div>';
+
+    // Most saved, all time
+    $saved = db()->query("SELECT page_id, 0 views, 0 readers, COUNT(*) saves FROM bookmarks GROUP BY page_id ORDER BY saves DESC LIMIT 10")->fetchAll();
+    $savedList = '';
+    if ($saved) {
+        $idx = page_index(array_column($saved, 'page_id'));
+        $savedList = '<ol class="rank plain">';
+        foreach ($saved as $i => $r) {
+            if (!($p = $idx[$r['page_id']] ?? null)) continue;
+            $savedList .= '<li><span class="rank-n">' . ($i + 1) . '</span><div class="rank-main"><div class="rank-name"><a href="' . e($p['url']) . '">' . icon_html($p['icon'], 'chip-icon') . e($p['title']) . '</a></div></div><span class="num rank-v"><span><strong>' . (int) $r['saves'] . '</strong> ★</span></span></li>';
+        }
+        $savedList .= '</ol>';
+    }
+    dash_layout('pages', 'Pages', $chips . $tiles . '<div class="dash-grid">'
+        . '<div class="dash-card wide"><h2>Most read <small>Manuscript pages</small></h2>' . page_rank_list(popular_pages($days, 50), true) . '</div>'
+        . '<div class="dash-card"><h2>Most saved <small>all time</small></h2>' . ($savedList ?: '<p class="small">Nothing saved yet.</p>') . '</div>'
+        . '<div class="dash-card wide"><h2>Join &amp; shop pages <small>visits, including visitors</small></h2>' . page_rank_list(popular_pages($days, 20, false), false) . '</div>'
+        . '</div><p class="small">Your own visits and search engines aren\'t counted. "Readers" counts different members; it never shows who read what.</p>');
 }
