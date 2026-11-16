@@ -17,6 +17,11 @@ final class NotionImporter
     private ?float $deadline = null;
 
     /** Stop cleanly after this many minutes (GitHub ends any job after 6 hours). */
+    private bool $guidesOnly = false;
+
+    /** Bring over grimoire and guide pages only, leaving the (slow, numerous) database entries for later. */
+    public function setGuidesOnly(bool $on): void { $this->guidesOnly = $on; }
+
     public function setTimeLimit(?int $minutes): void { $this->deadline = $minutes ? microtime(true) + $minutes * 60 : null; }
 
     private string $api;
@@ -162,6 +167,7 @@ final class NotionImporter
         ]);
 
         foreach ($ctx['children'] as $i => [$childKind, $childId]) {
+            if ($childKind === 'database' && $this->guidesOnly) continue;
             try {
                 if ($childKind === 'page') {
                     $this->importPage($this->call('GET', "/pages/$childId"), 'guide', $id, $i);
@@ -182,6 +188,7 @@ final class NotionImporter
         $st = db()->prepare('SELECT id, kind, sort FROM pages WHERE parent_id = ? AND kind IN (\'guide\', \'collection\') ORDER BY sort');
         $st->execute([$id]);
         foreach ($st->fetchAll() as $child) {
+            if ($child['kind'] === 'collection' && $this->guidesOnly) continue;
             try {
                 if ($child['kind'] === 'guide') {
                     $this->importPage($this->call('GET', '/pages/' . $child['id']), 'guide', $id, (int) $child['sort']);

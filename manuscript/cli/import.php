@@ -6,6 +6,7 @@
  *   php manuscript/cli/import.php correspondence     import just one (by its config slug)
  *   php manuscript/cli/import.php --prune            also remove entries that were deleted in Notion
  *   php manuscript/cli/import.php --max-minutes=300  stop safely after 5 hours (re-run to continue)
+ *   php manuscript/cli/import.php --guides-only      grimoire and guide pages only (quick); entries come on a normal run
  *
  * Safe to re-run any time: only pages edited in Notion since the last run are downloaded again.
  * Hostinger: run it over SSH, or add it as a Cron Job (e.g. weekly) in hPanel.
@@ -37,6 +38,8 @@ if (!flock($lock, LOCK_EX | LOCK_NB)) { fwrite(STDERR, "Another import is alread
 $start = microtime(true);
 $importer = new NotionImporter(fn($m) => print(date('H:i:s ') . $m . "\n"));
 $importer->setTimeLimit($maxMinutes);
+$importer->setGuidesOnly(in_array('--guides-only', $args, true));
+if (in_array('--guides-only', $args, true)) $prune = false; // a partial run must never remove entries
 $paused = false;
 foreach ($grimoires as $slug => $id) {
     try {
