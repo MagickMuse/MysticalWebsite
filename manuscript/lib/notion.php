@@ -207,7 +207,16 @@ final class NotionImporter
     private function importDatabase(string $dbId, string $parentId, int $sort): void
     {
         $dbId = normalize_id($dbId);
-        $meta = $this->call('GET', "/databases/$dbId");
+        try {
+            $meta = $this->call('GET', "/databases/$dbId");
+        } catch (RuntimeException $ex) {
+            // Linked views and helper databases (like the Counters) can't be read through the API: skip them quietly.
+            if (str_contains($ex->getMessage(), '→ 400') || str_contains($ex->getMessage(), '→ 404')) {
+                ($this->log)('  – skipping a database the importer cannot read (a linked view or helper)');
+                return;
+            }
+            throw $ex;
+        }
         $title = $this->plainText($meta['title'] ?? []) ?: 'Entries';
         if (preg_match((string) config('skip_databases', '/counter/i'), $title)) {
             ($this->log)("  – skipping database “{$title}”");
