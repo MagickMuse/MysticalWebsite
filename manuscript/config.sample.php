@@ -28,20 +28,7 @@ return [
     // Create an internal integration at https://www.notion.so/profile/integrations,
     // then share "The Magick Manuscript" page with it (••• menu → Connections).
     'notion_token' => 'ntn_xxx',
-    // Each grimoire's landing page in Notion. The importer pulls its guide pages,
-    // its databases, and every entry inside them.
-    'grimoires' => [
-        // slug => Notion page id
-        'begin-here'     => '2a516dcf7164804bb461c1a91571d60d',
-        'correspondence' => '28216dcf716480e3918dfab86e4c0b1c',
-        'timing'         => '28216dcf71648045b6e8cabf80242cb5',
-        // 'plant'        => '28216dcf71648075856dd4f77f6fce89',
-        // 'astrology'    => '28216dcf716480f9a3ced0b72e30a2a9',
-        // 'animal'       => '28216dcf7164801cad82efa4a4e25424',
-        // 'recipe'       => '28216dcf7164803eb959d824f8b44fb3',
-        // 'card'         => '28216dcf716480299d34f1ca3f2e7b79',
-        // add the rest here as you move them over
-    ],
+    // The list of grimoires to import is in manuscript/grimoires.php.
 
     // ---------- Stripe paywall ----------
     // Dashboard → Developers → API keys. Use test keys (sk_test_...) until you are ready.

@@ -5,3 +5,4 @@ data/
 manuscript-data/
 *.sqlite
 *.sqlite-*
+deploy.local.php

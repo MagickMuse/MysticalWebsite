@@ -26,7 +26,15 @@ hosting, no database server to set up, and nothing to install. Stripe takes the 
 
 ---
 
-## One-time setup (about 30 minutes)
+## Setting it up
+
+**The easy way: [TEST-SITE.md](TEST-SITE.md).** GitHub uploads the site to Hostinger over FTP and runs the
+Notion imports itself (`.github/workflows/`), using a few GitHub Secrets. Nobody needs FileZilla, SSH or
+the server's file manager after the first 10 minutes.
+
+The sections below describe the manual way, by hand on the server, for reference.
+
+## One-time setup by hand (about 30 minutes)
 
 ### 1. Deploy the code
 Merge this branch (or deploy it however the site is normally deployed). The `manuscript/` folder needs to end up at
@@ -40,7 +48,7 @@ Upload `manuscript/config.sample.php` there, rename it to **`manuscript-config.p
 |---|---|
 | `app_secret` | Any long random text. Over SSH: `php -r "echo bin2hex(random_bytes(32));"` |
 | `notion_token` | notion.so/profile/integrations → **New integration** (internal) → copy the secret. Then in Notion open **The Magick Manuscript** → ••• → **Connections** → add the integration. |
-| `grimoires` | Already filled in for the first ones. Add a line for each grimoire as it moves over. The id is the 32-character code at the end of the grimoire's Notion URL. |
+| grimoires | Listed in `manuscript/grimoires.php` (not the settings). Uncomment a line to bring that grimoire over. |
 | `stripe_secret_key` | Stripe Dashboard → Developers → API keys. Start with the **test** key (`sk_test_…`). |
 | `plans` → `price` | Stripe → Product catalog → create "The Magick Manuscript" with a **$333 one-time** price. Copy its `price_…` id. |
 | `stripe_webhook_secret` | Stripe → Developers → Webhooks → **Add endpoint** `https://magickmuse.com/manuscript/stripe-webhook`, events `checkout.session.completed`, `invoice.paid`, `charge.refunded`, `customer.subscription.updated`, `customer.subscription.deleted`. Copy its `whsec_…` secret. |

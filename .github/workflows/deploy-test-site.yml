@@ -1,0 +1,53 @@
+# Uploads the website to the TEST site on Hostinger (test.magickmuse.com), the same way FileZilla does,
+# every time the manuscript-wiki branch changes. The real magickmuse.com is not touched.
+name: Deploy test site
+
+on:
+  push:
+    branches: [manuscript-wiki]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-test-site
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FTP_HOST: ${{ secrets.FTP_HOST }}
+      FTP_USER: ${{ secrets.FTP_USER }}
+      LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      FTP_DIR: ${{ secrets.FTP_TEST_DIR }}
+      FTP_DATA_DIR: ${{ secrets.FTP_TEST_DATA_DIR }}
+      MANUSCRIPT_CONFIG: ${{ secrets.MANUSCRIPT_CONFIG_TEST }}
+      FTP_VERIFY_CERT: ${{ vars.FTP_VERIFY_CERT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the FTP tool
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Add the private settings
+        run: |
+          source .github/scripts/ftp-env.sh
+          write_settings manuscript/config.local.php
+          # Where the private data folder is, relative to manuscript/ on the server.
+          rel=$(python3 -c 'import os,sys; print(os.path.relpath("/"+sys.argv[1].strip("/"), "/"+sys.argv[2].strip("/")+"/manuscript"))' "$FTP_DATA_DIR" "$FTP_DIR")
+          printf "<?php\n// Written by the GitHub upload. Do not edit.\nreturn ['data_dir' => __DIR__ . '/%s'];\n" "$rel" > manuscript/deploy.local.php
+          php -l manuscript/deploy.local.php > /dev/null
+
+      - name: Upload to Hostinger
+        run: |
+          source .github/scripts/ftp-env.sh
+          lftp_run "
+          mkdir -p -f \"$FTP_DATA_DIR\"
+          mirror --reverse --parallel=4 --no-perms --verbose=1 \
+            -x '^\.git/' -x '^\.github/' -x '(^|/)\.gitignore$' -x '\.md$' -x '^manuscript/index\.html$' \
+            ./ \"$FTP_DIR\"
+          "
+          echo "Uploaded. Open the test site: the address set up for FTP_TEST_DIR (e.g. https://test.magickmuse.com)."

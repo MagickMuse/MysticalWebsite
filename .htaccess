@@ -27,6 +27,6 @@ ServerSignature Off
 </IfModule>
 
 # Never serve the Manuscript's private settings or data, wherever they end up.
-<FilesMatch "^(manuscript-config\.php|config\.local\.php|.*\.sqlite.*)$">
+<FilesMatch "^(manuscript-config\.php|config\.local\.php|deploy\.local\.php|.*\.sqlite.*)$">
   Require all denied
 </FilesMatch>

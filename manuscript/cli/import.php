@@ -5,6 +5,7 @@
  *   php manuscript/cli/import.php                    import every grimoire listed in the config
  *   php manuscript/cli/import.php correspondence     import just one (by its config slug)
  *   php manuscript/cli/import.php --prune            also remove entries that were deleted in Notion
+ *   php manuscript/cli/import.php --max-minutes=300  stop safely after 5 hours (re-run to continue)
  *
  * Safe to re-run any time: only pages edited in Notion since the last run are downloaded again.
  * Hostinger: run it over SSH, or add it as a Cron Job (e.g. weekly) in hPanel.
@@ -18,6 +19,8 @@ require __DIR__ . '/../lib/notion.php';
 set_time_limit(0);
 $args = array_slice($argv, 1);
 $prune = in_array('--prune', $args, true);
+$maxMinutes = null;
+foreach ($args as $a) if (preg_match('/^--max-minutes=(\d+)$/', $a, $m)) $maxMinutes = (int) $m[1];
 $only = array_values(array_filter($args, fn($a) => !str_starts_with($a, '--')));
 
 $grimoires = config('grimoires', []);
@@ -33,13 +36,22 @@ if (!flock($lock, LOCK_EX | LOCK_NB)) { fwrite(STDERR, "Another import is alread
 
 $start = microtime(true);
 $importer = new NotionImporter(fn($m) => print(date('H:i:s ') . $m . "\n"));
+$importer->setTimeLimit($maxMinutes);
+$paused = false;
 foreach ($grimoires as $slug => $id) {
     try {
         $importer->importGrimoire($slug, $id, $prune);
+    } catch (ImportPaused $ex) {
+        $paused = true;
+        break;
     } catch (Throwable $ex) {
         echo '! ' . $slug . ': ' . $ex->getMessage() . "\n";
     }
 }
 $s = $importer->stats();
-printf("Done in %.1f min: %d pages fetched, %d unchanged, %d images, %d errors.\n",
+if ($paused) {
+    printf("PAUSED after %.0f minutes: everything so far is saved. Run the import again to continue where it stopped.\n", (microtime(true) - $start) / 60);
+}
+printf(($paused ? 'So far' : 'Done') . " in %.1f min: %d pages fetched, %d unchanged, %d images, %d errors.\n",
     (microtime(true) - $start) / 60, $s['fetched'], $s['skipped'], $s['images'], $s['errors']);
+exit($paused ? 3 : 0);
