@@ -188,4 +188,26 @@
       .then(function (d) { var box = more.closest('[data-rels]'); box.innerHTML = d.html; })
       .catch(function () { location.href = more.getAttribute('href'); });
   });
+
+  // Grimoire lists: apply sort / group / "only my saved" as soon as they change
+  document.querySelectorAll('[data-autosubmit]').forEach(function (el) {
+    el.addEventListener('change', function () { el.form.submit(); });
+  });
+  // "Show more" on a grimoire list: add the next 120 without reloading
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-more-list]');
+    if (!btn) return;
+    e.preventDefault();
+    var list = document.querySelector('[data-col-list]');
+    btn.textContent = 'Loading…';
+    fetch(btn.getAttribute('data-more-list'), { credentials: 'same-origin' })
+      .then(function (r) { if (!r.ok) throw new Error(); return r.text(); })
+      .then(function (html) {
+        list.insertAdjacentHTML('beforeend', html);
+        var next = list.querySelector('.more-row');
+        if (next) { var url = next.getAttribute('data-next'); next.remove(); btn.href = url; btn.setAttribute('data-more-list', url + (url.indexOf('?') > -1 ? '&' : '?') + 'part=1'); btn.textContent = 'Show more'; }
+        else { btn.parentNode.remove(); }
+      })
+      .catch(function () { location.href = btn.href; });
+  });
 })();

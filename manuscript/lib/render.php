@@ -7,6 +7,15 @@ function site_url(string $path = ''): string
     return $site . '/' . ltrim($path, '/');
 }
 
+/** "What's inside" for a grimoire card: its "Within These Pages:" line from Notion, or its first sentence. */
+function grimoire_summary(array $g): string
+{
+    $plain = (string) $g['plain'];
+    if (preg_match('/Within These Pages:\s*(.+?)\s*(?:How to Walk It:|Why it.s called|Guide Pages|$)/su', $plain, $m)) return trim($m[1]);
+    $plain = preg_replace('/^The ' . preg_quote($g['title'], '/') . '\s*/u', '', $plain);
+    return preg_match('/^(.{20,200}?[.!?])\s/u', $plain, $m) ? $m[1] : mb_substr($plain, 0, 160);
+}
+
 /** The grimoire's photo from grimoire-photos.php at a given size, or null. */
 function grimoire_photo(string $slug, int $w, int $h): ?string
 {
@@ -72,7 +81,13 @@ function resolve_links(string $html): string
         if (!$p) return '<span class="unmoved" title="Not moved over from Notion yet">' . $text . '</span>';
         return '<a href="' . e($p['url']) . '">' . $text . '</a>';
     }, $html);
-    return preg_replace_callback('/<div data-mm-collection="([0-9a-f]{32})"><\/div>/', fn($mm) => collection_block($mm[1], 60), $html);
+    $html = preg_replace_callback('/<div data-mm-collection="([0-9a-f]{32})"><\/div>/', fn($mm) => collection_block($mm[1], 60), $html);
+    // Dividers that end up next to each other (e.g. around a skipped Counter database) become one,
+    // and a page never starts or ends with one.
+    $rule = '<div class="star-rule" role="separator"><i class="spark"></i></div>';
+    $html = preg_replace('~(?:' . preg_quote($rule, '~') . '\s*){2,}~', $rule, $html);
+    $html = preg_replace('~^\s*' . preg_quote($rule, '~') . '|' . preg_quote($rule, '~') . '\s*$~', '', $html);
+    return $html;
 }
 
 function entries_of(string $collectionId, ?int $limit = null): array
@@ -200,10 +215,10 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=8">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=13">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=8" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=13" defer></script>
 </head>
 <body class="mm<?= !empty($opt['protect']) && !is_admin() ? ' no-copy' : '' ?>">
 <a class="skip" href="#main">Skip to main content</a>

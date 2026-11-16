@@ -10,6 +10,7 @@ require __DIR__ . '/lib/shop.php';
 require __DIR__ . '/lib/dashboard.php';
 require __DIR__ . '/lib/engage.php';
 require __DIR__ . '/lib/properties.php';
+require __DIR__ . '/lib/collection.php';
 
 // Path relative to the wiki's base, e.g. "correspondence/protection".
 $base = parse_url(config('base_url'), PHP_URL_PATH) ?: '';
@@ -85,8 +86,10 @@ function view_home(): void
         $cover = $photo
             ? '<div class="frame arch g-cover"><img src="' . e($photo) . '" srcset="' . e(grimoire_photo($g['grimoire'], 480, 600)) . ' 1x, ' . e(grimoire_photo($g['grimoire'], 960, 1200)) . ' 2x" alt="" width="480" height="600" loading="lazy"></div>'
             : '<div class="frame arch g-cover"><i class="spark big" aria-hidden="true"></i></div>';
+        $inside = grimoire_summary($g);
         $cards .= '<a class="card g-card" href="' . e(page_url($g)) . '">' . $cover . '<h3>' . e($g['title']) . '</h3>'
-            . ($n ? '<p>' . number_format($n) . ' entries</p>' : '<p>Orientation &amp; guides</p>') . '</a>';
+            . ($inside ? '<p class="g-inside" title="' . e($inside) . '">' . e($inside) . '</p>' : '')
+            . '<p class="g-count">' . ($n ? number_format($n) . ' entries' : 'Guides') . '</p></a>';
     }
     if (!$grimoires) {
         $cards = '<p class="lede">Nothing has been moved over yet. Run the importer (see README) to bring grimoires in from Notion.</p>';
@@ -139,6 +142,7 @@ function view_page(array $p): void
     $access = has_access() || is_public_page($p);
     if (!$access) { view_gate($p); return; }
     record_view($p['id']);
+    if ($p['kind'] === 'collection') { view_collection($p); return; }
     $crumbs = $p['kind'] === 'grimoire' ? '' : breadcrumbs($p);
     $g = $p['kind'] === 'grimoire' ? $p : grimoire_root($p['grimoire']);
     $eyebrow = $p['kind'] === 'grimoire' ? 'The Magick Manuscript' : ($g['title'] ?? '');
@@ -165,7 +169,15 @@ function view_page(array $p): void
             $gallery = '<div class="gallery">' . implode('', array_map(fn($f) => '<figure><img src="' . e(media_url($f)) . '" alt="' . e($p['title']) . '" loading="lazy"></figure>', $images)) . '</div>';
         }
         // Landing pages: intro text is public, the guide pages it links to are for members.
-        $body = $panel . $gallery . '<div class="mm-prose">' . resolve_links((string) $p['body_html']) . '</div>';
+        $bodyHtml = resolve_links((string) $p['body_html']);
+        // A grimoire's intro box repeats its name as a heading ("The Animal Grimoire"); the page title already says it.
+        if ($p['kind'] === 'grimoire') {
+            $name = mb_strtolower(preg_replace('/^the\s+/i', '', $p['title']));
+            $bodyHtml = preg_replace_callback('~<h([2-4])\b[^>]*>(.*?)</h\1>~s', function ($m) use ($name) {
+                return mb_strtolower(preg_replace('/^the\s+/i', '', trim(html_entity_decode(strip_tags($m[2]))))) === $name ? '' : $m[0];
+            }, $bodyHtml, 1);
+        }
+        $body = $panel . $gallery . '<div class="mm-prose">' . $bodyHtml . '</div>';
     }
     layout($p['title'], '<article class="pg pg-' . e($p['kind']) . '">' . $cover . $head . $body . '</article>', ['private' => true, 'protect' => true]);
 }
