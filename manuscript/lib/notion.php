@@ -243,7 +243,16 @@ final class NotionImporter
             switch ($prop['type']) {
                 case 'relation':
                     $targets = array_column($prop['relation'], 'id');
-                    if (!empty($prop['has_more'])) $targets = $this->allRelations($page['id'], $prop['id']);
+                    if (!empty($prop['has_more'])) {
+                        try {
+                            $targets = $this->allRelations($page['id'], $prop['id']);
+                        } catch (ImportPaused $ex) {
+                            throw $ex;
+                        } catch (Throwable $ex) {
+                            // Keep the links Notion already sent rather than losing the whole entry.
+                            ($this->log)("  ~ kept the first " . count($targets) . " \"$name\" links on {$this->pageTitle($page)} (" . $ex->getMessage() . ')');
+                        }
+                    }
                     foreach ($targets as $i => $t) $ins->execute([$id, $name, normalize_id($t), $i]);
                     break;
                 case 'rich_text':
@@ -280,7 +289,7 @@ final class NotionImporter
     private function allRelations(string $pageId, string $propId): array
     {
         $ids = [];
-        foreach ($this->paginate('GET', '/pages/' . normalize_id($pageId) . '/properties/' . rawurlencode($propId)) as $item) {
+        foreach ($this->paginate('GET', '/pages/' . normalize_id($pageId) . '/properties/' . rawurlencode(rawurldecode($propId))) as $item) {
             if (isset($item['relation']['id'])) $ids[] = $item['relation']['id'];
         }
         return $ids;
