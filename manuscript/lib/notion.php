@@ -84,7 +84,7 @@ final class NotionImporter
                     $q->execute([$mg, $ms]);
                     $to = $q->fetchColumn() ?: null;
                 } else {
-                    $to = $g ? self::liveCopy($g, $title, $id) : null;
+                    $to = $g ? self::liveCopy($g, $title, $id, $this->scientificNames($page)) : null;
                 }
             }
             $save->execute([$id, $to, $title]);
@@ -127,13 +127,26 @@ final class NotionImporter
         if ($merged) ($this->log)("Duplicates: $merged merged.");
     }
 
-    private static function liveCopy(string $grimoire, string $title, string $id): ?string
+    /** Scientific or Latin names on a Notion page (property name contains "scientific", "latin" or "botanical"). */
+    private function scientificNames(array $page): array
+    {
+        $out = [];
+        foreach ($page['properties'] ?? [] as $name => $prop) {
+            if (!preg_match('/scientific|latin|botanical/i', $name)) continue;
+            $v = $prop[$prop['type']] ?? null;
+            $text = is_array($v) && isset($v[0]['plain_text']) ? $this->plainText($v) : (is_array($v) ? implode(',', array_column($v, 'name')) : (string) ($v['name'] ?? $v ?? ''));
+            foreach (preg_split('/[,;]/', $text) as $t) if (trim($t) !== '') $out[] = trim($t);
+        }
+        return $out;
+    }
+
+    private static function liveCopy(string $grimoire, string $title, string $id, array $sci = []): ?string
     {
         $norm = fn(string $t) => trim(preg_replace('/[^a-z0-9]+/', ' ', mb_strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', $t) ?: $t)));
         $one = fn(string $t) => preg_replace('/(ies)$/', 'y', preg_replace('/(?<=[^s])s$/', '', $t));
         $want = $norm($title);
         if ($want === '') return null;
-        $st = db()->prepare("SELECT id, title, aka FROM pages WHERE grimoire = ? AND kind = 'entry' AND id != ?");
+        $st = db()->prepare("SELECT id, title, aka, tags_json FROM pages WHERE grimoire = ? AND kind = 'entry' AND id != ?");
         $st->execute([$grimoire, $id]);
         $rows = $st->fetchAll();
         $tests = [
@@ -145,7 +158,18 @@ final class NotionImporter
         foreach ($tests as $test) {
             $hits = array_values(array_filter($rows, $test));
             if (count($hits) === 1) return $hits[0]['id'];
-            if (count($hits) > 1) return null; // more than one: don't guess
+            if (count($hits) > 1) {
+                // Several entries share the name (e.g. "Gravel Root"): the scientific name decides, else don't guess.
+                $sciNorm = array_map($norm, $sci);
+                $bySci = array_values(array_filter($hits, function ($r) use ($sciNorm, $norm) {
+                    $names = preg_split('/[,;]/', (string) $r['aka']);
+                    foreach ((array) json_decode((string) $r['tags_json'], true) as $prop => $vals) {
+                        if (preg_match('/scientific|latin|botanical/i', (string) $prop)) $names = array_merge($names, (array) $vals);
+                    }
+                    return (bool) array_intersect($sciNorm, array_map($norm, $names));
+                }));
+                return $sciNorm && count($bySci) === 1 ? $bySci[0]['id'] : null;
+            }
         }
         return null;
     }
