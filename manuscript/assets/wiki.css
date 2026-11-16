@@ -74,7 +74,6 @@ mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inhe
 .mm-prose li + li { margin-top: .35rem; }
 .mm-prose ul.todo { list-style: none; padding-left: 0; }
 .mm-prose a { color: var(--accent-text); text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.mm-prose .unmoved { border-bottom: 1px dotted var(--muted); }
 .mm-prose blockquote { margin: 0; font-family: var(--display); font-style: italic; font-size: 1.35rem; border-left: 1px solid var(--accent); padding-left: 1.4rem; line-height: 1.4; }
 .mm-prose figure { margin: 2rem 0; }
 .mm-prose figure img { margin-inline: auto; max-height: 520px; width: auto; }

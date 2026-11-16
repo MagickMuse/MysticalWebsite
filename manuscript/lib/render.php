@@ -143,10 +143,13 @@ function resolve_links(string $html): string
     $idx = page_index($m[1]);
     $html = preg_replace_callback('/<a data-mm-id="([0-9a-f]{32})">(.*?)<\/a>/s', function ($mm) use ($idx) {
         $p = $idx[$mm[1]] ?? null;
-        $text = $mm[2] === '…' ? e($p['title'] ?? 'Untitled page') : $mm[2];
-        if (!$p) return '<span class="unmoved" title="Not moved over from Notion yet">' . $text . '</span>';
+        if (!$p && $mm[2] === '…') return '';
+        $text = $mm[2] === '…' ? e($p['title']) : $mm[2];
+        // A link to a page that isn't on the site (archived, private, or a how-to-use-Notion guide) reads as plain words.
+        if (!$p) return $text === '' ? '' : '<span class="unmoved">' . $text . '</span>';
         return '<a href="' . e($p['url']) . '">' . $text . '</a>';
     }, $html);
+    $html = str_replace('<p class="page-link"></p>', '', $html);
     $html = preg_replace_callback('/<div data-mm-collection="([0-9a-f]{32})"><\/div>/', fn($mm) => collection_block($mm[1], 60), $html);
     // Dividers that end up next to each other (e.g. around a skipped Counter database) become one,
     // and a page never starts or ends with one.
@@ -292,10 +295,10 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=31">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=32">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=31" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=32" defer></script>
 </head>
 <?php $visitor = !has_access(); $openUrls = $visitor ? array_merge([url('sneak-peek')], array_map('page_url', open_pages())) : []; ?>
 <body class="mm<?= !empty($opt['protect']) && !is_admin() ? ' no-copy' : '' ?>"<?php if ($visitor): ?> data-visitor data-base="<?= e((string) parse_url(url(), PHP_URL_PATH)) ?>" data-open="<?= e(json_encode(array_map(fn($u) => rtrim((string) parse_url($u, PHP_URL_PATH), '/'), $openUrls))) ?>"<?php endif ?>>
