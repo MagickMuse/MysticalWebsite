@@ -30,10 +30,13 @@ jobs:
       FTP_DATA_DIR: ${{ secrets.FTP_TEST_DATA_DIR }}
       MANUSCRIPT_CONFIG: ${{ secrets.MANUSCRIPT_CONFIG_TEST }}
       FTP_VERIFY_CERT: ${{ vars.FTP_VERIFY_CERT }}
-      MM_CONFIG: ${{ runner.temp }}/manuscript-config.php
-      MM_DATA_DIR: ${{ runner.temp }}/manuscript-data
     steps:
       - uses: actions/checkout@v4
+
+      - name: Working folders
+        run: |
+          echo "MM_CONFIG=$RUNNER_TEMP/manuscript-config.php" >> "$GITHUB_ENV"
+          echo "MM_DATA_DIR=$RUNNER_TEMP/manuscript-data" >> "$GITHUB_ENV"
 
       - name: Install tools
         run: |

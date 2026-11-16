@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Test site setup · The Magick Manuscript</title>
+  <!-- Generated from manuscript/TEST-SITE.md for GitHub Pages. Edit the .md file, not this one.
+       On the real server /manuscript/ is handled by index.php and this file is never uploaded. -->
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .guide { max-width: 860px; margin-inline: auto; padding-block: clamp(2.5rem, 6vw, 5rem); display: grid; gap: 1.2rem; }
+    .guide h1 { font-size: clamp(2.6rem, 6vw, 4.2rem); margin-bottom: .6rem; }
+    .guide h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); margin-top: 2.2rem; padding-top: 1.8rem; border-top: 1px solid var(--line); }
+    .guide h3 { font-size: 1.35rem; margin-top: 1rem; }
+    .guide p, .guide li { max-width: 72ch; }
+    .guide ol, .guide ul { padding-left: 1.3rem; margin: 0; display: grid; gap: .5rem; }
+    .guide li > ul, .guide li > ol { margin-top: .5rem; }
+    .guide a { color: var(--accent-text); }
+    .guide code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .86em; background: var(--surface); padding: .1em .35em; border: 1px solid var(--line); overflow-wrap: anywhere; }
+    .guide hr { border: 0; border-top: 1px solid var(--line); width: 100%; margin: 1rem 0; }
+    .guide table { border-collapse: collapse; width: 100%; font-size: .9rem; display: block; overflow-x: auto; }
+    .guide th, .guide td { border: 1px solid var(--line); padding: .55rem .75rem; text-align: left; vertical-align: top; }
+    .guide th { background: var(--surface); font-weight: 400; }
+    .guide ul.task-list { list-style: none; padding-left: 0; }
+    .guide .task-list-item input { accent-color: var(--accent); margin-right: .6rem; }
+  </style>
+</head>
+<body>
+<header class="site"><div class="wrap nav"><a class="logo" href="../index.html">Magick Muse</a></div></header>
+<main class="wrap"><article class="guide">
+<h1 id="setting-up-the-test-site-the-github-way">Setting up the test
+site (the GitHub way)</h1>
+<p>A private copy of the new Manuscript wiki, shop and dashboard at
+<strong>test.magickmuse.com</strong>, using Stripe's test mode so no
+real money moves. The real magickmuse.com isn't touched.</p>
+<p><strong>How it works:</strong> everything is managed on GitHub. When
+anything changes on the <code>manuscript-wiki</code> branch, GitHub
+uploads the site to Hostinger over FTP, the same thing FileZilla does,
+using the FTP login you give it once. Imports from Notion also run on
+GitHub, and the pages go straight into a private folder on Hostinger.
+Nothing paid is ever stored on GitHub.</p>
+<p>Two rules:</p>
+<ol type="1">
+<li>The <strong>data folder</strong> (the Manuscript's pages and images)
+sits <strong>next to</strong> <code>public_html</code>, never inside it.
+GitHub and the site both refuse to run if it's inside.</li>
+<li>The repository is <strong>public</strong>. Passwords, keys and
+course links go only into GitHub's <strong>Secrets</strong> (step 4),
+never into files.</li>
+</ol>
+<hr />
+<h2 id="1-hostinger-your-husband-about-10-minutes-once">1. Hostinger
+(your husband, about 10 minutes, once)</h2>
+<p>Do these in hPanel:</p>
+<ol type="1">
+<li><strong>Subdomain:</strong> Domains → Subdomains → create
+<code>test</code> on <code>magickmuse.com</code>. Turn on SSL for it
+(Security → SSL).</li>
+<li><strong>PHP:</strong> Advanced → PHP Configuration → choose
+<strong>PHP 8.2 or newer</strong>.</li>
+<li><strong>Email:</strong> Emails → make sure a mailbox exists for
+sending sign-in links (e.g. <code>hello@magickmuse.com</code>) and note
+its password.</li>
+<li><strong>FTP details</strong>, the same ones you use in FileZilla (or
+Files → FTP Accounts):
+<ul>
+<li><strong>Host</strong>, e.g. <code>ftp.magickmuse.com</code> or the
+IP address</li>
+<li><strong>Username</strong></li>
+<li><strong>Password</strong></li>
+</ul></li>
+<li><strong>Two folder paths, exactly as FileZilla shows them</strong>
+after you log in:
+<ul>
+<li>The test subdomain's folder, e.g.
+<code>/domains/magickmuse.com/public_html/test</code> (or
+<code>/public_html/test</code>). This is <code>FTP_TEST_DIR</code>.</li>
+<li>A data folder <strong>next to</strong> <code>public_html</code>
+(same level, not inside it), e.g.
+<code>/domains/magickmuse.com/manuscript-data-test</code>. This is
+<code>FTP_TEST_DATA_DIR</code>. You don't need to create it; GitHub
+will.</li>
+</ul></li>
+</ol>
+<p>That's all the Hostinger work. No uploading, no files to edit.</p>
+<h2 id="2-notion-key-avelynn-2-minutes">2. Notion key (Avelynn, 2
+minutes)</h2>
+<ol type="1">
+<li>Go to <a
+href="https://www.notion.so/profile/integrations">notion.so/profile/integrations</a>
+→ <strong>New integration</strong>: type Internal, the Manuscript's
+workspace, name "Manuscript wiki", capabilities <strong>Read
+content</strong> only.</li>
+<li>Copy the <strong>Internal Integration Secret</strong> (starts with
+<code>ntn_</code>).</li>
+<li>In Notion open <strong>The Magick Manuscript</strong> →
+<strong>•••</strong> (top right) → <strong>Connections</strong> → add
+"Manuscript wiki".</li>
+</ol>
+<h2 id="3-stripe-in-test-mode-avelynn-10-minutes">3. Stripe in test mode
+(Avelynn, 10 minutes)</h2>
+<p>At <a href="https://dashboard.stripe.com">dashboard.stripe.com</a>,
+turn on <strong>Test mode</strong> (toggle at the top) first.</p>
+<ol type="1">
+<li><strong>API key:</strong> Developers → API keys → copy the
+<strong>Secret key</strong> (<code>sk_test_…</code>).</li>
+<li><strong>Manuscript price:</strong> Product catalog → Add product
+"The Magick Manuscript" → price <strong>$333, one-time</strong> → copy
+its id (<code>price_…</code>).</li>
+<li><strong>Webhook:</strong> Developers → Webhooks → Add endpoint
+<ul>
+<li>URL:
+<code>https://test.magickmuse.com/manuscript/stripe-webhook</code></li>
+<li>Events: <code>checkout.session.completed</code>,
+<code>invoice.paid</code>, <code>charge.refunded</code>,
+<code>customer.subscription.updated</code>,
+<code>customer.subscription.deleted</code></li>
+<li>Copy its <strong>Signing secret</strong>
+(<code>whsec_…</code>).</li>
+</ul></li>
+<li><strong>SEEKER10:</strong> Product catalog → Coupons → new coupon
+"10% off" → add the promotion code <code>SEEKER10</code>.</li>
+</ol>
+<p>Shop products (courses, templates) need nothing in Stripe.</p>
+<h2 id="4-put-everything-into-githubs-secrets-either-of-you">4. Put
+everything into GitHub's Secrets (either of you)</h2>
+<p>On GitHub: <strong>MagickMuse/MysticalWebsite → Settings → Secrets
+and variables → Actions → New repository secret</strong>. Add these six,
+one at a time, with the names spelled exactly like this:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Secret name</th>
+<th>What to paste</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>FTP_HOST</code></td>
+<td>FTP host from step 1</td>
+</tr>
+<tr class="even">
+<td><code>FTP_USER</code></td>
+<td>FTP username</td>
+</tr>
+<tr class="odd">
+<td><code>FTP_PASSWORD</code></td>
+<td>FTP password</td>
+</tr>
+<tr class="even">
+<td><code>FTP_TEST_DIR</code></td>
+<td>Test folder path from step 1, e.g.
+<code>/domains/magickmuse.com/public_html/test</code></td>
+</tr>
+<tr class="odd">
+<td><code>FTP_TEST_DATA_DIR</code></td>
+<td>Data folder path from step 1, e.g.
+<code>/domains/magickmuse.com/manuscript-data-test</code></td>
+</tr>
+<tr class="even">
+<td><code>MANUSCRIPT_CONFIG_TEST</code></td>
+<td>The <strong>whole</strong> private settings file you were sent
+(<code>config.local.php</code>), after replacing each
+<code>CHANGE-ME</code>: the <code>ntn_…</code> Notion key,
+<code>sk_test_…</code>, <code>whsec_…</code>, the <code>price_…</code>
+id, and the email password</td>
+</tr>
+</tbody>
+</table>
+<p>Secrets can't be read back by anyone, including you, and never appear
+on the public page. If you need to change one, use
+<strong>Update</strong> on it.</p>
+<h2 id="5-go">5. Go</h2>
+<p>Both jobs start by themselves. You don't need to press anything in
+GitHub. (A "Run workflow" button only appears once they're also on the
+<code>main</code> branch.)</p>
+<ol type="1">
+<li><strong>Upload the site:</strong> happens every time the
+<code>manuscript-wiki</code> branch changes. Once the secrets are in,
+tell Claude "the secrets are in" and it will start the first upload.
+Watch it in the <strong>Actions</strong> tab: <strong>Deploy test
+site</strong> with a green tick means it's on Hostinger.</li>
+<li><strong>Import the Manuscript:</strong> happens whenever
+<code>manuscript/import.txt</code> changes on the
+<code>manuscript-wiki</code> branch. Claude can do that for you, or you
+can do it on GitHub yourself: open the file, click the pencil, change
+the "Run" number, then <strong>Commit changes</strong>.
+<ul>
+<li>Notion allows about 3 requests a second, so the first full import is
+slow, roughly 1–2 minutes per 100 entries.</li>
+<li>GitHub stops any job after 6 hours, so a big import <strong>pauses
+itself</strong> before then, saves everything to Hostinger, and shows a
+yellow "paused" note. Start it again (change the Run number) and it
+carries on where it stopped. Later runs only fetch what changed.</li>
+<li>To import more grimoires, uncomment their lines in
+<code>manuscript/grimoires.php</code>.</li>
+</ul></li>
+</ol>
+<p>If a run has a red ✗, click it: the first red step says what's wrong
+in plain words (a missing secret, a typo in the settings, a wrong
+folder). If the upload step mentions a <strong>certificate</strong>, add
+a repository <em>variable</em> (same page, Variables tab) named
+<code>FTP_VERIFY_CERT</code> with the value <code>no</code>. It's the
+same as clicking "trust this certificate" in FileZilla, and the
+connection stays encrypted.</p>
+<h2 id="6-try-everything">6. Try everything</h2>
+<p>Stripe test card: <code>4242 4242 4242 4242</code>, any future date,
+any CVC and postcode. Tick each one as it works:</p>
+<ul class="task-list">
+<li><label><input type="checkbox" />Signed out,
+<code>/manuscript/</code>, a grimoire, an entry and search all show only
+"Members only". No text, titles or images.</label></li>
+<li><label><input type="checkbox" />Avelynn signs in at
+<code>/manuscript/login</code> with her admin email, the link arrives,
+and <code>/manuscript/dashboard</code> opens.</label></li>
+<li><label><input type="checkbox" />With another email,
+<code>/manuscript/join</code> → Lifetime $333 → test card → back on the
+site, signed in, entries readable, "Connections" links
+work.</label></li>
+<li><label><input type="checkbox" />That sale appears on the
+dashboard.</label></li>
+<li><label><input
+type="checkbox" /><code>/manuscript/join?code=SEEKER10</code> shows
+"Code SEEKER10 will be applied" and Stripe shows 10% off.</label></li>
+<li><label><input type="checkbox" /><code>/shop/witchcraft-101</code> →
+buy → it appears in <code>/shop/library</code> with the Google Classroom
+link.</label></li>
+<li><label><input type="checkbox" /><code>/shop/crystal-grimoire</code>
+→ enter an email → the email arrives with a library link, and the
+address shows under Dashboard → Email sign-ups.</label></li>
+<li><label><input type="checkbox" />Refund the Witchcraft 101 test
+payment in Stripe → it disappears from that buyer's library and shows as
+refunded on the dashboard.</label></li>
+<li><label><input type="checkbox" />Search as a member: typing "prot"
+suggests Protection. Results can be filtered by grimoire.</label></li>
+</ul>
+<p>If something fails on the site itself: hPanel → Advanced → Error Logs
+(lines start with <code>[manuscript]</code>). Stripe shows each webhook
+delivery under Developers → Webhooks.</p>
+<h2 id="7-going-live-later">7. Going live later</h2>
+<p>Once the test site passes everything above, the real site works the
+same way with its own secrets (<code>FTP_LIVE_DIR</code>,
+<code>FTP_LIVE_DATA_DIR</code>, <code>MANUSCRIPT_CONFIG_LIVE</code> with
+Stripe <strong>live</strong> keys and a live webhook to
+<code>https://magickmuse.com/manuscript/stripe-webhook</code>). Merging
+into <code>main</code> switches the site's buttons from Gumroad to the
+new shop, so the live upload, the import and the Gumroad customer import
+(README step 4) all need to happen together. Ask Claude to set up the
+live version when you're ready.</p>
+</article></main>
+</body>
+</html>
