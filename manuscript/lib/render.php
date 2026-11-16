@@ -7,6 +7,16 @@ function site_url(string $path = ''): string
     return $site . '/' . ltrim($path, '/');
 }
 
+/** The grimoire's photo from grimoire-photos.php at a given size, or null. */
+function grimoire_photo(string $slug, int $w, int $h): ?string
+{
+    static $photos = null;
+    $photos ??= is_file(MM_ROOT . '/grimoire-photos.php') ? require MM_ROOT . '/grimoire-photos.php' : [];
+    if (empty($photos[$slug])) return null;
+    $u = $photos[$slug];
+    return $u . (str_contains($u, '?') ? '&' : '?') . "w=$w&h=$h";
+}
+
 function find_page(string $grimoire, string $slug): ?array
 {
     $st = db()->prepare('SELECT * FROM pages WHERE grimoire = ? AND slug = ?');
@@ -173,7 +183,7 @@ function breadcrumbs(array $page): string
 function layout(string $title, string $body, array $opt = []): void
 {
     header('Content-Type: text/html; charset=utf-8');
-    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'");
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.pexels.com https://images.unsplash.com; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'");
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     // Anything shown to a signed-in person must never be stored by a cache and shown to someone else.

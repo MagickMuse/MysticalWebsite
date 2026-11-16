@@ -71,7 +71,10 @@ function view_home(): void
     $cards = '';
     foreach ($grimoires as $g) {
         $n = (int) db()->query("SELECT COUNT(*) FROM pages WHERE grimoire = " . db()->quote($g['grimoire']) . " AND kind = 'entry'")->fetchColumn();
-        $cover = $g['cover'] ? '<div class="frame arch g-cover"><img src="' . e(media_url($g['cover'])) . '" alt="" loading="lazy"></div>' : '<div class="frame arch g-cover"><i class="spark big" aria-hidden="true"></i></div>';
+        $photo = grimoire_photo($g['grimoire'], 480, 600);
+        $cover = $photo
+            ? '<div class="frame arch g-cover"><img src="' . e($photo) . '" srcset="' . e(grimoire_photo($g['grimoire'], 480, 600)) . ' 1x, ' . e(grimoire_photo($g['grimoire'], 960, 1200)) . ' 2x" alt="" width="480" height="600" loading="lazy"></div>'
+            : '<div class="frame arch g-cover"><i class="spark big" aria-hidden="true"></i></div>';
         $cards .= '<a class="card g-card" href="' . e(page_url($g)) . '">' . $cover . '<h3>' . e($g['title']) . '</h3>'
             . ($n ? '<p>' . number_format($n) . ' entries</p>' : '<p>Orientation &amp; guides</p>') . '</a>';
     }
@@ -144,7 +147,10 @@ function view_page(array $p): void
     }
     $head .= '</header>';
 
-    $cover = $p['cover'] ? '<div class="pg-cover"><img src="' . e(media_url($p['cover'])) . '" alt=""></div>' : '';
+    // Grimoires use their photo from the website; other pages use their own cover, if any.
+    $photo = $p['kind'] === 'grimoire' ? grimoire_photo($p['grimoire'], 1600, 640) : null;
+    $cover = $photo ? '<div class="pg-cover arch-banner"><img src="' . e($photo) . '" alt="" width="1600" height="640"></div>' : '';
+    if (!$photo) $cover = $p['cover'] ? '<div class="pg-cover"><img src="' . e(media_url($p['cover'])) . '" alt=""></div>' : '';
 
     if ($p['kind'] === 'collection') {
         $body = ($p['plain'] ? '<p class="lede">' . e($p['plain']) . '</p>' : '') . entry_list(entries_of($p['id']), true);

@@ -148,8 +148,10 @@ final class NotionImporter
         $plain = self::plainFromHtml($html);
 
         $icon = $this->icon($page['icon'] ?? null, $id . '-icon');
-        $cover = $this->fileUrl($page['cover'] ?? null);
-        $cover = $cover ? $this->download($cover, $id . '-cover') : null;
+        // Grimoire pages use the website's photos (grimoire-photos.php), not their Notion covers.
+        $cover = $kind === 'grimoire' ? null : $this->fileUrl($page['cover'] ?? null);
+        // The file name changes when the picture does, so a new cover in Notion replaces the old one.
+        $cover = $cover ? $this->download($cover, $id . '-cover-' . self::version($cover)) : null;
 
         $this->savePage([
             'id' => $id, 'slug' => $slug, 'grimoire' => $this->grimoire, 'kind' => $kind,
@@ -429,6 +431,12 @@ final class NotionImporter
         return $out;
     }
 
+    /** Short fingerprint of a file's address, ignoring Notion's expiring signature. */
+    private static function version(string $url): string
+    {
+        return substr(hash('crc32b', (string) parse_url($url, PHP_URL_HOST) . parse_url($url, PHP_URL_PATH)), 0, 8);
+    }
+
     public static function plainFromHtml(string $html): string
     {
         $html = preg_replace('~<span class="mm-callout-icon".*?</span>~s', '', $html);
@@ -470,7 +478,7 @@ final class NotionImporter
         if (!$icon) return null;
         if (($icon['type'] ?? '') === 'emoji') return $icon['emoji'];
         $u = $this->fileUrl($icon);
-        return $u ? 'file:' . $this->download($u, $name) : null;
+        return $u ? 'file:' . $this->download($u, $name . '-' . self::version($u)) : null;
     }
 
     /** Downloads an image into data_dir/media so it no longer depends on Notion's expiring links. */
