@@ -34,6 +34,9 @@ return [
     // which are about using Notion.
     // 'skip_pages' => '/\\bgrimoire guide\\b/i',
 
+    // Toggle sections the importer leaves out, by title (they explain using Notion).
+    // 'skip_sections' => ['Notion tips for new readers', 'Using search and comments'],
+
     // ---------- Stripe paywall ----------
     // Dashboard → Developers → API keys. Use test keys (sk_test_...) until you are ready.
     'stripe_secret_key'     => 'sk_test_xxx',

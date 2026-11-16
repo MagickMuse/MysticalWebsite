@@ -329,6 +329,8 @@ final class NotionImporter
                 $kids = $this->kids($b, $ctx);
                 return ($text !== '' ? "<p$color>$text</p>" : '') . ($kids ? "<div class=\"indent\">$kids</div>" : '');
             case 'heading_1': case 'heading_2': case 'heading_3':
+                // Notion-only sections (e.g. "Notion tips for new readers") are left out, with their contents.
+                if (!empty($d['is_toggleable']) && self::skipSection($this->plainText($d['rich_text'] ?? []))) return '';
                 // Page titles are h1, so Notion's three heading levels map to h2–h4.
                 $lvl = (int) substr($type, -1) + 1;
                 $h = "<h$lvl id=\"" . e(slugify(strip_tags($text))) . "\"$color>$text</h$lvl>";
@@ -340,6 +342,7 @@ final class NotionImporter
                 $mark = !empty($d['checked']) ? '☑' : '☐';
                 return "<li><span class=\"box\" aria-hidden=\"true\">$mark</span> $text" . $this->kids($b, $ctx) . '</li>';
             case 'toggle':
+                if (self::skipSection($this->plainText($d['rich_text'] ?? []))) return '';
                 return "<details class=\"toggle\"><summary>$text</summary>" . $this->kids($b, $ctx) . '</details>';
             case 'quote':
                 return "<blockquote$color>$text" . $this->kids($b, $ctx) . '</blockquote>';
@@ -431,6 +434,15 @@ final class NotionImporter
             $out .= $s;
         }
         return $out;
+    }
+
+    /** Sections about using Notion that don't belong on the website. */
+    private static function skipSection(string $title): bool
+    {
+        $titles = (array) config('skip_sections', ['Notion tips for new readers', 'Using search and comments']);
+        $t = mb_strtolower(trim($title));
+        foreach ($titles as $skip) if ($t === mb_strtolower(trim($skip))) return true;
+        return false;
     }
 
     /** Short fingerprint of a file's address, ignoring Notion's expiring signature. */
