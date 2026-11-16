@@ -127,6 +127,12 @@ function strip_skipped_links(string $html): string
             fn($m) => $m[1] . e($discord) . $m[2], $html);
     }
     $html = preg_replace('~<div class="column">\s*</div>~', '', $html);
+    // Columns that hold nothing but page links (e.g. a "Guide Pages" list) become one list that wraps,
+    // so there is no empty strip between half-width columns or hole under a shorter column.
+    $html = preg_replace_callback('~<div class="columns">((?:<div class="column">(?:<p class="page-link">.*?</p>)+</div>)+)</div>~s', function ($m) {
+        preg_match_all('~<p class="page-link">.*?</p>~s', $m[1], $links);
+        return '<div class="link-flow">' . implode('', $links[0]) . '</div>';
+    }, $html);
     return preg_replace('~<div class="columns">\s*</div>~', '', $html);
 }
 
@@ -286,10 +292,10 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=30">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=31">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=30" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=31" defer></script>
 </head>
 <?php $visitor = !has_access(); $openUrls = $visitor ? array_merge([url('sneak-peek')], array_map('page_url', open_pages())) : []; ?>
 <body class="mm<?= !empty($opt['protect']) && !is_admin() ? ' no-copy' : '' ?>"<?php if ($visitor): ?> data-visitor data-base="<?= e((string) parse_url(url(), PHP_URL_PATH)) ?>" data-open="<?= e(json_encode(array_map(fn($u) => rtrim((string) parse_url($u, PHP_URL_PATH), '/'), $openUrls))) ?>"<?php endif ?>>
