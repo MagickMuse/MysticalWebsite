@@ -362,9 +362,12 @@
       .then(function () { setTimeout(function () { location.href = href; }, 180); })
       .catch(function () { location.href = href; });
   }
-  // Coming back with the browser's Back button: put the row back as it was.
-  window.addEventListener('pageshow', function () {
+  // Put the row back as it was once a book has been opened: when coming back with the browser's Back button,
+  // and when the page changes without reloading (an address ending in #…, as in a preview).
+  function restoreShelf() {
     document.querySelectorAll('.book-stage, .book-veil').forEach(function (n) { n.remove(); });
-    document.querySelectorAll('.carousel .bk').forEach(function (b) { b.style.visibility = ''; });
-  });
+    document.querySelectorAll('.carousel .bk').forEach(function (b) { b.style.visibility = ''; b.classList.remove('open'); });
+  }
+  window.addEventListener('pageshow', restoreShelf);
+  window.addEventListener('hashchange', restoreShelf);
 })();
