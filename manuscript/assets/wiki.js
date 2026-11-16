@@ -219,6 +219,31 @@
     if (e.key === 'Escape') document.querySelectorAll('.col-filter[open]').forEach(function (d) { d.open = false; d.querySelector('summary').focus(); });
   });
 
+  // Visitors: anything inside the Manuscript (a book, a connection, a link) opens the join pop-up,
+  // except the pages anyone can read. Runs first (capture), so the book animation never starts for them.
+  (function () {
+    var body = document.body, pop = document.getElementById('join-pop');
+    if (!body.hasAttribute('data-visitor') || !pop || !pop.showModal) return;
+    var base = (body.getAttribute('data-base') || '').replace(/\/$/, '');
+    var open = []; try { open = JSON.parse(body.getAttribute('data-open') || '[]'); } catch (err) {}
+    var free = ['join', 'login', 'shop', 'checkout', 'account', 'welcome', 'sneak-peek', 'media', 'auth', 'logout'];
+    function locked(a) {
+      var u; try { u = new URL(a.href, location.href); } catch (err) { return false; }
+      if (u.origin !== location.origin) return false;
+      var path = u.pathname.replace(/\/$/, '');
+      if (path.indexOf(base + '/') !== 0) return false;
+      var first = path.slice(base.length + 1).split('/')[0];
+      return first !== '' && free.indexOf(first) === -1 && open.indexOf(path) === -1;
+    }
+    window.mmJoinPop = function () { if (!pop.open) pop.showModal(); };
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href]');
+      if (!a || !locked(a)) return;
+      e.preventDefault(); e.stopImmediatePropagation(); window.mmJoinPop();
+    }, true);
+    pop.addEventListener('click', function (e) { if (e.target === pop || e.target.closest('[data-close]')) pop.close(); });
+  })();
+
   // Carousel arrows: move along the row by most of its width.
   document.querySelectorAll('.carousel').forEach(function (c) {
     var track = c.querySelector('[data-carousel]'); if (!track) return;

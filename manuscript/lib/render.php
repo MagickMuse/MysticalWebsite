@@ -26,6 +26,50 @@ function grimoire_photo(string $slug, int $w, int $h): ?string
     return $u . (str_contains($u, '?') ? '&' : '?') . "w=$w&h=$h";
 }
 
+/** A page named in the config: a Notion page id, "grimoire/page-slug", or a grimoire's slug. */
+function page_by_ref(string $ref): ?array
+{
+    $ref = trim($ref);
+    if ($ref === '') return null;
+    if (preg_match('/^[0-9a-f-]{32,36}$/i', $ref)) return page_by_id($ref);
+    return str_contains($ref, '/') ? find_page(...explode('/', $ref, 2)) : grimoire_root($ref);
+}
+
+/** The one page visitors can read in full as a taste of the Manuscript (config "sneak_peek"). */
+function sneak_peek_page(): ?array
+{
+    static $p = false;
+    if ($p === false) $p = page_by_ref((string) config('sneak_peek', 'correspondence/protection'));
+    return $p;
+}
+
+/** Every page anyone can read: config "public_pages" plus the sneak peek. */
+function open_pages(): array
+{
+    static $pages = null;
+    if ($pages === null) {
+        $pages = array_values(array_filter(array_map('page_by_ref', array_map('strval', (array) config('public_pages', [])))));
+        if ($sp = sneak_peek_page()) $pages[] = $sp;
+    }
+    return $pages;
+}
+
+/** For visitors: the pop-up shown when they pick anything inside the Manuscript. */
+function join_popup(bool $onPeek): string
+{
+    $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
+    $next = (string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+    $peek = !$onPeek && sneak_peek_page() ? '<a class="btn ghost" href="' . e(url('sneak-peek')) . '">Take a sneak peek</a>' : '';
+    return '<dialog class="join-pop" id="join-pop" aria-labelledby="join-pop-h">'
+        . '<button class="join-x" type="button" data-close aria-label="Close">&times;</button>'
+        . '<p class="eyebrow labelled">Members only</p>'
+        . '<h2 id="join-pop-h">This lives inside <em>the Manuscript</em></h2>'
+        . '<p>Fifteen cross-linked grimoires and ' . $total . ' pages of researched magick, open to members. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>'
+        . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a>' . $peek . '</div>'
+        . (current_email() ? '' : '<p class="small">Already a member? <a href="' . e(url('login') . '?next=' . rawurlencode($next)) . '">Sign in</a></p>')
+        . '</dialog>';
+}
+
 function find_page(string $grimoire, string $slug): ?array
 {
     $st = db()->prepare('SELECT * FROM pages WHERE grimoire = ? AND slug = ?');
@@ -229,12 +273,13 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=24">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=25">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=24" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=25" defer></script>
 </head>
-<body class="mm<?= !empty($opt['protect']) && !is_admin() ? ' no-copy' : '' ?>">
+<?php $visitor = !has_access(); $openUrls = $visitor ? array_merge([url('sneak-peek')], array_map('page_url', open_pages())) : []; ?>
+<body class="mm<?= !empty($opt['protect']) && !is_admin() ? ' no-copy' : '' ?>"<?php if ($visitor): ?> data-visitor data-base="<?= e((string) parse_url(url(), PHP_URL_PATH)) ?>" data-open="<?= e(json_encode(array_map(fn($u) => rtrim((string) parse_url($u, PHP_URL_PATH), '/'), $openUrls))) ?>"<?php endif ?>>
 <a class="skip" href="#main">Skip to main content</a>
 <header class="site">
   <div class="wrap nav">
@@ -265,6 +310,7 @@ function layout(string $title, string $body, array $opt = []): void
 <main id="main" class="wrap mm-main">
 <?= $body ?>
 </main>
+<?= $visitor ? join_popup(!empty($opt['peek'])) : '' ?>
 <footer class="site">
   <div class="wrap foot">
     <div class="star-rule" aria-hidden="true"><i class="spark big"></i></div>

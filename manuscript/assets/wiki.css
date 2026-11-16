@@ -533,3 +533,22 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .bk:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 @media (hover: none) { .car-track { height: 320px; } }
 @media (max-width: 640px) { .carousel { padding: 0 .4rem; } .car-btn { display: none; } .car-track { height: 300px; } .bk { height: 260px; width: 50px; } .bk:hover, .bk:focus-visible { width: 190px; } .bk .cover { width: 190px; } }
+
+/* ---------- visitors: the join pop-up and the sneak peek note ---------- */
+.join-pop { width: min(520px, calc(100vw - 2rem)); padding: 2.4rem 2rem 1.8rem; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); text-align: center;
+  box-shadow: 0 30px 60px -20px rgba(46, 31, 32, .55); }
+.join-pop::backdrop { background: rgba(46, 31, 32, .55); backdrop-filter: blur(2px); }
+.join-pop[open] { animation: pop-in .28s cubic-bezier(.2,.7,.2,1); }
+@keyframes pop-in { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+.join-pop h2 { font-family: var(--display); font-weight: 400; font-size: 2rem; line-height: 1.15; margin: .4rem 0 .8rem; }
+.join-pop h2 em { color: var(--accent-text); }
+.join-pop p { color: var(--muted); }
+.join-pop .actions { display: flex; flex-wrap: wrap; gap: .7rem; justify-content: center; margin: 1.4rem 0 .6rem; }
+.join-x { position: absolute; top: .6rem; right: .8rem; width: 36px; height: 36px; border: 0; background: none; color: var(--muted); font-size: 1.6rem; line-height: 1; cursor: pointer; border-radius: 999px; }
+.join-x:hover { color: var(--accent); background: var(--surface); }
+.mm-hero .actions .btn + .btn { margin-left: .7rem; }
+.peek-note { margin: 0 0 1.6rem; padding: 1.2rem 1.4rem; border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent); border-radius: 6px; background: var(--surface); text-align: center; }
+.peek-note p { margin: .3rem 0; color: var(--ink); }
+.peek-note .eyebrow { margin: 0; }
+.peek-note .actions { justify-content: center; margin-top: .8rem; }
+@media (prefers-reduced-motion: reduce) { .join-pop[open] { animation: none; } }

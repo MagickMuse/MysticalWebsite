@@ -51,6 +51,7 @@ function route(array $parts, string $method): void
         case 'dashboard':     route_dashboard(array_slice($parts, 1), $method); return;
         case 'shop':          route_shop(array_slice($parts, 1), $method); return;
         case 'suggest':       search_suggest(trim((string) ($_GET['q'] ?? ''))); return;
+        case 'sneak-peek':    ($p = sneak_peek_page()) ? view_page($p) : redirect(url()); return;
     }
     $p = match (count($parts)) {
         1 => grimoire_root($first),
@@ -67,7 +68,9 @@ function route(array $parts, string $method): void
 
 function view_home(): void
 {
-    if (!has_access()) { view_gate(); return; }
+    // Visitors see the same home, as a taste: any book they pick opens the join pop-up (assets/wiki.js).
+    $member = has_access();
+    if (!$member) record_view('route:/manuscript/');
     $grimoires = db()->query("SELECT * FROM pages WHERE kind = 'grimoire'")->fetchAll();
     // Alphabetical by name; Begin Here is the way in, so it gets its own button instead of a card.
     $begin = null;
@@ -87,6 +90,12 @@ function view_home(): void
         $cards = '<p class="lede">Nothing has been moved over yet. Run the importer (see README) to bring grimoires in from Notion.</p>';
     }
     $join = $begin ? '<div class="actions"><a class="btn" href="' . e(page_url($begin)) . '">Begin here</a></div>' : '';
+    if (!$member) {
+        $join = '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a>'
+            . (sneak_peek_page() ? '<a class="btn ghost" href="' . e(url('sneak-peek')) . '">Take a sneak peek</a>' : '') . '</div>'
+            . (current_email() ? '<p class="small">Signed in as ' . e(current_email()) . ', but this email has no active membership. <a href="' . e(url('account')) . '">See your account</a></p>'
+                : '<p class="small">Already a member? <a href="' . e(url('login')) . '">Sign in</a></p>');
+    }
     layout('The Magick Manuscript', <<<HTML
 <section class="mm-hero">
   <p class="eyebrow labelled">A Living Digital Grimoire</p>
@@ -95,7 +104,8 @@ function view_home(): void
   $join
 </section>
 $cards
-HTML, ['private' => true, 'protect' => true]);
+HTML, $member ? ['private' => true, 'protect' => true]
+    : ['index' => true, 'protect' => true, 'description' => 'The Magick Manuscript: a members-only, cross-linked digital grimoire by The Magick Muse.']);
 }
 
 /** What non-members see in place of the Manuscript: no titles, lists or previews. */
@@ -120,13 +130,10 @@ function view_gate(?array $locked = null): void
 HTML, ['index' => !$locked, 'description' => 'The Magick Manuscript: a members-only, cross-linked digital grimoire by The Magick Muse.']);
 }
 
-/** Pages listed in config "public_pages" can be read by anyone. */
+/** Pages listed in config "public_pages", and the sneak peek page, can be read by anyone. */
 function is_public_page(array $p): bool
 {
-    $list = config('public_pages', []);
-    return in_array($p['id'], array_map('normalize_id', $list), true)
-        || in_array($p['grimoire'] . '/' . $p['slug'], $list, true)
-        || ($p['kind'] === 'grimoire' && in_array($p['grimoire'], $list, true));
+    return in_array($p['id'], array_column(open_pages(), 'id'), true);
 }
 
 function view_page(array $p): void
@@ -155,6 +162,14 @@ function view_page(array $p): void
     $head = '<header class="pg-head">' . $crumbs . '<p class="eyebrow">' . e($eyebrow) . '</p>'
         . '<div class="pg-title"><h1>' . icon_html($p['icon'], 'pg-icon big') . e($p['title']) . '</h1>' . save_button($p) . '</div></header>';
     $panel = in_array($p['kind'], ['entry', 'guide'], true) ? properties_panel($p, $tags, connections($p)) : '';
+    // Visitors reading the sneak peek get a note above it; every link inside opens the join pop-up.
+    $peek = !has_access() && ($sp = sneak_peek_page()) && $sp['id'] === $p['id'];
+    if ($peek) {
+        $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
+        $head = '<aside class="peek-note"><p class="eyebrow labelled">A sneak peek</p>'
+            . '<p>You\'re reading one page of the Manuscript, just as members see it. Every connection on it leads to another page: there are ' . $total . ' in all, across fifteen grimoires.</p>'
+            . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a></div></aside>' . $head;
+    }
 
     // Grimoires use their photo from the website; other pages use their own cover, if any.
     $photo = $p['kind'] === 'grimoire' ? grimoire_photo($p['grimoire'], 1600, 640) : null;
@@ -182,7 +197,7 @@ function view_page(array $p): void
             $box[0]), $bodyHtml);
         $body = $panel . $gallery . '<div class="mm-prose">' . $bodyHtml . '</div>';
     }
-    layout($p['title'], '<article class="pg pg-' . e($p['kind']) . '">' . $cover . $head . $body . '</article>', ['private' => true, 'protect' => true]);
+    layout($p['title'], '<article class="pg pg-' . e($p['kind']) . '">' . $cover . $head . $body . '</article>', ['private' => true, 'protect' => true, 'peek' => $peek]);
 }
 
 /** Turns what someone typed into an FTS5 query where every word is a prefix match ("rose qua" → Rose Quartz). */
@@ -285,11 +300,11 @@ function serve_media(string $file): void
 
 function media_is_public(string $file): bool
 {
-    foreach (config('public_pages', []) as $ref) {
-        $p = preg_match('/^[0-9a-f-]{32,36}$/i', $ref) ? page_by_id($ref)
-            : (str_contains($ref, '/') ? find_page(...explode('/', $ref, 2)) : grimoire_root($ref));
-        if ($p && (str_contains((string) $p['body_html'], $file) || $p['cover'] === $file || $p['icon'] === 'file:' . $file
-            || str_contains((string) $p['tags_json'], $file))) return true;
+    // Page icons are small decorations shown beside links (e.g. the sneak peek's connections): anyone may see them.
+    if (preg_match('/-icon-[0-9a-f]+\.[a-z]+$/', $file)) return true;
+    foreach (open_pages() as $p) {
+        if (str_contains((string) $p['body_html'], $file) || $p['cover'] === $file || $p['icon'] === 'file:' . $file
+            || str_contains((string) $p['tags_json'], $file)) return true;
     }
     return false;
 }

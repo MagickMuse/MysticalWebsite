@@ -96,4 +96,8 @@ return [
     // as a Notion page id or as "grimoire/page-slug" from the wiki address, e.g.
     //   'public_pages' => ['begin-here/what-is-magick', '71d0d5fb571147849802c3446fbb8c58'],
     'public_pages' => [],
+
+    // The sneak peek: one page visitors can read in full at {base_url}/sneak-peek. Its links open the join pop-up.
+    // Same forms as above; set to '' to turn it off.
+    'sneak_peek' => 'correspondence/protection',
 ];
