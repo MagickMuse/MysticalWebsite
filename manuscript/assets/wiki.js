@@ -174,4 +174,18 @@
     });
     window.addEventListener('beforeprint', function () { toast('The Manuscript can’t be printed.'); });
   }
+
+  // "Show all" on long relation rows: load the rest of the links only when asked
+  document.addEventListener('click', function (e) {
+    var more = e.target.closest('.rel-more[data-more]');
+    if (!more) return;
+    e.preventDefault();
+    if (more.getAttribute('aria-busy') === 'true') return;
+    more.setAttribute('aria-busy', 'true');
+    more.textContent = 'Loading…';
+    fetch(more.getAttribute('data-more'), { credentials: 'same-origin' })
+      .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function (d) { var box = more.closest('[data-rels]'); box.innerHTML = d.html; })
+      .catch(function () { location.href = more.getAttribute('href'); });
+  });
 })();

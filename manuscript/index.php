@@ -9,6 +9,7 @@ require __DIR__ . '/lib/stripe.php';
 require __DIR__ . '/lib/shop.php';
 require __DIR__ . '/lib/dashboard.php';
 require __DIR__ . '/lib/engage.php';
+require __DIR__ . '/lib/properties.php';
 
 // Path relative to the wiki's base, e.g. "correspondence/protection".
 $base = parse_url(config('base_url'), PHP_URL_PATH) ?: '';
@@ -43,6 +44,7 @@ function route(array $parts, string $method): void
         case 'account':       $method === 'POST' ? do_billing() : view_account(); return;
         case 'stripe-webhook': stripe_webhook(); return;
         case 'admin':         redirect(url('dashboard')); return;
+        case 'relations':     relations_json(); return;
         case 'saved':         $method === 'POST' ? toggle_saved() : view_saved(); return;
         case 'dashboard':     route_dashboard(array_slice($parts, 1), $method); return;
         case 'shop':          route_shop(array_slice($parts, 1), $method); return;
@@ -145,17 +147,10 @@ function view_page(array $p): void
     $images = $tags['_images'] ?? [];
     unset($tags['_images']);
 
+    // Title, then (for pages inside a grimoire) the properties panel: own properties, then relation links.
     $head = '<header class="pg-head">' . $crumbs . '<p class="eyebrow">' . e($eyebrow) . '</p>'
-        . '<div class="pg-title"><h1>' . icon_html($p['icon'], 'pg-icon big') . e($p['title']) . '</h1>' . save_button($p) . '</div>'
-        . ($p['aka'] ? '<p class="aka">Also called ' . e($p['aka']) . '</p>' : '');
-    if ($tags) {
-        $head .= '<dl class="props">';
-        foreach ($tags as $k => $vals) {
-            $head .= '<div><dt>' . e($k) . '</dt><dd>' . implode('', array_map(fn($v) => '<span class="tag">' . e($v) . '</span>', $vals)) . '</dd></div>';
-        }
-        $head .= '</dl>';
-    }
-    $head .= '</header>';
+        . '<div class="pg-title"><h1>' . icon_html($p['icon'], 'pg-icon big') . e($p['title']) . '</h1>' . save_button($p) . '</div></header>';
+    $panel = in_array($p['kind'], ['entry', 'guide'], true) ? properties_panel($p, $tags, connections($p)) : '';
 
     // Grimoires use their photo from the website; other pages use their own cover, if any.
     $photo = $p['kind'] === 'grimoire' ? grimoire_photo($p['grimoire'], 1600, 640) : null;
@@ -170,8 +165,7 @@ function view_page(array $p): void
             $gallery = '<div class="gallery">' . implode('', array_map(fn($f) => '<figure><img src="' . e(media_url($f)) . '" alt="' . e($p['title']) . '" loading="lazy"></figure>', $images)) . '</div>';
         }
         // Landing pages: intro text is public, the guide pages it links to are for members.
-        $body = $gallery . '<div class="mm-prose">' . resolve_links((string) $p['body_html']) . '</div>';
-        if ($p['kind'] !== 'grimoire') $body .= connections_html(connections($p));
+        $body = $panel . $gallery . '<div class="mm-prose">' . resolve_links((string) $p['body_html']) . '</div>';
     }
     layout($p['title'], '<article class="pg pg-' . e($p['kind']) . '">' . $cover . $head . $body . '</article>', ['private' => true, 'protect' => true]);
 }

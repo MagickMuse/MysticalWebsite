@@ -332,3 +332,51 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .no-copy .mm-main a img { pointer-events: auto; }
 @media print { .no-copy main, .no-copy footer { display: none !important; } body.no-copy::after { content: "The Magick Manuscript is for members to read online and can't be printed."; } }
 .mm-toast { position: fixed; left: 50%; bottom: 1.4rem; transform: translateX(-50%); z-index: 70; background: var(--ink); color: var(--bg); padding: .75rem 1.2rem; font-size: .9rem; box-shadow: 0 12px 30px -12px rgba(0,0,0,.5); }
+
+/* ---------- Notion-style entry pages ---------- */
+.pg-entry, .pg-guide { max-width: 900px; }
+.pg-entry .pg-head, .pg-guide .pg-head { margin-bottom: 1.2rem; gap: .5rem; }
+.pg-entry .pg-head h1, .pg-guide .pg-head h1 { font-size: clamp(2.3rem, 5vw, 3.3rem); }
+.pg-entry .crumbs, .pg-guide .crumbs { margin-bottom: .6rem; }
+
+.props-panel { display: grid; margin: 0 0 2.4rem; padding: .5rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: .92rem; }
+.prop-row { display: grid; grid-template-columns: minmax(9rem, 12rem) minmax(0, 1fr); gap: .3rem 1rem; align-items: start; padding: .4rem .5rem; border-radius: 4px; scroll-margin-top: 8rem; }
+.prop-row:hover { background: color-mix(in srgb, var(--surface) 70%, transparent); }
+.prop-name { display: flex; align-items: center; gap: .5rem; color: var(--muted); font-size: .86rem; line-height: 1.9; min-width: 0; }
+.prop-name small { margin-left: .2rem; font-size: .72rem; color: var(--muted); opacity: .8; }
+.prop-glyph { width: 1rem; flex: none; text-align: center; color: var(--gold); font-size: .85rem; }
+.prop-val { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; min-width: 0; line-height: 1.6; padding-top: .15rem; }
+.prop-text { color: var(--ink); }
+.prop-val a:not(.rel):not(.rel-more) { color: var(--accent-text); }
+
+/* tags, coloured like Notion's but softened to the brand */
+.pill { display: inline-block; padding: .05rem .5rem; border-radius: 4px; font-size: .82rem; line-height: 1.6; white-space: nowrap; color: var(--ink); }
+.pill-gray { background: #ece7e3; } .pill-brown { background: #eedfd3; } .pill-orange { background: #f6e1cc; }
+.pill-yellow { background: #f5ead0; } .pill-green { background: #dfe9dc; } .pill-blue { background: #dde6ee; }
+.pill-purple { background: #e7dfee; } .pill-pink { background: #f2dde4; } .pill-red { background: #f3d9d7; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pill { color: #f2e6de; }
+  :root:not([data-theme="light"]) .pill-gray { background: #3a3132; } :root:not([data-theme="light"]) .pill-brown { background: #43332b; }
+  :root:not([data-theme="light"]) .pill-orange { background: #4a3523; } :root:not([data-theme="light"]) .pill-yellow { background: #48402a; }
+  :root:not([data-theme="light"]) .pill-green { background: #2f3d30; } :root:not([data-theme="light"]) .pill-blue { background: #2c3843; }
+  :root:not([data-theme="light"]) .pill-purple { background: #3b3145; } :root:not([data-theme="light"]) .pill-pink { background: #482f39; }
+  :root:not([data-theme="light"]) .pill-red { background: #4b2c2c; } }
+
+/* relation links: page links with their icons, wrapping like Notion */
+.rels { display: flex; flex-wrap: wrap; gap: .15rem .3rem; align-items: center; }
+.rel { display: inline-flex; align-items: center; gap: .3rem; padding: .05rem .35rem; border-radius: 4px; text-decoration: none; color: var(--ink); line-height: 1.6; }
+.rel span { border-bottom: 1px solid color-mix(in srgb, var(--ink) 25%, transparent); }
+.rel:hover { background: var(--surface); }
+.rel:hover span { border-color: var(--accent); color: var(--accent-text); }
+.rel-icon { width: 1.05rem; height: 1.05rem; display: inline-grid; place-items: center; font-size: .9rem; object-fit: contain; flex: none; }
+.rel-more { display: inline-flex; align-items: center; padding: .1rem .6rem; margin-left: .2rem; border: 1px solid var(--line); border-radius: 999px; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; text-decoration: none; color: var(--muted); background: var(--bg); cursor: pointer; }
+.rel-more:hover { border-color: var(--accent); color: var(--accent-text); }
+.rel-more[aria-busy="true"] { opacity: .6; }
+
+/* the page's own text, in a comfortable reading column */
+.pg-entry .mm-prose, .pg-guide .mm-prose { font-size: 1.04rem; }
+.pg-entry .mm-prose > :first-child, .pg-guide .mm-prose > :first-child { margin-top: 0; }
+
+@media (max-width: 640px) {
+  .prop-row { grid-template-columns: 1fr; gap: .1rem; padding: .5rem .2rem; }
+  .prop-name { font-size: .78rem; }
+}
