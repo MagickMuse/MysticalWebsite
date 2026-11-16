@@ -394,6 +394,7 @@ final class NotionImporter
                 return $u && ($d['type'] ?? '') === 'external' ? '<p><a href="' . e($u) . '" rel="noopener">' . e(ucfirst($type)) . '</a></p>' : '';
             case 'bookmark': case 'embed': case 'link_preview':
                 $u = $d['url'] ?? '';
+                if ($u && preg_match(skip_links_pattern(), $u)) return ''; // Notion-only widgets
                 return $u ? '<p class="bookmark"><a href="' . e($u) . '" rel="noopener">' . e($this->plainText($d['caption'] ?? []) ?: $u) . '</a></p>' : '';
             case 'column_list':
                 return '<div class="columns">' . $this->kids($b, $ctx) . '</div>';

@@ -222,3 +222,9 @@ function normalize_id(string $id): string
 {
     return strtolower(str_replace('-', '', $id));
 }
+
+/** Links that only work inside Notion (the Notion widgets), left out of the Manuscript. */
+function skip_links_pattern(): string
+{
+    return (string) config('skip_links', '~^https?://magickmuse\\.github\\.io/Widgets/~i');
+}

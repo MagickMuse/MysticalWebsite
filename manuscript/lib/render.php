@@ -71,8 +71,18 @@ function icon_html(?string $icon, string $class = 'pg-icon'): string
 }
 
 /** Turns stored data-mm-id anchors into real links; links to pages not yet moved over become plain text. */
+/** Takes out bookmarks to Notion-only widgets, and any columns or column rows left empty by that. */
+function strip_skipped_links(string $html): string
+{
+    $html = preg_replace_callback('~<p class="bookmark"><a href="([^"]*)"[^>]*>.*?</a></p>~s',
+        fn($m) => preg_match(skip_links_pattern(), html_entity_decode($m[1])) ? '' : $m[0], $html);
+    $html = preg_replace('~<div class="column">\s*</div>~', '', $html);
+    return preg_replace('~<div class="columns">\s*</div>~', '', $html);
+}
+
 function resolve_links(string $html): string
 {
+    $html = strip_skipped_links($html);
     preg_match_all('/data-mm-id="([0-9a-f]{32})"/', $html, $m);
     $idx = page_index($m[1]);
     $html = preg_replace_callback('/<a data-mm-id="([0-9a-f]{32})">(.*?)<\/a>/s', function ($mm) use ($idx) {
@@ -219,10 +229,10 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=23">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=24">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=23" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=24" defer></script>
 </head>
 <body class="mm<?= !empty($opt['protect']) && !is_admin() ? ' no-copy' : '' ?>">
 <a class="skip" href="#main">Skip to main content</a>
