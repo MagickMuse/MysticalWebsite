@@ -6,3 +6,4 @@ manuscript-data/
 *.sqlite
 *.sqlite-*
 deploy.local.php
+config.live.php

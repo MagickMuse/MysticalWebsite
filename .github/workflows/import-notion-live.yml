@@ -1,0 +1,102 @@
+# Brings the Manuscript over from Notion for the LIVE site. Run it from the Actions tab;
+# once this file is on the main branch it also runs every Monday to pick up new pages.
+name: Import from Notion (live site)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 9 * * 1'   # Mondays
+
+permissions:
+  contents: read
+
+concurrency:
+  group: import-notion-live
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345          # GitHub's limit is 6 hours; the import pauses itself before that
+    env:
+      FTP_HOST: ${{ secrets.FTP_HOST }}
+      FTP_USER: ${{ secrets.FTP_USER }}
+      LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      FTP_DIR: ${{ secrets.FTP_LIVE_DIR }}
+      FTP_DATA_DIR: ${{ secrets.FTP_LIVE_DATA_DIR }}
+      MANUSCRIPT_CONFIG: ${{ secrets.MANUSCRIPT_CONFIG_LIVE }}
+      FTP_VERIFY_CERT: ${{ vars.FTP_VERIFY_CERT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Working folders
+        run: |
+          echo "MM_CONFIG=$RUNNER_TEMP/manuscript-config.php" >> "$GITHUB_ENV"
+          echo "MM_DATA_DIR=$RUNNER_TEMP/manuscript-data" >> "$GITHUB_ENV"
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp php-cli php-sqlite3 php-curl php-mbstring php-intl
+          php -r 'foreach (["pdo_sqlite","curl","mbstring"] as $e) if (!extension_loaded($e)) { fwrite(STDERR, "missing $e\n"); exit(1); }'
+
+      - name: Private settings
+        run: |
+          source .github/scripts/ftp-env.sh
+          write_settings "$MM_CONFIG"
+          mkdir -p "$MM_DATA_DIR"
+
+      - name: Fetch the current Manuscript database from the server
+        id: fetch
+        run: |
+          source .github/scripts/ftp-env.sh
+          # A connection problem stops here. Starting "fresh" by mistake would replace the server's copy.
+          lftp_run "mkdir -p -f \"$FTP_DATA_DIR\"
+          cls -1 \"$FTP_DATA_DIR/\"" > "$RUNNER_TEMP/listing.txt"
+          if grep -qE '(^|/)content\.sqlite$' "$RUNNER_TEMP/listing.txt"; then
+            lftp_run "get \"$FTP_DATA_DIR/content.sqlite\" -o \"$MM_DATA_DIR/content.sqlite\""
+            echo "Continuing from the server's copy ($(du -h "$MM_DATA_DIR/content.sqlite" | cut -f1))."
+          else
+            echo "No Manuscript database on the server yet: starting fresh."
+          fi
+
+      - name: Import from Notion
+        id: import
+        run: |
+          what=$(grep -v '^\s*#' manuscript/import.txt | tr '\n' ' ' | xargs || true)
+          args=""
+          for w in $what; do
+            case "$w" in all) ;; prune) args="$args --prune" ;; *) args="$args $w" ;; esac
+          done
+          set +e
+          php manuscript/cli/import.php $args --max-minutes=290
+          code=$?
+          set -e
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -ne 0 ] && [ "$code" -ne 3 ]; then exit "$code"; fi
+
+      - name: Upload to the server's private folder
+        # Also after an error part-way: every page saved so far is kept, and the next run continues.
+        if: always() && (steps.import.outcome == 'success' || steps.import.outcome == 'failure')
+        run: |
+          source .github/scripts/ftp-env.sh
+          [ -s "$MM_DATA_DIR/content.sqlite" ] || { echo "Nothing to upload."; exit 0; }
+          # One self-contained file, then swapped in place so the site never sees a half-uploaded copy.
+          php -r '$d = new PDO("sqlite:" . getenv("MM_DATA_DIR") . "/content.sqlite"); $d->exec("PRAGMA journal_mode = DELETE; VACUUM;");'
+          mkdir -p "$MM_DATA_DIR/media"
+          lftp_run "
+          mkdir -p -f \"$FTP_DATA_DIR/media\"
+          mirror --reverse --parallel=6 --no-perms --verbose=0 \"$MM_DATA_DIR/media\" \"$FTP_DATA_DIR/media\"
+          put \"$MM_DATA_DIR/content.sqlite\" -o \"$FTP_DATA_DIR/content.sqlite.uploading\"
+          set cmd:fail-exit no
+          rm \"$FTP_DATA_DIR/content.sqlite.old\"
+          mv \"$FTP_DATA_DIR/content.sqlite\" \"$FTP_DATA_DIR/content.sqlite.old\"
+          set cmd:fail-exit yes
+          mv \"$FTP_DATA_DIR/content.sqlite.uploading\" \"$FTP_DATA_DIR/content.sqlite\"
+          "
+          echo "Uploaded $(du -h "$MM_DATA_DIR/content.sqlite" | cut -f1) of Manuscript pages."
+
+      - name: Paused?
+        if: steps.import.outputs.code == '3'
+        run: |
+          echo "::warning::The import paused before GitHub's 6-hour limit. Everything so far is on the server. Run it again (or change manuscript/import.txt) to continue."

@@ -11,6 +11,6 @@ DirectoryIndex index.php
   RewriteRule ^ index.php [L,QSA]
 </IfModule>
 
-<FilesMatch "^(config\.local\.php|deploy\.local\.php|.*\.sqlite.*)$">
+<FilesMatch "^(config\.local\.php|config\.live\.php|deploy\.local\.php|.*\.sqlite.*)$">
   Require all denied
 </FilesMatch>
