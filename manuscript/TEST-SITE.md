@@ -1,148 +1,96 @@
-> Also available as a styled page: `manuscript/index.html` on this branch.
+# Setting up the test site (the GitHub way)
 
-# Setting up the test site
+A private copy of the new Manuscript wiki, shop and dashboard at **test.magickmuse.com**, using Stripe's test mode so no real money moves. The real magickmuse.com isn't touched.
 
-A private copy of the new Manuscript wiki, shop and dashboard at **test.magickmuse.com**, using Stripe's test mode so no real money moves. The real magickmuse.com isn't touched. About an hour, most of it waiting for the Notion import.
+**How it works:** everything is managed on GitHub. When anything changes on the `manuscript-wiki` branch, GitHub uploads the site to Hostinger over FTP, the same thing FileZilla does, using the FTP login you give it once. Imports from Notion also run on GitHub, and the pages go straight into a private folder on Hostinger. Nothing paid is ever stored on GitHub.
 
-**What you're installing:** the `manuscript-wiki` branch of [MagickMuse/MysticalWebsite](https://github.com/MagickMuse/MysticalWebsite/tree/manuscript-wiki). It's the existing static site plus a PHP app in `manuscript/` (members-only wiki, `/shop`, sign-in by emailed link, Stripe checkout, private dashboard). It needs PHP 8.1+ with SQLite. No database server, Composer or Node.
+Two rules:
 
-**Full reference:** [manuscript/README.md](https://github.com/MagickMuse/MysticalWebsite/blob/manuscript-wiki/manuscript/README.md) on the branch. This page is the test-site walkthrough.
+1. The **data folder** (the Manuscript's pages and images) sits **next to** `public_html`, never inside it. GitHub and the site both refuse to run if it's inside.
+2. The repository is **public**. Passwords, keys and course links go only into GitHub's **Secrets** (step 4), never into files.
 
-**Two rules that matter.**
+---
 
-1.  The data folder (the database of paid pages and the downloaded images) must be **outside every `public_html`**, or it could be downloaded by anyone. The app refuses to start if it isn't, and tells you why.
-2.  The repository is **public**. Never commit the settings file, API keys, or delivery links. They only ever live on the server.
+## 1. Hostinger (your husband, about 10 minutes, once)
 
-## 1. Create the subdomain
+Do these in hPanel:
 
-*Where: hPanel → Domains → Subdomains*
+1. **Subdomain:** Domains → Subdomains → create `test` on `magickmuse.com`. Turn on SSL for it (Security → SSL).
+2. **PHP:** Advanced → PHP Configuration → choose **PHP 8.2 or newer**.
+3. **Email:** Emails → make sure a mailbox exists for sending sign-in links (e.g. `hello@magickmuse.com`) and note its password.
+4. **FTP details**, the same ones you use in FileZilla (or Files → FTP Accounts):
+   - **Host**, e.g. `ftp.magickmuse.com` or the IP address
+   - **Username**
+   - **Password**
+5. **Two folder paths, exactly as FileZilla shows them** after you log in:
+   - The test subdomain's folder, e.g. `/domains/magickmuse.com/public_html/test` (or `/public_html/test`). This is `FTP_TEST_DIR`.
+   - A data folder **next to** `public_html` (same level, not inside it), e.g. `/domains/magickmuse.com/manuscript-data-test`. This is `FTP_TEST_DATA_DIR`. You don't need to create it; GitHub will.
 
-1.  Create `test` on `magickmuse.com`.
-2.  Note the **folder** hPanel gives it. It's usually something like `/home/u123456789/domains/magickmuse.com/public_html/test`. You'll need this path in the steps below; this page calls it `TEST_FOLDER`.
-3.  Make sure SSL is on for it (hPanel → Security → SSL), so it opens on `https://test.magickmuse.com`.
+That's all the Hostinger work. No uploading, no files to edit.
 
-## 2. Deploy the branch
+## 2. Notion key (Avelynn, 2 minutes)
 
-*Where: hPanel → Advanced → Git*
+1. Go to [notion.so/profile/integrations](https://www.notion.so/profile/integrations) → **New integration**: type Internal, the Manuscript's workspace, name "Manuscript wiki", capabilities **Read content** only.
+2. Copy the **Internal Integration Secret** (starts with `ntn_`).
+3. In Notion open **The Magick Manuscript** → **•••** (top right) → **Connections** → add "Manuscript wiki".
 
-1.  Repository: `https://github.com/MagickMuse/MysticalWebsite.git` (public, so no deploy key needed)
-2.  Branch: `manuscript-wiki`
-3.  Install path: the subdomain's folder, e.g. `public_html/test`. Git deploy needs the folder **empty**, so delete hPanel's default `default.php` or `index.html` first.
-4.  Click **Create**, then **Deploy**.
+## 3. Stripe in test mode (Avelynn, 10 minutes)
 
-Check: `https://test.magickmuse.com` shows the normal homepage, and `https://test.magickmuse.com/manuscript/` says "The Manuscript is not configured yet". That's expected at this point.
+At [dashboard.stripe.com](https://dashboard.stripe.com), turn on **Test mode** (toggle at the top) first.
 
-*No Git option on the plan?* On GitHub switch to the `manuscript-wiki` branch → Code → Download ZIP, then upload and extract it into the subdomain folder with File Manager. Upload the files *inside* the zip's top folder, not the folder itself.
+1. **API key:** Developers → API keys → copy the **Secret key** (`sk_test_…`).
+2. **Manuscript price:** Product catalog → Add product "The Magick Manuscript" → price **$333, one-time** → copy its id (`price_…`).
+3. **Webhook:** Developers → Webhooks → Add endpoint
+   - URL: `https://test.magickmuse.com/manuscript/stripe-webhook`
+   - Events: `checkout.session.completed`, `invoice.paid`, `charge.refunded`, `customer.subscription.updated`, `customer.subscription.deleted`
+   - Copy its **Signing secret** (`whsec_…`).
+4. **SEEKER10:** Product catalog → Coupons → new coupon "10% off" → add the promotion code `SEEKER10`.
 
-## 3. PHP version
+Shop products (courses, templates) need nothing in Stripe.
 
-*Where: hPanel → Advanced → PHP Configuration*
+## 4. Put everything into GitHub's Secrets (either of you)
 
-Choose **PHP 8.2 or newer**. Under PHP extensions, make sure `pdo_sqlite`, `sqlite3`, `curl` and `mbstring` are ticked (they normally are). `intl` is nice to have, for tidier page addresses from accented titles.
+On GitHub: **MagickMuse/MysticalWebsite → Settings → Secrets and variables → Actions → New repository secret**. Add these six, one at a time, with the names spelled exactly like this:
 
-## 4. Private data folder
+| Secret name | What to paste |
+|---|---|
+| `FTP_HOST` | FTP host from step 1 |
+| `FTP_USER` | FTP username |
+| `FTP_PASSWORD` | FTP password |
+| `FTP_TEST_DIR` | Test folder path from step 1, e.g. `/domains/magickmuse.com/public_html/test` |
+| `FTP_TEST_DATA_DIR` | Data folder path from step 1, e.g. `/domains/magickmuse.com/manuscript-data-test` |
+| `MANUSCRIPT_CONFIG_TEST` | The **whole** private settings file you were sent (`config.local.php`), after replacing each `CHANGE-ME`: the `ntn_…` Notion key, `sk_test_…`, `whsec_…`, the `price_…` id, and the email password |
 
-*Where: hPanel → Files → File Manager*
+Secrets can't be read back by anyone, including you, and never appear on the public page. If you need to change one, use **Update** on it.
 
-Create a folder **outside** `public_html`, next to it, for example:
+## 5. Go
 
-    /home/u123456789/domains/magickmuse.com/manuscript-data-test
+Both jobs start by themselves. You don't need to press anything in GitHub. (A "Run workflow" button only appears once they're also on the `main` branch.)
 
-Copy its full path (File Manager shows it at the top). This is `DATA_FOLDER`. Keep the test site's data separate from the real site's later `manuscript-data`, so testing never mixes with real members.
+1. **Upload the site:** happens every time the `manuscript-wiki` branch changes. Once the secrets are in, tell Claude "the secrets are in" and it will start the first upload. Watch it in the **Actions** tab: **Deploy test site** with a green tick means it's on Hostinger.
+2. **Import the Manuscript:** happens whenever `manuscript/import.txt` changes on the `manuscript-wiki` branch. Claude can do that for you, or you can do it on GitHub yourself: open the file, click the pencil, change the "Run" number, then **Commit changes**.
+   - Notion allows about 3 requests a second, so the first full import is slow, roughly 1–2 minutes per 100 entries.
+   - GitHub stops any job after 6 hours, so a big import **pauses itself** before then, saves everything to Hostinger, and shows a yellow "paused" note. Start it again (change the Run number) and it carries on where it stopped. Later runs only fetch what changed.
+   - To import more grimoires, uncomment their lines in `manuscript/grimoires.php`.
 
-## 5. Notion key
+If a run has a red ✗, click it: the first red step says what's wrong in plain words (a missing secret, a typo in the settings, a wrong folder). If the upload step mentions a **certificate**, add a repository *variable* (same page, Variables tab) named `FTP_VERIFY_CERT` with the value `no`. It's the same as clicking "trust this certificate" in FileZilla, and the connection stays encrypted.
 
-1.  Go to [notion.so/profile/integrations](https://www.notion.so/profile/integrations) → **New integration**. Type: Internal, workspace: the Manuscript's, name: "Manuscript wiki". Capabilities: **Read content** only.
-2.  Copy the **Internal Integration Secret** (starts with `ntn_`).
-3.  In Notion, open **The Magick Manuscript** page → **•••** (top right) → **Connections** → add "Manuscript wiki". This gives it read access to everything underneath.
-
-## 6. Stripe in test mode
-
-*Where: dashboard.stripe.com → turn on **Test mode** (toggle at the top) for everything below*
-
-1.  **API key:** Developers → API keys → copy the **Secret key** (`sk_test_…`).
-2.  **Manuscript price:** Product catalog → Add product "The Magick Manuscript".
-    - Price: **\$333, one-time** → copy its id (`price_…`). This is lifetime access, as it was on Gumroad.
-
-    Shop products (courses, templates) need nothing in Stripe; their prices come from `manuscript/products.php`.
-3.  **Webhook:** Developers → Webhooks → Add endpoint
-    - URL: `https://test.magickmuse.com/manuscript/stripe-webhook`
-    - Events: `checkout.session.completed`, `invoice.paid`, `charge.refunded`, `customer.subscription.updated`, `customer.subscription.deleted`
-    - Copy the endpoint's **Signing secret** (`whsec_…`).
-4.  **SEEKER10:** Product catalog → Coupons → new coupon "10% off" → add a promotion code `SEEKER10`.
-
-## 7. Email for sign-in links
-
-*Where: hPanel → Emails*
-
-Nobody has a password; people sign in from a link that's emailed to them, so email has to work. Create a mailbox such as `hello@magickmuse.com` (or use an existing one) and note its password. Hostinger's mail server is `smtp.hostinger.com`, port `465`.
-
-## 8. The settings file
-
-*Where: File Manager → `TEST_FOLDER/manuscript/`*
-
-1.  Copy `config.sample.php` to **`config.local.php`** in the same folder. (The app blocks this file from ever being downloaded, and Git deploys leave it alone because it's ignored.)
-2.  Edit `config.local.php` and set:
-
-| Setting                 | Test-site value                                                                                                                         |
-|-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| `base_url`              | `https://test.magickmuse.com/manuscript`                                                                                                |
-| `site_url`              | `https://test.magickmuse.com`                                                                                                           |
-| `data_dir`              | Uncomment it and use `DATA_FOLDER` from step 4. **Required** for the test site.                                                         |
-| `app_secret`            | Any long random text, at least 40 characters. Over SSH: `php -r "echo bin2hex(random_bytes(32));"`                                      |
-| `notion_token`          | The `ntn_…` secret from step 5                                                                                                          |
-| `grimoires`             | Leave as is: Begin Here, Correspondence and Timing to start                                                                             |
-| `stripe_secret_key`     | `sk_test_…`                                                                                                                             |
-| `stripe_webhook_secret` | `whsec_…`                                                                                                                               |
-| `plans` | Put the $333 lifetime `price_…` id in `lifetime`. That's the only plan. |
-| `product_links`         | The real Google Classroom links and Notion "duplicate" links for each product (Avelynn has these). They show only in buyers' libraries. |
-| `mail_from`, `smtp_*`   | The mailbox from step 7: host `smtp.hostinger.com`, port `465`, its address and password                                                |
-| `admins`                | Avelynn's email, plus yours if you want dashboard access. Only these emails can see the dashboard.                                      |
-
-Check: `https://test.magickmuse.com/manuscript/` now shows the "Members only" page. If it shows a "Setup problem" message instead, the data folder is inside `public_html`; fix `data_dir`.
-
-## 9. Import from Notion
-
-*Where: hPanel → Advanced → SSH Access, then connect with the details shown there*
-
-    cd TEST_FOLDER        # e.g. cd ~/domains/magickmuse.com/public_html/test
-    php manuscript/cli/import.php begin-here correspondence
-
-It prints progress as it goes. Notion only allows about 3 requests a second, so expect roughly **1–2 minutes per 100 entries** the first time. If it stops (closed laptop, dropped connection), just run the same command again; it carries on and skips what's already done.
-
-To bring in more grimoires, add each one to `grimoires` in the settings (its id is the 32-character code at the end of its Notion address) and run `php manuscript/cli/import.php` with its name.
-
-*No SSH on the plan?* hPanel → Advanced → Cron Jobs → a custom job running `php TEST_FOLDER/manuscript/cli/import.php` once, a few minutes from now. It's safe for it to overlap with itself, because a second copy exits straight away.
-
-## 10. Try everything
+## 6. Try everything
 
 Stripe test card: `4242 4242 4242 4242`, any future date, any CVC and postcode. Tick each one as it works:
 
 - [ ] Signed out, `/manuscript/`, a grimoire, an entry and search all show only "Members only". No text, titles or images.
 - [ ] Avelynn signs in at `/manuscript/login` with her admin email, the link arrives, and `/manuscript/dashboard` opens.
-- [ ] With another email, `/manuscript/join` → Lifetime → test card → back on the site, signed in, entries readable, cross-links ("Connections") work.
+- [ ] With another email, `/manuscript/join` → Lifetime $333 → test card → back on the site, signed in, entries readable, "Connections" links work.
 - [ ] That sale appears on the dashboard.
 - [ ] `/manuscript/join?code=SEEKER10` shows "Code SEEKER10 will be applied" and Stripe shows 10% off.
-- [ ] `/shop/witchcraft-101` → buy → it appears in `/shop/library` with its course link.
+- [ ] `/shop/witchcraft-101` → buy → it appears in `/shop/library` with the Google Classroom link.
 - [ ] `/shop/crystal-grimoire` → enter an email → the email arrives with a library link, and the address shows under Dashboard → Email sign-ups.
 - [ ] Refund the Witchcraft 101 test payment in Stripe → it disappears from that buyer's library and shows as refunded on the dashboard.
 - [ ] Search as a member: typing "prot" suggests Protection. Results can be filtered by grimoire.
-- [ ] Optional: Gumroad export → `php manuscript/cli/gumroad-import.php sales.csv --dry-run` lists every product it recognised.
 
-If something fails: the error log is in hPanel → Advanced → Error Logs (lines start with `[manuscript]`), and Stripe shows each webhook delivery and its response under Developers → Webhooks.
+If something fails on the site itself: hPanel → Advanced → Error Logs (lines start with `[manuscript]`). Stripe shows each webhook delivery under Developers → Webhooks.
 
-## 11. Updating & going live
+## 7. Going live later
 
-### Getting new changes onto the test site
-
-hPanel → Advanced → Git → **Deploy** (or turn on auto-deploy). Settings and data are untouched.
-
-### Going live, once everything above works
-
-1.  Merge `manuscript-wiki` into `main` and deploy magickmuse.com as usual. The site's buttons switch from Gumroad to `/manuscript/join` and `/shop` at that moment, so do the next steps straight away.
-2.  Put a settings file at `public_html/manuscript/config.local.php` for the real site: `https://magickmuse.com` addresses, its own `data_dir` (e.g. `…/manuscript-data`), a new `app_secret`, and Stripe **live** keys, live price ids and a live webhook pointing at `https://magickmuse.com/manuscript/stripe-webhook`. Recreate SEEKER10 in live mode.
-3.  Run the import for the real site, then the Gumroad import (README step 4), so existing buyers keep their access.
-4.  Add a weekly Cron Job running the importer, so new Notion pages appear on the wiki.
-5.  Delete the test subdomain, its Git deployment, and `manuscript-data-test`.
-
-Questions about the code: it's all in `manuscript/` on the branch, with comments.
+Once the test site passes everything above, the real site works the same way with its own secrets (`FTP_LIVE_DIR`, `FTP_LIVE_DATA_DIR`, `MANUSCRIPT_CONFIG_LIVE` with Stripe **live** keys and a live webhook to `https://magickmuse.com/manuscript/stripe-webhook`). Merging into `main` switches the site's buttons from Gumroad to the new shop, so the live upload, the import and the Gumroad customer import (README step 4) all need to happen together. Ask Claude to set up the live version when you're ready.

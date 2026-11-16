@@ -1,0 +1,10 @@
+# Changing this file and saving it to the manuscript-wiki branch starts an import from Notion
+# for the test site (see the "Import from Notion" workflow in GitHub's Actions tab).
+#
+# One word per line:
+#   all             every grimoire listed in manuscript/grimoires.php
+#   correspondence  just that grimoire (use the names from grimoires.php)
+#   prune           also remove pages that were deleted in Notion
+#
+# Run 1
+all

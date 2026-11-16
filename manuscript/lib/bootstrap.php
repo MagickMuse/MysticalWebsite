@@ -22,8 +22,14 @@ function config(?string $key = null, $default = null)
             http_response_code(500);
             exit("The Manuscript is not configured yet. Copy manuscript/config.sample.php (see manuscript/README.md).\n");
         }
+        // Written by the GitHub upload: where the private data folder is, relative to this app.
+        if (is_file(MM_ROOT . '/deploy.local.php')) $cfg = array_merge($cfg, (array) require MM_ROOT . '/deploy.local.php');
+        // The Manuscript's grimoires: manuscript/grimoires.php, unless the config lists its own.
+        if (empty($cfg['grimoires']) && is_file(MM_ROOT . '/grimoires.php')) $cfg['grimoires'] = require MM_ROOT . '/grimoires.php';
         $cfg['base_url'] = rtrim($cfg['base_url'] ?? '', '/');
-        $cfg['data_dir'] = rtrim($cfg['data_dir'] ?? (dirname(MM_ROOT, 2) . '/manuscript-data'), '/');
+        $cfg['data_dir'] = rtrim(getenv('MM_DATA_DIR') ?: ($cfg['data_dir'] ?? (dirname(MM_ROOT, 2) . '/manuscript-data')), '/');
+        // A relative data_dir is relative to the manuscript/ folder, e.g. '../../../manuscript-data-test'.
+        if ($cfg['data_dir'] !== '' && $cfg['data_dir'][0] !== '/') $cfg['data_dir'] = MM_ROOT . '/' . $cfg['data_dir'];
         // Safety: the database and paid images must never sit inside the public website folder.
         $web = realpath((string) ($_SERVER['DOCUMENT_ROOT'] ?? '')) ?: '';
         $dataParent = realpath(dirname($cfg['data_dir'])) ?: dirname($cfg['data_dir']);
@@ -39,17 +45,27 @@ function config(?string $key = null, $default = null)
     return $key === null ? $cfg : ($cfg[$key] ?? $default);
 }
 
+/*
+ * Two database files in data_dir:
+ *   content.sqlite  the Manuscript itself (pages, cross-links, search). Built by the Notion importer,
+ *                   which can run on GitHub and upload the finished file, so it is replaced as a whole.
+ *   site.sqlite     members, sales, sign-in links. Only ever written by the live site, never replaced.
+ * Queries don't need to say which file a table is in; SQLite finds it.
+ */
 function db(): PDO
 {
     static $pdo = null;
     if ($pdo) return $pdo;
     $dir = config('data_dir');
     if (!is_dir($dir)) mkdir($dir, 0750, true);
-    $pdo = new PDO('sqlite:' . $dir . '/manuscript.sqlite', null, null, [
+    $pdo = new PDO('sqlite:' . $dir . '/site.sqlite', null, null, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
     $pdo->exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;');
+    $pdo->prepare('ATTACH DATABASE ? AS content')->execute([$dir . '/content.sqlite']);
+    // The content file is uploaded as one piece, so it must not use a separate write-ahead log.
+    $pdo->exec('PRAGMA content.journal_mode = DELETE;');
     migrate($pdo);
     return $pdo;
 }
@@ -57,7 +73,7 @@ function db(): PDO
 function migrate(PDO $pdo): void
 {
     $pdo->exec(<<<SQL
-    CREATE TABLE IF NOT EXISTS pages (
+    CREATE TABLE IF NOT EXISTS content.pages (
         id          TEXT PRIMARY KEY,           -- Notion id, 32 hex chars, no dashes
         slug        TEXT NOT NULL,
         grimoire    TEXT NOT NULL,              -- grimoire slug from config
@@ -75,19 +91,19 @@ function migrate(PDO $pdo): void
         imported_at TEXT,
         UNIQUE (grimoire, slug)
     );
-    CREATE INDEX IF NOT EXISTS pages_parent ON pages(parent_id);
-    CREATE INDEX IF NOT EXISTS pages_kind ON pages(grimoire, kind);
+    CREATE INDEX IF NOT EXISTS content.pages_parent ON pages(parent_id);
+    CREATE INDEX IF NOT EXISTS content.pages_kind ON pages(grimoire, kind);
 
-    CREATE TABLE IF NOT EXISTS relations (
+    CREATE TABLE IF NOT EXISTS content.relations (
         from_id TEXT NOT NULL,
         prop    TEXT NOT NULL,                  -- property name, e.g. "Plants"
         to_id   TEXT NOT NULL,
         sort    INTEGER DEFAULT 0,
         PRIMARY KEY (from_id, prop, to_id)
     );
-    CREATE INDEX IF NOT EXISTS relations_to ON relations(to_id);
+    CREATE INDEX IF NOT EXISTS content.relations_to ON relations(to_id);
 
-    CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5(id UNINDEXED, title, aka, plain, tokenize = 'porter unicode61 remove_diacritics 2');
+    CREATE VIRTUAL TABLE IF NOT EXISTS content.search USING fts5(id UNINDEXED, title, aka, plain, tokenize = 'porter unicode61 remove_diacritics 2');
 
     CREATE TABLE IF NOT EXISTS members (
         email        TEXT PRIMARY KEY,

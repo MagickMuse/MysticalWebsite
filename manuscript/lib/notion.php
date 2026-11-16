@@ -9,8 +9,16 @@ declare(strict_types=1);
  * its relations kept, so cross-links (Protection → Hekate → Rosemary…) survive the move.
  * Re-running only re-downloads pages edited in Notion since the last run.
  */
+/** Thrown when the importer's time budget runs out; everything saved so far stays, and the next run continues. */
+final class ImportPaused extends RuntimeException {}
+
 final class NotionImporter
 {
+    private ?float $deadline = null;
+
+    /** Stop cleanly after this many minutes (GitHub ends any job after 6 hours). */
+    public function setTimeLimit(?int $minutes): void { $this->deadline = $minutes ? microtime(true) + $minutes * 60 : null; }
+
     private string $api;
     private string $token;
     private float $lastCall = 0;
@@ -109,6 +117,7 @@ final class NotionImporter
     /** Imports a Notion page (landing page, guide page, or database row). */
     private function importPage(array $page, string $kind, ?string $parentId, int $sort, ?string $forceSlug = null): void
     {
+        if ($this->deadline !== null && microtime(true) > $this->deadline) throw new ImportPaused('time limit reached');
         $id = normalize_id($page['id']);
         $this->seen[$id] = true;
         $title = $this->pageTitle($page);
@@ -157,6 +166,8 @@ final class NotionImporter
                 } else {
                     $this->importDatabase($childId, $id, $i);
                 }
+            } catch (ImportPaused $ex) {
+                throw $ex;
             } catch (Throwable $ex) {
                 $this->stats['errors']++;
                 ($this->log)('  ! ' . $ex->getMessage());
@@ -175,6 +186,8 @@ final class NotionImporter
                 } else {
                     $this->importDatabase($child['id'], $id, (int) $child['sort']);
                 }
+            } catch (ImportPaused $ex) {
+                throw $ex;
             } catch (Throwable $ex) {
                 $this->stats['errors']++;
                 ($this->log)('  ! ' . $ex->getMessage());
@@ -204,6 +217,8 @@ final class NotionImporter
         foreach ($this->paginate('POST', "/databases/$dbId/query", ['sorts' => [['timestamp' => 'created_time', 'direction' => 'ascending']]]) as $row) {
             try {
                 $this->importPage($row, 'entry', $dbId, $n++);
+            } catch (ImportPaused $ex) {
+                throw $ex;
             } catch (Throwable $ex) {
                 $this->stats['errors']++;
                 ($this->log)('  ! ' . $ex->getMessage());
