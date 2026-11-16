@@ -141,6 +141,14 @@ function view_page(array $p): void
 {
     $access = has_access() || is_public_page($p);
     if (!$access) { view_gate($p); return; }
+    // "Show more" on a grimoire page's list: answer with just the next entries.
+    if (!empty($_GET['part']) && $p['kind'] === 'grimoire') {
+        [$g, $several] = grimoire_lists($p['grimoire']);
+        $st = db()->prepare("SELECT * FROM pages WHERE grimoire = ? AND kind = 'collection'");
+        $st->execute([$p['grimoire']]);
+        foreach ($st->fetchAll() as $c) if (collection_part(collection_view($c, page_url($g), $several ? $c['slug'] : ''))) return;
+        http_response_code(404); return;
+    }
     record_view($p['id']);
     if ($p['kind'] === 'collection') { view_collection($p); return; }
     $crumbs = $p['kind'] === 'grimoire' ? '' : breadcrumbs($p);
@@ -161,9 +169,7 @@ function view_page(array $p): void
     $cover = $photo ? '<div class="pg-cover arch-banner"><img src="' . e($photo) . '" alt="" width="1600" height="640"></div>' : '';
     if (!$photo) $cover = $p['cover'] ? '<div class="pg-cover"><img src="' . e(media_url($p['cover'])) . '" alt=""></div>' : '';
 
-    if ($p['kind'] === 'collection') {
-        $body = ($p['plain'] ? '<p class="lede">' . e($p['plain']) . '</p>' : '') . entry_list(entries_of($p['id']), true);
-    } else {
+    {
         $gallery = '';
         if ($images) {
             $gallery = '<div class="gallery">' . implode('', array_map(fn($f) => '<figure><img src="' . e(media_url($f)) . '" alt="' . e($p['title']) . '" loading="lazy"></figure>', $images)) . '</div>';
@@ -177,6 +183,11 @@ function view_page(array $p): void
                 return mb_strtolower(preg_replace('/^the\s+/i', '', trim(html_entity_decode(strip_tags($m[2]))))) === $name ? '' : $m[0];
             }, $bodyHtml, 1);
         }
+        // In intro boxes, "Label:" written in bold becomes a label line, with any text after it as its own paragraph.
+        $bodyHtml = preg_replace_callback('~<aside class="mm-callout[^"]*">.*?</aside>~s', fn($box) => preg_replace_callback(
+            '~<p><strong>([^<]{2,80}:)</strong>\s*(.*?)</p>~s',
+            fn($m) => '<p class="label">' . $m[1] . '</p>' . (trim(strip_tags($m[2])) !== '' ? '<p>' . $m[2] . '</p>' : ''),
+            $box[0]), $bodyHtml);
         $body = $panel . $gallery . '<div class="mm-prose">' . $bodyHtml . '</div>';
     }
     layout($p['title'], '<article class="pg pg-' . e($p['kind']) . '">' . $cover . $head . $body . '</article>', ['private' => true, 'protect' => true]);

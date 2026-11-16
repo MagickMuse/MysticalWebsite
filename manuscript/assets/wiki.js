@@ -210,4 +210,12 @@
       })
       .catch(function () { location.href = btn.href; });
   });
+
+  // Sort & filter drop-down: close on a click outside it or on Escape
+  document.addEventListener('click', function (e) {
+    document.querySelectorAll('.col-filter[open]').forEach(function (d) { if (!d.contains(e.target)) d.open = false; });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') document.querySelectorAll('.col-filter[open]').forEach(function (d) { d.open = false; d.querySelector('summary').focus(); });
+  });
 })();

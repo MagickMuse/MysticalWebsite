@@ -2,11 +2,13 @@
 declare(strict_types=1);
 
 /*
- * A grimoire's list of entries, with Notion-style views:
- * filter by any property (Type, Element…), group by a property, sort (A–Z, most connected,
- * most read, recently updated), jump by letter, search within the grimoire, and "only my saved".
- * Everything is in the address (?type=Concept&sort=connected…), so views can be bookmarked and
- * work without JavaScript. The list shows 120 entries at a time.
+ * A grimoire's list of entries, shown right on the grimoire page, with Notion-style views:
+ * filter by any shared property (Type, Element…), group by it, sort (A–Z, most connected, most
+ * read, recently updated), jump by letter, search within the grimoire, and "only my saved".
+ * The controls sit behind one "Sort & filter" button. The view lives in the address, so it can
+ * be bookmarked and works without JavaScript. 120 entries show at a time, with "Show more".
+ * When a grimoire has several databases (e.g. Tarot, Lenormand, Playing cards), each list has
+ * its own view, told apart by ?list=<database>.
  */
 
 const COLLECTION_PAGE = 120;
@@ -49,9 +51,15 @@ function collection_facets(array $entries): array
 
 function facet_param(string $prop): string { return 'f_' . slugify($prop); }
 
-/** The current view, read from the address. */
-function collection_state(array $facets): array
+function default_state(): array
 {
+    return ['filters' => [], 'sort' => 'az', 'group' => '', 'letter' => '', 'q' => '', 'saved' => false, 'page' => 1];
+}
+
+/** The view from the address, if it is meant for this list. */
+function collection_state(array $facets, bool $mine): array
+{
+    if (!$mine) return default_state();
     $filters = [];
     foreach ($facets as $prop => $counts) {
         $v = (string) ($_GET[facet_param($prop)] ?? '');
@@ -71,19 +79,9 @@ function collection_state(array $facets): array
     ];
 }
 
-/** Builds a link to this collection with some of the view changed. */
-function collection_link(array $c, array $facets, array $state, array $change): string
+function is_default_view(array $s): bool
 {
-    $s = array_merge($state, $change);
-    $q = [];
-    foreach ($s['filters'] as $prop => $v) $q[facet_param($prop)] = $v;
-    if ($s['sort'] !== 'az') $q['sort'] = $s['sort'];
-    if ($s['group'] !== '') $q['group'] = $s['group'];
-    if ($s['letter'] !== '') $q['letter'] = $s['letter'];
-    if ($s['q'] !== '') $q['q'] = $s['q'];
-    if ($s['saved']) $q['saved'] = 1;
-    if (($s['page'] ?? 1) > 1) $q['page'] = $s['page'];
-    return page_url($c) . ($q ? '?' . http_build_query($q) : '');
+    return !$s['filters'] && $s['sort'] === 'az' && $s['group'] === '' && $s['letter'] === '' && $s['q'] === '' && !$s['saved'];
 }
 
 function first_letter(string $title): string
@@ -92,13 +90,17 @@ function first_letter(string $title): string
     return preg_match('/[A-Z]/', $l) ? $l : '#';
 }
 
-function view_collection(array $c): void
+/**
+ * One list, ready to show. $base is the page it sits on (the grimoire page);
+ * $listKey tells this list's view apart when the page has more than one ('' when it has one).
+ */
+function collection_view(array $c, string $base, string $listKey): array
 {
     $all = collection_entries($c['id']);
     $facets = collection_facets($all);
-    $state = collection_state($facets);
+    $mine = $listKey === '' || ($_GET['list'] ?? '') === $listKey;
+    $state = collection_state($facets, $mine);
 
-    // Filter
     $saved = [];
     if ($state['saved']) {
         $st = db()->prepare('SELECT page_id FROM bookmarks WHERE email = ?');
@@ -115,17 +117,16 @@ function view_collection(array $c): void
     $lettersPresent = array_count_values(array_map(fn($e) => first_letter($e['title']), $rows));
     if ($state['letter'] !== '') $rows = array_values(array_filter($rows, fn($e) => first_letter($e['title']) === $state['letter']));
 
-    // Sort
     $metric = [];
     if (in_array($state['sort'], ['connected', 'popular'], true) && $rows) {
-        $ids = array_column($rows, 'id');
-        foreach (array_chunk($ids, 500) as $chunk) {
-            $in = implode(',', array_fill(0, count($chunk), '?'));
-            $sql = $state['sort'] === 'connected'
-                ? "SELECT id, (SELECT COUNT(*) FROM relations WHERE from_id = id) + (SELECT COUNT(*) FROM relations WHERE to_id = id) n FROM (SELECT value AS id FROM json_each(?))"
-                : "SELECT page_id AS id, SUM(views) n FROM page_views WHERE page_id IN ($in) GROUP BY page_id";
-            $st = db()->prepare($sql);
-            $st->execute($state['sort'] === 'connected' ? [json_encode($chunk)] : $chunk);
+        foreach (array_chunk(array_column($rows, 'id'), 500) as $chunk) {
+            if ($state['sort'] === 'connected') {
+                $st = db()->prepare("SELECT value AS id, (SELECT COUNT(*) FROM relations WHERE from_id = value) + (SELECT COUNT(*) FROM relations WHERE to_id = value) AS n FROM json_each(?)");
+                $st->execute([json_encode($chunk)]);
+            } else {
+                $st = db()->prepare('SELECT page_id AS id, SUM(views) AS n FROM page_views WHERE page_id IN (' . implode(',', array_fill(0, count($chunk), '?')) . ') GROUP BY page_id');
+                $st->execute($chunk);
+            }
             foreach ($st->fetchAll() as $m) $metric[$m['id']] = (int) $m['n'];
         }
     }
@@ -135,92 +136,130 @@ function view_collection(array $c): void
         'connected', 'popular' => fn($a, $b) => (($metric[$b['id']] ?? 0) <=> ($metric[$a['id']] ?? 0)) ?: strnatcasecmp($a['title'], $b['title']),
         default => fn($a, $b) => strnatcasecmp($a['title'], $b['title']),
     });
+    return compact('c', 'base', 'listKey', 'all', 'facets', 'state', 'rows', 'lettersPresent', 'metric');
+}
 
-    $link = fn(array $change) => collection_link($c, $facets, $state, $change + ['page' => 1]);
+/** Address of this list with some of the view changed. */
+function view_link(array $v, array $change): string
+{
+    $s = array_merge($v['state'], $change);
+    $q = [];
+    if ($v['listKey'] !== '') $q['list'] = $v['listKey'];
+    foreach ($s['filters'] as $prop => $val) $q[facet_param($prop)] = $val;
+    if ($s['sort'] !== 'az') $q['sort'] = $s['sort'];
+    if ($s['group'] !== '') $q['group'] = $s['group'];
+    if ($s['letter'] !== '') $q['letter'] = $s['letter'];
+    if ($s['q'] !== '') $q['q'] = $s['q'];
+    if ($s['saved']) $q['saved'] = 1;
+    if (($s['page'] ?? 1) > 1) $q['page'] = $s['page'];
+    $anchor = '#list-' . $v['c']['slug'];
+    return $v['base'] . ($q ? '?' . http_build_query($q) : '') . (array_diff_key($q, ['list' => 1]) ? $anchor : '');
+}
 
-    // "Show more": the next 120 only (for the script to append), or a normal page without it.
+/** "Show more": just the next entries, for the page's script to append. Returns true if it answered. */
+function collection_part(array $v): bool
+{
+    if (empty($_GET['part']) || ($v['listKey'] !== '' && ($_GET['list'] ?? '') !== $v['listKey'])) return false;
+    header('Content-Type: text/html; charset=utf-8');
+    $offset = ($v['state']['page'] - 1) * COLLECTION_PAGE;
+    echo collection_items(array_slice($v['rows'], $offset, COLLECTION_PAGE), $v['state']['sort'], $v['metric']);
+    // The next batch's address, without the #anchor, so "&part=1" can be added to it.
+    if ($offset + COLLECTION_PAGE < count($v['rows'])) echo '<li class="more-row" data-next="' . e(preg_replace('/#.*$/', '', view_link($v, ['page' => $v['state']['page'] + 1]))) . '"></li>';
+    return true;
+}
+
+/** The whole list block: heading, one "Sort & filter" button with the controls folded inside, the entries. */
+function collection_html(array $v, bool $withHeading): string
+{
+    ['c' => $c, 'state' => $state, 'facets' => $facets, 'rows' => $rows, 'all' => $all, 'metric' => $metric] = $v;
+    $link = fn(array $change) => view_link($v, $change + ['page' => 1]);
     $total = count($rows);
-    $offset = ($state['page'] - 1) * COLLECTION_PAGE;
-    if (!empty($_GET['part'])) {
-        header('Content-Type: text/html; charset=utf-8');
-        echo collection_items(array_slice($rows, $offset, COLLECTION_PAGE), $state['sort'], $metric);
-        $next = $offset + COLLECTION_PAGE < $total ? collection_link($c, $facets, $state, ['page' => $state['page'] + 1]) : '';
-        echo $next ? '<li class="more-row" data-next="' . e($next) . '"></li>' : '';
-        return;
-    }
 
-    // Toolbar: search, sort, group, saved
-    $hidden = '';
-    foreach ($state['filters'] as $prop => $v) $hidden .= '<input type="hidden" name="' . e(facet_param($prop)) . '" value="' . e($v) . '">';
+    // Folded controls: search, sort, group, saved; then filters; then letters.
+    $hidden = $v['listKey'] !== '' ? '<input type="hidden" name="list" value="' . e($v['listKey']) . '">' : '';
+    foreach ($state['filters'] as $prop => $val) $hidden .= '<input type="hidden" name="' . e(facet_param($prop)) . '" value="' . e($val) . '">';
     if ($state['letter'] !== '') $hidden .= '<input type="hidden" name="letter" value="' . e($state['letter']) . '">';
-    $sortOpts = ['az' => 'A–Z', 'za' => 'Z–A', 'connected' => 'Most connected', 'popular' => 'Most read', 'updated' => 'Recently updated'];
-    $sortSel = '<label class="tool"><span>Sort</span><select name="sort" data-autosubmit>';
-    foreach ($sortOpts as $k => $label) $sortSel .= '<option value="' . $k . '"' . ($state['sort'] === $k ? ' selected' : '') . '>' . $label . '</option>';
-    $sortSel .= '</select></label>';
-    $groupSel = '';
-    if ($facets) {
-        $groupSel = '<label class="tool"><span>Group</span><select name="group" data-autosubmit><option value="">None</option>';
-        foreach (array_keys($facets) as $prop) $groupSel .= '<option value="' . e($prop) . '"' . ($state['group'] === $prop ? ' selected' : '') . '>By ' . e($prop) . '</option>';
-        $groupSel .= '</select></label>';
-    }
-    $savedBox = current_email() ? '<label class="tool check"><input type="checkbox" name="saved" value="1" data-autosubmit' . ($state['saved'] ? ' checked' : '') . '> Only my saved</label>' : '';
-    $toolbar = '<form class="col-tools" method="get" action="' . e(page_url($c)) . '">' . $hidden
+    $sel = function (string $name, array $opts, string $cur) {
+        $h = '<select name="' . $name . '" data-autosubmit>';
+        foreach ($opts as $k => $label) $h .= '<option value="' . e((string) $k) . '"' . ((string) $k === $cur ? ' selected' : '') . '>' . e($label) . '</option>';
+        return $h . '</select>';
+    };
+    $tools = '<form class="col-tools" method="get" action="' . e($v['base']) . '#list-' . e($c['slug']) . '">' . $hidden
         . '<label class="tool search"><span class="sr-only">Search ' . e($c['title']) . '</span><input type="search" name="q" value="' . e($state['q']) . '" placeholder="Search ' . e(mb_strtolower($c['title'])) . '…"></label>'
-        . $sortSel . $groupSel . $savedBox . '<noscript><button class="btn ghost" type="submit">Apply</button></noscript></form>';
-
-    // Filter chips, one row per property
+        . '<label class="tool"><span>Sort</span>' . $sel('sort', ['az' => 'A–Z', 'za' => 'Z–A', 'connected' => 'Most connected', 'popular' => 'Most read', 'updated' => 'Recently updated'], $state['sort']) . '</label>'
+        . ($facets ? '<label class="tool"><span>Group</span>' . $sel('group', ['' => 'None'] + array_combine(array_keys($facets), array_map(fn($p) => 'By ' . $p, array_keys($facets))), $state['group']) . '</label>' : '')
+        . (current_email() ? '<label class="tool check"><input type="checkbox" name="saved" value="1" data-autosubmit' . ($state['saved'] ? ' checked' : '') . '> Only my saved</label>' : '')
+        . '<noscript><button class="btn ghost" type="submit">Apply</button></noscript></form>';
     $chips = '';
     foreach ($facets as $prop => $counts) {
         $cur = $state['filters'][$prop] ?? '';
         $chips .= '<div class="facet"><span class="facet-name">' . e($prop) . '</span><div class="facet-vals">'
             . '<a class="fchip' . ($cur === '' ? ' on' : '') . '" href="' . e($link(['filters' => array_diff_key($state['filters'], [$prop => 1])])) . '">All</a>';
-        foreach ($counts as $v => $n) {
-            $f = $state['filters']; $f[$prop] = $v;
-            $chips .= '<a class="fchip ' . pill_class($v) . ($cur === $v ? ' on' : '') . '" href="' . e($link(['filters' => $f])) . '">' . e($v) . ' <small>' . $n . '</small></a>';
+        foreach ($counts as $val => $n) {
+            $f = $state['filters']; $f[$prop] = $val;
+            $chips .= '<a class="fchip ' . pill_class($val) . ($cur === $val ? ' on' : '') . '" href="' . e($link(['filters' => $f])) . '">' . e($val) . ' <small>' . $n . '</small></a>';
         }
         $chips .= '</div></div>';
     }
-
-    // Letter bar
     $letters = '<nav class="letters" aria-label="Jump to letter"><a href="' . e($link(['letter' => ''])) . '"' . ($state['letter'] === '' ? ' aria-current="true"' : '') . '>All</a>';
     foreach (array_merge(range('A', 'Z'), ['#']) as $L) {
-        $letters .= isset($lettersPresent[$L])
+        $letters .= isset($v['lettersPresent'][$L])
             ? '<a href="' . e($link(['letter' => $L])) . '"' . ($state['letter'] === $L ? ' aria-current="true"' : '') . '>' . $L . '</a>'
             : '<span>' . $L . '</span>';
     }
     $letters .= '</nav>';
 
-    $summary = '<p class="col-count">' . number_format($total) . ' of ' . number_format(count($all)) . ' ' . (count($all) === 1 ? 'entry' : 'entries')
-        . (($state['filters'] || $state['q'] !== '' || $state['letter'] !== '' || $state['saved']) ? ' · <a href="' . e(page_url($c)) . '">Clear</a>' : '') . '</p>';
+    // What's applied, as small removable tags beside the button.
+    $active = '';
+    foreach ($state['filters'] as $prop => $val) $active .= '<a class="atag ' . pill_class($val) . '" href="' . e($link(['filters' => array_diff_key($state['filters'], [$prop => 1])])) . '" title="Remove">' . e($val) . ' <span aria-hidden="true">×</span></a>';
+    $labels = ['za' => 'Z–A', 'connected' => 'Most connected', 'popular' => 'Most read', 'updated' => 'Recently updated'];
+    if ($state['sort'] !== 'az') $active .= '<a class="atag" href="' . e($link(['sort' => 'az'])) . '">' . $labels[$state['sort']] . ' <span aria-hidden="true">×</span></a>';
+    if ($state['group'] !== '') $active .= '<a class="atag" href="' . e($link(['group' => ''])) . '">By ' . e($state['group']) . ' <span aria-hidden="true">×</span></a>';
+    if ($state['letter'] !== '') $active .= '<a class="atag" href="' . e($link(['letter' => ''])) . '">' . e($state['letter']) . ' <span aria-hidden="true">×</span></a>';
+    if ($state['q'] !== '') $active .= '<a class="atag" href="' . e($link(['q' => ''])) . '">“' . e($state['q']) . '” <span aria-hidden="true">×</span></a>';
+    if ($state['saved']) $active .= '<a class="atag" href="' . e($link(['saved' => false])) . '">My saved <span aria-hidden="true">×</span></a>';
 
-    // The list: grouped, or one list with Show more
+    $count = number_format($total) . ($total === count($all) ? '' : ' of ' . number_format(count($all))) . ' ' . (count($all) === 1 ? 'entry' : 'entries');
+    $bar = '<div class="col-bar"><details class="col-filter"' . (is_default_view($state) ? '' : '') . '><summary><span class="sf-icon" aria-hidden="true">⇅</span> Sort &amp; filter</summary>'
+        . '<div class="col-views">' . $tools . ($chips ? '<div class="facets">' . $chips . '</div>' : '') . $letters . '</div></details>'
+        . ($active ? '<div class="atags">' . $active . '</div>' : '') . '<p class="col-count">' . $count . '</p></div>';
+
+    // Entries: grouped, or one list with "Show more".
     if ($state['group'] !== '') {
         $groups = [];
-        foreach ($rows as $r) {
-            $vals = $r['tags'][$state['group']] ?? [];
-            foreach ($vals ?: ['No ' . $state['group']] as $v) $groups[$v][] = $r;
-        }
+        foreach ($rows as $r) foreach (($r['tags'][$state['group']] ?? []) ?: ['No ' . $state['group']] as $val) $groups[$val][] = $r;
         uksort($groups, fn($a, $b) => (str_starts_with($a, 'No ') <=> str_starts_with($b, 'No ')) ?: strnatcasecmp($a, $b));
         $list = '';
-        foreach ($groups as $v => $items) {
-            $f = $state['filters']; $f[$state['group']] = $v;
-            $more = count($items) > GROUP_PREVIEW && !str_starts_with($v, 'No ')
+        foreach ($groups as $val => $items) {
+            $f = $state['filters']; $f[$state['group']] = $val;
+            $more = count($items) > GROUP_PREVIEW && !str_starts_with($val, 'No ')
                 ? '<a class="link" href="' . e($link(['filters' => $f, 'group' => ''])) . '">Show all ' . count($items) . '</a>' : '';
-            $list .= '<section class="col-group"><h2><span class="' . pill_class($v) . '">' . e($v) . '</span> <small>' . count($items) . '</small></h2>'
+            $list .= '<section class="col-group"><h3><span class="' . pill_class($val) . '">' . e($val) . '</span> <small>' . count($items) . '</small></h3>'
                 . '<ul class="entry-grid">' . collection_items(array_slice($items, 0, GROUP_PREVIEW), $state['sort'], $metric) . '</ul>' . $more . '</section>';
         }
     } else {
-        $next = $offset + COLLECTION_PAGE < $total ? collection_link($c, $facets, $state, ['page' => $state['page'] + 1]) : '';
-        $list = '<ul class="entry-grid" data-col-list>' . collection_items(array_slice($rows, $offset, COLLECTION_PAGE), $state['sort'], $metric) . '</ul>'
-            . ($next ? '<p class="col-more"><a class="btn ghost" href="' . e($next) . '" data-more-list="' . e($next . (str_contains($next, '?') ? '&' : '?') . 'part=1') . '">Show more</a></p>' : '');
+        $offset = 0;
+        $list = '<ul class="entry-grid" data-col-list>' . collection_items(array_slice($rows, 0, COLLECTION_PAGE * $state['page']), $state['sort'], $metric) . '</ul>';
+        if (COLLECTION_PAGE * $state['page'] < $total) {
+            $next = view_link($v, ['page' => $state['page'] + 1]);
+            $part = preg_replace('/#.*$/', '', $next);
+            $list .= '<p class="col-more"><a class="btn ghost" href="' . e($next) . '" data-more-list="' . e($part . (str_contains($part, '?') ? '&' : '?') . 'part=1') . '">Show more</a></p>';
+        }
     }
-    if (!$rows) $list = '<p class="lede">No entries match. <a href="' . e(page_url($c)) . '">Clear the filters</a>.</p>';
+    if (!$rows) $list = '<p class="lede">No entries match. <a href="' . e($link(['filters' => [], 'letter' => '', 'q' => '', 'saved' => false])) . '">Clear the filters</a>.</p>';
 
-    $intro = $c['plain'] ? '<p class="lede">' . e($c['plain']) . '</p>' : '';
+    $heading = $withHeading
+        ? '<div class="collection-head"><h2>' . icon_html($c['icon']) . e($c['title']) . '</h2></div>' : '';
+    return '<section class="collection" id="list-' . e($c['slug']) . '">' . $heading . $bar . $list . '</section>';
+}
+
+/** The database's own address (from old links or bookmarks): show the same list on its own. */
+function view_collection(array $c): void
+{
+    $v = collection_view($c, page_url($c), '');
+    if (collection_part($v)) return;
     $html = '<article class="pg pg-collection">' . breadcrumbs($c) . '<header class="pg-head"><p class="eyebrow">' . e(grimoire_root($c['grimoire'])['title'] ?? '') . '</p>'
-        . '<h1>' . icon_html($c['icon'], 'pg-icon big') . e($c['title']) . '</h1>' . $intro . '</header>'
-        . '<div class="col-views">' . $toolbar . ($chips ? '<div class="facets">' . $chips . '</div>' : '') . $letters . $summary . '</div>'
-        . $list . '</article>';
+        . '<h1>' . icon_html($c['icon'], 'pg-icon big') . e($c['title']) . '</h1></header>' . collection_html($v, false) . '</article>';
     layout($c['title'], $html, ['private' => true, 'protect' => true]);
 }
 

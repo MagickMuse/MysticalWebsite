@@ -124,14 +124,18 @@ function collection_block(string $id, int $limit): string
 {
     $c = page_by_id($id);
     if (!$c) return '';
-    $total = count_entries($id);
-    $html = '<section class="collection"><div class="collection-head"><h2>' . icon_html($c['icon']) . e($c['title']) . '</h2>'
-        . '<p class="count">' . number_format($total) . ' ' . ($total === 1 ? 'entry' : 'entries') . '</p></div>';
-    $html .= entry_list(entries_of($id, $limit), false);
-    if ($total > $limit) {
-        $html .= '<p><a class="link" href="' . e(page_url($c)) . '">Browse all ' . number_format($total) . '</a></p>';
-    }
-    return $html . '</section>';
+    // The full list with its "Sort & filter" lives right on the grimoire page.
+    [$g, $several] = grimoire_lists($c['grimoire']);
+    $v = collection_view($c, page_url($g), $several ? $c['slug'] : '');
+    return collection_html($v, $several);
+}
+
+/** The grimoire's landing page, and whether it holds more than one list. */
+function grimoire_lists(string $grimoire): array
+{
+    $st = db()->prepare("SELECT COUNT(*) FROM pages WHERE grimoire = ? AND kind = 'collection'");
+    $st->execute([$grimoire]);
+    return [grimoire_root($grimoire), (int) $st->fetchColumn() > 1];
 }
 
 /** Relations from this page, grouped by property, plus pages that point back here. */
@@ -215,10 +219,10 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=13">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=17">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=13" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=17" defer></script>
 </head>
 <body class="mm<?= !empty($opt['protect']) && !is_admin() ? ' no-copy' : '' ?>">
 <a class="skip" href="#main">Skip to main content</a>

@@ -432,8 +432,39 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .mm-callout { color: var(--ink); }
 .pg-grimoire .mm-callout { padding: 1.6rem 1.9rem; }
 .pg-grimoire .mm-callout > div > p:first-child { font-family: var(--display); font-size: clamp(1.25rem, 2.2vw, 1.5rem); line-height: 1.45; color: var(--ink); max-width: 60ch; }
-.mm-callout p:has(> strong:only-child) { margin-top: 1.4rem; margin-bottom: -.5rem; font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-text); }
-.mm-callout p:has(> strong:only-child) strong { font-weight: 500; }
 .mm-callout p { color: var(--ink); }
 .mm-callout details.toggle { margin-top: 1.4rem; border-top-color: color-mix(in srgb, var(--accent) 25%, var(--line)); }
 .mm-callout details.toggle > summary { font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-text); font-weight: 500; }
+
+/* ---------- condensed list bar: one "Sort & filter" button, controls folded inside ---------- */
+.collection { margin-top: 1.4rem; scroll-margin-top: 9rem; }
+.collection-head { margin-bottom: .6rem; }
+.col-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; margin-bottom: 1.1rem; }
+.col-filter { flex: 0 0 auto; }
+.col-filter[open] { flex: 1 1 100%; order: 3; }
+.col-filter > summary { list-style: none; display: inline-flex; align-items: center; gap: .5rem; padding: .5rem 1rem; min-height: 40px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); cursor: pointer; font-size: .74rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ink); user-select: none; }
+.col-filter > summary::-webkit-details-marker { display: none; }
+.col-filter > summary:hover, .col-filter[open] > summary { border-color: var(--accent); color: var(--accent-text); }
+.sf-icon { color: var(--gold); font-size: .95rem; letter-spacing: 0; }
+.col-filter .col-views { margin: .8rem 0 0; padding: 1.1rem 1.2rem; border: 1px solid var(--line); border-radius: 6px; background: color-mix(in srgb, var(--surface) 55%, var(--bg)); }
+.atags { display: flex; flex-wrap: wrap; gap: .35rem; }
+.atag { display: inline-flex; align-items: center; gap: .35rem; padding: .15rem .6rem; border-radius: 4px; font-size: .82rem; text-decoration: none; color: var(--ink); line-height: 1.6; }
+.atag:not([class*="pill-"]) { background: var(--surface); }
+.atag span { color: var(--muted); }
+.atag:hover span { color: var(--accent-text); }
+.col-bar .col-count { margin-left: auto; }
+.col-group h3 { font-size: 1.05rem; font-family: var(--body); font-weight: 400; display: flex; align-items: center; gap: .6rem; margin: 1.6rem 0 .7rem; }
+.col-group h3 small { font-size: .8rem; color: var(--muted); }
+
+/* intro-box labels ("Within These Pages:", "Why it's called…:") */
+.mm-callout p.label { margin-top: 1.4rem; margin-bottom: -.5rem; font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-text); font-weight: 500; }
+
+/* Sort & filter opens as a drop-down over the list, so the bar stays on one line */
+.col-bar { position: relative; flex-wrap: nowrap; }
+.col-filter[open] { flex: 0 0 auto; order: 0; }
+.col-filter .col-views { position: absolute; left: 0; right: 0; top: calc(100% + .5rem); z-index: 20; margin: 0; box-shadow: 0 24px 50px -24px rgba(46, 31, 32, .45); background: var(--bg); }
+.atags { flex: 1 1 auto; min-width: 0; }
+@media (max-width: 640px) { .col-bar { flex-wrap: wrap; } }
+.mm-prose ul.entry-grid { padding-left: 0; }
+.mm-prose ul.entry-grid li + li { margin-top: 0; }
+.mm-prose .collection h3 { margin-top: 1.6rem; }
