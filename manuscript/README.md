@@ -28,11 +28,8 @@ hosting, no database server to set up, and nothing to install. Stripe takes the 
 
 ## Setting it up
 
-**The easy way: [TEST-SITE.md](TEST-SITE.md).** GitHub uploads the site to Hostinger over FTP and runs the
-Notion imports itself (`.github/workflows/`), using a few GitHub Secrets. Nobody needs FileZilla, SSH or
-the server's file manager after the first 10 minutes.
-
-The sections below describe the manual way, by hand on the server, for reference.
+GitHub can upload the site to Hostinger over FTP and run the Notion imports itself
+(`.github/workflows/`, switched off until launch). The sections below describe doing it by hand.
 
 ## One-time setup by hand (about 30 minutes)
 
