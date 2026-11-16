@@ -3,8 +3,7 @@
 name: Deploy test site
 
 on:
-  push:
-    branches: [manuscript-wiki]
+  # Switched off until the site is ready to go on Hostinger.
   workflow_dispatch:
 
 permissions:
@@ -47,7 +46,7 @@ jobs:
           lftp_run "
           mkdir -p -f \"$FTP_DATA_DIR\"
           mirror --reverse --parallel=4 --no-perms --verbose=1 \
-            -x '^\.git/' -x '^\.github/' -x '(^|/)\.gitignore$' -x '\.md$' -x '^manuscript/index\.html$' \
+            -x '^\.git/' -x '^\.github/' -x '(^|/)\.gitignore$' -x '\.md$' \
             ./ \"$FTP_DIR\"
           "
           echo "Uploaded. Open the test site: the address set up for FTP_TEST_DIR (e.g. https://test.magickmuse.com)."

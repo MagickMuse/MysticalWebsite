@@ -4,12 +4,8 @@
 name: Import from Notion (test site)
 
 on:
-  push:
-    branches: [manuscript-wiki]
-    paths: [manuscript/import.txt]
+  # Switched off until the site is ready to go on Hostinger.
   workflow_dispatch:
-  schedule:
-    - cron: '23 9 * * 1'   # Mondays (only once this file is on the main branch)
 
 permissions:
   contents: read
