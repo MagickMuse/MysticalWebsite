@@ -244,7 +244,14 @@ function breadcrumbs(array $page): string
         if ($p) array_unshift($trail, $p);
     }
     $html = '<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' . e(url()) . '">Manuscript</a></li>';
-    foreach ($trail as $t) $html .= '<li><a href="' . e(page_url($t)) . '">' . e($t['title']) . '</a></li>';
+    // A grimoire with a single database: its name ("Animals" after "Animal Grimoire") only repeats the grimoire, so leave it out.
+    $st = db()->prepare("SELECT COUNT(*) FROM pages WHERE grimoire = ? AND kind = 'collection'");
+    $st->execute([$page['grimoire']]);
+    $several = (int) $st->fetchColumn() > 1;
+    foreach ($trail as $t) {
+        if ($t['kind'] === 'collection' && !$several) continue;
+        $html .= '<li><a href="' . e(page_url($t)) . '">' . e($t['title']) . '</a></li>';
+    }
     return $html . '</ol></nav>';
 }
 
