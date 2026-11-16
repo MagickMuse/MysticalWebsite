@@ -348,17 +348,10 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .prop-text { color: var(--ink); }
 .prop-val a:not(.rel):not(.rel-more) { color: var(--accent-text); }
 
-/* tags, coloured like Notion's but softened to the brand */
-.pill { display: inline-block; padding: .05rem .5rem; border-radius: 4px; font-size: .82rem; line-height: 1.6; white-space: nowrap; color: var(--ink); }
-.pill-gray { background: #ece7e3; } .pill-brown { background: #eedfd3; } .pill-orange { background: #f6e1cc; }
-.pill-yellow { background: #f5ead0; } .pill-green { background: #dfe9dc; } .pill-blue { background: #dde6ee; }
-.pill-purple { background: #e7dfee; } .pill-pink { background: #f2dde4; } .pill-red { background: #f3d9d7; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pill { color: #f2e6de; }
-  :root:not([data-theme="light"]) .pill-gray { background: #3a3132; } :root:not([data-theme="light"]) .pill-brown { background: #43332b; }
-  :root:not([data-theme="light"]) .pill-orange { background: #4a3523; } :root:not([data-theme="light"]) .pill-yellow { background: #48402a; }
-  :root:not([data-theme="light"]) .pill-green { background: #2f3d30; } :root:not([data-theme="light"]) .pill-blue { background: #2c3843; }
-  :root:not([data-theme="light"]) .pill-purple { background: #3b3145; } :root:not([data-theme="light"]) .pill-pink { background: #482f39; }
-  :root:not([data-theme="light"]) .pill-red { background: #4b2c2c; } }
+/* property values: words in the site's type, separated by small gold stars (no coloured tags) */
+.pill { display: inline-flex; align-items: center; gap: .65rem; color: var(--ink); font-size: .92rem; line-height: 1.6; }
+.pill + .pill::before, .fchip + .fchip::before { content: ""; flex: none; width: .5rem; height: .5rem; background: var(--gold); opacity: .85; -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
+.prop-val:has(> .pill) { gap: .2rem .65rem; }
 
 /* relation links: page links with their icons, wrapping like Notion */
 .rels { display: flex; flex-wrap: wrap; gap: .15rem .3rem; align-items: center; }
@@ -393,12 +386,13 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .facets { display: grid; gap: .5rem; }
 .facet { display: grid; grid-template-columns: minmax(6rem, 9rem) minmax(0, 1fr); gap: .5rem; align-items: start; }
 .facet-name { font-size: .75rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); padding-top: .3rem; }
-.facet-vals { display: flex; flex-wrap: wrap; gap: .35rem; }
-.fchip { display: inline-flex; align-items: center; gap: .35rem; padding: .15rem .6rem; border-radius: 4px; border: 1px solid transparent; font-size: .84rem; text-decoration: none; color: var(--ink); line-height: 1.6; }
-.fchip:not([class*="pill-"]) { background: var(--surface); }
-.fchip small { color: var(--muted); font-size: .72rem; }
-.fchip:hover { border-color: var(--line); }
-.fchip.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.facet-vals { display: flex; flex-wrap: wrap; align-items: center; gap: .2rem .6rem; }
+.facet-vals .fchip { color: var(--ink); }
+.facet-vals .fchip:hover, .facet-vals .fchip.on { color: var(--accent-text); }
+.fchip { display: inline-flex; align-items: center; gap: .6rem; padding: .1rem 0; font-size: .88rem; text-decoration: none; color: var(--ink); line-height: 1.6; }
+.fchip small { color: var(--muted); font-size: .72rem; margin-left: -.3rem; }
+.fchip:hover { color: var(--accent-text); text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: .3em; }
+.fchip.on { color: var(--accent-text); font-weight: 500; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: .3em; }
 .letters { display: flex; flex-wrap: wrap; gap: .15rem; font-size: .78rem; letter-spacing: .06em; }
 .letters a, .letters span { min-width: 1.7rem; padding: .2rem .35rem; text-align: center; border-radius: 4px; }
 .letters a { text-decoration: none; color: var(--ink); }
@@ -447,13 +441,15 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .sf-icon { color: var(--gold); font-size: .95rem; letter-spacing: 0; }
 .col-filter .col-views { margin: .8rem 0 0; padding: 1.1rem 1.2rem; border: 1px solid var(--line); border-radius: 6px; background: color-mix(in srgb, var(--surface) 55%, var(--bg)); }
 .atags { display: flex; flex-wrap: wrap; gap: .35rem; }
-.atag { display: inline-flex; align-items: center; gap: .35rem; padding: .15rem .6rem; border-radius: 4px; font-size: .82rem; text-decoration: none; color: var(--ink); line-height: 1.6; }
-.atag:not([class*="pill-"]) { background: var(--surface); }
+.atag { display: inline-flex; align-items: center; gap: .45rem; padding: .2rem .8rem; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 999px; font-size: .74rem; letter-spacing: .14em; text-transform: uppercase; text-decoration: none; color: var(--accent-text); line-height: 1.6; background: var(--bg); }
+.atag:hover { border-color: var(--accent); }
 .atag span { color: var(--muted); }
 .atag:hover span { color: var(--accent-text); }
 .col-bar .col-count { margin-left: auto; }
 .col-group h3 { font-size: 1.05rem; font-family: var(--body); font-weight: 400; display: flex; align-items: center; gap: .6rem; margin: 1.6rem 0 .7rem; }
 .col-group h3 small { font-size: .8rem; color: var(--muted); }
+.col-group h3 .pill { font-family: var(--display); font-size: 1.45rem; font-weight: 500; }
+.col-group h3 .pill::before { content: ""; flex: none; width: .6rem; height: .6rem; background: var(--gold); -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
 
 /* intro-box labels ("Within These Pages:", "Why it's called…:") */
 .mm-callout p.label { margin-top: 1.4rem; margin-bottom: -.5rem; font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-text); font-weight: 500; }

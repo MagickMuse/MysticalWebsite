@@ -9,11 +9,10 @@ declare(strict_types=1);
 
 const RELATION_PREVIEW = 12;
 
-/** Soft tag colours in the spirit of Notion's, picked by the tag's name so a value always keeps its colour. */
+/** A property value: plain words in the site's type, separated by small gold stars (no coloured tags). */
 function pill_class(string $value): string
 {
-    $colors = ['gray', 'brown', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'red'];
-    return 'pill pill-' . $colors[crc32(mb_strtolower(trim($value))) % count($colors)];
+    return 'pill';
 }
 
 function chip(array $p): string
@@ -38,7 +37,7 @@ function relation_row(array $page, string $name, array $items, bool $showAll): s
 function properties_panel(array $page, array $tags, array $groups): string
 {
     $rows = '';
-    // 1. The entry's own properties (Type, Planet…), as coloured tags or text.
+    // 1. The entry's own properties (Type, Planet…), as words separated by gold stars.
     foreach ($tags as $name => $vals) {
         $isLink = count($vals) === 1 && preg_match('~^https?://~', (string) $vals[0]);
         $value = $isLink
