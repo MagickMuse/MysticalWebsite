@@ -120,6 +120,12 @@ function strip_skipped_links(string $html): string
 {
     $html = preg_replace_callback('~<p class="bookmark"><a href="([^"]*)"[^>]*>.*?</a></p>~s',
         fn($m) => preg_match(skip_links_pattern(), html_entity_decode($m[1])) ? '' : $m[0], $html);
+    // Any Discord invite in the Manuscript uses the website's own invite link, so new members can be traced to the website.
+    $discord = (string) config('discord_url', '');
+    if ($discord !== '') {
+        $html = preg_replace_callback('~(href=")https?://(?:www\.)?(?:discord\.gg|discord(?:app)?\.com/invite)/[A-Za-z0-9-]+/?(")~',
+            fn($m) => $m[1] . e($discord) . $m[2], $html);
+    }
     $html = preg_replace('~<div class="column">\s*</div>~', '', $html);
     return preg_replace('~<div class="columns">\s*</div>~', '', $html);
 }
