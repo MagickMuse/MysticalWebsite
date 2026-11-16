@@ -11,6 +11,7 @@ require __DIR__ . '/lib/dashboard.php';
 require __DIR__ . '/lib/engage.php';
 require __DIR__ . '/lib/properties.php';
 require __DIR__ . '/lib/collection.php';
+require __DIR__ . '/lib/shelf.php';
 
 // Path relative to the wiki's base, e.g. "correspondence/protection".
 $base = parse_url(config('base_url'), PHP_URL_PATH) ?: '';
@@ -79,18 +80,9 @@ function view_home(): void
     $count = $words[count($grimoires)] ?? (string) count($grimoires);
     $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
 
-    $cards = '';
-    foreach ($grimoires as $g) {
-        $n = (int) db()->query("SELECT COUNT(*) FROM pages WHERE grimoire = " . db()->quote($g['grimoire']) . " AND kind = 'entry'")->fetchColumn();
-        $photo = grimoire_photo($g['grimoire'], 480, 600);
-        $cover = $photo
-            ? '<div class="frame arch g-cover"><img src="' . e($photo) . '" srcset="' . e(grimoire_photo($g['grimoire'], 480, 600)) . ' 1x, ' . e(grimoire_photo($g['grimoire'], 960, 1200)) . ' 2x" alt="" width="480" height="600" loading="lazy"></div>'
-            : '<div class="frame arch g-cover"><i class="spark big" aria-hidden="true"></i></div>';
-        $inside = grimoire_summary($g);
-        $cards .= '<a class="card g-card" href="' . e(page_url($g)) . '">' . $cover . '<h3>' . e($g['title']) . '</h3>'
-            . ($inside ? '<p class="g-inside" title="' . e($inside) . '">' . e($inside) . '</p>' : '')
-            . '<p class="g-count">' . ($n ? number_format($n) . ' entries' : 'Guides') . '</p></a>';
-    }
+    // The grimoires as books on one row (a carousel).
+    $counts = db()->query("SELECT grimoire, COUNT(*) FROM pages WHERE kind = 'entry' GROUP BY grimoire")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $cards = bookshelf_html($grimoires, $counts);
     if (!$grimoires) {
         $cards = '<p class="lede">Nothing has been moved over yet. Run the importer (see README) to bring grimoires in from Notion.</p>';
     }
@@ -102,7 +94,7 @@ function view_home(): void
   <p class="lede">{$count} cross-linked grimoires. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three. <span class="count-line">{$total} pages inscribed so far.</span></p>
   $join
 </section>
-<section class="g-cards cards">$cards</section>
+$cards
 HTML, ['private' => true, 'protect' => true]);
 }
 

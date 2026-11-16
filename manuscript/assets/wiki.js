@@ -218,4 +218,82 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') document.querySelectorAll('.col-filter[open]').forEach(function (d) { d.open = false; d.querySelector('summary').focus(); });
   });
+
+  // Carousel arrows: move along the row by most of its width.
+  document.querySelectorAll('.carousel').forEach(function (c) {
+    var track = c.querySelector('[data-carousel]'); if (!track) return;
+    var btns = c.querySelectorAll('[data-car]');
+    function sync() {
+      var max = track.scrollWidth - track.clientWidth - 2;
+      c.classList.toggle('fits', track.scrollWidth <= track.clientWidth + 2 + 170);
+      btns.forEach(function (b) { b.disabled = b.getAttribute('data-car') === '-1' ? track.scrollLeft <= 2 : track.scrollLeft >= max; });
+    }
+    btns.forEach(function (b) { b.addEventListener('click', function () { track.scrollBy({ left: +b.getAttribute('data-car') * track.clientWidth * 0.8, behavior: 'smooth' }); }); });
+    track.addEventListener('scroll', sync, { passive: true }); track.addEventListener('transitionend', sync); window.addEventListener('resize', sync); sync();
+  });
+
+  // Grimoire carousel: lift the book out from its cover, open it, then go in.
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html) e.innerHTML = html; return e; }
+  function esc(t) { var d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
+  document.addEventListener('click', function (e) {
+    var book = e.target.closest('.carousel .bk');
+    if (!book || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0 || reduceMotion || !document.body.animate) return;
+    e.preventDefault();
+    var href = book.href;
+    var r = book.getBoundingClientRect();
+    var W = Math.min(300, window.innerWidth * 0.42), H = W * 1.42, T = 46;
+    var color = getComputedStyle(book).getPropertyValue('--bc'), inkOn = getComputedStyle(book).getPropertyValue('--ink-on');
+
+    var veil = el('div', 'book-veil'), stage = el('div', 'book-stage'), wrap = el('div', 'b3d-wrap'), box = el('div', 'b3d');
+    box.style.width = W + 'px'; box.style.height = H + 'px'; box.style.setProperty('--bc', color); box.style.setProperty('--ink-on', inkOn);
+    var spine = el('div', 'b3d-spine', '<span class="t">' + esc(book.getAttribute('data-label')) + '</span>');
+    spine.style.width = T + 'px'; spine.style.transform = 'translateZ(' + (-T / 2) + 'px) rotateY(-90deg)';
+    var pages = el('div', 'b3d-pages', '<p class="p"><em>The Magick Manuscript</em>' + esc(book.getAttribute('data-title')) + '</p>');
+    pages.style.transform = 'translateZ(' + (T / 2 - 2) + 'px)';
+    var front = el('div', 'b3d-front');
+    front.style.transform = 'translateZ(' + (T / 2) + 'px)';
+    var photo = book.getAttribute('data-photo');
+    front.appendChild(el('div', 'face', (photo ? '<img src="' + esc(photo) + '" alt="">' : '') + '<span class="t">' + esc(book.getAttribute('data-label')) + '</span>'));
+    front.appendChild(el('div', 'inside'));
+    // Hovered, the book already shows its cover: start from that. Tapped (no hover), start side-on from the spine.
+    var fromCover = r.width > 120, turn0 = fromCover ? 'rotateY(0deg)' : 'rotateY(90deg)';
+    if (!fromCover) pages.style.opacity = '0';
+    box.appendChild(pages); box.appendChild(spine); box.appendChild(front);
+    wrap.appendChild(box); stage.appendChild(wrap);
+    document.body.appendChild(veil); document.body.appendChild(stage);
+
+    // Start exactly over the book in the row.
+    var s0 = fromCover ? r.width / W : r.height / H, cx0 = r.left + r.width / 2, cy0 = r.top + r.height / 2;
+    var cx1 = window.innerWidth / 2, cy1 = window.innerHeight / 2;
+    wrap.style.width = W + 'px'; wrap.style.height = H + 'px'; wrap.style.transformOrigin = '50% 50%';
+    var at = function (cx, cy, sc, dz) { return 'translate(' + (cx - W / 2) + 'px,' + (cy - H / 2) + 'px) translateZ(' + (dz || 0) + 'px) scale(' + sc + ')'; };
+    box.style.transform = turn0;
+    wrap.style.transform = at(cx0, cy0, s0);
+    book.style.visibility = 'hidden';
+    var opts = function (d, delay) { return { duration: d, delay: delay || 0, easing: 'cubic-bezier(.45,.05,.2,1)', fill: 'forwards' }; };
+
+    veil.animate([{ opacity: 0 }, { opacity: 1 }], opts(500));
+    // 1. lift it out of the row
+    wrap.animate([{ transform: at(cx0, cy0, s0) }, { transform: at(cx0, cy0 - 30, s0 * 1.08, 60) }], opts(300)).finished
+      .then(function () {
+        // 2. bring it to the middle (turning it to the cover if it started side-on)
+        wrap.animate([{ transform: at(cx0, cy0 - 30, s0 * 1.08, 60) }, { transform: at(cx1, cy1, 1, 0) }], opts(fromCover ? 600 : 750));
+        if (fromCover) return box.animate([{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(-8deg)', offset: .5 }, { transform: 'rotateY(0deg)' }], opts(600)).finished;
+        pages.animate([{ opacity: 0 }, { opacity: 0, offset: .4 }, { opacity: 1 }], opts(750));
+        return box.animate([{ transform: 'rotateY(90deg)' }, { transform: 'rotateY(0deg)' }], opts(750)).finished;
+      })
+      .then(function () {
+        // 3. open the cover, shifting the open book to stay centred
+        wrap.animate([{ transform: at(cx1, cy1, 1, 0) }, { transform: at(cx1 + W / 2, cy1, 1.05, 0) }], opts(700));
+        return front.animate([{ transform: 'translateZ(' + (T / 2) + 'px) rotateY(0deg)' }, { transform: 'translateZ(' + (T / 2) + 'px) rotateY(-170deg)' }], opts(700)).finished;
+      })
+      .then(function () { setTimeout(function () { location.href = href; }, 180); })
+      .catch(function () { location.href = href; });
+  });
+  // Coming back with the browser's Back button: put the row back as it was.
+  window.addEventListener('pageshow', function () {
+    document.querySelectorAll('.book-stage, .book-veil').forEach(function (n) { n.remove(); });
+    document.querySelectorAll('.carousel .bk').forEach(function (b) { b.style.visibility = ''; });
+  });
 })();
