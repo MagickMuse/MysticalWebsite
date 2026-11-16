@@ -65,10 +65,16 @@ function view_home(): void
 {
     if (!has_access()) { view_gate(); return; }
     $grimoires = db()->query("SELECT * FROM pages WHERE kind = 'grimoire'")->fetchAll();
-    $order = array_keys(config('grimoires', []));
-    $rank = array_flip($order);
-    usort($grimoires, fn($a, $b) => ($rank[$a['grimoire']] ?? 99) <=> ($rank[$b['grimoire']] ?? 99));
-    $total = (int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn();
+    // Alphabetical by name; Begin Here is the way in, so it gets its own button instead of a card.
+    $begin = null;
+    $grimoires = array_values(array_filter($grimoires, function ($g) use (&$begin) {
+        if ($g['grimoire'] === 'begin-here') { $begin = $g; return false; }
+        return true;
+    }));
+    usort($grimoires, fn($a, $b) => strnatcasecmp($a['title'], $b['title']));
+    $words = [1 => 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen', 'Twenty'];
+    $count = $words[count($grimoires)] ?? (string) count($grimoires);
+    $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
 
     $cards = '';
     foreach ($grimoires as $g) {
@@ -83,12 +89,12 @@ function view_home(): void
     if (!$grimoires) {
         $cards = '<p class="lede">Nothing has been moved over yet. Run the importer (see README) to bring grimoires in from Notion.</p>';
     }
-    $join = '';
+    $join = $begin ? '<div class="actions"><a class="btn" href="' . e(page_url($begin)) . '">Begin here</a></div>' : '';
     layout('The Magick Manuscript', <<<HTML
 <section class="mm-hero">
   <p class="eyebrow labelled">A Living Digital Grimoire</p>
   <h1>The Magick <em>Manuscript</em></h1>
-  <p class="lede">Fifteen cross-linked grimoires. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three. <span class="count-line">{$total} pages inscribed so far.</span></p>
+  <p class="lede">{$count} cross-linked grimoires. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three. <span class="count-line">{$total} pages inscribed so far.</span></p>
   $join
 </section>
 <section class="g-cards cards">$cards</section>
