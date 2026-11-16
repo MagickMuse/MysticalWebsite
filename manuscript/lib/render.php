@@ -140,28 +140,19 @@ function connections(array $page): array
         $shown[$r['to_id']] = true;
     }
     // Backlinks that the outgoing relations did not already cover, grouped by their database.
+    // A group with the same name as a relation (e.g. "Correspondences") joins that relation's row.
+    $byLower = [];
+    foreach (array_keys($out) as $k) $byLower[mb_strtolower($k)] = $k;
     foreach ($back as $b) {
         if (isset($shown[$b['from_id']]) || !isset($idx[$b['from_id']]) || $b['from_id'] === $page['id']) continue;
         $group = $idx[$b['parent_id']]['title'] ?? 'Other pages';
+        $group = $byLower[mb_strtolower($group)] ?? $group;
+        $shown[$b['from_id']] = true;
         $out[$group][$b['from_id']] = $idx[$b['from_id']];
     }
     foreach ($out as &$list) uasort($list, fn($a, $b) => strnatcasecmp($a['title'], $b['title']));
     ksort($out, SORT_NATURAL | SORT_FLAG_CASE);
     return $out;
-}
-
-function connections_html(array $groups): string
-{
-    if (!$groups) return '';
-    $html = '<section class="connections" aria-labelledby="conn-h"><p class="eyebrow labelled" id="conn-h">Connections</p><div class="conn-groups">';
-    foreach ($groups as $name => $items) {
-        $n = count($items);
-        $chips = '';
-        foreach ($items as $it) $chips .= '<li><a class="chip" href="' . e($it['url']) . '">' . icon_html($it['icon'], 'chip-icon') . e($it['title']) . '</a></li>';
-        $open = $n <= 24 ? ' open' : '';
-        $html .= "<details class=\"conn\"$open><summary><span>" . e($name) . '</span><small>' . $n . '</small></summary><ul class="chips">' . $chips . '</ul></details>';
-    }
-    return $html . '</div></section>';
 }
 
 function breadcrumbs(array $page): string
@@ -209,10 +200,10 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=7">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=8">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=7" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=8" defer></script>
 </head>
 <body class="mm<?= !empty($opt['protect']) && !is_admin() ? ' no-copy' : '' ?>">
 <a class="skip" href="#main">Skip to main content</a>
