@@ -312,7 +312,7 @@ function view_join(): void
     }
     $login = e(url('login'));
     $note = has_access() ? '<p class="notice">You already have full access. <a href="' . e(url()) . '">Open the Manuscript</a>.</p>' : '';
-    $codeNote = $code ? '<p class="notice">Code <strong>' . e($code) . '</strong> will be applied at checkout.</p>' : '';
+    // A code from a link (e.g. the SEEKER10 pop-up) is applied quietly at checkout; no note on the page.
     $desc = safe_html($copy['description_html']);
     $terms = safe_html($copy['terms_html']);
     $community = community_links();
@@ -322,7 +322,6 @@ function view_join(): void
   <h1>The Magick <em>Manuscript</em></h1>
   <p class="lede">20,000+ entries · 15 cross-linked grimoires · an interactive digital grimoire that never stops growing.</p>
   $note
-  $codeNote
 </section>
 <section class="cards plans $planClass">$plans</section>
 <p class="center small">Secure checkout by Stripe. After paying you're signed in straight away. Already a member? <a href="$login">Sign in</a></p>
