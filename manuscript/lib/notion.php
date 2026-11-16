@@ -93,6 +93,40 @@ final class NotionImporter
         ($this->log)("Archived duplicates: $linked links now go to the live entry.");
     }
 
+    /**
+     * Pages with the same name in the same list are duplicates: the one with the most content stays,
+     * the others' connections move onto it, and links to them go to it.
+     */
+    public function mergeDuplicates(): void
+    {
+        $groups = db()->query("SELECT parent_id, lower(trim(title)) AS t FROM pages WHERE kind = 'entry' GROUP BY 1, 2 HAVING COUNT(*) > 1")->fetchAll();
+        $merged = 0;
+        foreach ($groups as $g) {
+            $st = db()->prepare("SELECT p.id, p.title, p.slug, length(p.body_html) AS len,
+                    (SELECT COUNT(*) FROM relations r WHERE r.from_id = p.id OR r.to_id = p.id) AS links
+                FROM pages p WHERE p.kind = 'entry' AND p.parent_id = ? AND lower(trim(p.title)) = ?
+                ORDER BY len DESC, links DESC, p.id");
+            $st->execute([$g['parent_id'], $g['t']]);
+            $rows = $st->fetchAll();
+            $keep = array_shift($rows);
+            foreach ($rows as $dup) {
+                db()->prepare('UPDATE OR IGNORE relations SET from_id = ? WHERE from_id = ?')->execute([$keep['id'], $dup['id']]);
+                db()->prepare('UPDATE OR IGNORE relations SET to_id = ? WHERE to_id = ?')->execute([$keep['id'], $dup['id']]);
+                db()->prepare('DELETE FROM relations WHERE (from_id = ? OR to_id = ?) OR (from_id = ? AND to_id = ?)')->execute([$dup['id'], $dup['id'], $keep['id'], $keep['id']]);
+                db()->prepare('INSERT OR REPLACE INTO aliases (id, to_id, title) VALUES (?, ?, ?)')->execute([$dup['id'], $keep['id'], $dup['title']]);
+                foreach (['DELETE FROM pages WHERE id = ?', 'DELETE FROM search WHERE id = ?'] as $sql) db()->prepare($sql)->execute([$dup['id']]);
+                // The page that stays takes the plain address (coven, not coven-2).
+                if (strlen($dup['slug']) < strlen($keep['slug'])) {
+                    db()->prepare('UPDATE pages SET slug = ? WHERE id = ?')->execute([$dup['slug'], $keep['id']]);
+                    $keep['slug'] = $dup['slug'];
+                }
+                ($this->log)("  – duplicate “{$dup['title']}” merged into the fuller copy");
+                $merged++;
+            }
+        }
+        if ($merged) ($this->log)("Duplicates: $merged merged.");
+    }
+
     private static function liveCopy(string $grimoire, string $title, string $id): ?string
     {
         $norm = fn(string $t) => trim(preg_replace('/[^a-z0-9]+/', ' ', mb_strtolower(iconv('UTF-8', 'ASCII//TRANSLIT', $t) ?: $t)));
@@ -294,7 +328,7 @@ final class NotionImporter
             throw $ex;
         }
         $title = $this->plainText($meta['title'] ?? []) ?: 'Entries';
-        if (preg_match((string) config('skip_databases', '/counter/i'), $title)) {
+        if (preg_match((string) config('skip_databases', '/counter|^card totals$|^calendar$/i'), $title)) {
             ($this->log)("  – skipping database “{$title}”");
             return;
         }

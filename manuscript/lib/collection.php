@@ -196,6 +196,7 @@ function collection_html(array $v, bool $withHeading): string
         $chips .= '<div class="facet"><span class="facet-name">' . e($prop) . '</span><div class="facet-vals">'
             . '<a class="fchip' . ($cur === '' ? ' on' : '') . '" href="' . e($link(['filters' => array_diff_key($state['filters'], [$prop => 1])])) . '">All</a>';
         foreach ($counts as $val => $n) {
+            $val = (string) $val; // PHP turns numeric keys like "1" into numbers
             $f = $state['filters']; $f[$prop] = $val;
             $chips .= '<a class="fchip ' . pill_class($val) . ($cur === $val ? ' on' : '') . '" href="' . e($link(['filters' => $f])) . '">' . e($val) . ' <small>' . $n . '</small></a>';
         }
@@ -228,9 +229,10 @@ function collection_html(array $v, bool $withHeading): string
     if ($state['group'] !== '') {
         $groups = [];
         foreach ($rows as $r) foreach (($r['tags'][$state['group']] ?? []) ?: ['No ' . $state['group']] as $val) $groups[$val][] = $r;
-        uksort($groups, fn($a, $b) => (str_starts_with($a, 'No ') <=> str_starts_with($b, 'No ')) ?: strnatcasecmp($a, $b));
+        uksort($groups, fn($a, $b) => (str_starts_with((string) $a, 'No ') <=> str_starts_with((string) $b, 'No ')) ?: strnatcasecmp((string) $a, (string) $b));
         $list = '';
         foreach ($groups as $val => $items) {
+            $val = (string) $val;
             $f = $state['filters']; $f[$state['group']] = $val;
             $more = count($items) > GROUP_PREVIEW && !str_starts_with($val, 'No ')
                 ? '<a class="link" href="' . e($link(['filters' => $f, 'group' => ''])) . '">Show all ' . count($items) . '</a>' : '';

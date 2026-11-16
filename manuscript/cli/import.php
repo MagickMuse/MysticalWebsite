@@ -52,6 +52,7 @@ foreach ($grimoires as $slug => $id) {
     }
 }
 if (!$paused && !in_array('--guides-only', $args, true)) {
+    try { $importer->mergeDuplicates(); } catch (Throwable $ex) { echo '! duplicates: ' . $ex->getMessage() . "\n"; }
     try { $importer->linkDuplicates(); } catch (Throwable $ex) { echo '! archived duplicates: ' . $ex->getMessage() . "\n"; }
 }
 $s = $importer->stats();
