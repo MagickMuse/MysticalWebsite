@@ -148,6 +148,7 @@ final class NotionImporter
         }
 
         $this->stats['fetched']++;
+        $failedBefore = $this->stats['img_failed'] ?? 0;
         $ctx = ['page' => $id, 'children' => []];
         $html = $this->renderChildren($page['id'], $ctx);
         $plain = self::plainFromHtml($html);
@@ -163,7 +164,8 @@ final class NotionImporter
             'parent_id' => $parentId, 'title' => $title, 'icon' => $icon, 'cover' => $cover,
             'aka' => $aka, 'tags_json' => json_encode($tags, JSON_UNESCAPED_UNICODE),
             'body_html' => $html, 'plain' => $plain, 'sort' => $sort,
-            'notion_edited' => $edited, 'imported_at' => now(),
+            // A picture that could not be downloaded leaves the page marked as not yet imported, so the next run tries again.
+            'notion_edited' => ($this->stats['img_failed'] ?? 0) > $failedBefore ? '' : $edited, 'imported_at' => now(),
         ]);
 
         foreach ($ctx['children'] as $i => [$childKind, $childId]) {
@@ -533,9 +535,14 @@ final class NotionImporter
         $ch = curl_init($u);
         curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_TIMEOUT => 60, CURLOPT_USERAGENT => 'MagickManuscript/1.0']);
         $bytes = curl_exec($ch);
-        $ok = curl_getinfo($ch, CURLINFO_HTTP_CODE) === 200;
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
         curl_close($ch);
-        if (!$ok || !$bytes) { ($this->log)("  ! image download failed for $name"); return null; }
+        if ($code !== 200 || !$bytes) {
+            $this->stats['img_failed'] = ($this->stats['img_failed'] ?? 0) + 1;
+            ($this->log)("  ! image download failed for $name (" . ($err ?: "HTTP $code") . ', ' . parse_url($u, PHP_URL_HOST) . ')');
+            return null;
+        }
         file_put_contents("$dir/$file", $bytes);
         $this->stats['images']++;
         return $file;
