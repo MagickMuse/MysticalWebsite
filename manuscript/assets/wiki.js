@@ -308,22 +308,44 @@
     io.observe(document.documentElement);
     setTimeout(function () { io.disconnect(); finish(all); }, 120);
   }
+  // Four-pointed gold stars that twinkle around a box (centre cx, cy; size w × h).
+  function sparkle(cx, cy, w, h, delay, burst) {
+    if (reduceMotion) return;
+    var n = burst ? 22 : 12;
+    for (var i = 0; i < n; i++) {
+      var s = el('i', 'sparkle' + (i % 4 === 0 ? ' big' : i % 3 === 0 ? ' small' : ''));
+      var a = (i / n) * Math.PI * 2 + Math.random() * 0.6;
+      var rx = w / 2 + 14 + Math.random() * 46, ry = h / 2 + 10 + Math.random() * 40;
+      var x = cx + Math.cos(a) * rx * (burst ? 0.98 + Math.random() * 0.3 : 1), y = cy + Math.sin(a) * ry * (burst ? 0.98 + Math.random() * 0.3 : 1);
+      s.style.left = x + 'px'; s.style.top = y + 'px';
+      document.body.appendChild(s);
+      var d = 700 + Math.random() * 450, start = (delay || 0) + Math.random() * (burst ? 300 : 420);
+      var dx = burst ? Math.cos(a) * 34 : 0, dy = burst ? Math.sin(a) * 34 : -14;
+      s.animate([
+        { opacity: 0, transform: 'translate(0,0) scale(.2) rotate(0deg)' },
+        { opacity: 1, transform: 'translate(' + dx / 2 + 'px,' + dy / 2 + 'px) scale(1) rotate(45deg)', offset: .4 },
+        { opacity: 0, transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.3) rotate(90deg)' }
+      ], { duration: d, delay: start, easing: 'ease-out', fill: 'both' });
+    }
+  }
   function openBook(book, v) {
     var href = book.href;
     var r = book.getBoundingClientRect();
-    var W = Math.min(300, window.innerWidth * 0.42, v.h * 0.6), H = W * 1.42, T = 46;
+    var W = Math.min(300, window.innerWidth * 0.44, v.h * 0.6), H = W * 1.42, T = Math.max(26, Math.round(W * 0.15));
+    var label = book.getAttribute('data-label') || '';
     var color = getComputedStyle(book).getPropertyValue('--bc'), inkOn = getComputedStyle(book).getPropertyValue('--ink-on');
 
     var veil = el('div', 'book-veil'), stage = el('div', 'book-stage'), wrap = el('div', 'b3d-wrap'), box = el('div', 'b3d');
     box.style.width = W + 'px'; box.style.height = H + 'px'; box.style.setProperty('--bc', color); box.style.setProperty('--ink-on', inkOn);
-    var spine = el('div', 'b3d-spine', '<span class="t">' + esc(book.getAttribute('data-label')) + '</span>');
+    box.style.setProperty('--w', W + 'px'); box.style.setProperty('--t', T + 'px'); box.style.setProperty('--n', String(Math.max(4, label.length)));
+    var spine = el('div', 'b3d-spine', '<span class="t">' + esc(label) + '</span>');
     spine.style.width = T + 'px'; spine.style.transform = 'translateZ(' + (-T / 2) + 'px) rotateY(-90deg)';
     var pages = el('div', 'b3d-pages', '<p class="p"><em>The Magick Manuscript</em>' + esc(book.getAttribute('data-title')) + '</p>');
     pages.style.transform = 'translateZ(' + (T / 2 - 2) + 'px)';
     var front = el('div', 'b3d-front');
     front.style.transform = 'translateZ(' + (T / 2) + 'px)';
     var photo = book.getAttribute('data-photo');
-    front.appendChild(el('div', 'face', (photo ? '<img src="' + esc(photo) + '" alt="">' : '') + '<span class="t">' + esc(book.getAttribute('data-label')) + '</span>'));
+    front.appendChild(el('div', 'face', (photo ? '<img src="' + esc(photo) + '" alt="">' : '') + '<span class="t">' + esc(label) + '</span>'));
     front.appendChild(el('div', 'inside'));
     // Hovered, the book already shows its cover: start from that. Tapped (no hover), start side-on from the spine.
     var fromCover = r.width > 120, turn0 = fromCover ? 'rotateY(0deg)' : 'rotateY(90deg)';
@@ -344,28 +366,31 @@
     book.style.visibility = 'hidden';
     var opts = function (d, delay) { return { duration: d, delay: delay || 0, easing: 'cubic-bezier(.45,.05,.2,1)', fill: 'forwards' }; };
 
-    veil.animate([{ opacity: 0 }, { opacity: 1 }], opts(500));
+    veil.animate([{ opacity: 0 }, { opacity: 1 }], opts(380));
+    var travel = fromCover ? 460 : 560, openT = 560;
     // 1. lift it out of the row
-    wrap.animate([{ transform: at(cx0, cy0, s0) }, { transform: at(cx0, cy0 - 30, s0 * 1.08, 60) }], opts(300)).finished
+    wrap.animate([{ transform: at(cx0, cy0, s0) }, { transform: at(cx0, cy0 - 24, s0 * 1.06, 50) }], opts(200)).finished
       .then(function () {
-        // 2. bring it to the middle (turning it to the cover if it started side-on)
-        wrap.animate([{ transform: at(cx0, cy0 - 30, s0 * 1.08, 60) }, { transform: at(cx1, cy1, 1, 0) }], opts(fromCover ? 600 : 750));
-        if (fromCover) return box.animate([{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(-8deg)', offset: .5 }, { transform: 'rotateY(0deg)' }], opts(600)).finished;
-        pages.animate([{ opacity: 0 }, { opacity: 0, offset: .4 }, { opacity: 1 }], opts(750));
-        return box.animate([{ transform: 'rotateY(90deg)' }, { transform: 'rotateY(0deg)' }], opts(750)).finished;
+        // 2. bring it to the middle (turning it to the cover if it started side-on); stars start to gather
+        sparkle(cx1, cy1, W, H, travel - 120);
+        wrap.animate([{ transform: at(cx0, cy0 - 24, s0 * 1.06, 50) }, { transform: at(cx1, cy1, 1, 0) }], opts(travel));
+        if (fromCover) return box.animate([{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(-8deg)', offset: .5 }, { transform: 'rotateY(0deg)' }], opts(travel)).finished;
+        pages.animate([{ opacity: 0 }, { opacity: 0, offset: .4 }, { opacity: 1 }], opts(travel));
+        return box.animate([{ transform: 'rotateY(90deg)' }, { transform: 'rotateY(0deg)' }], opts(travel)).finished;
       })
       .then(function () {
-        // 3. open the cover, shifting the open book to stay centred
-        wrap.animate([{ transform: at(cx1, cy1, 1, 0) }, { transform: at(cx1 + W / 2, cy1, 1.05, 0) }], opts(700));
-        return front.animate([{ transform: 'translateZ(' + (T / 2) + 'px) rotateY(0deg)' }, { transform: 'translateZ(' + (T / 2) + 'px) rotateY(-170deg)' }], opts(700)).finished;
+        // 3. open the cover, shifting the open book to stay centred, in a burst of stars
+        sparkle(cx1, cy1, W * 2, H, 0, true);
+        wrap.animate([{ transform: at(cx1, cy1, 1, 0) }, { transform: at(cx1 + W / 2, cy1, 1.05, 0) }], opts(openT));
+        return front.animate([{ transform: 'translateZ(' + (T / 2) + 'px) rotateY(0deg)' }, { transform: 'translateZ(' + (T / 2) + 'px) rotateY(-170deg)' }], opts(openT)).finished;
       })
-      .then(function () { setTimeout(function () { location.href = href; }, 180); })
+      .then(function () { setTimeout(function () { location.href = href; }, 220); })
       .catch(function () { location.href = href; });
   }
   // Put the row back as it was once a book has been opened: when coming back with the browser's Back button,
   // and when the page changes without reloading (an address ending in #…, as in a preview).
   function restoreShelf() {
-    document.querySelectorAll('.book-stage, .book-veil').forEach(function (n) { n.remove(); });
+    document.querySelectorAll('.book-stage, .book-veil, .sparkle').forEach(function (n) { n.remove(); });
     document.querySelectorAll('.carousel .bk').forEach(function (b) { b.style.visibility = ''; b.classList.remove('open'); });
   }
   window.addEventListener('pageshow', restoreShelf);
