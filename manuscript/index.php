@@ -215,7 +215,7 @@ function view_search(string $q): void
     }
     $count = count($rows);
     $shown = $count >= 100 ? '100+' : (string) $count;
-    $body = '<section class="mm-results"><p class="eyebrow">Search</p><h1>' . ($count ? $shown . ' results for <em>' . e($q) . '</em>' : 'Nothing found for <em>' . e($q) . '</em>') . '</h1>'
+    $body = '<section class="mm-results"><p class="eyebrow">Search</p><h1>' . ($count ? $shown . ($count === 1 ? ' result' : ' results') . ' for <em>' . e($q) . '</em>' : 'Nothing found for <em>' . e($q) . '</em>') . '</h1>'
         . $chips
         . ($count ? '<ol class="results">' . $list . '</ol>' : '<p class="lede">Try another spelling, a shorter word, or a related term.</p>')
         . '</section>';
