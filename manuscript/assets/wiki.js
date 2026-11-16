@@ -126,4 +126,52 @@
       hit.addEventListener('mouseleave', function () { tip.hidden = true; });
     });
   });
+
+  // Small message at the bottom of the screen
+  var toastTimer;
+  function toast(text) {
+    var t = document.querySelector('.mm-toast');
+    if (!t) { t = document.createElement('div'); t.className = 'mm-toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+    t.textContent = text; t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 2600);
+  }
+
+  // Save / unsave a page without reloading (falls back to a normal form post without JavaScript)
+  document.querySelectorAll('.save-form').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = form.querySelector('.save-btn');
+      btn.disabled = true;
+      fetch(form.action, { method: 'POST', body: new FormData(form), credentials: 'same-origin', headers: { 'X-Requested-With': 'fetch' } })
+        .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+        .then(function (d) {
+          btn.setAttribute('aria-pressed', String(d.saved));
+          btn.querySelector('.save-star').textContent = d.saved ? '★' : '☆';
+          btn.querySelector('.save-label').textContent = d.saved ? 'Saved' : 'Save';
+          toast(d.saved ? 'Saved. Find it under ★ Saved at the top.' : 'Removed from your saved pages.');
+        })
+        .catch(function () { form.submit(); })
+        .then(function () { btn.disabled = false; });
+    });
+  });
+
+  // Copy protection on Manuscript pages (members only; the curator is exempt)
+  if (document.body.classList.contains('no-copy')) {
+    var main = document.querySelector('.mm-main');
+    var inField = function (el) { return el && el.closest && el.closest('input, textarea, [contenteditable="true"]'); };
+    var inMain = function (el) { return main && el && main.contains(el); };
+    var stop = function (msg) { return function (e) { if (inField(e.target)) return; if (e.type !== 'copy' && e.type !== 'cut' && !inMain(e.target)) return; e.preventDefault(); if (msg) toast(msg); }; };
+    var msg = 'Copying is turned off for the Manuscript.';
+    document.addEventListener('copy', stop(msg));
+    document.addEventListener('cut', stop(msg));
+    document.addEventListener('contextmenu', stop(''));
+    document.addEventListener('dragstart', stop(''));
+    document.addEventListener('selectstart', stop(''));
+    document.addEventListener('keydown', function (e) {
+      if (!(e.ctrlKey || e.metaKey) || inField(e.target)) return;
+      var k = (e.key || '').toLowerCase();
+      if (k === 'c' || k === 'x' || k === 'a' || k === 's' || k === 'p') { e.preventDefault(); if (k !== 'a') toast(k === 'p' ? 'The Manuscript can’t be printed.' : msg); }
+    });
+    window.addEventListener('beforeprint', function () { toast('The Manuscript can’t be printed.'); });
+  }
 })();

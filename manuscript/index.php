@@ -8,6 +8,7 @@ require __DIR__ . '/lib/mail.php';
 require __DIR__ . '/lib/stripe.php';
 require __DIR__ . '/lib/shop.php';
 require __DIR__ . '/lib/dashboard.php';
+require __DIR__ . '/lib/engage.php';
 
 // Path relative to the wiki's base, e.g. "correspondence/protection".
 $base = parse_url(config('base_url'), PHP_URL_PATH) ?: '';
@@ -42,6 +43,7 @@ function route(array $parts, string $method): void
         case 'account':       $method === 'POST' ? do_billing() : view_account(); return;
         case 'stripe-webhook': stripe_webhook(); return;
         case 'admin':         redirect(url('dashboard')); return;
+        case 'saved':         $method === 'POST' ? toggle_saved() : view_saved(); return;
         case 'dashboard':     route_dashboard(array_slice($parts, 1), $method); return;
         case 'shop':          route_shop(array_slice($parts, 1), $method); return;
         case 'suggest':       search_suggest(trim((string) ($_GET['q'] ?? ''))); return;
@@ -90,7 +92,7 @@ function view_home(): void
   $join
 </section>
 <section class="g-cards cards">$cards</section>
-HTML, ['private' => true]);
+HTML, ['private' => true, 'protect' => true]);
 }
 
 /** What non-members see in place of the Manuscript: no titles, lists or previews. */
@@ -103,6 +105,7 @@ function view_gate(?array $locked = null): void
     $join = e(url('join'));
     $heading = $locked ? 'This page lives inside <em>the Manuscript</em>' : 'The Magick <em>Manuscript</em>';
     if ($locked) http_response_code(403);
+    record_view($locked ? 'route:members-only' : 'route:/manuscript/');
     layout($locked ? 'Members only' : 'The Magick Manuscript', <<<HTML
 <section class="mm-hero narrow gate">
   <p class="eyebrow labelled">Members only</p>
@@ -127,6 +130,7 @@ function view_page(array $p): void
 {
     $access = has_access() || is_public_page($p);
     if (!$access) { view_gate($p); return; }
+    record_view($p['id']);
     $crumbs = $p['kind'] === 'grimoire' ? '' : breadcrumbs($p);
     $g = $p['kind'] === 'grimoire' ? $p : grimoire_root($p['grimoire']);
     $eyebrow = $p['kind'] === 'grimoire' ? 'The Magick Manuscript' : ($g['title'] ?? '');
@@ -136,7 +140,7 @@ function view_page(array $p): void
     unset($tags['_images']);
 
     $head = '<header class="pg-head">' . $crumbs . '<p class="eyebrow">' . e($eyebrow) . '</p>'
-        . '<h1>' . icon_html($p['icon'], 'pg-icon big') . e($p['title']) . '</h1>'
+        . '<div class="pg-title"><h1>' . icon_html($p['icon'], 'pg-icon big') . e($p['title']) . '</h1>' . save_button($p) . '</div>'
         . ($p['aka'] ? '<p class="aka">Also called ' . e($p['aka']) . '</p>' : '');
     if ($tags) {
         $head .= '<dl class="props">';
@@ -163,7 +167,7 @@ function view_page(array $p): void
         $body = $gallery . '<div class="mm-prose">' . resolve_links((string) $p['body_html']) . '</div>';
         if ($p['kind'] !== 'grimoire') $body .= connections_html(connections($p));
     }
-    layout($p['title'], '<article class="pg pg-' . e($p['kind']) . '">' . $cover . $head . $body . '</article>', ['private' => true]);
+    layout($p['title'], '<article class="pg pg-' . e($p['kind']) . '">' . $cover . $head . $body . '</article>', ['private' => true, 'protect' => true]);
 }
 
 /** Turns what someone typed into an FTS5 query where every word is a prefix match ("rose qua" → Rose Quartz). */
@@ -225,7 +229,7 @@ function view_search(string $q): void
         . $chips
         . ($count ? '<ol class="results">' . $list . '</ol>' : '<p class="lede">Try another spelling, a shorter word, or a related term.</p>')
         . '</section>';
-    layout('Search: ' . $q, $body, ['private' => true]);
+    layout('Search: ' . $q, $body, ['private' => true, 'protect' => true]);
 }
 
 /** Live suggestions for the search box: page titles and alternate names only. */
@@ -297,6 +301,7 @@ final class NotionImporterLinks
 
 function view_join(): void
 {
+    record_view('route:/manuscript/join');
     $copy = require MM_ROOT . '/manuscript-copy.php';
     $code = preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($_GET['code'] ?? ''));
     $csrf = e(csrf_token());
