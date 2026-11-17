@@ -4,23 +4,29 @@ declare(strict_types=1);
 /** Minimal Stripe API client: no SDK needed, works on any PHP host with curl. */
 function stripe(string $method, string $path, array $params = []): array
 {
-    $ch = curl_init('https://api.stripe.com/v1/' . ltrim($path, '/') . ($method === 'GET' && $params ? '?' . http_build_query($params) : ''));
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_USERPWD => config('stripe_secret_key') . ':',
-        CURLOPT_CUSTOMREQUEST => $method,
-        CURLOPT_TIMEOUT => 20,
-        CURLOPT_HTTPHEADER => ['Stripe-Version: 2024-06-20'],
-    ]);
-    if ($method !== 'GET') curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
-    $res = curl_exec($ch);
-    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    $data = json_decode((string) $res, true) ?: [];
-    if ($code >= 400 || !$res) {
-        throw new RuntimeException('Stripe error: ' . ($data['error']['message'] ?? "HTTP $code"));
+    // One key for every try, so a POST retried after a network hiccup can't create a second checkout or portal session.
+    $headers = ['Stripe-Version: 2024-06-20'];
+    if ($method === 'POST') $headers[] = 'Idempotency-Key: ' . bin2hex(random_bytes(16));
+    for ($attempt = 1; ; $attempt++) {
+        $ch = curl_init('https://api.stripe.com/v1/' . ltrim($path, '/') . ($method === 'GET' && $params ? '?' . http_build_query($params) : ''));
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_USERPWD => config('stripe_secret_key') . ':',
+            CURLOPT_CUSTOMREQUEST => $method,
+            CURLOPT_TIMEOUT => 20,
+            CURLOPT_HTTPHEADER => $headers,
+        ]);
+        if ($method !== 'GET') curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+        $res = curl_exec($ch);
+        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if (($code === 0 || $code === 429 || $code >= 500) && $attempt < 3) { usleep(400000 * $attempt); continue; }
+        $data = json_decode((string) $res, true) ?: [];
+        if ($code >= 400 || !$res) {
+            throw new RuntimeException('Stripe error: ' . ($data['error']['message'] ?? "HTTP $code"));
+        }
+        return $data;
     }
-    return $data;
 }
 
 function create_checkout(string $planKey, ?string $email, string $code = ''): string
@@ -136,6 +142,8 @@ function apply_stripe_event(array $event): void
     $obj = $event['data']['object'];
     switch ($event['type']) {
         case 'checkout.session.completed':
+        // Bank transfers and some wallets finish later: Stripe sends this when the money actually arrives.
+        case 'checkout.session.async_payment_succeeded':
             if (!in_array($obj['payment_status'] ?? 'paid', ['paid', 'no_payment_required'], true)) return;
             $email = $obj['customer_details']['email'] ?? $obj['customer_email'] ?? null;
             if (!$email) return;

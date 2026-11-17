@@ -44,7 +44,7 @@ return [
     // Dashboard → Developers → API keys. Use test keys (sk_test_...) until you are ready.
     'stripe_secret_key'     => 'sk_test_xxx',
     // Dashboard → Developers → Webhooks → add endpoint {base_url}/stripe-webhook
-    // with events: checkout.session.completed, invoice.paid, charge.refunded,
+    // with events: checkout.session.completed, checkout.session.async_payment_succeeded, invoice.paid, charge.refunded,
     // customer.subscription.updated, customer.subscription.deleted. Paste its signing secret here.
     'stripe_webhook_secret' => 'whsec_xxx',
     // The Manuscript is sold as lifetime access for $333 (Stripe → Product catalog → one-time price).
