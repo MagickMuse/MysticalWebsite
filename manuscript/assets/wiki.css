@@ -521,8 +521,11 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
   font-family: var(--display); font-weight: 600; line-height: 1; letter-spacing: 0; text-transform: uppercase; color: var(--ink-on); white-space: nowrap;
   font-size: min(1.12rem, calc(var(--room) / (var(--n, 8) * 1.12))); }
 .bk-title.n3 { --n: 3; } .bk-title.n4 { --n: 4; } .bk-title.n5 { --n: 5; } .bk-title.n6 { --n: 6; } .bk-title.n7 { --n: 7; } .bk-title.n8 { --n: 8; } .bk-title.n9 { --n: 9; } .bk-title.n10 { --n: 10; } .bk-title.n11 { --n: 11; } .bk-title.n12 { --n: 12; } .bk-title.n13 { --n: 13; } .bk-title.n14 { --n: 14; } .bk-title.n15 { --n: 15; } .bk-title.n16 { --n: 16; }
-.bk-star { position: absolute; left: 50%; bottom: 32px; width: 14px; height: 14px; margin-left: -7px; background: var(--gold); -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
-.bk.t4 .band, .bk.t4 .bk-star { background: #f3e2b4; }
+.bk-star { position: absolute; left: 50%; bottom: 28px; width: 14px; height: 14px; margin-left: -7px; background: var(--gold); -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
+svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -webkit-mask: none; mask: none; color: var(--gold); }
+.bk.t4 .band, .bk.t4 i.bk-star { background: #f3e2b4; }
+.bk.t4 svg.bk-star { color: #f3e2b4; }
+.bk.t5 svg.bk-star { color: #7a1f2b; }
 
 /* the front cover, shown on hover */
 .bk .cover { position: absolute; inset: 0; width: 220px; opacity: 0; transition: opacity .35s .05s; background: var(--bc); }

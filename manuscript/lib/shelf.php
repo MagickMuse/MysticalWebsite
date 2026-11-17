@@ -5,6 +5,7 @@ declare(strict_types=1);
  * The Manuscript home: the grimoires as book spines in one row (a carousel), in the website's colours.
  * Hovering (or focusing) a spine turns it to its front cover: the grimoire's photo with its title on top.
  * Clicking lifts the book out and opens it (assets/wiki.js), then goes into the grimoire.
+ * Each spine carries its grimoire's icon, the same as on the website's Grimoires page.
  * Colours come from classes, since the site's security rules allow no inline styles.
  */
 
@@ -29,7 +30,7 @@ function real_book(array $g, int $n, int $i): string
     return '<a class="bk ' . $tone . '" href="' . e(page_url($g)) . '"'
         . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '')) . '"'
         . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'
-        . '<span class="spine" aria-hidden="true"><i class="band top"></i><span class="bk-title' . $len . '">' . e($label) . '</span><i class="bk-star"></i><i class="band bottom"></i></span>'
+        . '<span class="spine" aria-hidden="true"><i class="band top"></i><span class="bk-title' . $len . '">' . e($label) . '</span>' . (grimoire_glyph($g['grimoire'], 'bk-star') ?: '<i class="bk-star"></i>') . '<i class="band bottom"></i></span>'
         . '<span class="cover" aria-hidden="true">' . ($photo ? '<img src="' . e($photo) . '" alt="" loading="lazy">' : '')
         . '<span class="cover-title">' . e($label) . '</span>'
         . '<span class="cover-sub">' . ($n ? number_format($n) . ' entries' : 'Guides') . '</span></span></a>';

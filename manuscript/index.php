@@ -11,6 +11,7 @@ require __DIR__ . '/lib/dashboard.php';
 require __DIR__ . '/lib/engage.php';
 require __DIR__ . '/lib/properties.php';
 require __DIR__ . '/lib/collection.php';
+require __DIR__ . '/lib/glyphs.php';
 require __DIR__ . '/lib/shelf.php';
 
 // Path relative to the wiki's base, e.g. "correspondence/protection".
