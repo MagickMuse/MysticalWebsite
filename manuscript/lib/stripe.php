@@ -29,7 +29,23 @@ function stripe(string $method, string $path, array $params = []): array
     }
 }
 
-function create_checkout(string $planKey, ?string $email, string $code = ''): string
+/**
+ * Creates the Checkout Session. With a publishable key set, the payment form is embedded in our own page
+ * (ui_mode embedded: Stripe returns a client_secret and comes back to return_url); without one, buyers go to
+ * Stripe's hosted page (url). Either way fulfillment happens in the webhook.
+ */
+function open_checkout(array $params): array
+{
+    if (config('stripe_publishable_key')) {
+        $params['ui_mode'] = 'embedded';
+        $params['return_url'] = $params['success_url'];
+        unset($params['success_url'], $params['cancel_url']);
+    }
+    $s = stripe('POST', 'checkout/sessions', $params);
+    return ['url' => $s['url'] ?? null, 'client_secret' => $s['client_secret'] ?? null];
+}
+
+function create_checkout(string $planKey, ?string $email, string $code = ''): array
 {
     $plan = config('plans')[$planKey] ?? null;
     if (!$plan || empty($plan['price'])) throw new InvalidArgumentException('Unknown plan');
@@ -44,7 +60,7 @@ function create_checkout(string $planKey, ?string $email, string $code = ''): st
     if ($plan['mode'] === 'payment') $params['customer_creation'] = 'always';
     if ($plan['mode'] === 'subscription') $params['subscription_data'] = ['metadata' => ['plan' => $planKey]];
     if ($email) $params['customer_email'] = $email;
-    return stripe('POST', 'checkout/sessions', apply_code($params, $code))['url'];
+    return open_checkout(apply_code($params, $code));
 }
 
 /** A discount code from a link (e.g. ?code=SEEKER10) is applied for the buyer, if it exists in Stripe. */
@@ -65,7 +81,7 @@ function apply_code(array $params, string $code): array
 }
 
 /** Checkout for a shop product. $amountCents is only used for pay-what-you-want products. */
-function create_product_checkout(string $slug, ?int $amountCents, ?string $email, string $code = ''): string
+function create_product_checkout(string $slug, ?int $amountCents, ?string $email, string $code = ''): array
 {
     $p = products()[$slug] ?? null;
     if (!$p || !empty($p['free'])) throw new InvalidArgumentException('Unknown product');
@@ -90,7 +106,19 @@ function create_product_checkout(string $slug, ?int $amountCents, ?string $email
         'payment_intent_data' => ['metadata' => ['product' => $slug]],
     ];
     if ($email) $params['customer_email'] = $email;
-    return stripe('POST', 'checkout/sessions', apply_code($params, $code))['url'];
+    return open_checkout(apply_code($params, $code));
+}
+
+/** Our own page holding Stripe's embedded payment form, or a redirect to Stripe's hosted page. */
+function show_checkout(array $session, string $title, string $back): void
+{
+    if (empty($session['client_secret'])) { redirect((string) $session['url']); return; }
+    layout('Checkout', '<section class="pay"><p class="eyebrow labelled">Secure checkout</p><h1>' . e($title) . '</h1>'
+        . '<div class="pay-frame"><div id="checkout" data-pk="' . e((string) config('stripe_publishable_key')) . '" data-secret="' . e($session['client_secret']) . '">'
+        . '<p class="pay-loading">Opening the secure payment form…</p></div></div>'
+        . '<noscript><p class="lede">The payment form needs JavaScript. Please turn it on and reload this page.</p></noscript>'
+        . '<p class="small pay-note">Payments are processed by Stripe; your card details never touch this site. <a class="link" href="' . e($back) . '">Go back</a></p></section>',
+        ['private' => true, 'stripe' => true]);
 }
 
 function record_payment(array $row): void

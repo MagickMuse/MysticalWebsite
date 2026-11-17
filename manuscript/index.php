@@ -389,7 +389,8 @@ function do_checkout(): void
 {
     check_csrf();
     if (empty($_POST['agree'])) redirect(url('join') . '#terms');
-    redirect(create_checkout((string) ($_POST['plan'] ?? ''), current_email(), (string) ($_POST['code'] ?? '')));
+    $plan = (string) ($_POST['plan'] ?? '');
+    show_checkout(create_checkout($plan, current_email(), (string) ($_POST['code'] ?? '')), config('plans')[$plan]['label'] ?? 'The Magick Manuscript', url('join'));
 }
 
 function view_welcome(): void

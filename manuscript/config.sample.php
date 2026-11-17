@@ -43,6 +43,8 @@ return [
     // ---------- Stripe paywall ----------
     // Dashboard → Developers → API keys. Use test keys (sk_test_...) until you are ready.
     'stripe_secret_key'     => 'sk_test_xxx',
+    // Publishable key (pk_test_… / pk_live_…). Set it to show the payment form on our own page; leave it out to send buyers to Stripe's page.
+    // 'stripe_publishable_key' => 'pk_test_xxx',
     // Dashboard → Developers → Webhooks → add endpoint {base_url}/stripe-webhook
     // with events: checkout.session.completed, checkout.session.async_payment_succeeded, invoice.paid, charge.refunded,
     // customer.subscription.updated, customer.subscription.deleted. Paste its signing secret here.

@@ -279,7 +279,13 @@ function breadcrumbs(array $page): string
 function layout(string $title, string $body, array $opt = []): void
 {
     header('Content-Type: text/html; charset=utf-8');
-    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.pexels.com https://images.unsplash.com; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'");
+    // The checkout page alone may load Stripe's payment form (Stripe's published CSP list for Stripe.js and embedded Checkout).
+    $stripe = !empty($opt['stripe']);
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'" . ($stripe ? ' https://js.stripe.com https://*.js.stripe.com' : '')
+        . "; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.pexels.com https://images.unsplash.com" . ($stripe ? ' https://*.stripe.com' : '')
+        . "; connect-src 'self'" . ($stripe ? ' https://api.stripe.com https://checkout.stripe.com https://merchant-ui-api.stripe.com' : '')
+        . ($stripe ? '; frame-src https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://checkout.stripe.com' : '')
+        . "; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'");
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     // Anything shown to a signed-in person must never be stored by a cache and shown to someone else.
@@ -305,10 +311,14 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=34">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=35">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=34" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=35" defer></script>
+<?php if ($stripe): ?>
+  <script src="https://js.stripe.com/v3/" defer></script>
+  <script src="<?= e(url('assets/checkout.js')) ?>?v=1" defer></script>
+<?php endif; ?>
 </head>
 <?php $visitor = !has_access(); $openUrls = $visitor ? array_merge([url('sneak-peek')], array_map('page_url', open_pages())) : []; ?>
 <body class="mm<?= !empty($opt['protect']) && !is_admin() ? ' no-copy' : '' ?>"<?php if ($visitor): ?> data-visitor data-base="<?= e((string) parse_url(url(), PHP_URL_PATH)) ?>" data-open="<?= e(json_encode(array_map(fn($u) => rtrim((string) parse_url($u, PHP_URL_PATH), '/'), $openUrls))) ?>"<?php endif ?>>
