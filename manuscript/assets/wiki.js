@@ -269,6 +269,7 @@
       current = bk;
       if (!bk) return;
       bk.classList.add('open');
+      if (bk.classList.contains('lying')) return; // lies flat: it lifts a little where it is, no cover to show
       var wide = parseFloat(getComputedStyle(bk.querySelector('.cover')).width) || 220, pad = 16;
       var left = bk.offsetLeft - track.offsetLeft, right = left + wide;
       var view0 = track.scrollLeft, view1 = view0 + track.clientWidth, to = null;
@@ -348,14 +349,17 @@
     front.appendChild(el('div', 'face', (photo ? '<img src="' + esc(photo) + '" alt="">' : '') + '<span class="t">' + esc(label) + '</span>'));
     front.appendChild(el('div', 'inside'));
     // Hovered, the book already shows its cover: start from that. Tapped (no hover), start side-on from the spine.
-    var fromCover = r.width > 120, turn0 = fromCover ? 'rotateY(0deg)' : 'rotateY(90deg)';
+    // A book lying flat starts from its spine too, turned on its side; it stands up as it comes to the middle.
+    var lying = book.classList.contains('lying');
+    var fromCover = !lying && r.width > 120, turn0 = fromCover ? 'rotateY(0deg)' : lying ? 'rotateZ(-90deg) rotateY(90deg)' : 'rotateY(90deg)';
+    if (lying) box.classList.add('lying');
     if (!fromCover) pages.style.opacity = '0';
     box.appendChild(pages); box.appendChild(spine); box.appendChild(front);
     wrap.appendChild(box); stage.appendChild(wrap);
     document.body.appendChild(veil); document.body.appendChild(stage);
 
     // Start exactly over the book in the row.
-    var s0 = fromCover ? r.width / W : r.height / H, cx0 = r.left + r.width / 2, cy0 = r.top + r.height / 2;
+    var s0 = fromCover ? r.width / W : (lying ? r.width : r.height) / H, cx0 = r.left + r.width / 2, cy0 = r.top + r.height / 2;
     // Open in the middle of the visible screen; the open book (cover + pages, 2W wide) is centred, so the spine sits at the middle.
     var cx1 = v.x, cy1 = v.y;
     stage.style.perspectiveOrigin = v.x + 'px ' + v.y + 'px';
@@ -376,7 +380,8 @@
         wrap.animate([{ transform: at(cx0, cy0 - 24, s0 * 1.06, 50) }, { transform: at(cx1, cy1, 1, 0) }], opts(travel));
         if (fromCover) return box.animate([{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(-8deg)', offset: .5 }, { transform: 'rotateY(0deg)' }], opts(travel)).finished;
         pages.animate([{ opacity: 0 }, { opacity: 0, offset: .4 }, { opacity: 1 }], opts(travel));
-        return box.animate([{ transform: 'rotateY(90deg)' }, { transform: 'rotateY(0deg)' }], opts(travel)).finished;
+        return box.animate(lying ? [{ transform: turn0 }, { transform: 'rotateZ(0deg) rotateY(0deg)' }]
+          : [{ transform: 'rotateY(90deg)' }, { transform: 'rotateY(0deg)' }], opts(travel)).finished;
       })
       .then(function () {
         // 3. open the cover, shifting the open book to stay centred, in a burst of stars

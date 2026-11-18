@@ -473,7 +473,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .b3d > * { position: absolute; top: 0; backface-visibility: hidden; }
 .b3d-front { left: 0; width: 100%; height: 100%; transform-origin: left center; transform-style: preserve-3d; z-index: 2; }
 .b3d-front .face, .b3d-front .inside { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 2px 6px 6px 2px; }
-.b3d-front .face { background: var(--bc); overflow: hidden; box-shadow: inset 6px 0 10px rgba(0,0,0,.35); }
+.b3d-front .face { background: var(--leather), var(--bc); overflow: hidden; box-shadow: inset 6px 0 10px rgba(0,0,0,.35); }
 .b3d-front .face img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .b3d-front .face::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, color-mix(in srgb, var(--bc) 92%, transparent) 0%, color-mix(in srgb, var(--bc) 55%, transparent) 26%, rgba(0,0,0,0) 48%, rgba(0,0,0,0) 70%, rgba(28,20,21,.55) 100%); }
 .b3d-front .face::after { content: ""; position: absolute; inset: 4%; z-index: 2; border: 1px solid color-mix(in srgb, var(--gold) 85%, transparent); border-radius: 2px; }
@@ -490,12 +490,16 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .b3d-pages .p { margin: 0; padding: 0 8%; font-family: var(--display); color: var(--ink); font-size: calc(var(--w) * .075); line-height: 1.25; text-wrap: balance; }
 .b3d-pages .p em { display: block; font-family: var(--script); color: var(--accent); font-size: calc(var(--w) * .1); line-height: 1.2; margin-bottom: calc(var(--w) * .04); font-style: normal; }
 .b3d-pages .p::before { content: ""; display: block; width: calc(var(--w) * .06); height: calc(var(--w) * .06); margin: 0 auto calc(var(--w) * .05); background: var(--gold); -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
-.b3d-spine { left: 0; height: 100%; transform-origin: left center; background: var(--bc); border-radius: 3px; overflow: hidden; }
+.b3d-spine { left: 0; height: 100%; transform-origin: left center; background: var(--leather), var(--bc); box-shadow: var(--worn); border-radius: 3px; overflow: hidden; }
 .b3d-spine .t { position: absolute; inset: 12% 0 14%; display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; text-orientation: upright; /* upright, like the shelf */
   font-family: var(--display); font-weight: 600; line-height: 1; text-transform: uppercase; color: var(--ink-on, #e5c983); white-space: nowrap;
   font-size: min(calc(var(--t) * .42), calc(var(--w) * 1.42 * .74 / (var(--n) * 1.12))); }
 
-/* ---------- the Manuscript home: one row of grimoire spines, in the site's colours ---------- */
+/* ---------- leather: a fine dark grain and soft light pebbling, laid over each book's colour ---------- */
+.bk, .slab, .b3d { --leather: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0 0 0 -.18'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='turbulence' baseFrequency='.42' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -.35 .1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+  --worn: inset 0 0 0 1px rgba(0,0,0,.22), inset 0 0 10px rgba(0,0,0,.28); }
+
+/* ---------- the Manuscript home: the grimoire spines on two shelves, in the site's colours ---------- */
 .carousel { position: relative; max-width: 1200px; margin: 0 auto; padding: 0 2.6rem; }
 .car-track { display: flex; align-items: flex-end; gap: 6px; justify-content: safe center; height: 340px; padding: 24px 4px 0; overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .car-track::-webkit-scrollbar { display: none; }
@@ -511,8 +515,8 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
   overflow: hidden; transition: width .45s cubic-bezier(.2,.7,.2,1), transform .35s, box-shadow .35s;
   box-shadow: 0 14px 22px -14px rgba(46, 31, 32, .6); }
 .bk.t1 { --bc: #7a1f2b; } .bk.t2 { --bc: #9c4a4f; } .bk.t3 { --bc: #2e1f20; } .bk.t4 { --bc: #a07a2c; } .bk.t5 { --bc: #c99a92; --ink-on: #3a2224; }
-.bk .spine { position: absolute; inset: 0; transition: opacity .3s;
-  background: linear-gradient(90deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,0) 14%, rgba(255,255,255,.16) 32%, rgba(0,0,0,0) 52%, rgba(0,0,0,.08) 86%, rgba(0,0,0,.3) 100%), var(--bc); }
+.bk .spine { position: absolute; inset: 0; transition: opacity .3s; box-shadow: var(--worn);
+  background: var(--leather), linear-gradient(90deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,0) 14%, rgba(255,255,255,.16) 32%, rgba(0,0,0,0) 52%, rgba(0,0,0,.08) 86%, rgba(0,0,0,.3) 100%), var(--bc); }
 .band { position: absolute; left: 0; right: 0; height: 2px; background: var(--gold); opacity: .85; }
 .band.top { top: 16px; box-shadow: 0 6px 0 -0.5px color-mix(in srgb, var(--gold) 60%, transparent); }
 .band.bottom { bottom: 18px; box-shadow: 0 -6px 0 -0.5px color-mix(in srgb, var(--gold) 60%, transparent); }
@@ -529,7 +533,7 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .bk.t5 svg.bk-star { color: #7a1f2b; }
 
 /* the front cover, shown on hover */
-.bk .cover { position: absolute; inset: 0; width: 220px; opacity: 0; transition: opacity .35s .05s; background: var(--bc); }
+.bk .cover { position: absolute; inset: 0; width: 220px; opacity: 0; transition: opacity .35s .05s; background: var(--leather), var(--bc); }
 .bk .cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .bk .cover::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in srgb, var(--bc) 92%, transparent) 0%, color-mix(in srgb, var(--bc) 55%, transparent) 26%, rgba(0,0,0,0) 48%, rgba(0,0,0,0) 70%, rgba(28,20,21,.55) 100%); z-index: 1; }
 .bk .cover::after { content: ""; position: absolute; inset: 9px; border: 1px solid color-mix(in srgb, var(--gold) 85%, transparent); border-radius: 2px; z-index: 2; pointer-events: none; }
@@ -541,6 +545,33 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .car-track:not([data-ready]) .bk:hover .cover, .bk.open .cover, .bk:focus-visible .cover { opacity: 1; }
 .bk:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 @media (hover: none) { .car-track { height: 320px; } }
+
+/* two shelves, one above the other */
+.shelves { display: grid; grid-template-columns: minmax(0, 1fr); gap: .6rem; } /* never wider than the screen: each shelf scrolls instead */
+.shelves .carousel { width: 100%; } /* both ledges the same length */
+
+/* a grimoire lying flat on two plain books (its name is too long to stand) */
+.stack { flex: none; display: flex; flex-direction: column; align-items: center; margin: 0 10px; }
+.bk.lying, .bk.lying.open, .car-track:not([data-ready]) .bk.lying:hover, .bk.lying:focus-visible { width: 320px; height: 58px; border-radius: 2px 3px 3px 2px; }
+.bk.lying { margin-bottom: 1px; transition: transform .35s, box-shadow .35s; }
+.bk.lying.open, .car-track:not([data-ready]) .bk.lying:hover, .bk.lying:focus-visible { transform: translateY(-8px) rotate(-1.5deg); box-shadow: 0 18px 22px -14px rgba(46, 31, 32, .7); }
+.bk.lying .spine, .bk.lying.open .spine, .car-track:not([data-ready]) .bk.lying:hover .spine, .bk.lying:focus-visible .spine { opacity: 1; box-shadow: var(--worn);
+  background: var(--leather), linear-gradient(180deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,0) 14%, rgba(255,255,255,.16) 32%, rgba(0,0,0,0) 52%, rgba(0,0,0,.08) 86%, rgba(0,0,0,.3) 100%), var(--bc); }
+.bk.lying .band { top: 0; bottom: 0; width: 2px; height: auto; }
+.bk.lying .band.left { left: 16px; right: auto; box-shadow: 6px 0 0 -0.5px color-mix(in srgb, var(--gold) 60%, transparent); }
+.bk.lying .band.right { right: 18px; left: auto; box-shadow: -6px 0 0 -0.5px color-mix(in srgb, var(--gold) 60%, transparent); }
+.bk.lying .bk-title { top: 0; bottom: 0; left: 70px; right: 34px; writing-mode: horizontal-tb; letter-spacing: .1em; font-size: .92rem; }
+.bk.lying .bk-star { left: 46px; top: 50%; bottom: auto; margin-top: -11px; }
+.bk.lying i.bk-star { margin-top: -7px; }
+.slab { display: block; height: 34px; border-radius: 2px; box-shadow: var(--worn), 0 10px 16px -12px rgba(46, 31, 32, .6);
+  background: var(--leather), linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,0) 18%, rgba(255,255,255,.14) 36%, rgba(0,0,0,0) 56%, rgba(0,0,0,.28) 100%), var(--bc);
+  border-left: 6px solid color-mix(in srgb, #000 18%, var(--bc)); }
+.slab.s1 { width: 290px; margin-left: 14px; }
+.slab.s2 { width: 330px; height: 42px; margin-right: 8px; }
+.slab.t1 { --bc: #7a1f2b; } .slab.t2 { --bc: #9c4a4f; } .slab.t3 { --bc: #2e1f20; } .slab.t4 { --bc: #a07a2c; } .slab.t5 { --bc: #c99a92; }
+/* lifted out and turned upright: the spine lettering turns with it */
+.b3d.lying .b3d-spine .t { text-orientation: mixed; }
+@media (max-width: 640px) { .shelves { gap: 1.6rem; } .bk.lying, .bk.lying.open, .bk.lying:focus-visible { width: 250px; height: 50px; } .bk.lying .bk-title { font-size: .74rem; left: 60px; right: 28px; letter-spacing: .08em; } .slab.s1 { width: 226px; } .slab.s2 { width: 258px; height: 36px; } }
 @media (max-width: 640px) { .carousel { padding: 0 .4rem; } .car-btn { display: none; } .car-track { height: 320px; } .bk { height: 280px; width: 50px; --room: 194px; } .car-track:not([data-ready]) .bk:hover, .bk.open, .bk:focus-visible { width: 190px; } .bk .cover { width: 190px; } }
 
 /* ---------- visitors: the join pop-up and the sneak peek note ---------- */

@@ -2,7 +2,8 @@
 declare(strict_types=1);
 
 /*
- * The Manuscript home: the grimoires as book spines in one row (a carousel), in the website's colours.
+ * The Manuscript home: the grimoires as book spines on two shelves, in the website's colours.
+ * A grimoire with a long name (Correspondences) lies flat on a little stack of plain books, its title read left to right.
  * Hovering (or focusing) a spine turns it to its front cover: the grimoire's photo with its title on top.
  * Clicking lifts the book out and opens it (assets/wiki.js), then goes into the grimoire.
  * Each spine carries its grimoire's icon, the same as on the website's Grimoires page.
@@ -36,14 +37,43 @@ function real_book(array $g, int $n, int $i): string
         . '<span class="cover-sub">' . ($n ? number_format($n) . ' entries' : 'Guides') . '</span></span></a>';
 }
 
-/** All the grimoires in one row, in alphabetical order, with arrows to move along. */
+/** Names this long don't fit standing up, so the book lies flat on a stack. */
+const LYING_FROM = 13;
+
+/** A grimoire lying on its side on top of two plain books. Clicking it opens it like the others. */
+function lying_book(array $g, int $n, int $i): string
+{
+    $label = grimoire_label($g);
+    $inside = grimoire_summary($g);
+    $photo = grimoire_photo($g['grimoire'], 440, 600);
+    $tone = 't' . (1 + $i % 5);
+    return '<div class="stack">'
+        . '<a class="bk lying ' . $tone . '" href="' . e(page_url($g)) . '"'
+        . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '') . ($n ? ' (' . number_format($n) . ' entries)' : '')) . '"'
+        . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'
+        . '<span class="spine" aria-hidden="true"><i class="band left"></i>' . (grimoire_glyph($g['grimoire'], 'bk-star') ?: '<i class="bk-star"></i>')
+        . '<span class="bk-title">' . e($label) . '</span><i class="band right"></i></span></a>'
+        // Plain books underneath, just for the look: not links, hidden from screen readers.
+        . '<span class="slab s1 t' . (1 + ($i + 2) % 5) . '" aria-hidden="true"></span>'
+        . '<span class="slab s2 t' . (1 + ($i + 4) % 5) . '" aria-hidden="true"></span>'
+        . '</div>';
+}
+
+/** The grimoires on two shelves, in alphabetical order; each shelf scrolls sideways if the screen is narrow. */
 function bookshelf_html(array $grimoires, array $counts): string
 {
-    $books = '';
-    foreach (array_values($grimoires) as $i => $g) $books .= real_book($g, $counts[$g['grimoire']] ?? 0, $i);
-    return '<section class="carousel" aria-label="The grimoires">'
-        . '<button class="car-btn prev" type="button" aria-label="Previous grimoires" data-car="-1">‹</button>'
-        . '<div class="car-track" data-carousel>' . $books . '</div>'
-        . '<button class="car-btn next" type="button" aria-label="More grimoires" data-car="1">›</button>'
-        . '<div class="ledge" aria-hidden="true"></div></section>';
+    $items = [];
+    foreach (array_values($grimoires) as $i => $g) {
+        $n = $counts[$g['grimoire']] ?? 0;
+        $items[] = mb_strlen(grimoire_label($g)) >= LYING_FROM ? lying_book($g, $n, $i) : real_book($g, $n, $i);
+    }
+    $html = '';
+    foreach (array_chunk($items, max(1, (int) ceil(count($items) / 2))) as $k => $row) {
+        $html .= '<section class="carousel" aria-label="' . ($k === 0 ? 'Top shelf' : 'Bottom shelf') . '">'
+            . '<button class="car-btn prev" type="button" aria-label="Previous grimoires" data-car="-1">‹</button>'
+            . '<div class="car-track" data-carousel>' . implode('', $row) . '</div>'
+            . '<button class="car-btn next" type="button" aria-label="More grimoires" data-car="1">›</button>'
+            . '<div class="ledge" aria-hidden="true"></div></section>';
+    }
+    return '<div class="shelves" role="group" aria-label="The grimoires">' . $html . '</div>';
 }
