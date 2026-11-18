@@ -112,6 +112,17 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .gallery { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
 .gallery figure { margin: 0; flex: 1 1 220px; max-width: 360px; border: 1px solid var(--line); }
 .gallery img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.gallery .zoom { display: block; cursor: zoom-in; }
+/* inside the properties (a spread's layout): the whole picture, not a square crop */
+.gallery.in-panel { margin: .4rem 0 1rem; }
+.gallery.in-panel figure { flex: 0 1 auto; max-width: min(100%, 520px); background: var(--bg); }
+.gallery.in-panel img { aspect-ratio: auto; height: auto; max-height: 360px; object-fit: contain; }
+/* a picture opened full size */
+.lightbox { max-width: none; max-height: none; width: 100vw; height: 100dvh; margin: 0; padding: 0; border: 0; background: rgba(28, 20, 21, .9); display: grid; place-items: center; }
+.lightbox:not([open]) { display: none; }
+.lightbox img { max-width: 94vw; max-height: 90dvh; width: auto; height: auto; object-fit: contain; box-shadow: 0 20px 60px rgba(0,0,0,.5); background: #f6efe8; cursor: zoom-out; }
+.lightbox .lb-x { position: fixed; top: 14px; right: 18px; width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(246,239,232,.5); background: transparent; color: #f6efe8; font: 400 1.8rem/1 var(--display); cursor: pointer; }
+.lightbox .lb-x:hover { border-color: #f6efe8; }
 
 /* Notion colors, softened to the brand palette */
 .c-red, .c-pink { color: var(--accent-text); }

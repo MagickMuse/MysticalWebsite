@@ -176,6 +176,20 @@
     }).catch(function () { head.textContent = 'Search could not load. Please refresh the page.'; });
   }
 
+  // Pictures open full size in an overlay; a click anywhere, the × or Escape closes it.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[data-zoom]');
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0 || typeof HTMLDialogElement !== 'function') return;
+    e.preventDefault();
+    var d = document.createElement('dialog'); d.className = 'lightbox'; d.setAttribute('aria-label', 'Picture');
+    var x = document.createElement('button'); x.className = 'lb-x'; x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.textContent = '×';
+    var img = document.createElement('img'); img.src = a.getAttribute('href'); img.alt = (a.querySelector('img') || {}).alt || '';
+    d.appendChild(x); d.appendChild(img); document.body.appendChild(d);
+    d.addEventListener('click', function () { d.close(); });
+    d.addEventListener('close', function () { d.remove(); a.focus(); });
+    d.showModal();
+  });
+
   // GitHub Pages copy: a group shows its first entries; "Show all" reveals the rest in place.
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-show-all]'); if (!b) return;

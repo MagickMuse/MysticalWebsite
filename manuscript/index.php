@@ -183,7 +183,15 @@ function view_page(array $p): void
     {
         $gallery = '';
         if ($images) {
-            $gallery = '<div class="gallery">' . implode('', array_map(fn($f) => '<figure><img src="' . e(media_url($f)) . '" alt="' . e($p['title']) . '" loading="lazy"></figure>', $images)) . '</div>';
+            // Each picture opens full size when clicked (assets/wiki.js); without JavaScript the link opens the picture itself.
+            $gallery = '<div class="gallery">' . implode('', array_map(fn($f) => '<figure><a class="zoom" href="' . e(media_url($f)) . '" data-zoom>'
+                . '<img src="' . e(media_url($f)) . '" alt="' . e($p['title']) . '" loading="lazy"></a></figure>', $images)) . '</div>';
+        }
+        // A spread's layout picture goes right above its Card Details, where the positions are explained.
+        $details = '<div class="prop-row"><div class="prop-name"><span class="prop-glyph" aria-hidden="true">◇</span>Card Details</div>';
+        if ($gallery && str_contains($panel, $details)) {
+            $panel = str_replace($details, str_replace('class="gallery"', 'class="gallery in-panel"', $gallery) . $details, $panel);
+            $gallery = '';
         }
         // Landing pages: intro text is public, the guide pages it links to are for members.
         $bodyHtml = resolve_links((string) $p['body_html']);
