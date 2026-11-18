@@ -44,6 +44,13 @@ const LYING_FROM = 13;
 const LYING_WITH_CANDLE = ['ritual'];
 
 /** A grimoire lying on its side on top of two plain books. Clicking it opens it like the others. */
+/** A group of three pillar candles of different heights, the tallest in the middle, slightly overlapping. */
+function candles_html(): string
+{
+    $one = fn(string $c) => '<span class="candle ' . $c . '"><i class="wax"></i><i class="wick"></i><i class="flame"></i></span>';
+    return '<span class="candles" aria-hidden="true"><i class="glow"></i>' . $one('c1') . $one('c2') . $one('c3') . '</span>';
+}
+
 function lying_book(array $g, int $n, int $i, bool $candle = false, string $side = 'at-end'): string
 {
     $label = grimoire_label($g);
@@ -52,8 +59,8 @@ function lying_book(array $g, int $n, int $i, bool $candle = false, string $side
     $photo = grimoire_photo($g['grimoire'], 440, 600);
     $tone = 't' . (1 + $i % 5);
     return '<div class="stack ' . $side . $short . '">'
-        // A candle in a glass jar burning on top of the book (just for the look).
-        . ($candle ? '<span class="candle" aria-hidden="true"><i class="glow"></i><i class="jar"><i class="wax"></i><i class="wick"></i><i class="flame"></i><i class="glass"></i></i></span>' : '')
+        // Three candles burning on top of the book, tallest in the middle (just for the look).
+        . ($candle ? candles_html() : '')
         . '<a class="bk lying ' . $tone . '" href="' . e(page_url($g)) . '"'
         . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '') . ($n ? ' (' . number_format($n) . ' entries)' : '')) . '"'
         . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'
