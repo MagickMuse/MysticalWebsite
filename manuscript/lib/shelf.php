@@ -44,22 +44,22 @@ const LYING_FROM = 13;
 const LYING_WITH_CANDLE = ['ritual'];
 
 /** A grimoire lying on its side on top of two plain books. Clicking it opens it like the others. */
-function lying_book(array $g, int $n, int $i, bool $candle = false): string
+function lying_book(array $g, int $n, int $i, bool $candle = false, string $side = 'at-end'): string
 {
     $label = grimoire_label($g);
     $short = mb_strlen($label) < 10 ? ' short' : '';
     $inside = grimoire_summary($g);
     $photo = grimoire_photo($g['grimoire'], 440, 600);
     $tone = 't' . (1 + $i % 5);
-    return '<div class="stack' . $short . '">'
-        // A candle burning on top of the book (just for the look).
-        . ($candle ? '<span class="candle" aria-hidden="true"><i class="glow"></i><i class="flame"></i><i class="wick"></i><i class="wax"></i></span>' : '')
+    return '<div class="stack ' . $side . $short . '">'
+        // A candle in a glass jar burning on top of the book (just for the look).
+        . ($candle ? '<span class="candle" aria-hidden="true"><i class="glow"></i><i class="jar"><i class="wax"></i><i class="wick"></i><i class="flame"></i><i class="glass"></i></i></span>' : '')
         . '<a class="bk lying ' . $tone . '" href="' . e(page_url($g)) . '"'
         . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '') . ($n ? ' (' . number_format($n) . ' entries)' : '')) . '"'
         . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'
         . '<span class="spine" aria-hidden="true"><i class="band left"></i>' . (grimoire_glyph($g['grimoire'], 'bk-star') ?: '<i class="bk-star"></i>')
         . '<span class="bk-title">' . e($label) . '</span><i class="band right"></i></span></a>'
-        // Plain books underneath, just for the look: not links, hidden from screen readers.
+        // Plain books underneath, each bigger than the one on it, just for the look: not links, hidden from screen readers.
         . '<span class="slab s1 t' . (1 + ($i + 2) % 5) . '" aria-hidden="true"></span>'
         . '<span class="slab s2 t' . (1 + ($i + 4) % 5) . '" aria-hidden="true"></span>'
         . '</div>';
@@ -68,14 +68,23 @@ function lying_book(array $g, int $n, int $i, bool $candle = false): string
 /** The grimoires on two shelves, in alphabetical order; each shelf scrolls sideways if the screen is narrow. */
 function bookshelf_html(array $grimoires, array $counts): string
 {
-    $items = [];
+    // Standing books in alphabetical order, split over the two shelves. The flat stacks don't mirror each other:
+    // one ends the top shelf on the right, the other starts the bottom shelf on the left, so the two balance on a diagonal.
+    $up = $flat = [];
     foreach (array_values($grimoires) as $i => $g) {
         $n = $counts[$g['grimoire']] ?? 0;
         $candle = in_array($g['grimoire'], LYING_WITH_CANDLE, true);
-        $items[] = $candle || mb_strlen(grimoire_label($g)) >= LYING_FROM ? lying_book($g, $n, $i, $candle) : real_book($g, $n, $i);
+        if ($candle || mb_strlen(grimoire_label($g)) >= LYING_FROM) $flat[] = [$g, $n, $i, $candle];
+        else $up[] = real_book($g, $n, $i);
+    }
+    $half = (int) ceil(count($up) / 2);
+    $rows = [array_slice($up, 0, $half), array_slice($up, $half)];
+    foreach ($flat as $k => [$g, $n, $i, $candle]) {
+        if ($k % 2 === 0) $rows[0][] = lying_book($g, $n, $i, $candle, 'at-end');
+        else array_unshift($rows[1], lying_book($g, $n, $i, $candle, 'at-start'));
     }
     $html = '';
-    foreach (array_chunk($items, max(1, (int) ceil(count($items) / 2))) as $k => $row) {
+    foreach ($rows as $k => $row) {
         $html .= '<section class="carousel" aria-label="' . ($k === 0 ? 'Top shelf' : 'Bottom shelf') . '">'
             . '<button class="car-btn prev" type="button" aria-label="Previous grimoires" data-car="-1">‹</button>'
             . '<div class="car-track" data-carousel>' . implode('', $row) . '</div>'
