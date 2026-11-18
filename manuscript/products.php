@@ -5,12 +5,16 @@
  *
  * Delivery links (Google Classroom, Notion duplicate links) are NOT kept here, because this
  * repository is public. They go in the private config file under 'product_links'.
+ *
+ * tax_code is Stripe's tax category, required by Managed Payments (Stripe collects and files sales tax/VAT):
+ * https://docs.stripe.com/tax/tax-codes
  */
 return [
     'witchcraft-101' => [
         'name' => 'Witchcraft 101: Foundations of Magick ✧ Self-Paced Beginner Course',
         'short_name' => 'Witchcraft 101',
         'kind' => 'Course',
+        'tax_code' => 'txcd_20060358', // on-demand online course, written material
         'tagline' => 'A self-paced beginner course in seven units, grounded in published sources.',
         'price_cents' => 1000,
         'pay_what_you_want' => true,
@@ -25,6 +29,7 @@ HTML,
         'name' => 'Witchcraft 111: Intro to Magickal Practices ✧ Self-Paced Beginner Course',
         'short_name' => 'Witchcraft 111',
         'kind' => 'Course',
+        'tax_code' => 'txcd_20060358', // on-demand online course, written material
         'tagline' => 'Seven units: divination, astrology, herbalism, ancestors, deities, runes and crystals.',
         'price_cents' => 2000,
         'pay_what_you_want' => true,
@@ -40,6 +45,7 @@ HTML,
         'name' => 'Blank Interconnected 14 Grimoires ✧ Notion Template Framework',
         'short_name' => 'The Blank Grimoire',
         'kind' => 'Notion template',
+        'tax_code' => 'txcd_10503000', // digital document, downloadable, permanent rights
         'tagline' => 'You\'ll get to build your own digital grimoire with ease!',
         'price_cents' => 1000,
         'pay_what_you_want' => true,

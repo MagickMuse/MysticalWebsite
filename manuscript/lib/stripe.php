@@ -2,10 +2,10 @@
 declare(strict_types=1);
 
 /** Minimal Stripe API client: no SDK needed, works on any PHP host with curl. */
-function stripe(string $method, string $path, array $params = []): array
+function stripe(string $method, string $path, array $params = [], string $version = '2024-06-20'): array
 {
     // One key for every try, so a POST retried after a network hiccup can't create a second checkout or portal session.
-    $headers = ['Stripe-Version: 2024-06-20'];
+    $headers = ['Stripe-Version: ' . $version];
     if ($method === 'POST') $headers[] = 'Idempotency-Key: ' . bin2hex(random_bytes(16));
     for ($attempt = 1; ; $attempt++) {
         $ch = curl_init('https://api.stripe.com/v1/' . ltrim($path, '/') . ($method === 'GET' && $params ? '?' . http_build_query($params) : ''));
@@ -29,6 +29,8 @@ function stripe(string $method, string $path, array $params = []): array
     }
 }
 
+const MANAGED_PAYMENTS_API_VERSION = '2026-02-25.preview';
+
 /**
  * Creates the Checkout Session. With a publishable key set, the payment form is embedded in our own page
  * (ui_mode embedded: Stripe returns a client_secret and comes back to return_url); without one, buyers go to
@@ -41,7 +43,14 @@ function open_checkout(array $params): array
         $params['return_url'] = $params['success_url'];
         unset($params['success_url'], $params['cancel_url']);
     }
-    $s = stripe('POST', 'checkout/sessions', $params);
+    // Managed Payments: Stripe is the seller of record and handles sales tax/VAT, fraud and order support.
+    // It needs this API version (or later) and a tax code on every product.
+    $version = '2024-06-20';
+    if (config('managed_payments', false)) {
+        $params['managed_payments'] = ['enabled' => 'true'];
+        $version = MANAGED_PAYMENTS_API_VERSION;
+    }
+    $s = stripe('POST', 'checkout/sessions', $params, $version);
     return ['url' => $s['url'] ?? null, 'client_secret' => $s['client_secret'] ?? null];
 }
 
@@ -95,7 +104,7 @@ function create_product_checkout(string $slug, ?int $amountCents, ?string $email
             'price_data' => [
                 'currency' => config('currency', 'usd'),
                 'unit_amount' => $amount,
-                'product_data' => ['name' => $p['short_name'] ?? $p['name']],
+                'product_data' => ['name' => $p['short_name'] ?? $p['name']] + (!empty($p['tax_code']) ? ['tax_code' => $p['tax_code']] : []),
             ],
         ]],
         'success_url' => site_url('shop/thanks?session_id={CHECKOUT_SESSION_ID}'),

@@ -43,6 +43,10 @@ return [
     // ---------- Stripe paywall ----------
     // Dashboard → Developers → API keys. Use test keys (sk_test_...) until you are ready.
     'stripe_secret_key'     => 'sk_test_xxx',
+    // Managed Payments: Stripe is the seller of record, so it collects and files sales tax/VAT, screens fraud and
+    // handles order support. Every Stripe product needs a tax code (the Manuscript product: set it in the Dashboard;
+    // shop products: 'tax_code' in products.php). https://docs.stripe.com/payments/managed-payments
+    // 'managed_payments' => true,
     // Publishable key (pk_test_… / pk_live_…). Set it to show the payment form on our own page; leave it out to send buyers to Stripe's page.
     // 'stripe_publishable_key' => 'pk_test_xxx',
     // Dashboard → Developers → Webhooks → add endpoint {base_url}/stripe-webhook
