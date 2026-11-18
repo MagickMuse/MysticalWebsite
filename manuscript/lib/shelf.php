@@ -37,22 +37,23 @@ function real_book(array $g, int $n, int $i): string
         . '<span class="cover-sub">' . ($n ? number_format($n) . ' entries' : 'Guides') . '</span></span></a>';
 }
 
-/** Names this long don't fit standing up, so the book lies flat on a stack. */
-const LYING_FROM = 13;
-
 /**
- * Plain books in a stack can carry a title and lead somewhere: grimoire whose stack it's in =>
- * [book (s1 right under the grimoire, s2 the bottom one) => [title, a page ("grimoire/slug") or "route:<address>"]].
+ * The two flat stacks on the shelves: books lying on their side that lead to guide pages and tools, not grimoires.
+ * Listed top of the stack first; each book underneath is longer and thicker than the one on it.
+ * A book is [title, a page ("grimoire/slug") or "route:<address>", tone] — no title for a plain one.
+ * The top shelf's stack ends it on the right; the bottom shelf's starts it on the left, under three candles.
  */
-const TITLED_UNDER = ['correspondence' => [
-    's1' => ['Calendar', 'route:calendar'],
-    's2' => ['Journal Prompts', 'begin-here/journal-prompts'],
-]];
+const SHELF_STACKS = [
+    'top' => ['candles' => false, 'books' => [
+        ['Calendar', 'route:calendar', 't1'],
+        ['Journal Prompts', 'begin-here/journal-prompts', 't3'],
+    ]],
+    'bottom' => ['candles' => true, 'books' => [
+        [null, null, 't4'],
+        ['Tarot Spreads', 'card/tarot-spreads', 't2'],
+    ]],
+];
 
-/** Grimoires that lie flat with a lit candle on top, one per shelf to balance the stacks (the Rituals). */
-const LYING_WITH_CANDLE = ['ritual'];
-
-/** A grimoire lying on its side on top of two plain books. Clicking it opens it like the others. */
 /** A group of three pillar candles of different heights, the tallest in the middle, slightly overlapping. */
 function candles_html(): string
 {
@@ -60,57 +61,33 @@ function candles_html(): string
     return '<span class="candles" aria-hidden="true"><i class="glow"></i>' . $one('c1') . $one('c2') . $one('c3') . '</span>';
 }
 
-/** The bottom book of a stack: plain, or titled and leading to a page (TITLED_UNDER) once that page is on the site. */
-function under_book(string $grimoire, string $which, string $tone): string
+/** One book lying in a stack ($k: 0 on top, then bigger): titled and a link once its page is on the site, else plain. */
+function stack_book(?string $title, ?string $ref, string $tone, int $k): string
 {
-    [$title, $ref] = TITLED_UNDER[$grimoire][$which] ?? [null, null];
     $href = null;
     if ($ref && str_starts_with($ref, 'route:')) $href = url(substr($ref, 6));
     elseif ($ref && ($page = page_by_ref($ref))) $href = page_url($page);
-    if (!$href) return '<span class="slab ' . $which . ' ' . $tone . '" aria-hidden="true"></span>';
-    return '<a class="slab titled ' . $which . ' ' . $tone . '" href="' . e($href) . '" aria-label="' . e($title) . '">'
+    if (!$title || !$href) return '<span class="slab s' . $k . ' ' . $tone . '" aria-hidden="true"></span>';
+    return '<a class="slab titled s' . $k . ' ' . $tone . '" href="' . e($href) . '" aria-label="' . e($title) . '">'
         . '<span class="slab-title" aria-hidden="true">' . e($title) . '</span></a>';
 }
 
-function lying_book(array $g, int $n, int $i, bool $candle = false, string $side = 'at-end'): string
+function stack_html(array $stack, string $side): string
 {
-    $label = grimoire_label($g);
-    $short = mb_strlen($label) < 10 ? ' short' : '';
-    $inside = grimoire_summary($g);
-    $photo = grimoire_photo($g['grimoire'], 440, 600);
-    $tone = 't' . (1 + $i % 5);
-    return '<div class="stack ' . $side . $short . '">'
-        // Three candles burning on top of the book, tallest in the middle (just for the look).
-        . ($candle ? candles_html() : '')
-        . '<a class="bk lying ' . $tone . '" href="' . e(page_url($g)) . '"'
-        . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '') . ($n ? ' (' . number_format($n) . ' entries)' : '')) . '"'
-        . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'
-        . '<span class="spine" aria-hidden="true"><i class="band left"></i>' . (grimoire_glyph($g['grimoire'], 'bk-star') ?: '<i class="bk-star"></i>')
-        . '<span class="bk-title">' . e($label) . '</span><i class="band right"></i></span></a>'
-        // Plain books underneath, each bigger than the one on it, just for the look: not links, hidden from screen readers.
-        . under_book($g['grimoire'], 's1', 't' . (1 + ($i + 2) % 5))
-        . under_book($g['grimoire'], 's2', 't' . (1 + ($i + 4) % 5))
-        . '</div>';
+    $html = '<div class="stack ' . $side . '">' . (!empty($stack['candles']) ? candles_html() : '');
+    foreach ($stack['books'] as $k => [$title, $ref, $tone]) $html .= stack_book($title, $ref, $tone, $k);
+    return $html . '</div>';
 }
 
-/** The grimoires on two shelves, in alphabetical order; each shelf scrolls sideways if the screen is narrow. */
+/** The grimoires standing on two shelves in alphabetical order, with a flat stack at the end of each; shelves scroll on narrow screens. */
 function bookshelf_html(array $grimoires, array $counts): string
 {
-    // Standing books in alphabetical order, split over the two shelves. The flat stacks don't mirror each other:
-    // one ends the top shelf on the right, the other starts the bottom shelf on the left, so the two balance on a diagonal.
-    $up = $flat = [];
-    foreach (array_values($grimoires) as $i => $g) {
-        $n = $counts[$g['grimoire']] ?? 0;
-        $candle = in_array($g['grimoire'], LYING_WITH_CANDLE, true);
-        if ($candle || mb_strlen(grimoire_label($g)) >= LYING_FROM) $flat[] = [$g, $n, $i, $candle];
-        else $up[] = real_book($g, $n, $i);
-    }
+    $up = [];
+    foreach (array_values($grimoires) as $i => $g) $up[] = real_book($g, $counts[$g['grimoire']] ?? 0, $i);
     $half = (int) ceil(count($up) / 2);
     $rows = [array_slice($up, 0, $half), array_slice($up, $half)];
-    foreach ($flat as $k => [$g, $n, $i, $candle]) {
-        if ($k % 2 === 0) $rows[0][] = lying_book($g, $n, $i, $candle, 'at-end');
-        else array_unshift($rows[1], lying_book($g, $n, $i, $candle, 'at-start'));
-    }
+    $rows[0][] = stack_html(SHELF_STACKS['top'], 'at-end');
+    array_unshift($rows[1], stack_html(SHELF_STACKS['bottom'], 'at-start'));
     $html = '';
     foreach ($rows as $k => $row) {
         $html .= '<section class="carousel" aria-label="' . ($k === 0 ? 'Top shelf' : 'Bottom shelf') . '">'
@@ -119,11 +96,13 @@ function bookshelf_html(array $grimoires, array $counts): string
             . '<button class="car-btn next" type="button" aria-label="More grimoires" data-car="1">›</button>'
             . '<div class="ledge" aria-hidden="true"></div></section>';
     }
-    // Phones: every grimoire lying flat in one alphabetical pile, the candles on top (CSS shows one or the other).
+    // Phones: every grimoire lying flat in one alphabetical pile, the candles on top and the titled stack books at the base.
     $pile = '';
     foreach (array_values($grimoires) as $i => $g) $pile .= pile_book($g, $counts[$g['grimoire']] ?? 0, $i);
+    $base = '';
+    foreach (SHELF_STACKS as $stack) foreach ($stack['books'] as $k => [$title, $ref, $tone]) if ($title) $base .= stack_book($title, $ref, $tone, $k + 1);
     return '<div class="shelves" role="group" aria-label="The grimoires">' . $html . '</div>'
-        . '<div class="book-pile" role="group" aria-label="The grimoires">' . candles_html() . $pile . '<div class="ledge" aria-hidden="true"></div></div>';
+        . '<div class="book-pile" role="group" aria-label="The grimoires">' . candles_html() . $pile . $base . '<div class="ledge" aria-hidden="true"></div></div>';
 }
 
 /** One grimoire lying flat, for the phone pile. */

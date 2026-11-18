@@ -844,3 +844,12 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .cal-more { color: var(--muted); font-size: .68rem; }
 .cal-days a[aria-current="date"] .cal-more { color: inherit; opacity: .8; }
 @media (max-width: 640px) { .cal-n { font-size: 1rem; } .cal-ev { font-size: 0; } .cal-ev i { font-size: .8rem; margin: 0; } .cal-more { display: none; } } /* phones: just the emoji */
+
+/* the flat stacks now hold only books lying on their side (guides and tools): the top one is the smallest */
+.stack { --w: 270px; }
+.stack .slab.s0 { width: var(--w); height: 56px; margin: 0; }
+.stack.at-start .candles { margin-left: calc(74px + 26px); }
+@media (max-width: 640px) { .stack { --w: 200px; } .stack .slab.s0 { height: 50px; } }
+/* phones: the titled books (Calendar, Journal Prompts) are the big books at the base of the pile */
+.book-pile .slab { flex: none; width: min(306px, 90vw); height: 50px; }
+.book-pile .slab.s2 { width: min(322px, 94vw); height: 54px; }
