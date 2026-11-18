@@ -178,7 +178,15 @@ function view_page(array $p): void
     $photo = $p['kind'] === 'grimoire' ? grimoire_photo($p['grimoire'], 1600, 640) : null;
     $cover = $photo ? '<div class="pg-cover arch-banner"><img src="' . e($photo) . '" alt="" width="1600" height="640"></div>' : '';
     // Cut-out pictures (transparent PNGs, like the Animal Grimoire's) are shown whole, standing on the page, not cropped into the arch.
-    if (!$photo) $cover = $p['cover'] ? '<div class="pg-cover' . (is_cutout($p['cover']) ? ' cutout' : '') . '"><img src="' . e(media_url($p['cover'])) . '" alt=""></div>' : '';
+    // Tall pictures (a tarot or Lenormand card) are shown whole too, and open full size when clicked: a wide banner would crop them to a strip.
+    if (!$photo && $p['cover']) {
+        $whole = is_cutout($p['cover']) || is_portrait($p['cover']);
+        $img = '<img src="' . e(media_url($p['cover'])) . '" alt="' . ($whole ? e($p['title']) : '') . '">';
+        $cover = '<div class="pg-cover' . ($whole ? ' cutout' : '') . '">'
+            . ($whole ? '<a class="zoom" href="' . e(media_url($p['cover'])) . '" data-zoom>' . $img . '</a>' : $img) . '</div>';
+    } elseif (!$photo) {
+        $cover = '';
+    }
 
     {
         $gallery = '';
@@ -218,6 +226,13 @@ function is_cutout(string $file): bool
     if (!str_ends_with(strtolower($file), '.png')) return false;
     $h = @file_get_contents(config('data_dir') . '/media/' . basename($file), false, null, 0, 26);
     return $h !== false && strlen($h) === 26 && in_array(ord($h[25]), [4, 6], true);
+}
+
+/** True for a picture taller than it is wide, read from the file itself. */
+function is_portrait(string $file): bool
+{
+    $size = @getimagesize(config('data_dir') . '/media/' . basename($file));
+    return $size !== false && $size[1] > $size[0] * 1.05;
 }
 
 /** Turns what someone typed into an FTS5 query where every word is a prefix match ("rose qua" → Rose Quartz). */
