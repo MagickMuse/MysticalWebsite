@@ -646,7 +646,7 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .pg.with-aside .rel { padding: .05rem 0; }
 .pg.with-aside .gallery.in-panel { margin: .3rem 0 .8rem; }
 @media (min-width: 900px) {
-  .pg.with-aside { max-width: 1200px; display: grid; grid-template-columns: 240px minmax(0, 1fr); column-gap: clamp(2rem, 4vw, 3.6rem);
+  .pg.with-aside { max-width: 1440px; display: grid; grid-template-columns: clamp(300px, 34%, 480px) minmax(0, 1fr); column-gap: clamp(2rem, 4vw, 4rem);
     grid-template-areas: "cover cover" "head head" "side gallery" "side body"; grid-template-rows: auto auto auto 1fr; align-items: start; }
   .pg.with-aside > .pg-cover { grid-area: cover; }
   .pg.with-aside > .pg-head, .pg.with-aside > .peek-note { grid-area: head; }
@@ -842,3 +842,7 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .mm-prose .steps li { padding-left: .3rem; }
 .mm-prose .steps li + li, .mm-prose .ingredients li + li { margin-top: .45rem; }
 .mm-prose .steps li::marker { font-family: var(--display); color: var(--accent-text); font-weight: 600; }
+
+/* long connection lists: the first few, then "Show all" (on the GitHub Pages copy the rest are in the page, hidden) */
+.rels .rel[hidden] { display: none; }
+button.rel-more { cursor: pointer; font: inherit; background: none; }

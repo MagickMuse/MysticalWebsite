@@ -332,6 +332,13 @@
     }).catch(function () {});
   })();
 
+  // GitHub Pages copy: a long connection list shows its first links; "Show all" reveals the rest in place.
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-show-rels]'); if (!b) return;
+    b.parentNode.querySelectorAll('.rel[hidden]').forEach(function (a) { a.hidden = false; });
+    b.remove();
+  });
+
   // GitHub Pages copy: a group shows its first entries; "Show all" reveals the rest in place.
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-show-all]'); if (!b) return;
