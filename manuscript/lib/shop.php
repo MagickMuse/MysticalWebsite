@@ -169,7 +169,7 @@ function do_claim(): void
     $email = strtolower(trim((string) ($_POST['email'] ?? '')));
     if (!$p || empty($p['free'])) { not_found(); return; }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { view_product($p); return; }
-    if (!throttle('claim', 5, 900)) { layout('Slow down', '<section class="mm-empty"><h1>Too many tries</h1><p class="lede">Please wait a few minutes.</p></section>'); return; }
+    if (!throttle('claim', 5, 900) || too_many_links($email)) { layout('Slow down', '<section class="mm-empty"><h1>Too many tries</h1><p class="lede">Please wait a few minutes.</p></section>'); return; }
 
     db()->prepare('INSERT OR IGNORE INTO leads (email, product, created_at) VALUES (?, ?, ?)')->execute([$email, $p['slug'], now()]);
     grant($email, $p['slug'], 'free');
@@ -193,7 +193,7 @@ function view_shop_thanks(): void
             if (($s['status'] ?? '') === 'complete' && $email) {
                 // Normally the webhook records it; doing it here too means no waiting.
                 handle_stripe_event(['id' => 'thanks_' . $sid, 'type' => 'checkout.session.completed', 'data' => ['object' => $s]]);
-                sign_in($email);
+                if (checkout_link_fresh($s)) sign_in($email);
                 $slug = $s['metadata']['product'] ?? null;
             }
         } catch (Throwable $ex) {

@@ -400,13 +400,17 @@ function view_welcome(): void
     if (preg_match('/^cs_[A-Za-z0-9_]+$/', $sid)) {
         try {
             $s = stripe('GET', 'checkout/sessions/' . $sid);
-            if (($s['status'] ?? '') === 'complete') {
-                $email = $s['customer_details']['email'] ?? null;
+            $buyer = $s['customer_details']['email'] ?? null;
+            if (($s['status'] ?? '') === 'complete' && $buyer) {
                 // The webhook normally records the membership; doing it here too means no waiting.
-                if ($email && !member_row($email)) {
+                if (!member_row($buyer)) {
                     handle_stripe_event(['id' => 'welcome_' . $sid, 'type' => 'checkout.session.completed', 'data' => ['object' => $s]]);
                 }
-                if ($email) sign_in($email);
+                // Only say "you're in" when access really was granted (a bank transfer may still be pending).
+                if (checkout_link_fresh($s) && member_row($buyer)) {
+                    sign_in($buyer);
+                    $email = $buyer;
+                }
             }
         } catch (Throwable $ex) {
             error_log('[manuscript] welcome: ' . $ex->getMessage());
@@ -459,7 +463,7 @@ function do_login(): void
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { view_login('<p class="notice error">That email doesn’t look right.</p>', $next); return; }
     if (!throttle('login', 5, 900)) { view_login('<p class="notice error">Too many tries. Please wait a few minutes.</p>', $next); return; }
     // Only customers and admins get a link; everyone sees the same message so emails can't be probed.
-    if (is_customer($email) || is_admin($email)) {
+    if ((is_customer($email) || is_admin($email)) && !too_many_links($email)) {
         $link = url('auth?token=' . issue_login_token($email) . '&next=' . rawurlencode($next));
         send_mail($email, 'Your sign-in link for The Magick Muse',
             "Open this link to sign in:\n\n$link\n\nIt works once and expires in 30 minutes. If you didn't ask for it, ignore this email.",

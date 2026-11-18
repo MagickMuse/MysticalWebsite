@@ -53,7 +53,8 @@ function smtp_send(string $to, string $subject, array $headers, string $body): b
         $cmd($ehlo, '250');
         if ($port === 587) {
             $cmd('STARTTLS', '220');
-            stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+            // If encryption fails, stop: otherwise the SMTP password below would be sent in plain text.
+            if (!stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) throw new RuntimeException('SMTP: STARTTLS failed');
             $cmd($ehlo, '250');
         }
         $cmd('AUTH LOGIN', '334');

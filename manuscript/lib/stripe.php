@@ -137,6 +137,16 @@ function show_checkout(array $session, string $title, string $back): void
         ['private' => true, 'stripe' => true]);
 }
 
+/**
+ * The return link (?session_id=cs_…) signs the buyer in only for a few hours after checkout opened.
+ * The link ends up in browser history, logs and Referer headers; without this, anyone who later saw it
+ * could sign in as the buyer.
+ */
+function checkout_link_fresh(array $s): bool
+{
+    return (int) ($s['created'] ?? 0) > time() - 3 * 3600;
+}
+
 function record_payment(array $row): void
 {
     $row += ['currency' => 'usd', 'refunded_cents' => 0, 'source' => 'stripe', 'intent' => null, 'created_at' => now()];
@@ -150,6 +160,8 @@ function record_payment(array $row): void
 function verify_webhook(string $payload, string $header): ?array
 {
     $secret = (string) config('stripe_webhook_secret');
+    // Without a secret, anyone could sign a fake "payment succeeded" event with an empty key.
+    if ($secret === '') { error_log('[manuscript] stripe_webhook_secret is not set: webhook refused'); return null; }
     $parts = [];
     foreach (explode(',', $header) as $kv) {
         [$k, $v] = array_pad(explode('=', trim($kv), 2), 2, '');

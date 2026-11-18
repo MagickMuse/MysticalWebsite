@@ -152,6 +152,18 @@ function check_csrf(): void
     }
 }
 
+/**
+ * Per-address limit on sign-in emails, kept in the database. The per-session throttle() below is skipped
+ * by anyone who simply doesn't send the cookie, which would let a script flood a customer's inbox.
+ */
+function too_many_links(string $email, int $max = 3, int $seconds = 900): bool
+{
+    // A token lives 30 minutes, so one issued in the last $seconds expires after now + 30 min - $seconds.
+    $st = db()->prepare('SELECT COUNT(*) FROM login_tokens WHERE email = ? AND expires_at > ?');
+    $st->execute([strtolower($email), time() + 30 * 60 - $seconds]);
+    return (int) $st->fetchColumn() >= $max;
+}
+
 /** Simple per-session limit so the login form can't be used to spam inboxes. */
 function throttle(string $key, int $max, int $seconds): bool
 {

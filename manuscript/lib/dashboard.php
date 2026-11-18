@@ -375,7 +375,7 @@ function dash_export(string $file): void
     foreach (db()->query($sql, PDO::FETCH_ASSOC) as $row) {
         if ($first) { fputcsv($out, array_keys($row)); $first = false; }
         // Stop spreadsheet apps from treating a cell as a formula.
-        fputcsv($out, array_map(fn($v) => is_string($v) && preg_match('/^[=+\-@]/', $v) ? "'" . $v : $v, $row));
+        fputcsv($out, array_map(fn($v) => is_string($v) && preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v, $row));
     }
 }
 

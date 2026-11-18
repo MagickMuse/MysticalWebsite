@@ -1,0 +1,8 @@
+# Private settings and data: never commit these (they hold Stripe, SMTP and app secrets).
+manuscript/config.local.php
+manuscript/config.live.php
+manuscript/config.test.php
+manuscript/deploy.local.php
+manuscript-config.php
+*.sqlite
+*.sqlite-*
