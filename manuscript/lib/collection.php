@@ -69,14 +69,16 @@ function default_state(string $group = ''): array
 }
 
 /** The view from the address, if it is meant for this list. */
-function collection_state(array $facets, bool $mine): array
+function collection_state(array $facets, bool $mine, array $all = []): array
 {
     $default = default_group($facets);
     if (!$mine) return default_state($default);
+    // Any property the entries have can filter the list (a value clicked on an entry's page links here),
+    // not only the handful offered as filter chips.
     $filters = [];
-    foreach ($facets as $prop => $counts) {
-        $v = (string) ($_GET[facet_param($prop)] ?? '');
-        if ($v !== '' && isset($counts[$v])) $filters[$prop] = $v;
+    foreach ($all as $e) foreach ($e['tags'] as $prop => $vals) {
+        $v = (string) ($_GET[facet_param((string) $prop)] ?? '');
+        if ($v !== '' && !isset($filters[$prop]) && in_array($v, array_map('strval', (array) $vals), true)) $filters[$prop] = $v;
     }
     $sort = (string) ($_GET['sort'] ?? 'az');
     if (!in_array($sort, ['az', 'za', 'connected', 'popular', 'updated'], true)) $sort = 'az';
@@ -84,10 +86,13 @@ function collection_state(array $facets, bool $mine): array
     $group = (string) ($_GET['group'] ?? $default);
     if ($group === 'none') $group = '';
     elseif (!isset($facets[$group])) $group = $default;
+    // Filtered to one type, grouping by type would only make one group: show the plain list.
+    $autoFlat = !isset($_GET['group']) && $group !== '' && isset($filters[$group]);
+    if ($autoFlat) $group = '';
     $letter = strtoupper(substr((string) ($_GET['letter'] ?? ''), 0, 1));
     if (!preg_match('/^[A-Z#]$/', $letter)) $letter = '';
     return [
-        'filters' => $filters, 'sort' => $sort, 'group' => $group, 'defaultGroup' => $default, 'letter' => $letter,
+        'filters' => $filters, 'sort' => $sort, 'group' => $group, 'defaultGroup' => $default, 'autoFlat' => $autoFlat, 'letter' => $letter,
         'q' => trim(mb_substr((string) ($_GET['q'] ?? ''), 0, 80)),
         'saved' => !empty($_GET['saved']) && current_email(),
         'page' => max(1, (int) ($_GET['page'] ?? 1)),
@@ -114,7 +119,7 @@ function collection_view(array $c, string $base, string $listKey): array
     $all = collection_entries($c['id']);
     $facets = collection_facets($all);
     $mine = $listKey === '' || ($_GET['list'] ?? '') === $listKey;
-    $state = collection_state($facets, $mine);
+    $state = collection_state($facets, $mine, $all);
 
     $saved = [];
     if ($state['saved']) {
@@ -158,6 +163,8 @@ function collection_view(array $c, string $base, string $listKey): array
 function view_link(array $v, array $change): string
 {
     $s = array_merge($v['state'], $change);
+    // A list made flat only because it's filtered to one type goes back to its usual grouping when that filter goes.
+    if (!empty($v['state']['autoFlat']) && !array_key_exists('group', $change)) $s['group'] = $s['defaultGroup'];
     $q = [];
     if ($v['listKey'] !== '') $q['list'] = $v['listKey'];
     foreach ($s['filters'] as $prop => $val) $q[facet_param($prop)] = $val;
@@ -231,7 +238,8 @@ function collection_html(array $v, bool $withHeading): string
     $labels = ['za' => 'Z–A', 'connected' => 'Most connected', 'popular' => 'Most read', 'updated' => 'Recently updated'];
     if ($state['sort'] !== 'az') $active .= '<a class="atag" href="' . e($link(['sort' => 'az'])) . '">' . $labels[$state['sort']] . ' <span aria-hidden="true">×</span></a>';
     // Grouping is only shown as a removable tag when it isn't the list's usual one.
-    if ($state['group'] !== $state['defaultGroup']) {
+    $autoFlat = !empty($state['autoFlat']); // filtered to one type: flat on purpose
+    if ($state['group'] !== $state['defaultGroup'] && !$autoFlat) {
         $active .= $state['group'] !== ''
             ? '<a class="atag" href="' . e($link(['group' => $state['defaultGroup']])) . '">By ' . e($state['group']) . ' <span aria-hidden="true">×</span></a>'
             : '<a class="atag" href="' . e($link(['group' => $state['defaultGroup']])) . '">Not grouped <span aria-hidden="true">×</span></a>';

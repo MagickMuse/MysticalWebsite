@@ -190,6 +190,50 @@
     d.showModal();
   });
 
+  // GitHub Pages copy: a property value clicked on an entry (?f_type=Flower#list-plants) filters the grimoire's list here,
+  // from values.json beside the page (built by .github/scripts/build-static-values.py).
+  (function () {
+    if (!staticSearch || !document.querySelector('section.collection')) return;
+    var params = new URLSearchParams(location.search), wanted = [];
+    params.forEach(function (v, k) { if (k.indexOf('f_') === 0 && v) wanted.push([k.slice(2), v]); });
+    if (!wanted.length) return;
+    fetch(new URL('values.json', location.href)).then(function (r) { return r.json(); }).then(function (data) {
+      var key = params.get('list') || Object.keys(data.lists).find(function (k) { return data.lists[k].props[wanted[0][0]]; });
+      var list = data.lists[key], section = document.getElementById('list-' + key);
+      if (!list || !section) return;
+      var keep = null;
+      wanted.forEach(function (w) {
+        var ids = new Set(((list.props[w[0]] || {})[w[1]] || []).map(function (i) { return list.slugs[i]; }));
+        keep = keep ? new Set([...keep].filter(function (s) { return ids.has(s); })) : ids;
+      });
+      // Every entry of this list once, in A–Z order, then only the ones with the value.
+      var seen = {}, items = [];
+      section.querySelectorAll('.entry-grid li').forEach(function (li) {
+        var a = li.querySelector('a'), m = a && a.getAttribute('href').match(/\/([^\/]+)\/$/);
+        if (!m || seen[m[1]]) return;
+        seen[m[1]] = true;
+        if (keep.has(m[1])) { var c = li.cloneNode(true); c.hidden = false; items.push(c); }
+      });
+      items.sort(function (x, y) { return x.textContent.trim().localeCompare(y.textContent.trim(), undefined, { numeric: true }); });
+      section.querySelectorAll('.col-group, ul[data-col-list], .col-more, .collection > .lede').forEach(function (n) { n.remove(); });
+      var ul = document.createElement('ul'); ul.className = 'entry-grid';
+      items.forEach(function (li) { ul.appendChild(li); });
+      var bar = section.querySelector('.col-bar');
+      bar.after(ul);
+      if (!items.length) { var none = document.createElement('p'); none.className = 'lede'; none.textContent = 'No entries match.'; ul.replaceWith(none); }
+      var count = bar.querySelector('.col-count');
+      if (count) count.textContent = items.length + ' of ' + Object.keys(seen).length + ' entries';
+      var tags = bar.querySelector('.atags') || bar.insertBefore(Object.assign(document.createElement('div'), { className: 'atags' }), count);
+      wanted.forEach(function (w) {
+        var t = document.createElement('a'); t.className = 'atag'; t.title = 'Remove';
+        t.href = location.pathname + '#list-' + key; t.textContent = w[1] + ' ';
+        var x = document.createElement('span'); x.setAttribute('aria-hidden', 'true'); x.textContent = '×'; t.appendChild(x);
+        tags.appendChild(t);
+      });
+      section.scrollIntoView();
+    }).catch(function () {});
+  })();
+
   // GitHub Pages copy: a group shows its first entries; "Show all" reveals the rest in place.
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-show-all]'); if (!b) return;

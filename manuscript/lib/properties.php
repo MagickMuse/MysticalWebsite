@@ -34,15 +34,30 @@ function relation_row(array $page, string $name, array $items, bool $showAll): s
     return $html . '</div>';
 }
 
+/** Where a property value leads: its grimoire's list, showing only the entries with that value. */
+function value_link_base(array $page): ?callable
+{
+    if ($page['kind'] !== 'entry' || !$page['parent_id']) return null;
+    $list = page_by_id($page['parent_id']);
+    if (!$list || $list['kind'] !== 'collection') return null;
+    [$g, $several] = grimoire_lists($page['grimoire']);
+    if (!$g) return null;
+    return fn(string $prop, string $value) => page_url($g) . '?' . http_build_query(($several ? ['list' => $list['slug']] : []) + [facet_param($prop) => $value])
+        . '#list-' . $list['slug'];
+}
+
 function properties_panel(array $page, array $tags, array $groups): string
 {
     $rows = '';
+    $to = value_link_base($page);
     // 1. The entry's own properties (Type, Planet…), as words separated by gold stars.
     foreach ($tags as $name => $vals) {
         $isLink = count($vals) === 1 && preg_match('~^https?://~', (string) $vals[0]);
         $value = $isLink
             ? '<a href="' . e($vals[0]) . '" rel="noopener" target="_blank">' . e(preg_replace('~^https?://(www\.)?~', '', $vals[0])) . '</a>'
-            : implode('', array_map(fn($v) => mb_strlen($v) > 40 ? '<span class="prop-text">' . e($v) . '</span>' : '<span class="' . pill_class($v) . '">' . e($v) . '</span>', $vals));
+            : implode('', array_map(fn($v) => mb_strlen($v) > 40 ? '<span class="prop-text">' . e($v) . '</span>'
+                : ($to ? '<a class="' . pill_class($v) . '" href="' . e($to((string) $name, (string) $v)) . '" title="All ' . e((string) $name) . ': ' . e((string) $v) . '">' . e($v) . '</a>'
+                    : '<span class="' . pill_class($v) . '">' . e($v) . '</span>'), $vals));
         $rows .= '<div class="prop-row"><div class="prop-name"><span class="prop-glyph" aria-hidden="true">◇</span>' . e($name) . '</div><div class="prop-val">' . $value . '</div></div>';
     }
     if ($page['aka']) {
