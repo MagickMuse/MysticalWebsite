@@ -853,3 +853,14 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 /* phones: the titled books (Calendar, Journal Prompts) are the big books at the base of the pile */
 .book-pile .slab { flex: none; width: min(306px, 90vw); height: 50px; }
 .book-pile .slab.s2 { width: min(322px, 94vw); height: 54px; }
+
+/* ---------- recipes and rituals: Description, Quantities and Directions as the page's text ---------- */
+.mm-prose .lead-in { font-size: 1.12rem; line-height: 1.7; color: var(--ink); }
+.mm-prose .lead-in + h2, .mm-prose .ingredients + h2 { margin-top: 2rem; }
+.mm-prose .ingredients { padding-left: 1.2rem; }
+.mm-prose .ingredients li { padding-left: .2rem; }
+.mm-prose .ingredients li::marker { content: "✦  "; color: var(--gold); font-size: .8em; }
+.mm-prose .steps { padding-left: 1.6rem; }
+.mm-prose .steps li { padding-left: .3rem; }
+.mm-prose .steps li + li, .mm-prose .ingredients li + li { margin-top: .45rem; }
+.mm-prose .steps li::marker { font-family: var(--display); color: var(--accent-text); font-weight: 600; }

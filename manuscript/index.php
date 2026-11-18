@@ -161,6 +161,8 @@ function view_page(array $p): void
     $tags = json_decode($p['tags_json'] ?? '[]', true) ?: [];
     $images = $tags['_images'] ?? [];
     unset($tags['_images']);
+    // Recipes and rituals: Description, Quantities and Directions go in the middle of the page, not with the properties.
+    $textParts = content_properties($p['grimoire'], $tags);
 
     // Title, then (for pages inside a grimoire) the properties panel: own properties, then relation links.
     // On a grimoire, "The Magick Manuscript" above the title leads back to the Manuscript's home.
@@ -211,7 +213,7 @@ function view_page(array $p): void
             $gallery = '';
         }
         // Landing pages: intro text is public, the guide pages it links to are for members.
-        $bodyHtml = resolve_links((string) $p['body_html']);
+        $bodyHtml = $textParts . resolve_links((string) $p['body_html']);
         // A grimoire's intro box repeats its name as a heading ("The Animal Grimoire"); the page title already says it.
         if ($p['kind'] === 'grimoire') {
             $name = mb_strtolower(preg_replace('/^the\s+/i', '', $p['title']));

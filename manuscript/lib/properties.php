@@ -9,6 +9,51 @@ declare(strict_types=1);
 
 const RELATION_PREVIEW = 12;
 
+/**
+ * Properties that are really the page's text: shown in the middle of the page, not with the others.
+ * A recipe or ritual reads as Description (an introduction), Quantities (a list) and Directions (numbered steps).
+ */
+const CONTENT_PROPERTIES = [
+    'ritual' => ['Description', 'Quantities', 'Directions'],
+    'recipe' => ['Description', 'Quantities', 'Directions'],
+];
+
+/** Takes the page's text properties out of $tags and returns them as HTML for the middle of the page. */
+function content_properties(string $grimoire, array &$tags): string
+{
+    $html = '';
+    foreach (CONTENT_PROPERTIES[$grimoire] ?? [] as $name) {
+        if (!isset($tags[$name])) continue;
+        $text = trim(implode("\n", array_map('strval', (array) $tags[$name])));
+        unset($tags[$name]);
+        if ($text === '') continue;
+        $html .= match ($name) {
+            'Quantities' => '<h2 id="quantities">Quantities</h2>' . text_as_list($text, false),
+            'Directions' => '<h2 id="directions">Directions</h2>' . text_as_list($text, true),
+            default => implode('', array_map(fn($p) => '<p class="lead-in">' . nl2br(e(trim($p)), false) . '</p>', preg_split('/\n\s*\n/', $text))),
+        };
+    }
+    return $html;
+}
+
+/**
+ * Lines typed as a list in Notion ("• Bay leaves", "1. Light the candle") as an HTML list. Lines without a bullet
+ * or number belong to the item above them (an incantation inside a step). Text that isn't a list stays a paragraph.
+ */
+function text_as_list(string $text, bool $numbered): string
+{
+    $mark = '/^\s*(?:[•●▪◦*\-–]|\d+[.)])\s+/u';
+    $lines = array_values(array_filter(array_map('trim', explode("\n", $text)), fn($l) => $l !== ''));
+    $items = [];
+    foreach ($lines as $line) {
+        if (preg_match($mark, $line) || !$items) $items[] = [preg_replace($mark, '', $line)];
+        else $items[count($items) - 1][] = $line;
+    }
+    if (count($items) < 2 && !preg_match($mark, $lines[0] ?? '')) return '<p>' . nl2br(e($text), false) . '</p>';
+    $tag = $numbered ? 'ol class="steps"' : 'ul class="ingredients"';
+    return '<' . $tag . '>' . implode('', array_map(fn($i) => '<li>' . implode('<br>', array_map('e', $i)) . '</li>', $items)) . '</' . strtok($tag, ' ') . '>';
+}
+
 /** A property value: plain words in the site's type, separated by small gold stars (no coloured tags). */
 function pill_class(string $value): string
 {
