@@ -32,7 +32,7 @@ function collection_entries(string $collectionId): array
 /** Properties never offered in Sort & filter, though entries still show them (config "hidden_filters" can replace the list). */
 function hidden_filters(): array
 {
-    return array_map('mb_strtolower', (array) config('hidden_filters', ['Precautions']));
+    return array_map('mb_strtolower', (array) config('hidden_filters', ['Precautions', 'Notes/Warnings', 'Notes']));
 }
 
 /** Properties that work as filters: a handful of short values shared by many entries. */
