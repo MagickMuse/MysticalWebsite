@@ -127,6 +127,38 @@ final class NotionImporter
         if ($merged) ($this->log)("Duplicates: $merged merged.");
     }
 
+    /**
+     * Rules the site applies to what came from Notion, after every import (also to pages not re-downloaded):
+     *  - grimoires without pictures (config "no_pictures", default the Entity Grimoire): no cover, no picture icon,
+     *    no pictures in the text or in picture properties
+     *  - icons set by the site (manuscript/site-icons.php), e.g. the astrological symbols for planets and signs
+     */
+    public function applySiteRules(): void
+    {
+        $none = (array) config('no_pictures', ['entity']);
+        $n = 0;
+        foreach ($none as $g) {
+            $st = db()->prepare("SELECT id, body_html, tags_json FROM pages WHERE grimoire = ? AND (cover IS NOT NULL OR icon LIKE 'file:%' OR body_html LIKE '%<img%' OR tags_json LIKE '%_images%')");
+            $st->execute([$g]);
+            $up = db()->prepare("UPDATE pages SET cover = NULL, icon = CASE WHEN icon LIKE 'file:%' THEN NULL ELSE icon END, body_html = ?, tags_json = ? WHERE id = ?");
+            foreach ($st->fetchAll() as $p) {
+                $tags = json_decode((string) $p['tags_json'], true) ?: [];
+                unset($tags['_images']);
+                $body = preg_replace('~<figure>.*?</figure>~s', '', (string) $p['body_html']);
+                $up->execute([$body, json_encode($tags, JSON_UNESCAPED_UNICODE), $p['id']]);
+                $n++;
+            }
+        }
+        db()->exec("UPDATE pages SET icon = NULL WHERE icon = 'file:'"); // icons whose picture never downloaded
+        $icons = is_file(MM_ROOT . '/site-icons.php') ? (array) require MM_ROOT . '/site-icons.php' : [];
+        $set = db()->prepare('UPDATE pages SET icon = ? WHERE grimoire = ? AND slug = ?');
+        foreach ($icons as $ref => $file) {
+            [$g, $slug] = explode('/', $ref, 2);
+            $set->execute(['asset:' . $file, $g, $slug]);
+        }
+        ($this->log)("Site rules: pictures taken off $n page(s); " . count($icons) . ' icons set by the site.');
+    }
+
     /** Scientific or Latin names on a Notion page (property name contains "scientific", "latin" or "botanical"). */
     private function scientificNames(array $page): array
     {
@@ -678,7 +710,8 @@ final class NotionImporter
         if (!$icon) return null;
         if (($icon['type'] ?? '') === 'emoji') return $icon['emoji'];
         $u = $this->fileUrl($icon);
-        return $u ? 'file:' . $this->download($u, $name . '-' . self::version($u)) : null;
+        $file = $u ? $this->download($u, $name . '-' . self::version($u)) : null;
+        return $file ? 'file:' . $file : null; // a picture that failed to download leaves no icon, not an empty one
     }
 
     /** Downloads an image into data_dir/media so it no longer depends on Notion's expiring links. */

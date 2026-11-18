@@ -101,6 +101,13 @@ function grimoire_root(string $slug): ?array
     return $st->fetch() ?: null;
 }
 
+/** A page's icon as shown: none for a picture icon in a grimoire without pictures (the Entity Grimoire). */
+function shown_icon(array $p): ?string
+{
+    $icon = $p['icon'] ?? null;
+    return $icon && str_starts_with((string) $icon, 'file:') && in_array($p['grimoire'] ?? '', (array) config('no_pictures', ['entity']), true) ? null : $icon;
+}
+
 /** Light-weight lookup of many pages at once: id => [title, url, icon]. */
 function page_index(array $ids): array
 {
@@ -110,7 +117,7 @@ function page_index(array $ids): array
         $place = implode(',', array_fill(0, count($chunk), '?'));
         $st = db()->prepare("SELECT id, slug, grimoire, kind, title, icon, parent_id FROM pages WHERE id IN ($place)");
         $st->execute($chunk);
-        foreach ($st->fetchAll() as $p) $out[$p['id']] = $p + ['url' => page_url($p)];
+        foreach ($st->fetchAll() as $p) $out[$p['id']] = ['icon' => shown_icon($p)] + $p + ['url' => page_url($p)];
     }
     // Archived duplicates in Notion stand in for their live entry.
     $gone = array_values(array_diff($ids, array_keys($out)));
@@ -118,14 +125,17 @@ function page_index(array $ids): array
         $place = implode(',', array_fill(0, count($chunk), '?'));
         $st = db()->prepare("SELECT a.id AS alias, p.id, p.slug, p.grimoire, p.kind, p.title, p.icon, p.parent_id FROM aliases a JOIN pages p ON p.id = a.to_id WHERE a.id IN ($place)");
         $st->execute($chunk);
-        foreach ($st->fetchAll() as $p) { $a = $p['alias']; unset($p['alias']); $out[$a] = $p + ['url' => page_url($p)]; }
+        foreach ($st->fetchAll() as $p) { $a = $p['alias']; unset($p['alias']); $out[$a] = ['icon' => shown_icon($p)] + $p + ['url' => page_url($p)]; }
     }
     return $out;
 }
 
 function icon_html(?string $icon, string $class = 'pg-icon'): string
 {
-    if (!$icon) return '';
+    if (!$icon || $icon === 'file:') return ''; // "file:" alone: an icon whose picture never downloaded
+    if (str_starts_with($icon, 'asset:')) {
+        return '<img class="' . $class . '" src="' . e(url('assets/' . substr($icon, 6))) . '" alt="" width="24" height="24" loading="lazy">';
+    }
     if (str_starts_with($icon, 'file:')) {
         return '<img class="' . $class . '" src="' . e(media_url(substr($icon, 5))) . '" alt="" width="24" height="24" loading="lazy">';
     }

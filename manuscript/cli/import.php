@@ -55,6 +55,7 @@ if (!$paused && !in_array('--guides-only', $args, true)) {
     try { $importer->mergeDuplicates(); } catch (Throwable $ex) { echo '! duplicates: ' . $ex->getMessage() . "\n"; }
     try { $importer->linkDuplicates(); } catch (Throwable $ex) { echo '! archived duplicates: ' . $ex->getMessage() . "\n"; }
 }
+try { $importer->applySiteRules(); } catch (Throwable $ex) { echo '! site rules: ' . $ex->getMessage() . "\n"; }
 $s = $importer->stats();
 if ($paused) {
     printf("PAUSED after %.0f minutes: everything so far is saved. Run the import again to continue where it stopped.\n", (microtime(true) - $start) / 60);

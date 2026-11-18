@@ -156,6 +156,8 @@ function view_page(array $p): void
     $g = $p['kind'] === 'grimoire' ? $p : grimoire_root($p['grimoire']);
     $eyebrow = $p['kind'] === 'grimoire' ? 'The Magick Manuscript' : ($g['title'] ?? '');
 
+    $noPictures = in_array($p['grimoire'], (array) config('no_pictures', ['entity']), true);
+    if ($noPictures && str_starts_with((string) $p['icon'], 'file:')) $p['icon'] = null;
     $tags = json_decode($p['tags_json'] ?? '[]', true) ?: [];
     $images = $tags['_images'] ?? [];
     unset($tags['_images']);
@@ -175,6 +177,12 @@ function view_page(array $p): void
             . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a></div></aside>' . $head;
     }
 
+    // Grimoires without pictures (the Entity Grimoire): nothing to show, even before the next import takes them off.
+    if ($noPictures) {
+        $p['cover'] = null;
+        $images = [];
+        $p['body_html'] = preg_replace('~<figure>.*?</figure>~s', '', (string) $p['body_html']);
+    }
     // Grimoires use their photo from the website; other pages use their own cover, if any.
     $photo = $p['kind'] === 'grimoire' ? grimoire_photo($p['grimoire'], 1600, 640) : null;
     $cover = $photo ? '<div class="pg-cover arch-banner"><img src="' . e($photo) . '" alt="" width="1600" height="640"></div>' : '';
@@ -259,7 +267,7 @@ function view_calendar(): void
         foreach ($rows as $r) if (isset($idx[$r['to_id']])) $events[$r['from_id']][] = $idx[$r['to_id']];
     }
     echo_calendar_page(calendar_html($days, fn(array $p) => page_url($p), fn(array $p) => array_map(
-        fn($t) => [$t['icon'] && !str_starts_with((string) $t['icon'], 'file:') ? $t['icon'] : '', $t['title']], $events[$p['id']] ?? [])));
+        fn($t) => [$t['icon'] && !preg_match('/^(file|asset):/', (string) $t['icon']) ? $t['icon'] : '', $t['title']], $events[$p['id']] ?? [])));
 }
 
 /** The twelve months as lists of days ($days[month][day] = page); $href gives a day's address, $events its festivals ([emoji, name]…). */
@@ -378,7 +386,7 @@ function search_suggest(string $q): void
         'title' => $r['title'],
         'url' => page_url($r),
         'where' => $parents[$r['parent_id']]['title'] ?? '',
-        'icon' => ($r['icon'] && !str_starts_with($r['icon'], 'file:')) ? $r['icon'] : '',
+        'icon' => ($r['icon'] && !preg_match('/^(file|asset):/', $r['icon'])) ? $r['icon'] : '', // emoji only
     ], $rows), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 }
 

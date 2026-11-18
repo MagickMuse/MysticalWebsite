@@ -21,6 +21,7 @@ function collection_entries(string $collectionId): array
     $st->execute([$collectionId]);
     $rows = $st->fetchAll();
     foreach ($rows as &$r) {
+        $r['icon'] = shown_icon($r);
         $t = json_decode($r['tags_json'] ?? '[]', true) ?: [];
         unset($t['_images']);
         $r['tags'] = $t;
