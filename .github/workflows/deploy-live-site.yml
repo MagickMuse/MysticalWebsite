@@ -46,7 +46,7 @@ jobs:
           lftp_run "
           mkdir -p -f \"$FTP_DATA_DIR\"
           mirror --reverse --parallel=4 --no-perms --verbose=1 \
-            -x '^\.git/' -x '^\.github/' -x '(^|/)\.gitignore$' -x '\.md$' -x '^preview/' -x '^manuscript/index\.html$' -x '^shop/' -x '^manuscript/(join|login|sneak-peek)/' -x '^manuscript/media/' -x '^manuscript/(animal|astrology|begin-here|card|correspondence|dream|entity|material|mineral|oil|plant|recipe|ritual|rune|symbol|timing)/' \
+            -x '^\.git/' -x '^\.github/' -x '(^|/)\.gitignore$' -x '\.md$' -x '^preview/' -x '^manuscript/index\.html$' -x '^shop/' -x '^manuscript/(join|login|sneak-peek|account|saved|search)/' -x '^manuscript/media/' -x '^manuscript/(animal|astrology|begin-here|card|correspondence|dream|entity|material|mineral|oil|plant|recipe|ritual|rune|symbol|timing)/' \
             ./ \"$FTP_DIR\"
           "
           echo "Uploaded. Open the test site: the address set up for FTP_TEST_DIR (e.g. https://test.magickmuse.com)."
