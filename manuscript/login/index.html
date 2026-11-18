@@ -38,15 +38,12 @@
 <section class="mm-hero narrow">
   <p class="eyebrow labelled">Welcome back</p>
   <h1>Sign <em>in</em></h1>
-  
+  <p class="notice">Signing in isn’t available in this preview of the Manuscript: it has no server to send sign-in emails or keep you signed in. Members sign in with the email they bought with once the Manuscript is on magickmuse.com.</p>
   <div class="signin">
-  <form class="mm-form" method="post" action="../../manuscript/login/">
-    <input type="hidden" name="csrf" value="ad00d92db2e7ffa5150199a9430a6968">
-    <input type="hidden" name="next" value="/manuscript">
+  <form class="mm-form">
     <label for="email">Your email</label>
-    <input id="email" name="email" type="email" autocomplete="email" required>
-    <button class="btn" type="submit">Email me a sign-in link</button>
-    <p class="small">No password needed. Use the email you bought with. The link works once and expires in 30 minutes.</p>
+    <input id="email" name="email" type="email" autocomplete="email" disabled>
+    <button class="btn" type="submit" disabled>Email me a sign-in link</button>
   </form>
   </div>
 </section></main>

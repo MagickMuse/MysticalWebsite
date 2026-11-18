@@ -42,10 +42,14 @@
 <main id="main" class="wrap mm-main">
 <section class="mm-hero narrow">
   <p class="eyebrow labelled">Account</p>
-  <h1><em>member@example.com</em></h1>
-  <p class="lede">Member: full Manuscript access</p>
-  <div class="actions">  <a class="link" href="../../shop/library/">Your library</a> 
-    <form method="post" action="../../manuscript/logout/"><input type="hidden" name="csrf" value="2c2929324e829a269b3d1ad57d6f1eb0"><button class="link as-button" type="submit">Sign out</button></form>
+  <h1>Your <em>account</em></h1>
+  <p class="notice">Signing in isn’t available in this preview of the Manuscript: it has no server to send sign-in emails or keep you signed in. Members sign in with the email they bought with once the Manuscript is on magickmuse.com.</p>
+  <div class="signin">
+  <form class="mm-form">
+    <label for="email">Your email</label>
+    <input id="email" name="email" type="email" autocomplete="email" disabled>
+    <button class="btn" type="submit" disabled>Email me a sign-in link</button>
+  </form>
   </div>
 </section></main>
 <footer class="site">
