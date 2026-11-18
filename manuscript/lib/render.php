@@ -355,16 +355,16 @@ function layout(string $title, string $body, array $opt = []): void
 <a class="skip" href="#main">Skip to main content</a>
 <header class="site">
   <div class="wrap nav">
-    <a class="logo" href="<?= e(site_url('index.html')) ?>">Magick Muse</a>
+    <a class="logo" href="<?= e(site_url('')) ?>">Magick Muse</a>
     <button class="menu" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
     <nav id="site-menu" aria-label="Main">
       <ul class="left">
         <li><a href="<?= e(url()) ?>" aria-current="page"><span>Manuscript</span><small>the grimoire</small></a></li>
-        <li><a href="<?= e(site_url('meetup.html')) ?>"><span>Muses</span><small>the coven</small></a></li>
+        <li><a href="<?= e(site_url('meetup')) ?>"><span>Muses</span><small>the coven</small></a></li>
       </ul>
       <ul class="right">
-        <li><a href="<?= e(site_url('mastery.html')) ?>"><span>Mastery</span><small>guides &amp; courses</small></a></li>
-        <li><a href="<?= e(site_url('story.html')) ?>"><span>Mythos</span><small>our story</small></a></li>
+        <li><a href="<?= e(site_url('mastery')) ?>"><span>Mastery</span><small>guides &amp; courses</small></a></li>
+        <li><a href="<?= e(site_url('story')) ?>"><span>Mythos</span><small>our story</small></a></li>
       </ul>
     </nav>
   </div>
@@ -386,8 +386,8 @@ function layout(string $title, string $body, array $opt = []): void
 <footer class="site">
   <div class="wrap foot">
     <div class="star-rule" aria-hidden="true"><i class="spark big"></i></div>
-    <a class="logo" href="<?= e(site_url('index.html')) ?>">Magick Muse</a>
-    <p class="legal"><a href="<?= e(site_url('privacy-policy.html')) ?>">Privacy Policy</a></p>
+    <a class="logo" href="<?= e(site_url('')) ?>">Magick Muse</a>
+    <p class="legal"><a href="<?= e(site_url('privacy-policy')) ?>">Privacy Policy</a></p>
     <small>&copy; <?= date('Y') ?> The Magick Muse. All rights reserved. The Manuscript is for members only: please do not copy or share its pages.</small>
   </div>
 </footer>

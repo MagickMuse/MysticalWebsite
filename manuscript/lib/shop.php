@@ -39,7 +39,7 @@ function community_links(): string
 {
     $discord = (string) config('discord_url', 'https://discord.com/invite/PBr2BtCpxk');
     return '<div class="actions community"><a class="link" href="' . e($discord) . '" target="_blank" rel="noopener">Join our Discord coven</a>'
-        . '<a class="link" href="' . e(site_url('story.html')) . '">Curious about the Curator?</a></div>';
+        . '<a class="link" href="' . e(site_url('story')) . '">Curious about the Curator?</a></div>';
 }
 
 function product(string $slug): ?array

@@ -20,9 +20,28 @@ Options -Indexes
 # Hide server signature
 ServerSignature Off
 
-# The shop (/shop, /shop/library, /shop/<product>) is served by the Manuscript app.
+# Addresses without ".html", and blog posts under /blog/. Old addresses answer with a permanent (301) redirect,
+# so shared links and search rankings carry over.
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # Blog posts moved into /blog/ (old address, with or without .html)
+  RewriteRule ^(astrology-for-witches|candle-magick-for-beginners|crystals-for-beginners|essential-witch-tools-for-beginners|herbalism-for-witches|how-my-witchcraft-practice-has-changed|how-to-cast-a-spell-for-beginners|how-to-celebrate-samhain|how-to-dispose-of-a-spell|how-to-find-reliable-witchcraft-information|how-to-research-witchcraft|how-to-work-with-ancestors-witchcraft|how-to-work-with-deities-witchcraft|how-to-work-with-greek-gods|law-of-similars-witchcraft|meditation-for-witches-beginners|protection-magick-for-beginners|runes-for-beginners|what-is-a-correspondence-in-witchcraft|what-is-baneful-magick|what-is-divination-witchcraft|what-is-shadow-work-witchcraft|what-to-do-with-your-first-tarot-deck|what-to-include-in-a-grimoire|witch-without-wicca|witchcraft-books-for-beginners)(?:\.html)?$ /blog/$1 [R=301,L]
+  RewriteCond %{THE_REQUEST} \s/+blog/[^?\s]+\.html[\s?]
+  RewriteRule ^blog/([a-z0-9-]+)\.html$ /blog/$1 [R=301,L]
+  # The blog's list of posts is the Mastery page
+  RewriteRule ^blog/?$ /mastery [R=301,L]
+  # /index.html → /, and any other /page.html → /page (only when asked for directly, not after a rewrite below)
+  RewriteCond %{THE_REQUEST} \s/+index\.html[\s?]
+  RewriteRule ^index\.html$ / [R=301,L]
+  RewriteCond %{THE_REQUEST} \s/+([^?\s]+?)\.html[\s?]
+  RewriteRule ^(.+)\.html$ /$1 [R=301,L]
+  # A clean address is answered from its .html file
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}.html -f
+  RewriteRule ^(.+?)/?$ $1.html [L]
+
+  # The shop (/shop, /shop/library, /shop/<product>) is served by the Manuscript app.
   RewriteRule ^shop(/.*)?$ manuscript/index.php [L,QSA]
 </IfModule>
 
