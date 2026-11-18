@@ -216,7 +216,10 @@
     var timer = 0, jumping = false, over = false;
     function show() { nav.classList.add('show'); }
     function hide() { if (!over && !nav.contains(document.activeElement)) nav.classList.remove('show'); }
-    function later() { clearTimeout(timer); timer = setTimeout(hide, 1100); }
+    // Touch screens: gone a moment after scrolling stops, so it never sits over the text being read.
+    var touch = window.matchMedia && window.matchMedia('(hover: none)').matches;
+    var holdUntil = 0; // a finger on the list keeps it up a little longer, even if the page is still gliding
+    function later(ms) { clearTimeout(timer); timer = setTimeout(hide, Math.max(ms || (touch ? 800 : 1100), holdUntil - Date.now())); }
     function mark() {
       var cur = -1;
       heads.forEach(function (h, i) { if (h.getBoundingClientRect().top < 140) cur = i; });
@@ -227,10 +230,12 @@
       if (jumping) { clearTimeout(timer); timer = setTimeout(function () { jumping = false; }, 160); return; }
       show(); later();
     }, { passive: true });
-    nav.addEventListener('pointerenter', function () { over = true; clearTimeout(timer); });
-    nav.addEventListener('pointerleave', function () { over = false; later(); });
-    nav.addEventListener('focusin', show);
-    nav.addEventListener('focusout', later);
+    // Only a mouse resting on the list keeps it open; a finger touching it (to tap a title) gets a moment longer.
+    nav.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { over = true; clearTimeout(timer); } });
+    nav.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') { over = false; later(); } });
+    nav.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') { holdUntil = Date.now() + 1600; later(1600); } });
+    nav.addEventListener('focusin', function () { if (!touch) show(); });
+    nav.addEventListener('focusout', function () { later(); });
     nav.addEventListener('click', function (e) {
       var a = e.target.closest('a'); if (!a) return;
       e.preventDefault();

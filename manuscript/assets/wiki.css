@@ -846,3 +846,10 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 /* long connection lists: the first few, then "Show all" (on the GitHub Pages copy the rest are in the page, hidden) */
 .rels .rel[hidden] { display: none; }
 button.rel-more { cursor: pointer; font: inherit; background: none; }
+
+/* phones: a slimmer table of contents, so less of the text is covered while it shows */
+@media (max-width: 640px) {
+  .toc { width: min(210px, 58vw); max-height: 52dvh; padding: .7rem .75rem .8rem; right: .5rem; }
+  .toc a { font-size: .78rem; padding: .22rem .35rem; }
+  .toc .lvl-3 a { padding-left: .8rem; font-size: .75rem; } .toc .lvl-4 a { padding-left: 1.2rem; font-size: .72rem; }
+}
