@@ -282,9 +282,13 @@
     if (!staticSearch || !document.querySelector('section.collection')) return;
     var params = new URLSearchParams(location.search), wanted = [];
     params.forEach(function (v, k) { if (k.indexOf('f_') === 0 && v) wanted.push([k.slice(2), v]); });
-    if (!wanted.length) return;
+    var letter = (params.get('letter') || '').toUpperCase().slice(0, 1);
+    if (!wanted.length && !letter) return;
+    // An entry's name, without the emoji or picture beside it.
+    var nameOf = function (li) { var n = li.querySelector('a > span:not(.pg-icon):last-child'); return (n ? n.textContent : li.textContent).trim(); };
+    var firstLetter = function (t) { var c = t.trim().replace(/^["'“‘(]+/, '').normalize('NFD').charAt(0).toUpperCase(); return /[A-Z]/.test(c) ? c : '#'; };
     fetch(new URL('values.json', location.href)).then(function (r) { return r.json(); }).then(function (data) {
-      var key = params.get('list') || Object.keys(data.lists).find(function (k) { return data.lists[k].props[wanted[0][0]]; });
+      var key = params.get('list') || (wanted.length ? Object.keys(data.lists).find(function (k) { return data.lists[k].props[wanted[0][0]]; }) : Object.keys(data.lists)[0]);
       var list = data.lists[key], section = document.getElementById('list-' + key);
       if (!list || !section) return;
       var keep = null;
@@ -298,9 +302,9 @@
         var a = li.querySelector('a'), m = a && a.getAttribute('href').match(/\/([^\/]+)\/$/);
         if (!m || seen[m[1]]) return;
         seen[m[1]] = true;
-        if (keep.has(m[1])) { var c = li.cloneNode(true); c.hidden = false; items.push(c); }
+        if ((!keep || keep.has(m[1])) && (!letter || firstLetter(nameOf(li)) === letter)) { var c = li.cloneNode(true); c.hidden = false; items.push(c); }
       });
-      items.sort(function (x, y) { return x.textContent.trim().localeCompare(y.textContent.trim(), undefined, { numeric: true }); });
+      items.sort(function (x, y) { return nameOf(x).localeCompare(nameOf(y), undefined, { numeric: true, sensitivity: 'base' }); });
       section.querySelectorAll('.col-group, ul[data-col-list], .col-more, .collection > .lede').forEach(function (n) { n.remove(); });
       var ul = document.createElement('ul'); ul.className = 'entry-grid';
       items.forEach(function (li) { ul.appendChild(li); });
@@ -310,6 +314,14 @@
       var count = bar.querySelector('.col-count');
       if (count) count.textContent = items.length + ' of ' + Object.keys(seen).length + ' entries';
       var tags = bar.querySelector('.atags') || bar.insertBefore(Object.assign(document.createElement('div'), { className: 'atags' }), count);
+      // The chosen value and letter show as chosen in the sidebar.
+      section.querySelectorAll('.facet').forEach(function (f) {
+        var slug = (f.querySelector('.facet-name').textContent || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        var w = wanted.find(function (x) { return x[0] === slug; });
+        if (w) f.querySelectorAll('.fchip').forEach(function (c) { c.classList.toggle('on', c.textContent.replace(/\s*\d+$/, '').trim() === w[1]); });
+      });
+      section.querySelectorAll('.letters a').forEach(function (a) { if ((letter && a.textContent === letter) || (!letter && a.textContent === 'All')) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+      if (letter) wanted.push(['letter', letter]);
       wanted.forEach(function (w) {
         var t = document.createElement('a'); t.className = 'atag'; t.title = 'Remove';
         t.href = location.pathname + '#list-' + key; t.textContent = w[1] + ' ';

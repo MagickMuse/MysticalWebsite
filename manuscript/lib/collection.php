@@ -273,7 +273,10 @@ function collection_html(array $v, bool $withHeading): string
             $f = $state['filters']; $f[$state['group']] = $val;
             $more = count($items) > GROUP_PREVIEW && !str_starts_with($val, 'No ')
                 ? '<a class="link" href="' . e($link(['filters' => $f, 'group' => ''])) . '">Show all ' . count($items) . '</a>' : '';
-            $list .= '<section class="col-group"><h3><span class="' . pill_class($val) . '">' . e($val) . '</span> <small>' . count($items) . '</small></h3>'
+            // The group's name leads to just that group, as one list (not for the "No …" group).
+            $name = str_starts_with($val, 'No ') ? '<span class="' . pill_class($val) . '">' . e($val) . '</span>'
+                : '<a class="' . pill_class($val) . '" href="' . e($link(['filters' => $f, 'group' => ''])) . '" title="Only ' . e($val) . '">' . e($val) . '</a>';
+            $list .= '<section class="col-group"><h3>' . $name . ' <small>' . count($items) . '</small></h3>'
                 . '<ul class="entry-grid">' . collection_items(array_slice($items, 0, GROUP_PREVIEW), $state['sort'], $metric) . '</ul>' . $more . '</section>';
         }
     } else {
