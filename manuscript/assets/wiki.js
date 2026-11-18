@@ -190,6 +190,59 @@
     d.showModal();
   });
 
+  // How tall the pinned site header is, so pinned sidebars and jumped-to sections stay below it.
+  (function () {
+    var head = document.querySelector('header.site'); if (!head) return;
+    var set = function () { document.documentElement.style.setProperty('--site-head', head.offsetHeight + 'px'); };
+    set(); window.addEventListener('resize', set);
+  })();
+
+  // Table of contents for a page with written content: it shows while the reader scrolls, fades out
+  // a moment after scrolling stops, and a click on a title goes to that section (and closes it).
+  (function () {
+    var prose = document.querySelector('.pg.with-aside > .mm-prose'); if (!prose) return;
+    var heads = Array.prototype.filter.call(prose.querySelectorAll('h2[id], h3[id], h4[id]'), function (h) { return h.textContent.trim(); });
+    if (heads.length < 2) return;
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var nav = document.createElement('nav'); nav.className = 'toc'; nav.setAttribute('aria-label', 'On this page');
+    var t = document.createElement('p'); t.className = 'toc-title'; t.textContent = 'On this page'; nav.appendChild(t);
+    var ol = document.createElement('ol'); nav.appendChild(ol);
+    var links = heads.map(function (h) {
+      var li = document.createElement('li'); li.className = 'lvl-' + h.tagName.charAt(1);
+      var a = document.createElement('a'); a.href = '#' + h.id; a.textContent = h.textContent.trim();
+      li.appendChild(a); ol.appendChild(li); return a;
+    });
+    document.body.appendChild(nav);
+    var timer = 0, jumping = false, over = false;
+    function show() { nav.classList.add('show'); }
+    function hide() { if (!over && !nav.contains(document.activeElement)) nav.classList.remove('show'); }
+    function later() { clearTimeout(timer); timer = setTimeout(hide, 1100); }
+    function mark() {
+      var cur = -1;
+      heads.forEach(function (h, i) { if (h.getBoundingClientRect().top < 140) cur = i; });
+      links.forEach(function (a, i) { if (i === cur) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+    }
+    window.addEventListener('scroll', function () {
+      mark();
+      if (jumping) { clearTimeout(timer); timer = setTimeout(function () { jumping = false; }, 160); return; }
+      show(); later();
+    }, { passive: true });
+    nav.addEventListener('pointerenter', function () { over = true; clearTimeout(timer); });
+    nav.addEventListener('pointerleave', function () { over = false; later(); });
+    nav.addEventListener('focusin', show);
+    nav.addEventListener('focusout', later);
+    nav.addEventListener('click', function (e) {
+      var a = e.target.closest('a'); if (!a) return;
+      e.preventDefault();
+      var h = document.getElementById(a.getAttribute('href').slice(1));
+      for (var d = h.closest('details'); d; d = d.parentElement && d.parentElement.closest('details')) d.open = true; // sections folded in a toggle
+      jumping = true; over = false; nav.classList.remove('show'); a.blur();
+      h.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+      history.replaceState(null, '', '#' + h.id);
+    });
+    mark();
+  })();
+
   // GitHub Pages copy: a property value clicked on an entry (?f_type=Flower#list-plants) filters the grimoire's list here,
   // from values.json beside the page (built by .github/scripts/build-static-values.py).
   (function () {

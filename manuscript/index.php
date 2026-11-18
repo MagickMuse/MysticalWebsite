@@ -217,7 +217,10 @@ function view_page(array $p): void
             $box[0]), $bodyHtml);
         $body = $panel . $gallery . '<div class="mm-prose">' . $bodyHtml . '</div>';
     }
-    layout($p['title'], '<article class="pg pg-' . e($p['kind']) . '">' . $cover . $head . $body . '</article>', ['private' => true, 'protect' => true, 'peek' => $peek]);
+    // With written content, the properties become a sidebar beside it (and wiki.js adds a table of contents).
+    // A page that is only properties keeps them across the page: sidebars beside nothing would only show the gap.
+    $aside = $panel !== '' && trim(html_entity_decode(strip_tags($bodyHtml))) !== '';
+    layout($p['title'], '<article class="pg pg-' . e($p['kind']) . ($aside ? ' with-aside' : '') . '">' . $cover . $head . $body . '</article>', ['private' => true, 'protect' => true, 'peek' => $peek]);
 }
 
 /** True for a PNG with transparency (colour type with alpha), read from the file's header. */
