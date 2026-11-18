@@ -54,6 +54,16 @@ function open_pages(): array
     return $pages;
 }
 
+/** How many grimoires the Manuscript holds, as a word ("Fifteen"), not counting Begin Here. */
+function grimoire_count_word(): string
+{
+    static $word = null;
+    if ($word !== null) return $word;
+    $n = (int) db()->query("SELECT COUNT(*) FROM pages WHERE kind = 'grimoire' AND grimoire != 'begin-here'")->fetchColumn();
+    $words = [1 => 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen', 'Twenty'];
+    return $word = $words[$n] ?? (string) $n;
+}
+
 /** For visitors: the pop-up shown when they pick anything inside the Manuscript. */
 function join_popup(bool $onPeek): string
 {
@@ -64,7 +74,7 @@ function join_popup(bool $onPeek): string
         . '<button class="join-x" type="button" data-close aria-label="Close">&times;</button>'
         . '<p class="eyebrow labelled">Members only</p>'
         . '<h2 id="join-pop-h">This lives inside <em>the Manuscript</em></h2>'
-        . '<p>Fifteen cross-linked grimoires and ' . $total . ' pages of researched magick, open to members. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>'
+        . '<p>' . grimoire_count_word() . ' cross-linked grimoires and ' . $total . ' pages of researched magick, open to members. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>'
         . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a>' . $peek . '</div>'
         . (current_email() ? '' : '<p class="small">Already a member? <a href="' . e(url('login') . '?next=' . rawurlencode($next)) . '">Sign in</a></p>')
         . '</dialog>';
@@ -122,7 +132,6 @@ function icon_html(?string $icon, string $class = 'pg-icon'): string
     return '<span class="' . $class . '" aria-hidden="true">' . e($icon) . '</span>';
 }
 
-/** Turns stored data-mm-id anchors into real links; links to pages not yet moved over become plain text. */
 /** Takes out bookmarks to Notion-only widgets, and any columns or column rows left empty by that. */
 function strip_skipped_links(string $html): string
 {
@@ -144,6 +153,7 @@ function strip_skipped_links(string $html): string
     return preg_replace('~<div class="columns">\s*</div>~', '', $html);
 }
 
+/** Turns stored data-mm-id anchors into real links; links to pages not yet moved over become plain text. */
 function resolve_links(string $html): string
 {
     $html = strip_skipped_links($html);

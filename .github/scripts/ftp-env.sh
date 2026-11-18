@@ -5,7 +5,7 @@ set -euo pipefail
 need() {
   local name="$1"
   if [ -z "${!name:-}" ]; then
-    echo "::error::The GitHub secret $name is missing. Add it under Settings → Secrets and variables → Actions (see manuscript/TEST-SITE.md)."
+    echo "::error::The GitHub secret $name is missing. Add it under Settings → Secrets and variables → Actions (see manuscript/README.md)."
     exit 1
   fi
 }

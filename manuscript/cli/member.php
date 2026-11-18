@@ -1,6 +1,6 @@
 <?php
 /*
- * Give or remove access from the command line (the /admin page does the same).
+ * Give or remove access from the command line (Dashboard → Members does the same).
  *
  *   php manuscript/cli/member.php add someone@example.com "Gumroad lifetime"
  *   php manuscript/cli/member.php import gumroad-customers.csv    (any CSV with an email column)

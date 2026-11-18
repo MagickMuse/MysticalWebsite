@@ -157,9 +157,11 @@ function do_buy(): void
 {
     check_csrf();
     $slug = (string) ($_POST['product'] ?? '');
+    $p = product($slug);
+    if (!$p || !empty($p['free'])) { not_found(); return; }
     $amount = isset($_POST['amount']) ? (int) round((float) $_POST['amount'] * 100) : null;
     $session = create_product_checkout($slug, $amount, current_email(), (string) ($_POST['code'] ?? ''));
-    show_checkout($session, short_name(product($slug)), site_url('shop/' . $slug));
+    show_checkout($session, short_name($p), site_url('shop/' . $slug));
 }
 
 function do_claim(): void

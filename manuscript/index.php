@@ -80,8 +80,7 @@ function view_home(): void
         return true;
     }));
     usort($grimoires, fn($a, $b) => strnatcasecmp($a['title'], $b['title']));
-    $words = [1 => 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen', 'Twenty'];
-    $count = $words[count($grimoires)] ?? (string) count($grimoires);
+    $count = grimoire_count_word();
     $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
 
     // The grimoires as books on one row (a carousel).
@@ -117,6 +116,7 @@ function view_gate(?array $locked = null): void
         ? '<p class="small">Signed in as ' . e(current_email()) . ', but this email has no active membership. <a href="' . e(url('account')) . '">See your account</a></p>'
         : '<p class="small">Already a member? <a href="' . e(url('login') . '?next=' . rawurlencode((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH))) . '">Sign in</a></p>';
     $join = e(url('join'));
+    $count = grimoire_count_word();
     $heading = $locked ? 'This page lives inside <em>the Manuscript</em>' : 'The Magick <em>Manuscript</em>';
     if ($locked) http_response_code(403);
     record_view($locked ? 'route:members-only' : 'route:/manuscript/');
@@ -124,7 +124,7 @@ function view_gate(?array $locked = null): void
 <section class="mm-hero narrow gate">
   <p class="eyebrow labelled">Members only</p>
   <h1>$heading</h1>
-  <p class="lede">Fifteen cross-linked grimoires and {$total} pages of researched magick, open to members. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>
+  <p class="lede">{$count} cross-linked grimoires and {$total} pages of researched magick, open to members. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>
   <div class="actions"><a class="btn" href="{$join}">Become a member</a></div>
   $signin
 </section>
@@ -168,7 +168,7 @@ function view_page(array $p): void
     if ($peek) {
         $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
         $head = '<aside class="peek-note"><p class="eyebrow labelled">A sneak peek</p>'
-            . '<p>You\'re reading one page of the Manuscript, just as members see it. Every connection on it leads to another page: there are ' . $total . ' in all, across fifteen grimoires.</p>'
+            . '<p>You\'re reading one page of the Manuscript, just as members see it. Every connection on it leads to another page: there are ' . $total . ' in all, across ' . mb_strtolower(grimoire_count_word()) . ' grimoires.</p>'
             . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a></div></aside>' . $head;
     }
 
@@ -390,6 +390,7 @@ function do_checkout(): void
     check_csrf();
     if (empty($_POST['agree'])) redirect(url('join') . '#terms');
     $plan = (string) ($_POST['plan'] ?? '');
+    if (empty(config('plans', [])[$plan]['price'])) { not_found(); return; }
     show_checkout(create_checkout($plan, current_email(), (string) ($_POST['code'] ?? '')), config('plans')[$plan]['label'] ?? 'The Magick Manuscript', url('join'));
 }
 
@@ -490,8 +491,10 @@ function view_account(): void
     $status = match (true) {
         is_admin($email) && !$m => 'Curator (admin) access',
         !$m => 'No membership on this email',
-        $m['plan'] === 'lifetime' => 'Member: full Manuscript access',
-        $m['plan'] === 'comp' => 'Member (complimentary)',
+        // A refunded or revoked lifetime/comp member keeps the plan name but not the access.
+        $m['plan'] === 'lifetime' && $m['status'] === 'active' => 'Member: full Manuscript access',
+        $m['plan'] === 'comp' && $m['status'] === 'active' => 'Member (complimentary)',
+        in_array($m['plan'], ['lifetime', 'comp'], true) => 'Membership ended',
         $m['status'] === 'active' => 'Monthly member, renews ' . e(substr((string) $m['paid_through'], 0, 10)),
         default => 'Membership ' . e($m['status']) . ($m['paid_through'] ? ', access until ' . e(substr($m['paid_through'], 0, 10)) : ''),
     };

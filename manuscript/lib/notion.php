@@ -9,21 +9,21 @@ declare(strict_types=1);
  * its relations kept, so cross-links (Protection → Hekate → Rosemary…) survive the move.
  * Re-running only re-downloads pages edited in Notion since the last run.
  */
-/** Thrown when the importer's time budget runs out; everything saved so far stays, and the next run continues. */
+/** A Notion API call that failed (the HTTP status is the exception code). */
 final class NotionError extends RuntimeException {}
 
+/** Thrown when the importer's time budget runs out; everything saved so far stays, and the next run continues. */
 class ImportPaused extends RuntimeException {}
 
 final class NotionImporter
 {
     private ?float $deadline = null;
-
-    /** Stop cleanly after this many minutes (GitHub ends any job after 6 hours). */
     private bool $guidesOnly = false;
 
     /** Bring over grimoire and guide pages only, leaving the (slow, numerous) database entries for later. */
     public function setGuidesOnly(bool $on): void { $this->guidesOnly = $on; }
 
+    /** Stop cleanly after this many minutes (GitHub ends any job after 6 hours). */
     public function setTimeLimit(?int $minutes): void { $this->deadline = $minutes ? microtime(true) + $minutes * 60 : null; }
 
     private string $api;
@@ -240,8 +240,15 @@ final class NotionImporter
         $page = $this->call('GET', "/pages/$pageId");
         $title = $this->pageTitle($page);
         ($this->log)("▸ $title ($slug)");
+        $errorsBefore = $this->stats['errors'];
         $this->importPage($page, 'grimoire', null, 0, $slug);
 
+        // A page or database that failed to load was never marked as seen: pruning now would delete it
+        // (a whole database's entries, after one Notion hiccup). Only prune after a clean walk.
+        if ($prune && $this->stats['errors'] > $errorsBefore) {
+            ($this->log)("  ! $slug had errors, so nothing was removed this time (run again to prune)");
+            $prune = false;
+        }
         if ($prune) {
             $ids = array_keys($this->seen);
             $place = implode(',', array_fill(0, count($ids), '?'));
@@ -525,11 +532,11 @@ final class NotionImporter
                 return '<figure><img src="' . e(media_url($file)) . "\" alt=\"$alt\" loading=\"lazy\">" . ($cap ? "<figcaption>$cap</figcaption>" : '') . '</figure>';
             case 'video': case 'file': case 'pdf': case 'audio':
                 $u = $this->fileUrl($d);
-                return $u && ($d['type'] ?? '') === 'external' ? '<p><a href="' . e($u) . '" rel="noopener">' . e(ucfirst($type)) . '</a></p>' : '';
+                return $u && ($d['type'] ?? '') === 'external' && self::safeUrl($u) ? '<p><a href="' . e($u) . '" rel="noopener">' . e(ucfirst($type)) . '</a></p>' : '';
             case 'bookmark': case 'embed': case 'link_preview':
                 $u = $d['url'] ?? '';
                 if ($u && preg_match(skip_links_pattern(), $u)) return ''; // Notion-only widgets
-                return $u ? '<p class="bookmark"><a href="' . e($u) . '" rel="noopener">' . e($this->plainText($d['caption'] ?? []) ?: $u) . '</a></p>' : '';
+                return $u && self::safeUrl($u) ? '<p class="bookmark"><a href="' . e($u) . '" rel="noopener">' . e($this->plainText($d['caption'] ?? []) ?: $u) . '</a></p>' : '';
             case 'column_list':
                 return '<div class="columns">' . $this->kids($b, $ctx) . '</div>';
             case 'column':
@@ -590,10 +597,16 @@ final class NotionImporter
             if (!$target && $href && ($nid = self::notionIdFromUrl($href))) $target = $nid;
 
             if ($target) $s = '<a data-mm-id="' . normalize_id($target) . "\">$s</a>";
-            elseif ($href) $s = '<a href="' . e($href) . "\" rel=\"noopener\">$s</a>";
+            elseif ($href && self::safeUrl($href)) $s = '<a href="' . e($href) . "\" rel=\"noopener\">$s</a>";
             $out .= $s;
         }
         return $out;
+    }
+
+    /** Only ordinary web, mail and same-site links are kept (no javascript: or data: links). */
+    private static function safeUrl(string $u): bool
+    {
+        return (bool) preg_match('~^(https?://|mailto:|/|#)~i', trim($u));
     }
 
     /** Sections about using Notion that don't belong on the website. */

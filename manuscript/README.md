@@ -105,7 +105,7 @@ Everyone signs in at `/manuscript/login` (or `/shop/library`) with the email the
 |---|---|
 | New pages written in Notion | Re-run the importer, or let the weekly cron do it |
 | Add a whole grimoire | Add its slug and Notion id to `grimoires` in the config, then run `php manuscript/cli/import.php <slug>` |
-| Remove pages deleted in Notion | `php manuscript/cli/import.php --prune` |
+| Remove pages deleted in Notion | `php manuscript/cli/import.php --prune` (skipped for a grimoire if any page failed to load that run, so a Notion hiccup never deletes pages) |
 | Gift access / remove access | Dashboard → Members, or `php manuscript/cli/member.php add|remove email` |
 | Refund someone | In Stripe (Payments → the payment → Refund). The dashboard updates, and a full refund removes their access. |
 | Add a product | Add it to `products` in the config. Its page is `/shop/<slug>` |
