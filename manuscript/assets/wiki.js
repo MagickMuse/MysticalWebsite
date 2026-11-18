@@ -500,7 +500,7 @@
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html) e.innerHTML = html; return e; }
   function esc(t) { var d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
   document.addEventListener('click', function (e) {
-    var book = e.target.closest('.carousel .bk');
+    var book = e.target.closest('.carousel .bk, .book-pile .bk');
     if (!book || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0 || reduceMotion || !document.body.animate) return;
     e.preventDefault();
     visibleArea(function (v) { openBook(book, v); });
@@ -606,7 +606,7 @@
   // and when the page changes without reloading (an address ending in #…, as in a preview).
   function restoreShelf() {
     document.querySelectorAll('.book-stage, .book-veil, .sparkle').forEach(function (n) { n.remove(); });
-    document.querySelectorAll('.carousel .bk').forEach(function (b) { b.style.visibility = ''; b.classList.remove('open'); });
+    document.querySelectorAll('.carousel .bk, .book-pile .bk').forEach(function (b) { b.style.visibility = ''; b.classList.remove('open'); });
   }
   window.addEventListener('pageshow', restoreShelf);
   window.addEventListener('hashchange', restoreShelf);

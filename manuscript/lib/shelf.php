@@ -111,5 +111,22 @@ function bookshelf_html(array $grimoires, array $counts): string
             . '<button class="car-btn next" type="button" aria-label="More grimoires" data-car="1">›</button>'
             . '<div class="ledge" aria-hidden="true"></div></section>';
     }
-    return '<div class="shelves" role="group" aria-label="The grimoires">' . $html . '</div>';
+    // Phones: every grimoire lying flat in one alphabetical pile, the candles on top (CSS shows one or the other).
+    $pile = '';
+    foreach (array_values($grimoires) as $i => $g) $pile .= pile_book($g, $counts[$g['grimoire']] ?? 0, $i);
+    return '<div class="shelves" role="group" aria-label="The grimoires">' . $html . '</div>'
+        . '<div class="book-pile" role="group" aria-label="The grimoires">' . candles_html() . $pile . '<div class="ledge" aria-hidden="true"></div></div>';
+}
+
+/** One grimoire lying flat, for the phone pile. */
+function pile_book(array $g, int $n, int $i): string
+{
+    $label = grimoire_label($g);
+    $inside = grimoire_summary($g);
+    $photo = grimoire_photo($g['grimoire'], 440, 600);
+    return '<a class="bk lying t' . (1 + $i % 5) . '" href="' . e(page_url($g)) . '"'
+        . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '') . ($n ? ' (' . number_format($n) . ' entries)' : '')) . '"'
+        . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'
+        . '<span class="spine" aria-hidden="true"><i class="band left"></i>' . (grimoire_glyph($g['grimoire'], 'bk-star') ?: '<i class="bk-star"></i>')
+        . '<span class="bk-title">' . e($label) . '</span><i class="band right"></i></span></a>';
 }

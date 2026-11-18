@@ -791,3 +791,21 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .slab.titled:hover { filter: brightness(1.15); }
 .slab.titled:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 @media (max-width: 640px) { .slab-title { font-size: .74rem; letter-spacing: .1em; } }
+
+/* ---------- phones: every grimoire lying flat in one alphabetical pile, candles on top ---------- */
+.book-pile { display: none; }
+@media (max-width: 640px) {
+  .shelves { display: none; }
+  .book-pile { display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: .6rem; }
+  .book-pile .candles { align-self: center; margin: 0 0 0 110px; height: 84px; }
+  .book-pile .bk.lying, .book-pile .bk.lying.open, .book-pile .bk.lying:focus-visible { --pw: 280px; width: min(var(--pw), 86vw); height: 46px; flex: none; transform: translateX(var(--px, 0)); }
+  .book-pile .bk.lying .bk-title { left: 56px; right: 26px; font-size: .78rem; letter-spacing: .1em; }
+  .book-pile .bk.lying .bk-star { left: 38px; }
+  /* not a neat tower: slightly different lengths, nudged left and right */
+  .book-pile .bk:nth-of-type(5n + 1) { --pw: 286px; --px: -6px; }
+  .book-pile .bk:nth-of-type(5n + 2) { --pw: 270px; --px: 9px; }
+  .book-pile .bk:nth-of-type(5n + 3) { --pw: 296px; --px: -2px; }
+  .book-pile .bk:nth-of-type(5n + 4) { --pw: 276px; --px: -10px; }
+  .book-pile .bk:nth-of-type(5n) { --pw: 290px; --px: 6px; }
+  .book-pile .ledge { align-self: stretch; margin: 0 .4rem; }
+}
