@@ -255,6 +255,12 @@ function dash_sales_table(int $limit, int $offset = 0): string
     $rows = '';
     foreach ($st->fetchAll() as $p) {
         $ref = $p['refunded_cents'] > 0 ? ' <span class="tag">refunded ' . e(money((int) $p['refunded_cents'], $p['currency'])) . '</span>' : '';
+        $ref .= match ($p['dispute'] ?? null) {
+            'open' => ' <span class="tag">chargeback open</span>',
+            'lost' => ' <span class="tag">chargeback lost</span>',
+            'won' => ' <span class="tag">chargeback won</span>',
+            default => '',
+        };
         $src = $p['source'] === 'gumroad' ? ' <span class="tag">Gumroad</span>' : '';
         $rows .= '<tr><td>' . e(substr($p['created_at'], 0, 10)) . '</td><td>' . e($p['email']) . '</td><td>' . e(product_name($p['product'])) . $src . '</td><td class="num">' . e(money((int) $p['amount_cents'], $p['currency'])) . $ref . '</td></tr>';
     }

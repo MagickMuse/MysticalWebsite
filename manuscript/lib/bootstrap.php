@@ -115,7 +115,7 @@ function migrate(PDO $pdo): void
     CREATE TABLE IF NOT EXISTS members (
         email        TEXT PRIMARY KEY,
         plan         TEXT,                      -- monthly | lifetime | comp
-        status       TEXT NOT NULL,             -- active | past_due | canceled
+        status       TEXT NOT NULL,             -- active | past_due | canceled | disputed (chargeback open)
         stripe_customer TEXT,
         stripe_subscription TEXT,
         paid_through TEXT,
@@ -140,7 +140,8 @@ function migrate(PDO $pdo): void
         currency    TEXT NOT NULL DEFAULT 'usd',
         refunded_cents INTEGER NOT NULL DEFAULT 0,
         source      TEXT NOT NULL,              -- stripe | gumroad
-        intent      TEXT,                       -- Stripe payment_intent, to match refunds
+        intent      TEXT,                       -- Stripe payment_intent, to match refunds and disputes
+        dispute     TEXT,                       -- chargeback: open | won | lost (NULL: none)
         created_at  TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS payments_created ON payments(created_at);
@@ -193,6 +194,9 @@ function migrate(PDO $pdo): void
         received_at TEXT NOT NULL
     );
     SQL);
+    // Columns added after the first release: CREATE TABLE IF NOT EXISTS leaves existing tables as they were.
+    $cols = array_column($pdo->query('PRAGMA table_info(payments)')->fetchAll(), 'name');
+    if (!in_array('dispute', $cols, true)) $pdo->exec('ALTER TABLE payments ADD COLUMN dispute TEXT');
 }
 
 function now(): string { return gmdate('Y-m-d H:i:s'); }

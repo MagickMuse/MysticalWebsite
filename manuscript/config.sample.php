@@ -46,7 +46,7 @@ return [
     // Publishable key (pk_test_… / pk_live_…). Set it to show the payment form on our own page; leave it out to send buyers to Stripe's page.
     // 'stripe_publishable_key' => 'pk_test_xxx',
     // Dashboard → Developers → Webhooks → add endpoint {base_url}/stripe-webhook
-    // with events: checkout.session.completed, checkout.session.async_payment_succeeded, invoice.paid, charge.refunded,
+    // with events: checkout.session.completed, checkout.session.async_payment_succeeded, invoice.paid, charge.refunded, charge.dispute.created, charge.dispute.closed,
     // customer.subscription.updated, customer.subscription.deleted. Paste its signing secret here.
     'stripe_webhook_secret' => 'whsec_xxx',
     // The Manuscript is sold as lifetime access for $333 (Stripe → Product catalog → one-time price).

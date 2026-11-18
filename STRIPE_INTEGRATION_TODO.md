@@ -8,10 +8,12 @@ Checkout for The Magick Manuscript ($333 access) and the shop (courses, Notion t
 Done:
 - Fixed **$333** price on The Magick Manuscript: `price_1UcdYXD79698XBfZonGEOVnY` (lookup key `manuscript_access`), set in config.live.php.
 - **SEEKER10**: promotion code for a 10% coupon (`FaWP0Gr4`, once, The Magick Manuscript only).
-- **Webhook** `we_1UcwtxD79698XBfZHD0Mgb1a` → `https://magickmuse.com/manuscript/stripe-webhook`, 6 events, API `2026-03-25.dahlia`; its signing secret is in config.live.php.
+- **Webhook** `we_1UcwtxD79698XBfZHD0Mgb1a` → `https://magickmuse.com/manuscript/stripe-webhook`, 6 events (add the 2 dispute events below: see "Blocking live checkout"), API `2026-03-25.dahlia`; its signing secret is in config.live.php.
 - Stripe Tax: active, head office address set. Products carry tax code `txcd_20060058`.
 
 Blocking live checkout:
+- **Dispute events on the webhook.** Workbench → Webhooks → the magickmuse.com endpoint → Edit destination → add
+  `charge.dispute.created` and `charge.dispute.closed`, then Save. Without them a chargeback doesn't pause access.
 - **Account review.** Payments aren't enabled yet, so Stripe has no payment methods to offer
   ("No valid payment method types"). Once approved, check Settings → Payment methods.
 - **Tax registrations.** None yet: add one for each place you must collect tax (Settings → Tax → Registrations),
@@ -71,7 +73,7 @@ metadata, `customer_creation`, and `allow_promotion_codes`/`discounts` (SEEKER10
 3. **Fixed $333 price** on The Magick Manuscript in live mode; put its ID in `plans.lifetime.price`.
 4. **SEEKER10**: a coupon plus a promotion code `SEEKER10` (test and live).
 5. **Webhook** at `https://magickmuse.com/manuscript/stripe-webhook` with the events
-   `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.paid`, `charge.refunded`,
+   `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.paid`, `charge.refunded`, `charge.dispute.created`, `charge.dispute.closed`,
    `customer.subscription.updated`, `customer.subscription.deleted`. Its signing secret goes in `stripe_webhook_secret`.
 6. **Branding** (optional): Stripe → Settings → Branding for the logo on receipts and emails.
 
@@ -87,7 +89,7 @@ No packages to install: the site talks to Stripe's API directly (PHP + curl), an
 3. Stripe returns the buyer to `/manuscript/welcome` or `/shop/thanks`.
 4. The **webhook** (`/manuscript/stripe-webhook`) verifies Stripe's signature and grants access on
    `checkout.session.completed`, or on `checkout.session.async_payment_succeeded` for payments that clear later.
-   Refunds remove access. Each event is handled once.
+   Refunds remove access. A chargeback pauses access, restores it if won and ends it if lost. Each event is handled once.
 
 The checkout page's security policy (CSP) opens to Stripe only on that page ([manuscript/lib/render.php](manuscript/lib/render.php)).
 

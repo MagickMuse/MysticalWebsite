@@ -48,7 +48,7 @@ Upload `manuscript/config.sample.php` there, rename it to **`manuscript-config.p
 | grimoires | Listed in `manuscript/grimoires.php` (not the settings). Uncomment a line to bring that grimoire over. |
 | `stripe_secret_key` | Stripe Dashboard → Developers → API keys. Start with the **test** key (`sk_test_…`). |
 | `plans` → `price` | Stripe → Product catalog → create "The Magick Manuscript" with a **$333 one-time** price. Copy its `price_…` id. |
-| `stripe_webhook_secret` | Stripe → Developers → Webhooks → **Add endpoint** `https://magickmuse.com/manuscript/stripe-webhook`, events `checkout.session.completed`, `invoice.paid`, `charge.refunded`, `customer.subscription.updated`, `customer.subscription.deleted`. Copy its `whsec_…` secret. |
+| `stripe_webhook_secret` | Stripe → Developers → Webhooks → **Add endpoint** `https://magickmuse.com/manuscript/stripe-webhook`, events `checkout.session.completed`, `invoice.paid`, `charge.refunded`, `charge.dispute.created`, `charge.dispute.closed`, `customer.subscription.updated`, `customer.subscription.deleted`. Copy its `whsec_…` secret. |
 | `products` | Already filled in with the four Gumroad products. Replace each `REPLACE-ME` link with the real Notion/course link, and check prices. Files to deliver (PDFs etc.) go on the server in `manuscript-data/products/<product-slug>/`. |
 | `mail_from`, `smtp_*` | A Hostinger email account (e.g. hello@magickmuse.com). Host `smtp.hostinger.com`, port `465`, the mailbox's address and password. |
 | `admins` | The email(s) that can open the dashboard. Nobody else can see it. |

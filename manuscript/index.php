@@ -493,6 +493,7 @@ function view_account(): void
         !$m => 'No membership on this email',
         // A refunded or revoked lifetime/comp member keeps the plan name but not the access.
         $m['plan'] === 'lifetime' && $m['status'] === 'active' => 'Member: full Manuscript access',
+        $m['status'] === 'disputed' => 'Access paused: your bank is disputing the payment. Access comes back if the dispute is withdrawn or settled in our favour.',
         $m['plan'] === 'comp' && $m['status'] === 'active' => 'Member (complimentary)',
         in_array($m['plan'], ['lifetime', 'comp'], true) => 'Membership ended',
         $m['status'] === 'active' => 'Monthly member, renews ' . e(substr((string) $m['paid_through'], 0, 10)),

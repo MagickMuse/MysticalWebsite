@@ -257,6 +257,12 @@ function apply_stripe_event(array $event): void
             }
             break;
 
+        // Chargebacks: access pauses while the bank looks at it, comes back if we win, and ends if we lose.
+        case 'charge.dispute.created':
+        case 'charge.dispute.closed':
+            apply_dispute($obj, $event['type'] === 'charge.dispute.created');
+            break;
+
         case 'customer.subscription.updated':
         case 'customer.subscription.deleted':
             $st = db()->prepare('SELECT email FROM members WHERE stripe_customer = ? OR stripe_subscription = ?');
@@ -281,6 +287,33 @@ function apply_stripe_event(array $event): void
                 'paid_through' => gmdate('Y-m-d H:i:s', period_end($obj)),
             ]);
             break;
+    }
+}
+
+function apply_dispute(array $dispute, bool $opened): void
+{
+    $intent = $dispute['payment_intent'] ?? null;
+    if (!is_string($intent) || $intent === '') return;
+    $st = db()->prepare('SELECT email, product, amount_cents FROM payments WHERE intent = ?');
+    $st->execute([$intent]);
+    $pay = $st->fetch();
+    if (!$pay) return; // not a sale we recorded (e.g. a subscription invoice)
+
+    // Stripe closes a dispute as won, lost, or warning_closed (an inquiry that never became a chargeback).
+    $outcome = $opened ? 'open' : (($dispute['status'] ?? '') === 'lost' ? 'lost' : 'won');
+    db()->prepare('UPDATE payments SET dispute = ? WHERE intent = ?')->execute([$outcome, $intent]);
+    // Money taken back by the bank no longer counts as revenue.
+    if ($outcome === 'lost') db()->prepare('UPDATE payments SET refunded_cents = amount_cents WHERE intent = ?')->execute([$intent]);
+
+    if ($pay['product'] === 'membership-lifetime') {
+        $m = member_row($pay['email']);
+        if (!$m || $m['plan'] !== 'lifetime') return; // given access another way since: leave it alone
+        if ($outcome === 'open' && $m['status'] === 'active') upsert_member($pay['email'], ['status' => 'disputed']);
+        if ($outcome === 'won' && $m['status'] === 'disputed') upsert_member($pay['email'], ['status' => 'active']);
+        if ($outcome === 'lost') upsert_member($pay['email'], ['status' => 'canceled', 'paid_through' => null]);
+    } elseif (!str_starts_with($pay['product'], 'membership-')) {
+        if ($outcome === 'won') grant($pay['email'], $pay['product'], 'stripe');
+        else db()->prepare("DELETE FROM purchases WHERE email = ? AND product = ? AND source = 'stripe'")->execute([$pay['email'], $pay['product']]);
     }
 }
 
