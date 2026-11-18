@@ -51,15 +51,28 @@ function collection_facets(array $entries): array
 
 function facet_param(string $prop): string { return 'f_' . slugify($prop); }
 
-function default_state(): array
+/**
+ * What a list is grouped by until the reader picks something else: its "Type" property (or "Spread Type",
+ * or "Category"), if it has one that works as a filter. A long A–Z list is a lot to take in; grouped by type it reads in sections.
+ */
+function default_group(array $facets): string
 {
-    return ['filters' => [], 'sort' => 'az', 'group' => '', 'letter' => '', 'q' => '', 'saved' => false, 'page' => 1];
+    foreach (['/^type$/i', '/\btype\b/i', '/^categor/i'] as $pattern) {
+        foreach (array_keys($facets) as $prop) if (preg_match($pattern, (string) $prop)) return (string) $prop;
+    }
+    return '';
+}
+
+function default_state(string $group = ''): array
+{
+    return ['filters' => [], 'sort' => 'az', 'group' => $group, 'defaultGroup' => $group, 'letter' => '', 'q' => '', 'saved' => false, 'page' => 1];
 }
 
 /** The view from the address, if it is meant for this list. */
 function collection_state(array $facets, bool $mine): array
 {
-    if (!$mine) return default_state();
+    $default = default_group($facets);
+    if (!$mine) return default_state($default);
     $filters = [];
     foreach ($facets as $prop => $counts) {
         $v = (string) ($_GET[facet_param($prop)] ?? '');
@@ -67,12 +80,14 @@ function collection_state(array $facets, bool $mine): array
     }
     $sort = (string) ($_GET['sort'] ?? 'az');
     if (!in_array($sort, ['az', 'za', 'connected', 'popular', 'updated'], true)) $sort = 'az';
-    $group = (string) ($_GET['group'] ?? '');
-    if (!isset($facets[$group])) $group = '';
+    // ?group=none: the reader turned grouping off. No ?group at all: the default.
+    $group = (string) ($_GET['group'] ?? $default);
+    if ($group === 'none') $group = '';
+    elseif (!isset($facets[$group])) $group = $default;
     $letter = strtoupper(substr((string) ($_GET['letter'] ?? ''), 0, 1));
     if (!preg_match('/^[A-Z#]$/', $letter)) $letter = '';
     return [
-        'filters' => $filters, 'sort' => $sort, 'group' => $group, 'letter' => $letter,
+        'filters' => $filters, 'sort' => $sort, 'group' => $group, 'defaultGroup' => $default, 'letter' => $letter,
         'q' => trim(mb_substr((string) ($_GET['q'] ?? ''), 0, 80)),
         'saved' => !empty($_GET['saved']) && current_email(),
         'page' => max(1, (int) ($_GET['page'] ?? 1)),
@@ -81,7 +96,7 @@ function collection_state(array $facets, bool $mine): array
 
 function is_default_view(array $s): bool
 {
-    return !$s['filters'] && $s['sort'] === 'az' && $s['group'] === '' && $s['letter'] === '' && $s['q'] === '' && !$s['saved'];
+    return !$s['filters'] && $s['sort'] === 'az' && $s['group'] === ($s['defaultGroup'] ?? '') && $s['letter'] === '' && $s['q'] === '' && !$s['saved'];
 }
 
 function first_letter(string $title): string
@@ -147,7 +162,7 @@ function view_link(array $v, array $change): string
     if ($v['listKey'] !== '') $q['list'] = $v['listKey'];
     foreach ($s['filters'] as $prop => $val) $q[facet_param($prop)] = $val;
     if ($s['sort'] !== 'az') $q['sort'] = $s['sort'];
-    if ($s['group'] !== '') $q['group'] = $s['group'];
+    if ($s['group'] !== ($s['defaultGroup'] ?? '')) $q['group'] = $s['group'] === '' ? 'none' : $s['group'];
     if ($s['letter'] !== '') $q['letter'] = $s['letter'];
     if ($s['q'] !== '') $q['q'] = $s['q'];
     if ($s['saved']) $q['saved'] = 1;
@@ -187,7 +202,7 @@ function collection_html(array $v, bool $withHeading): string
     $tools = '<form class="col-tools" method="get" action="' . e($v['base']) . '#list-' . e($c['slug']) . '">' . $hidden
         . '<label class="tool search"><span class="sr-only">Search ' . e($c['title']) . '</span><input type="search" name="q" value="' . e($state['q']) . '" placeholder="Search ' . e(mb_strtolower($c['title'])) . '…"></label>'
         . '<label class="tool"><span>Sort</span>' . $sel('sort', ['az' => 'A–Z', 'za' => 'Z–A', 'connected' => 'Most connected', 'popular' => 'Most read', 'updated' => 'Recently updated'], $state['sort']) . '</label>'
-        . ($facets ? '<label class="tool"><span>Group</span>' . $sel('group', ['' => 'None'] + array_combine(array_keys($facets), array_map(fn($p) => 'By ' . $p, array_keys($facets))), $state['group']) . '</label>' : '')
+        . ($facets ? '<label class="tool"><span>Group</span>' . $sel('group', ['none' => 'None'] + array_combine(array_keys($facets), array_map(fn($p) => 'By ' . $p, array_keys($facets))), $state['group'] === '' ? 'none' : $state['group']) . '</label>' : '')
         . (current_email() ? '<label class="tool check"><input type="checkbox" name="saved" value="1" data-autosubmit' . ($state['saved'] ? ' checked' : '') . '> Only my saved</label>' : '')
         . '<noscript><button class="btn ghost" type="submit">Apply</button></noscript></form>';
     $chips = '';
@@ -215,7 +230,12 @@ function collection_html(array $v, bool $withHeading): string
     foreach ($state['filters'] as $prop => $val) $active .= '<a class="atag ' . pill_class($val) . '" href="' . e($link(['filters' => array_diff_key($state['filters'], [$prop => 1])])) . '" title="Remove">' . e($val) . ' <span aria-hidden="true">×</span></a>';
     $labels = ['za' => 'Z–A', 'connected' => 'Most connected', 'popular' => 'Most read', 'updated' => 'Recently updated'];
     if ($state['sort'] !== 'az') $active .= '<a class="atag" href="' . e($link(['sort' => 'az'])) . '">' . $labels[$state['sort']] . ' <span aria-hidden="true">×</span></a>';
-    if ($state['group'] !== '') $active .= '<a class="atag" href="' . e($link(['group' => ''])) . '">By ' . e($state['group']) . ' <span aria-hidden="true">×</span></a>';
+    // Grouping is only shown as a removable tag when it isn't the list's usual one.
+    if ($state['group'] !== $state['defaultGroup']) {
+        $active .= $state['group'] !== ''
+            ? '<a class="atag" href="' . e($link(['group' => $state['defaultGroup']])) . '">By ' . e($state['group']) . ' <span aria-hidden="true">×</span></a>'
+            : '<a class="atag" href="' . e($link(['group' => $state['defaultGroup']])) . '">Not grouped <span aria-hidden="true">×</span></a>';
+    }
     if ($state['letter'] !== '') $active .= '<a class="atag" href="' . e($link(['letter' => ''])) . '">' . e($state['letter']) . ' <span aria-hidden="true">×</span></a>';
     if ($state['q'] !== '') $active .= '<a class="atag" href="' . e($link(['q' => ''])) . '">“' . e($state['q']) . '” <span aria-hidden="true">×</span></a>';
     if ($state['saved']) $active .= '<a class="atag" href="' . e($link(['saved' => false])) . '">My saved <span aria-hidden="true">×</span></a>';

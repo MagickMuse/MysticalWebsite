@@ -176,6 +176,13 @@
     }).catch(function () { head.textContent = 'Search could not load. Please refresh the page.'; });
   }
 
+  // GitHub Pages copy: a group shows its first entries; "Show all" reveals the rest in place.
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-show-all]'); if (!b) return;
+    b.parentNode.querySelectorAll('li[hidden]').forEach(function (li) { li.hidden = false; });
+    b.remove();
+  });
+
   // Chart hover tooltips (dashboard)
   document.querySelectorAll('.chart-wrap').forEach(function (wrap) {
     var tip = document.createElement('div');
