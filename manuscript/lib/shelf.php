@@ -40,8 +40,8 @@ function real_book(array $g, int $n, int $i): string
 /** Names this long don't fit standing up, so the book lies flat on a stack. */
 const LYING_FROM = 13;
 
-/** A plain book in a stack can carry a title and lead to a page: grimoire whose stack it's in => [title, page, section]. */
-const TITLED_UNDER = ['correspondence' => ['Shadow Work', 'begin-here/journal-prompts', 'shadow-work']];
+/** A plain book in a stack can carry a title and lead to a page: grimoire whose stack it's in => [title, page, section ('' for the top)]. */
+const TITLED_UNDER = ['correspondence' => ['Journal Prompts', 'begin-here/journal-prompts', '']];
 
 /** Grimoires that lie flat with a lit candle on top, one per shelf to balance the stacks (the Rituals). */
 const LYING_WITH_CANDLE = ['ritual'];
@@ -60,7 +60,7 @@ function under_book(string $grimoire, string $classes): string
     [$title, $ref, $section] = TITLED_UNDER[$grimoire] ?? [null, null, null];
     $page = $ref ? page_by_ref($ref) : null;
     if (!$page) return '<span class="slab ' . $classes . '" aria-hidden="true"></span>';
-    return '<a class="slab titled ' . $classes . '" href="' . e(page_url($page) . '#' . $section) . '" aria-label="' . e($title . ': ' . $page['title']) . '">'
+    return '<a class="slab titled ' . $classes . '" href="' . e(page_url($page) . ($section !== '' ? '#' . $section : '')) . '" aria-label="' . e($page['title']) . '">'
         . '<span class="slab-title" aria-hidden="true">' . e($title) . '</span></a>';
 }
 
