@@ -40,14 +40,20 @@ function real_book(array $g, int $n, int $i): string
 /** Names this long don't fit standing up, so the book lies flat on a stack. */
 const LYING_FROM = 13;
 
+/** Grimoires that lie flat with a lit candle on top, one per shelf to balance the stacks (the Rituals). */
+const LYING_WITH_CANDLE = ['ritual'];
+
 /** A grimoire lying on its side on top of two plain books. Clicking it opens it like the others. */
-function lying_book(array $g, int $n, int $i): string
+function lying_book(array $g, int $n, int $i, bool $candle = false): string
 {
     $label = grimoire_label($g);
+    $short = mb_strlen($label) < 10 ? ' short' : '';
     $inside = grimoire_summary($g);
     $photo = grimoire_photo($g['grimoire'], 440, 600);
     $tone = 't' . (1 + $i % 5);
-    return '<div class="stack">'
+    return '<div class="stack' . $short . '">'
+        // A candle burning on top of the book (just for the look).
+        . ($candle ? '<span class="candle" aria-hidden="true"><i class="glow"></i><i class="flame"></i><i class="wick"></i><i class="wax"></i></span>' : '')
         . '<a class="bk lying ' . $tone . '" href="' . e(page_url($g)) . '"'
         . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '') . ($n ? ' (' . number_format($n) . ' entries)' : '')) . '"'
         . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'
@@ -65,7 +71,8 @@ function bookshelf_html(array $grimoires, array $counts): string
     $items = [];
     foreach (array_values($grimoires) as $i => $g) {
         $n = $counts[$g['grimoire']] ?? 0;
-        $items[] = mb_strlen(grimoire_label($g)) >= LYING_FROM ? lying_book($g, $n, $i) : real_book($g, $n, $i);
+        $candle = in_array($g['grimoire'], LYING_WITH_CANDLE, true);
+        $items[] = $candle || mb_strlen(grimoire_label($g)) >= LYING_FROM ? lying_book($g, $n, $i, $candle) : real_book($g, $n, $i);
     }
     $html = '';
     foreach (array_chunk($items, max(1, (int) ceil(count($items) / 2))) as $k => $row) {

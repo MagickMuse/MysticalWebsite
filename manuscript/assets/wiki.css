@@ -652,3 +652,24 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .mm-main a.rel:hover > span:not(.rel-icon) { text-decoration-color: currentColor; }
 .mm-main .mm-prose .page-link a, .mm-main .pg-head .eyebrow a { text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: .22em; text-decoration-color: color-mix(in srgb, currentColor 50%, transparent); }
 .mm-main .mm-prose .page-link a:hover, .mm-main .pg-head .eyebrow a:hover { text-decoration-color: currentColor; }
+
+/* a shorter book lying flat (Rituals), and its stack */
+.stack.short .bk.lying, .stack.short .bk.lying.open, .car-track:not([data-ready]) .stack.short .bk.lying:hover, .stack.short .bk.lying:focus-visible { width: 262px; }
+.stack.short .slab.s1 { width: 238px; } .stack.short .slab.s2 { width: 276px; }
+/* a lit candle standing on the flat book */
+.candle { position: relative; display: block; align-self: flex-end; width: 26px; height: 60px; margin: 0 46px 0 0; transition: transform .35s; }
+.candle .wax { position: absolute; left: 0; bottom: 0; width: 26px; height: 46px; border-radius: 5px 5px 2px 2px;
+  background: linear-gradient(90deg, #e3d4ba 0%, #fbf4e6 38%, #f2e6d0 70%, #d9c7a8 100%); box-shadow: 0 8px 10px -8px rgba(46, 31, 32, .6); }
+.candle .wax::before { content: ""; position: absolute; left: 4px; top: -1px; width: 7px; height: 14px; border-radius: 0 0 4px 4px; background: #fbf4e6; } /* a drip of wax */
+.candle .wick { position: absolute; left: 12px; bottom: 46px; width: 2px; height: 7px; border-radius: 1px; background: #3a2a22; }
+.candle .flame { position: absolute; left: 6px; bottom: 50px; width: 14px; height: 24px; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%; transform-origin: 50% 92%;
+  background: radial-gradient(ellipse at 50% 78%, #fffbe8 0 18%, #ffd36b 42%, rgba(244, 132, 30, .9) 68%, rgba(244, 132, 30, 0) 72%);
+  filter: drop-shadow(0 0 6px rgba(255, 190, 90, .85)); animation: flicker 2.6s ease-in-out infinite alternate; }
+.candle .glow { position: absolute; left: -34px; bottom: 24px; width: 94px; height: 94px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 206, 120, .38), rgba(255, 206, 120, 0) 66%); animation: glow 2.6s ease-in-out infinite alternate; }
+@keyframes flicker { 0% { transform: scale(1, 1) rotate(-1.5deg); } 30% { transform: scale(1.05, .95) rotate(1.5deg); } 55% { transform: scale(.96, 1.06) rotate(-.5deg); } 80% { transform: scale(1.03, .98) rotate(1deg); } 100% { transform: scale(1, 1.02) rotate(0deg); } }
+@keyframes glow { from { opacity: .75; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .candle .flame, .candle .glow { animation: none; } }
+/* lifting the book lifts the candle with it */
+.stack:has(.bk.lying.open, .bk.lying:focus-visible) .candle, .car-track:not([data-ready]) .stack:has(.bk.lying:hover) .candle { transform: translateY(-12px); }
+@media (max-width: 640px) { .stack.short .bk.lying, .stack.short .bk.lying.open, .stack.short .bk.lying:focus-visible { width: 220px; } .stack.short .slab.s1 { width: 200px; } .stack.short .slab.s2 { width: 232px; } .candle { margin-right: 34px; transform: scale(.85); transform-origin: bottom; } }
