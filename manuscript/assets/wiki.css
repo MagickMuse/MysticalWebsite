@@ -23,7 +23,6 @@ mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inhe
   .mm-search { flex-basis: 100%; }
   .mm-search .btn { padding-inline: .9rem; letter-spacing: .12em; }
   .mm-acct { order: -1; margin-left: auto; }
-  .props dt { min-width: 0; width: 100%; }
 }
 
 /* ---------- hero / landing ---------- */
@@ -34,12 +33,6 @@ mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inhe
 .mm-hero.narrow { max-width: 720px; margin-inline: auto; }
 .count-line { display: block; margin-top: .4rem; font-family: var(--display); font-style: italic; font-size: 1.2rem; color: var(--ink); }
 
-.g-cards { grid-template-columns: repeat(auto-fit, minmax(230px, 280px)); justify-content: center; gap: 1.6rem; }
-.g-card { text-align: center; justify-items: center; transition: border-color .3s, transform .3s; }
-.g-card:hover { border-color: var(--accent); transform: translateY(-3px); }
-.g-card h3 { font-size: 1.55rem; }
-.g-cover { width: 100%; max-width: 220px; aspect-ratio: 4 / 5; }
-.g-cover .spark { font-size: 2.4rem; background: var(--bg); }
 
 /* ---------- article ---------- */
 .pg { max-width: 920px; margin-inline: auto; }
@@ -57,10 +50,6 @@ mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inhe
 .crumbs a { text-decoration: none; color: var(--muted); }
 .crumbs a:hover { color: var(--accent-text); }
 
-.props { display: grid; gap: .5rem; margin: .6rem 0 0; padding: 1rem 0 0; border-top: 1px solid var(--line); }
-.props div { display: flex; flex-wrap: wrap; gap: .4rem 1rem; align-items: baseline; }
-.props dt { font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); min-width: 9rem; }
-.props dd { margin: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
 .tag { font-size: .8rem; padding: .15rem .7rem; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; }
 
 /* body text converted from Notion */
@@ -147,19 +136,12 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 
 /* ---------- connections ---------- */
 .connections { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--line); display: grid; gap: 1.4rem; }
-.conn-groups { display: grid; gap: .4rem; }
-.conn > summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: baseline; padding: .8rem 0; border-bottom: 1px solid var(--line); }
-.conn > summary::-webkit-details-marker { display: none; }
-.conn > summary span { font-family: var(--display); font-size: 1.45rem; }
-.conn > summary small { font-size: .75rem; letter-spacing: .18em; color: var(--muted); }
-.conn > summary small::after { content: " ✦"; color: var(--gold); }
 .chips { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; margin: 0; padding: 1rem 0 1.4rem; }
 .chip { display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .9rem; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; font-size: .88rem; transition: border-color .2s, color .2s; }
 .chip:hover { border-color: var(--accent); color: var(--accent-text); }
 .chip-icon { width: 1.1rem; height: 1.1rem; display: inline-grid; place-items: center; object-fit: contain; font-size: .9rem; }
 
 /* ---------- paywall, forms, results ---------- */
-.teaser { font-size: 1.1rem; color: var(--muted); max-width: 72ch; -webkit-mask: linear-gradient(#000 40%, transparent); mask: linear-gradient(#000 40%, transparent); }
 .paywall { display: grid; gap: 1rem; justify-items: center; text-align: center; margin-top: 2.5rem; padding: clamp(2rem, 5vw, 3.5rem); border: 1px solid var(--line); background: var(--surface); }
 .paywall h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
 .paywall .actions { justify-content: center; }
@@ -421,9 +403,6 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 @media (max-width: 640px) { .facet { grid-template-columns: 1fr; } }
 
 /* grimoire cards: what's inside */
-.g-card { gap: .7rem; }
-.g-card .g-inside { font-size: .86rem; line-height: 1.55; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-width: 34ch; }
-.g-card .g-count { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-text); }
 
 /* tighter grimoire landing pages */
 .pg-grimoire .pg-head { margin-bottom: 1.4rem; }
@@ -705,7 +684,6 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 /* Correspondences (ending the top shelf) lines up on the left, against the books before it;
    Rituals (starting the bottom shelf) lines up on the right, against the books after it. */
 .stack { --w: 300px; }
-.stack.short { --w: 236px; }
 .stack.at-end { align-items: flex-start; margin: 0 20px 0 0; }
 .stack.at-start { align-items: flex-end; margin: 0 0 0 20px; }
 .stack .bk.lying, .stack .bk.lying.open, .car-track:not([data-ready]) .stack .bk.lying:hover, .stack .bk.lying:focus-visible { width: var(--w); height: 56px; }
@@ -746,7 +724,7 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 /* lifting the book lifts the candles with it */
 .stack:has(.bk.lying.open, .bk.lying:focus-visible) .candles, .car-track:not([data-ready]) .stack:has(.bk.lying:hover) .candles { transform: translateY(-8px); }
 @media (max-width: 640px) {
-  .stack { --w: 224px; } .stack.short { --w: 180px; }
+  .stack { --w: 224px; }
   .stack.at-end { margin-right: 12px; } .stack.at-start { margin-left: 12px; }
   .stack .bk.lying, .stack .bk.lying.open, .stack .bk.lying:focus-visible { height: 50px; }
   .stack .slab.s1 { width: calc(var(--w) + 26px); height: 52px; } .stack .slab.s2 { width: calc(var(--w) + 52px); height: 58px; }

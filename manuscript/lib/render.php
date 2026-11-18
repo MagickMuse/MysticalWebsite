@@ -195,36 +195,6 @@ function resolve_links(string $html): string
     return $html;
 }
 
-function entries_of(string $collectionId, ?int $limit = null): array
-{
-    $st = db()->prepare("SELECT id, slug, grimoire, kind, title, icon, aka FROM pages WHERE parent_id = ? AND kind = 'entry'");
-    $st->execute([$collectionId]);
-    $rows = $st->fetchAll();
-    usort($rows, fn($a, $b) => strnatcasecmp($a['title'], $b['title'])); // "Day 3" before "Day 10"
-    return $limit ? array_slice($rows, 0, $limit) : $rows;
-}
-
-function count_entries(string $collectionId): int
-{
-    $st = db()->prepare("SELECT COUNT(*) FROM pages WHERE parent_id = ? AND kind = 'entry'");
-    $st->execute([$collectionId]);
-    return (int) $st->fetchColumn();
-}
-
-function entry_list(array $entries, bool $filterable): string
-{
-    $html = '';
-    if ($filterable) {
-        $html .= '<label class="filter"><span class="sr-only">Filter entries</span><input type="search" placeholder="Filter by name…" data-filter></label>';
-    }
-    $html .= '<ul class="entry-grid" data-filterable>';
-    foreach ($entries as $en) {
-        $html .= '<li data-name="' . e(mb_strtolower($en['title'] . ' ' . ($en['aka'] ?? ''))) . '"><a href="' . e(page_url($en)) . '">'
-            . icon_html($en['icon']) . '<span>' . e($en['title']) . '</span></a></li>';
-    }
-    return $html . '</ul>';
-}
-
 function collection_block(string $id, int $limit): string
 {
     $c = page_by_id($id);
