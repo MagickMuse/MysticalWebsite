@@ -150,7 +150,15 @@ function strip_skipped_links(string $html): string
         preg_match_all('~<p class="page-link">.*?</p>~s', $m[1], $links);
         return '<div class="link-flow">' . implode('', $links[0]) . '</div>';
     }, $html);
-    return preg_replace('~<div class="columns">\s*</div>~', '', $html);
+    $html = preg_replace('~<div class="columns">\s*</div>~', '', $html);
+    return group_page_links($html);
+}
+
+/** Two or more guide-page links in a row become one list (shown in two columns), unless they already are one. */
+function group_page_links(string $html): string
+{
+    return preg_replace_callback('~(<div class="link-flow">)?((?:<p class="page-link">.*?</p>\s*){2,})~s',
+        fn($m) => $m[1] !== '' ? $m[0] : '<div class="link-flow">' . $m[2] . '</div>', $html);
 }
 
 /** Turns stored data-mm-id anchors into real links; links to pages not yet moved over become plain text. */
@@ -321,7 +329,7 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=35">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=36">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
   <script src="<?= e(url('assets/wiki.js')) ?>?v=35" defer></script>

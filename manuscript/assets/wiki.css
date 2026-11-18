@@ -575,8 +575,12 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 @media (max-width: 640px) { .pg-cover.cutout img { max-height: 240px; } }
 
 /* page links that sat in Notion columns: one list that wraps, with even spacing */
-.link-flow { display: flex; flex-wrap: wrap; gap: .5rem 2rem; margin-top: 1rem; }
-.mm-prose .link-flow .page-link, .mm-prose .link-flow .page-link + .page-link { margin: 0; }
+/* Lists of guide pages: two even columns, read down the first column then the second; one column on phones. */
+.link-flow { columns: 2; column-gap: 2.5rem; margin-top: 1rem; }
+.mm-prose .link-flow .page-link, .mm-prose .link-flow .page-link + .page-link { margin: 0 0 .6rem; break-inside: avoid; }
+.mm-prose .link-flow .page-link a { display: flex; align-items: baseline; }
+.mm-prose .link-flow .page-link a::before { flex: none; }
+@media (max-width: 640px) { .link-flow { columns: 1; } }
 
 /* Checkout: Stripe's payment form inside our own page, in a framed card that matches the site */
 .pay { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.2rem 4rem; text-align: center; }
