@@ -7,18 +7,19 @@
 mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inherit; padding: 0 .1em; }
 
 /* ---------- search bar under the nav ---------- */
-.mm-bar { display: flex; gap: 1rem; align-items: center; padding-bottom: .9rem; }
-.mm-search { flex: 1; display: flex; max-width: 760px; margin-inline: auto; }
+/* Three columns, the outer two equal, so the search box sits in the middle of the page and the account links on the right. */
+.mm-bar { display: grid; grid-template-columns: minmax(11rem, 1fr) minmax(0, 760px) minmax(11rem, 1fr); gap: 1rem; align-items: center; padding-bottom: .9rem; }
+.mm-search { grid-column: 2; display: flex; width: 100%; }
 .mm-search input {
   flex: 1; min-width: 0; font: inherit; font-size: .95rem; color: var(--ink); background: var(--bg);
   border: 1px solid var(--line); border-right: 0; padding: .7rem 1rem;
 }
 .mm-search .btn { padding: .7rem 1.2rem; }
-.mm-acct { margin-left: auto; font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
+.mm-acct { grid-column: 3; justify-self: end; margin: 0; font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
 .mm-acct a { text-decoration: none; }
 .mm-acct a:hover { color: var(--accent-text); }
 @media (max-width: 640px) {
-  .mm-bar { flex-wrap: wrap; gap: .5rem; }
+  .mm-bar { display: flex; flex-wrap: wrap; gap: .5rem; }
   .mm-search { flex-basis: 100%; }
   .mm-search .btn { padding-inline: .9rem; letter-spacing: .12em; }
   .mm-acct { order: -1; margin-left: auto; }
@@ -345,7 +346,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .prop-name small { margin-left: .2rem; font-size: .72rem; color: var(--muted); opacity: .8; }
 .prop-glyph { width: 1rem; flex: none; text-align: center; color: var(--gold); font-size: .85rem; }
 .prop-val { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; min-width: 0; line-height: 1.6; padding-top: .15rem; }
-.prop-text { color: var(--ink); }
+.prop-text { color: var(--ink); white-space: pre-line; } /* keep the line breaks typed in Notion, e.g. one card per line in a spread */
 .prop-val a:not(.rel):not(.rel-more) { color: var(--accent-text); }
 
 /* property values: words in the site's type, separated by small gold stars (no coloured tags) */
@@ -558,6 +559,8 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .peek-note { margin: 0 0 1.6rem; padding: 1.2rem 1.4rem; border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent); border-radius: 6px; background: var(--surface); text-align: center; }
 .peek-note p { margin: .3rem 0; color: var(--ink); }
 .peek-note .eyebrow { margin: 0; }
+.pg-head .eyebrow a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color .2s; }
+.pg-head .eyebrow a:hover, .pg-head .eyebrow a:focus-visible { border-bottom-color: currentColor; }
 .peek-note .actions { justify-content: center; margin-top: .8rem; }
 @media (prefers-reduced-motion: reduce) { .join-pop[open] { animation: none; } }
 

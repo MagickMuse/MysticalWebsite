@@ -160,7 +160,9 @@ function view_page(array $p): void
     unset($tags['_images']);
 
     // Title, then (for pages inside a grimoire) the properties panel: own properties, then relation links.
-    $head = '<header class="pg-head">' . $crumbs . '<p class="eyebrow">' . e($eyebrow) . '</p>'
+    // On a grimoire, "The Magick Manuscript" above the title leads back to the Manuscript's home.
+    $eyebrowHtml = $p['kind'] === 'grimoire' ? '<a href="' . e(url()) . '">' . e($eyebrow) . '</a>' : e($eyebrow);
+    $head = '<header class="pg-head">' . $crumbs . '<p class="eyebrow">' . $eyebrowHtml . '</p>'
         . '<div class="pg-title"><h1>' . icon_html($p['icon'], 'pg-icon big') . e($p['title']) . '</h1>' . save_button($p) . '</div></header>';
     $panel = in_array($p['kind'], ['entry', 'guide'], true) ? properties_panel($p, $tags, connections($p)) : '';
     // Visitors reading the sneak peek get a note above it; every link inside opens the join pop-up.
