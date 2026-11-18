@@ -809,3 +809,38 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
   .book-pile .bk:nth-of-type(5n) { --pw: 290px; --px: 6px; }
   .book-pile .ledge { align-self: stretch; margin: 0 .4rem; }
 }
+
+/* ---------- the Calendar: a month at a time, each day a link to its page ---------- */
+.pg-calendar { max-width: 1000px; }
+.calendar .pg-head { margin-bottom: .6rem; }
+.calendar .lede { max-width: 62ch; color: var(--muted); }
+.cal-nav { display: flex; align-items: center; gap: 1rem; margin: 1.4rem 0 1rem; }
+.cal-nav[hidden] { display: none; }
+.cal-title { margin: 0; min-width: 10ch; text-align: center; font-family: var(--display); font-size: clamp(1.7rem, 4vw, 2.3rem); }
+.cal-btn { width: 40px; height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--accent-text); font: 400 1.6rem/1 var(--display); cursor: pointer; display: grid; place-items: center; }
+.cal-btn:hover { border-color: var(--accent); }
+.cal-today { margin-left: auto; }
+.cal-m-name { font-size: 1.6rem; margin: 2.2rem 0 .8rem; }
+.calendar.js .cal-m-name { display: none; } /* the month's name is in the bar above */
+.cal-week, .cal-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.cal-week span { padding: .3rem 0 .4rem; text-align: center; font-size: .64rem; letter-spacing: .17em; text-transform: uppercase; color: var(--accent-text); }
+.cal-days li[hidden] { display: none; }
+.cal-days > li > a, .cal-days > li > span { display: flex; align-items: flex-start; aspect-ratio: 1.2; padding: .45rem .6rem; border: 1px solid var(--line); border-radius: 4px;
+  font-family: var(--display); font-size: 1.2rem; line-height: 1; color: var(--ink); background: color-mix(in srgb, var(--surface) 40%, var(--bg)); }
+.cal-days > li > span { color: var(--muted); }
+.cal-days > li > a:hover { border-color: var(--accent); color: var(--accent-text); background: var(--bg); }
+.cal-days a[aria-current="date"] { background: var(--btn); border-color: var(--btn); color: var(--on-btn); text-decoration-color: currentColor; }
+@media (max-width: 640px) {
+  .cal-week, .cal-days { gap: 3px; }
+  .cal-days > li > a, .cal-days > li > span { aspect-ratio: 1; padding: .3rem .35rem; font-size: 1rem; }
+  .cal-week span { font-size: .55rem; letter-spacing: .06em; }
+  .cal-today { margin-left: 0; }
+}
+/* the festivals on a day, under its number */
+.cal-days > li > a, .cal-days > li > span { flex-direction: column; gap: .3rem; overflow: hidden; }
+.cal-n { font-family: var(--display); font-size: 1.2rem; line-height: 1; }
+.cal-ev, .cal-more { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--body); font-size: .74rem; line-height: 1.3; }
+.cal-ev i { font-style: normal; margin-right: .25rem; }
+.cal-more { color: var(--muted); font-size: .68rem; }
+.cal-days a[aria-current="date"] .cal-more { color: inherit; opacity: .8; }
+@media (max-width: 640px) { .cal-n { font-size: 1rem; } .cal-ev { font-size: 0; } .cal-ev i { font-size: .8rem; margin: 0; } .cal-more { display: none; } } /* phones: just the emoji */

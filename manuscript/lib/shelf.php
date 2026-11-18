@@ -40,8 +40,14 @@ function real_book(array $g, int $n, int $i): string
 /** Names this long don't fit standing up, so the book lies flat on a stack. */
 const LYING_FROM = 13;
 
-/** A plain book in a stack can carry a title and lead to a page: grimoire whose stack it's in => [title, page, section ('' for the top)]. */
-const TITLED_UNDER = ['correspondence' => ['Journal Prompts', 'begin-here/journal-prompts', '']];
+/**
+ * Plain books in a stack can carry a title and lead somewhere: grimoire whose stack it's in =>
+ * [book (s1 right under the grimoire, s2 the bottom one) => [title, a page ("grimoire/slug") or "route:<address>"]].
+ */
+const TITLED_UNDER = ['correspondence' => [
+    's1' => ['Calendar', 'route:calendar'],
+    's2' => ['Journal Prompts', 'begin-here/journal-prompts'],
+]];
 
 /** Grimoires that lie flat with a lit candle on top, one per shelf to balance the stacks (the Rituals). */
 const LYING_WITH_CANDLE = ['ritual'];
@@ -55,12 +61,14 @@ function candles_html(): string
 }
 
 /** The bottom book of a stack: plain, or titled and leading to a page (TITLED_UNDER) once that page is on the site. */
-function under_book(string $grimoire, string $classes): string
+function under_book(string $grimoire, string $which, string $tone): string
 {
-    [$title, $ref, $section] = TITLED_UNDER[$grimoire] ?? [null, null, null];
-    $page = $ref ? page_by_ref($ref) : null;
-    if (!$page) return '<span class="slab ' . $classes . '" aria-hidden="true"></span>';
-    return '<a class="slab titled ' . $classes . '" href="' . e(page_url($page) . ($section !== '' ? '#' . $section : '')) . '" aria-label="' . e($page['title']) . '">'
+    [$title, $ref] = TITLED_UNDER[$grimoire][$which] ?? [null, null];
+    $href = null;
+    if ($ref && str_starts_with($ref, 'route:')) $href = url(substr($ref, 6));
+    elseif ($ref && ($page = page_by_ref($ref))) $href = page_url($page);
+    if (!$href) return '<span class="slab ' . $which . ' ' . $tone . '" aria-hidden="true"></span>';
+    return '<a class="slab titled ' . $which . ' ' . $tone . '" href="' . e($href) . '" aria-label="' . e($title) . '">'
         . '<span class="slab-title" aria-hidden="true">' . e($title) . '</span></a>';
 }
 
@@ -80,8 +88,8 @@ function lying_book(array $g, int $n, int $i, bool $candle = false, string $side
         . '<span class="spine" aria-hidden="true"><i class="band left"></i>' . (grimoire_glyph($g['grimoire'], 'bk-star') ?: '<i class="bk-star"></i>')
         . '<span class="bk-title">' . e($label) . '</span><i class="band right"></i></span></a>'
         // Plain books underneath, each bigger than the one on it, just for the look: not links, hidden from screen readers.
-        . '<span class="slab s1 t' . (1 + ($i + 2) % 5) . '" aria-hidden="true"></span>'
-        . under_book($g['grimoire'], 's2 t' . (1 + ($i + 4) % 5))
+        . under_book($g['grimoire'], 's1', 't' . (1 + ($i + 2) % 5))
+        . under_book($g['grimoire'], 's2', 't' . (1 + ($i + 4) % 5))
         . '</div>';
 }
 

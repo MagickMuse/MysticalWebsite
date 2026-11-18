@@ -52,6 +52,7 @@ function route(array $parts, string $method): void
         case 'dashboard':     route_dashboard(array_slice($parts, 1), $method); return;
         case 'shop':          route_shop(array_slice($parts, 1), $method); return;
         case 'suggest':       search_suggest(trim((string) ($_GET['q'] ?? ''))); return;
+        case 'calendar':      view_calendar(); return;
         case 'sneak-peek':    ($p = sneak_peek_page()) ? view_page($p) : redirect(url()); return;
     }
     $p = match (count($parts)) {
@@ -229,6 +230,67 @@ function is_cutout(string $file): bool
     if (!str_ends_with(strtolower($file), '.png')) return false;
     $h = @file_get_contents(config('data_dir') . '/media/' . basename($file), false, null, 0, 26);
     return $h !== false && strlen($h) === 26 && in_array(ord($h[25]), [4, 6], true);
+}
+
+/**
+ * /calendar: the year, month by month, every day linking to its page in the Timing grimoire (january-1 … december-31).
+ * All twelve months are in the page; wiki.js shows one at a time, lines the days up under their weekdays for the
+ * current year, marks today, and moves between months. Without JavaScript the months are simple lists.
+ */
+function view_calendar(): void
+{
+    if (!has_access()) { view_gate(['locked' => true]); return; }
+    record_view('route:/manuscript/calendar');
+    $st = db()->prepare("SELECT id, slug, grimoire, kind, title FROM pages WHERE grimoire = 'timing' AND kind = 'entry'");
+    $st->execute();
+    $days = [];
+    $months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+    foreach ($st->fetchAll() as $p) {
+        if (preg_match('/^(' . implode('|', $months) . ')-(\d{1,2})$/', $p['slug'], $m)) $days[array_search($m[1], $months, true) + 1][(int) $m[2]] = $p;
+    }
+    // The festivals on each day: its "Related Timing" connections (Samhain on October 31, Yule on December 21…).
+    $ids = array_merge(...array_map(fn($m) => array_column($m, 'id'), $days ?: [[]]));
+    $events = [];
+    foreach (array_chunk($ids, 500) as $chunk) {
+        $q = db()->prepare("SELECT from_id, to_id FROM relations WHERE prop = 'Related Timing' AND from_id IN (" . implode(',', array_fill(0, count($chunk), '?')) . ') ORDER BY sort');
+        $q->execute($chunk);
+        $rows = $q->fetchAll();
+        $idx = page_index(array_column($rows, 'to_id'));
+        foreach ($rows as $r) if (isset($idx[$r['to_id']])) $events[$r['from_id']][] = $idx[$r['to_id']];
+    }
+    echo_calendar_page(calendar_html($days, fn(array $p) => page_url($p), fn(array $p) => array_map(
+        fn($t) => [$t['icon'] && !str_starts_with((string) $t['icon'], 'file:') ? $t['icon'] : '', $t['title']], $events[$p['id']] ?? [])));
+}
+
+/** The twelve months as lists of days ($days[month][day] = page); $href gives a day's address, $events its festivals ([emoji, name]…). */
+function calendar_html(array $days, callable $href, ?callable $events = null): string
+{
+    $html = '';
+    for ($m = 1; $m <= 12; $m++) {
+        $name = date('F', mktime(0, 0, 0, $m, 1, 2024));
+        $html .= '<section class="cal-m" data-month="' . $m . '" aria-label="' . $name . '"><h2 class="cal-m-name">' . $name . '</h2><ol class="cal-days">';
+        for ($d = 1; $d <= (int) date('t', mktime(0, 0, 0, $m, 1, 2024)); $d++) {
+            $p = $days[$m][$d] ?? null;
+            $ev = $p && $events ? $events($p) : [];
+            $list = '';
+            foreach (array_slice($ev, 0, 2) as [$icon, $name]) $list .= '<span class="cal-ev">' . ($icon ? '<i aria-hidden="true">' . e($icon) . '</i>' : '') . e($name) . '</span>';
+            if (count($ev) > 2) $list .= '<span class="cal-more">+' . (count($ev) - 2) . ' more</span>';
+            $label = $p ? $p['title'] . ($ev ? ': ' . implode(', ', array_column($ev, 1)) : '') : '';
+            $html .= '<li data-day="' . $d . '">' . ($p ? '<a href="' . e($href($p)) . '" aria-label="' . e($label) . '"><span class="cal-n">' . $d . '</span>' . $list . '</a>' : '<span><span class="cal-n">' . $d . '</span></span>') . '</li>';
+        }
+        $html .= '</ol></section>';
+    }
+    return '<section class="calendar" data-calendar><header class="pg-head"><p class="eyebrow">Timing Grimoire</p><h1>Calendar</h1>'
+        . '<p class="lede small">Every day of the year has its own page: its correspondences, the spirits and festivals tied to it, and the rituals for it.</p></header>'
+        . '<nav class="cal-nav" hidden><button class="cal-btn" type="button" data-cal="-1" aria-label="Previous month">‹</button>'
+        . '<p class="cal-title" aria-live="polite"></p><button class="cal-btn" type="button" data-cal="1" aria-label="Next month">›</button>'
+        . '<button class="link as-button cal-today" type="button" data-cal="0">Today</button></nav>'
+        . '<div class="cal-months">' . $html . '</div></section>';
+}
+
+function echo_calendar_page(string $html): void
+{
+    layout('Calendar', '<article class="pg pg-calendar">' . $html . '</article>', ['private' => true, 'protect' => true]);
 }
 
 /** True for a picture taller than it is wide, read from the file itself. */

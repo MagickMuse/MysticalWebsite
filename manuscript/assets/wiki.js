@@ -243,6 +243,39 @@
     mark();
   })();
 
+  // The Calendar: one month at a time, days under their weekdays for the year shown, today marked.
+  (function () {
+    var cal = document.querySelector('[data-calendar]'); if (!cal) return;
+    var months = cal.querySelectorAll('.cal-m'), nav = cal.querySelector('.cal-nav'), title = cal.querySelector('.cal-title');
+    var now = new Date(), year = now.getFullYear(), month = now.getMonth() + 1;
+    var leap = function (y) { return (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0; };
+    cal.classList.add('js'); nav.hidden = false;
+    months.forEach(function (m) {
+      var row = document.createElement('div'); row.className = 'cal-week'; row.setAttribute('aria-hidden', 'true');
+      ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(function (n) { var c = document.createElement('span'); c.textContent = n; row.appendChild(c); });
+      m.querySelector('.cal-days').before(row);
+    });
+    function show() {
+      var first = new Date(year, month - 1, 1).getDay(), cur = null;
+      months.forEach(function (m) { var on = +m.getAttribute('data-month') === month; m.hidden = !on; if (on) cur = m; });
+      cur.querySelectorAll('.cal-days li').forEach(function (li, i) {
+        var d = +li.getAttribute('data-day'), a = li.firstElementChild;
+        li.style.gridColumnStart = i === 0 ? String(first + 1) : '';
+        li.hidden = month === 2 && d === 29 && !leap(year);
+        if (year === now.getFullYear() && month === now.getMonth() + 1 && d === now.getDate()) a.setAttribute('aria-current', 'date'); else a.removeAttribute('aria-current');
+      });
+      title.textContent = cur.getAttribute('aria-label') + ' ' + year;
+    }
+    nav.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-cal]'); if (!b) return;
+      var step = +b.getAttribute('data-cal');
+      if (step === 0) { year = now.getFullYear(); month = now.getMonth() + 1; }
+      else { month += step; if (month < 1) { month = 12; year--; } if (month > 12) { month = 1; year++; } }
+      show();
+    });
+    show();
+  })();
+
   // GitHub Pages copy: a property value clicked on an entry (?f_type=Flower#list-plants) filters the grimoire's list here,
   // from values.json beside the page (built by .github/scripts/build-static-values.py).
   (function () {
