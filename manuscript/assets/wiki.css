@@ -635,3 +635,20 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .pay-loading { text-align: center; color: var(--muted); padding: 3rem 1rem; margin: 0; }
 .pay-note { margin-top: 1.2rem; color: var(--muted); }
 .pay-note .link { margin-left: .4rem; }
+
+/* ---------- every link in the Manuscript is underlined, so it always reads as a link ----------
+   Buttons, book spines, pictures, the dashboard's tabs and pill-shaped filters keep their own look. */
+.mm-main a:where(:not(.btn, .bk, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn)) {
+  text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: .22em;
+  text-decoration-color: color-mix(in srgb, currentColor 50%, transparent); }
+.mm-main a:where(:not(.btn, .bk, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn)):hover { text-decoration-color: currentColor; }
+.mm-main .dash-tabs a { text-decoration-line: none; }
+/* links that used to draw their own line underneath: the underline replaces it */
+.rel span, .pg-head .eyebrow a, .pg-head .eyebrow a:hover, .mm-prose .page-link a { border-bottom-color: transparent; }
+.suggest a { text-decoration-line: underline; text-underline-offset: .2em; text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); }
+/* connection links: the underline sits under the words, not under the emoji beside them */
+.mm-main a.rel:not(.zoom) { text-decoration-line: none; }
+.mm-main a.rel > span:not(.rel-icon) { text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: .22em; text-decoration-color: color-mix(in srgb, currentColor 50%, transparent); }
+.mm-main a.rel:hover > span:not(.rel-icon) { text-decoration-color: currentColor; }
+.mm-main .mm-prose .page-link a, .mm-main .pg-head .eyebrow a { text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: .22em; text-decoration-color: color-mix(in srgb, currentColor 50%, transparent); }
+.mm-main .mm-prose .page-link a:hover, .mm-main .pg-head .eyebrow a:hover { text-decoration-color: currentColor; }
