@@ -29,28 +29,35 @@ function stripe(string $method, string $path, array $params = [], string $versio
     }
 }
 
-const MANAGED_PAYMENTS_API_VERSION = '2026-02-25.preview';
+/** The custom payment form (ui_mode form) needs this Stripe API version or later. */
+const CHECKOUT_API_VERSION = '2026-03-25.dahlia';
 
 /**
- * Creates the Checkout Session. With a publishable key set, the payment form is embedded in our own page
- * (ui_mode embedded: Stripe returns a client_secret and comes back to return_url); without one, buyers go to
+ * Creates the Checkout Session. With a publishable key set, the custom payment form is shown on our own page
+ * (ui_mode form: Stripe returns a client_secret and comes back to return_url); without one, buyers go to
  * Stripe's hosted page (url). Either way fulfillment happens in the webhook.
  */
 function open_checkout(array $params): array
 {
     if (config('stripe_publishable_key')) {
-        $params['ui_mode'] = 'embedded';
+        $params['ui_mode'] = 'form';
         $params['return_url'] = $params['success_url'];
         unset($params['success_url'], $params['cancel_url']);
     }
-    // Managed Payments: Stripe is the seller of record and handles sales tax/VAT, fraud and order support.
-    // It needs this API version (or later) and a tax code on every product.
-    $version = '2024-06-20';
-    if (config('managed_payments', false)) {
-        $params['managed_payments'] = ['enabled' => 'true'];
-        $version = MANAGED_PAYMENTS_API_VERSION;
+    // Checkout settings chosen in Stripe's Checkout Studio.
+    $params += [
+        'billing_address_collection' => 'auto',
+        'phone_number_collection' => ['enabled' => 'false'],
+        'automatic_tax' => ['enabled' => 'true'],   // Stripe Tax: needs the business address and tax registrations set in Stripe
+        'submit_type' => 'auto',
+        'name_collection' => ['individual' => ['enabled' => 'true', 'optional' => 'true']],
+        'integration_identifier' => 'custom_embedded_web_0001',
+    ];
+    if (($params['mode'] ?? '') === 'subscription') {
+        $params['payment_method_collection'] = 'always';
+        unset($params['submit_type']);   // Stripe accepts submit_type only for one-time payments
     }
-    $s = stripe('POST', 'checkout/sessions', $params, $version);
+    $s = stripe('POST', 'checkout/sessions', $params, CHECKOUT_API_VERSION);
     return ['url' => $s['url'] ?? null, 'client_secret' => $s['client_secret'] ?? null];
 }
 
@@ -123,7 +130,7 @@ function show_checkout(array $session, string $title, string $back): void
 {
     if (empty($session['client_secret'])) { redirect((string) $session['url']); return; }
     layout('Checkout', '<section class="pay"><p class="eyebrow labelled">Secure checkout</p><h1>' . e($title) . '</h1>'
-        . '<div class="pay-frame"><div id="checkout" data-pk="' . e((string) config('stripe_publishable_key')) . '" data-secret="' . e($session['client_secret']) . '">'
+        . '<div class="pay-frame"><div id="checkout-form" data-pk="' . e((string) config('stripe_publishable_key')) . '" data-secret="' . e($session['client_secret']) . '">'
         . '<p class="pay-loading">Opening the secure payment form…</p></div></div>'
         . '<noscript><p class="lede">The payment form needs JavaScript. Please turn it on and reload this page.</p></noscript>'
         . '<p class="small pay-note">Payments are processed by Stripe; your card details never touch this site. <a class="link" href="' . e($back) . '">Go back</a></p></section>',

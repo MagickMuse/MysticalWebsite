@@ -6,7 +6,7 @@
  * Delivery links (Google Classroom, Notion duplicate links) are NOT kept here, because this
  * repository is public. They go in the private config file under 'product_links'.
  *
- * tax_code is Stripe's tax category, required by Managed Payments (Stripe collects and files sales tax/VAT):
+ * tax_code is Stripe's tax category, used by Stripe Tax to work out sales tax/VAT:
  * https://docs.stripe.com/tax/tax-codes
  */
 return [

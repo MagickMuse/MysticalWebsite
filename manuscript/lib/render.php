@@ -316,8 +316,8 @@ function layout(string $title, string $body, array $opt = []): void
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
   <script src="<?= e(url('assets/wiki.js')) ?>?v=35" defer></script>
 <?php if ($stripe): ?>
-  <script src="https://js.stripe.com/v3/" defer></script>
-  <script src="<?= e(url('assets/checkout.js')) ?>?v=1" defer></script>
+  <script src="https://js.stripe.com/dahlia/stripe.js" defer></script>
+  <script src="<?= e(url('assets/checkout.js')) ?>?v=2" defer></script>
 <?php endif; ?>
 </head>
 <?php $visitor = !has_access(); $openUrls = $visitor ? array_merge([url('sneak-peek')], array_map('page_url', open_pages())) : []; ?>
