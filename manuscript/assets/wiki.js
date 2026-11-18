@@ -32,6 +32,38 @@
     });
   });
 
+  // The GitHub Pages copy has no server: its search form points at search/ (with a slash), and searching
+  // happens here in the browser, over the titles and other names in search/index.json.
+  var staticSearch = (function () {
+    var f = document.querySelector('.mm-search'), action = f && f.getAttribute('action');
+    if (!action || !/search\/$/.test(action)) return null;
+    var root = new URL(action + '../', location.href), loaded = null;
+    var fold = function (t) { return (t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); };
+    function load() {
+      return loaded || (loaded = fetch(new URL('search/index.json', root)).then(function (r) { return r.json(); }).then(function (d) {
+        d.p.forEach(function (r) { r.t = fold(r[0]); r.a = fold(r[1]); r.w = (r.t + ' ' + r.a).split(/[^\p{L}\p{N}]+/u); });
+        return d;
+      }));
+    }
+    // Every word typed must start a word of the title or other names ("rose qua" finds Rose Quartz). Best matches first.
+    function find(q, grimoire) {
+      var terms = fold(q).split(/[^\p{L}\p{N}]+/u).filter(Boolean).slice(0, 8), whole = fold(q).trim();
+      return load().then(function (d) {
+        var hits = [];
+        if (terms.length) d.p.forEach(function (r) {
+          if (grimoire && r[3] !== grimoire) return;
+          for (var i = 0; i < terms.length; i++) if (!r.w.some(function (w) { return w.indexOf(terms[i]) === 0; })) return;
+          var score = r.t === whole ? 0 : r.t.indexOf(whole) === 0 ? 1 : r.t.indexOf(whole) >= 0 ? 2 : r.a.indexOf(whole) >= 0 ? 3 : 4;
+          hits.push({ score: score, len: r[0].length, title: r[0], aka: r[1], url: new URL(r[2], root).href, grimoire: r[3],
+            where: r[4] || d.g[r[3]] || '', icon: r[5] });
+        });
+        hits.sort(function (a, b) { return a.score - b.score || a.len - b.len || a.title.localeCompare(b.title); });
+        return { hits: hits, grimoires: d.g };
+      });
+    }
+    return { find: find, action: action };
+  })();
+
   // Live search suggestions
   var form = document.querySelector('.mm-search');
   var box = document.getElementById('mm-q');
@@ -60,8 +92,8 @@
       if (q.length < 2) { close(); return; }
       timer = setTimeout(function () {
         var mine = ++seq;
-        fetch(endpoint + '?q=' + encodeURIComponent(q), { credentials: 'same-origin' })
-          .then(function (r) { return r.json(); })
+        (staticSearch ? staticSearch.find(q).then(function (res) { return res.hits.slice(0, 8); })
+          : fetch(endpoint + '?q=' + encodeURIComponent(q), { credentials: 'same-origin' }).then(function (r) { return r.json(); }))
           .then(function (rows) {
             if (mine !== seq) return;
             list.textContent = '';
@@ -79,7 +111,7 @@
             all.className = 'all';
             var aa = document.createElement('a');
             aa.href = form.getAttribute('action') + '?q=' + encodeURIComponent(q);
-            aa.textContent = rows.length ? 'Search all pages for “' + q + '”' : 'No titles match. Search all text for “' + q + '”';
+            aa.textContent = rows.length ? 'Search all pages for “' + q + '”' : staticSearch ? 'No titles match “' + q + '”' : 'No titles match. Search all text for “' + q + '”';
             all.appendChild(aa);
             list.appendChild(all);
             list.hidden = false;
@@ -98,6 +130,50 @@
       else if (e.key === 'Escape') { close(); }
     });
     document.addEventListener('click', function (e) { if (!form.contains(e.target)) close(); });
+  }
+
+  // The search results page of the GitHub Pages copy: filled in here from the index.
+  var results = document.querySelector('[data-static-results]');
+  if (results && staticSearch) {
+    var params = new URLSearchParams(location.search), q = (params.get('q') || '').trim(), only = params.get('g') || '';
+    var head = results.querySelector('h1'), out = results.querySelector('.results'), chipsBox = results.querySelector('.filters');
+    if (box) box.value = q;
+    var put = function (parent, tag, cls, txt) { var n = document.createElement(tag); if (cls) n.className = cls; if (txt) n.textContent = txt; parent.appendChild(n); return n; };
+    var heading = function (n) {
+      head.textContent = '';
+      head.append(n ? (n > 100 ? '100+' : n) + (n === 1 ? ' result for ' : ' results for ') : 'Nothing found for ');
+      put(head, 'em', '', q);
+    };
+    if (!q) { head.textContent = 'Search the Manuscript'; out.hidden = true; }
+    else staticSearch.find(q).then(function (res) {
+      var counts = {};
+      res.hits.forEach(function (h) { counts[h.grimoire] = (counts[h.grimoire] || 0) + 1; });
+      var hits = only ? res.hits.filter(function (h) { return h.grimoire === only; }) : res.hits;
+      heading(hits.length);
+      document.title = 'Search: ' + q + ' | The Magick Manuscript';
+      // Filter by grimoire, when the results span several.
+      var keys = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; });
+      if (keys.length > 1 || only) {
+        var link = function (label, g, n) {
+          var a = put(chipsBox, 'a', 'chip', label + ' ');
+          a.href = staticSearch.action + '?q=' + encodeURIComponent(q) + (g ? '&g=' + encodeURIComponent(g) : '');
+          if (g === only) a.setAttribute('aria-current', 'true');
+          put(a, 'small', '', String(n));
+        };
+        link('All', '', res.hits.length);
+        keys.forEach(function (g) { link(res.grimoires[g] || g, g, counts[g]); });
+        chipsBox.hidden = false;
+      }
+      if (!hits.length) { put(out, 'li', 'lede', 'Try another spelling, a shorter word, or a related term.'); return; }
+      hits.slice(0, 100).forEach(function (h) {
+        var li = put(out, 'li'), a = put(li, 'a');
+        a.href = h.url;
+        if (h.icon) put(a, 'span', 'pg-icon', h.icon).setAttribute('aria-hidden', 'true');
+        put(a, 'strong', '', h.title);
+        if (h.where) put(li, 'small', '', h.where);
+        if (h.aka) put(li, 'small', 'aka-s', 'Also: ' + h.aka);
+      });
+    }).catch(function () { head.textContent = 'Search could not load. Please refresh the page.'; });
   }
 
   // Chart hover tooltips (dashboard)
