@@ -405,13 +405,29 @@
       .catch(function () { location.href = btn.href; });
   });
 
-  // Sort & filter drop-down: close on a click outside it or on Escape
+  // Sort & filter drop-down: close on a click outside it or on Escape (not when it's the sidebar on a wide screen)
+  var dropdowns = function () { return Array.prototype.filter.call(document.querySelectorAll('.col-filter[open]'), function (d) { return !d.closest('.tools-aside'); }); };
   document.addEventListener('click', function (e) {
-    document.querySelectorAll('.col-filter[open]').forEach(function (d) { if (!d.contains(e.target)) d.open = false; });
+    dropdowns().forEach(function (d) { if (!d.contains(e.target)) d.open = false; });
   });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') document.querySelectorAll('.col-filter[open]').forEach(function (d) { d.open = false; d.querySelector('summary').focus(); });
+    if (e.key === 'Escape') dropdowns().forEach(function (d) { d.open = false; d.querySelector('summary').focus(); });
   });
+
+  // Wide screens: a grimoire's Sort & filter sits open in a sidebar on the left of its list.
+  (function () {
+    var lists = document.querySelectorAll('section.collection'); if (!lists.length || !window.matchMedia) return;
+    var wide = window.matchMedia('(min-width: 1000px)');
+    var apply = function () {
+      lists.forEach(function (c) {
+        var d = c.querySelector('.col-filter'); if (!d) return;
+        c.classList.toggle('tools-aside', wide.matches);
+        d.open = wide.matches;
+      });
+    };
+    apply();
+    if (wide.addEventListener) wide.addEventListener('change', apply);
+  })();
 
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

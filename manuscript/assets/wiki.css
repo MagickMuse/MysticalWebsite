@@ -752,3 +752,31 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
   .stack .slab.s1 { width: calc(var(--w) + 26px); height: 52px; } .stack .slab.s2 { width: calc(var(--w) + 52px); height: 58px; }
   .stack.at-start .candles { margin-left: calc(52px + 18px); }
 }
+
+/* ---------- wide screens: a grimoire list's Sort & filter in a sidebar on the left (wiki.js adds .tools-aside) ---------- */
+@media (min-width: 1000px) {
+  .collection.tools-aside { display: grid; grid-template-columns: 240px minmax(0, 1fr); column-gap: clamp(2rem, 3.5vw, 3.2rem); align-items: start; }
+  .collection.tools-aside > * { grid-column: 2; }
+  .collection.tools-aside > .collection-head { grid-column: 1 / -1; }
+  .collection.tools-aside > .col-bar { grid-column: 1; grid-row: 1 / span 400; }
+  .collection.tools-aside:has(> .collection-head) > .col-bar { grid-row: 2 / span 400; }
+  .collection.tools-aside > .col-bar { position: sticky; top: calc(var(--site-head, 160px) + 1.2rem); max-height: calc(100dvh - var(--site-head, 160px) - 2.4rem);
+    overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; display: flex; flex-direction: column; align-items: stretch; gap: .9rem; margin: 0; padding-right: .3rem; }
+  .tools-aside .col-bar .col-count { order: -1; margin: 0; font-size: .64rem; letter-spacing: .17em; text-transform: uppercase; color: var(--accent-text); }
+  .tools-aside .atags { order: 0; }
+  .tools-aside .col-filter { order: 1; }
+  .tools-aside .col-filter > summary { display: none; }
+  .tools-aside .col-filter .col-views { position: static; display: grid; gap: 1.1rem; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+  .tools-aside .col-tools { display: grid; gap: .8rem; grid-auto-rows: min-content; align-content: start; }
+  .tools-aside .tool.search { flex: none; display: block; margin: 0; }
+  .tools-aside .tool { display: grid; gap: .3rem; font-size: .64rem; letter-spacing: .17em; color: var(--accent-text); }
+  .tools-aside .tool select, .tools-aside .tool.search input { width: 100%; max-width: none; }
+  .tools-aside .tool.check { display: flex; gap: .5rem; color: var(--ink); letter-spacing: .08em; }
+  .tools-aside .facets { gap: 0; }
+  .tools-aside .facet { display: block; padding: .7rem 0 .75rem; border-top: 1px solid var(--line); }
+  .tools-aside .facet-name { display: block; padding: 0; margin-bottom: .35rem; font-size: .64rem; letter-spacing: .17em; color: var(--accent-text); }
+  .tools-aside .facet-vals { gap: .1rem .5rem; font-size: .9rem; }
+  .tools-aside .letters { padding-top: .7rem; border-top: 1px solid var(--line); }
+  .tools-aside .col-group:first-of-type, .tools-aside > .entry-grid:first-of-type { margin-top: 0; }
+  .tools-aside .col-group h3:first-child { margin-top: 0; }
+}
