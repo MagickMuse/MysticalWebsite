@@ -37,6 +37,9 @@ return [
     // Toggle sections the importer leaves out, by title (they explain using Notion).
     // 'skip_sections' => ['Notion tips for new readers', 'Using search and comments'],
 
+    // Properties never offered in a grimoire list's Sort & filter (entries still show them). Default: Precautions.
+    // 'hidden_filters' => ['Precautions'],
+
     // Links left out of the Manuscript because they only work inside Notion (pattern). Default: the widgets.
     // 'skip_links' => '~^https?://magickmuse\\.github\\.io/Widgets/~i',
 

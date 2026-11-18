@@ -28,11 +28,19 @@ function collection_entries(string $collectionId): array
     return $rows;
 }
 
+/** Properties never offered in Sort & filter, though entries still show them (config "hidden_filters" can replace the list). */
+function hidden_filters(): array
+{
+    return array_map('mb_strtolower', (array) config('hidden_filters', ['Precautions']));
+}
+
 /** Properties that work as filters: a handful of short values shared by many entries. */
 function collection_facets(array $entries): array
 {
     $values = [];
+    $hidden = hidden_filters();
     foreach ($entries as $e) foreach ($e['tags'] as $prop => $vals) foreach ($vals as $v) {
+        if (in_array(mb_strtolower((string) $prop), $hidden, true)) continue 2;
         if (mb_strlen($v) > 32) continue 2;
         $values[$prop][$v] = ($values[$prop][$v] ?? 0) + 1;
     }
