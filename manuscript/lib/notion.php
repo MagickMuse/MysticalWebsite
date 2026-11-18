@@ -242,6 +242,19 @@ final class NotionImporter
         ($this->log)("▸ $title ($slug)");
         $errorsBefore = $this->stats['errors'];
         $this->importPage($page, 'grimoire', null, 0, $slug);
+        // Pages kept outside the grimoire in Notion that belong to it on the site (manuscript/extra-pages.php).
+        $extra = is_file(MM_ROOT . '/extra-pages.php') ? (array) ((require MM_ROOT . '/extra-pages.php')[$slug] ?? []) : [];
+        $n = 1000;
+        foreach ($extra as $extraSlug => $extraId) {
+            try {
+                $this->importPage($this->call('GET', '/pages/' . normalize_id((string) $extraId)), 'guide', $pageId, $n++, (string) $extraSlug);
+            } catch (ImportPaused $ex) {
+                throw $ex;
+            } catch (Throwable $ex) {
+                $this->stats['errors']++;
+                ($this->log)('  ! ' . $extraSlug . ': ' . $ex->getMessage());
+            }
+        }
 
         // A page or database that failed to load was never marked as seen: pruning now would delete it
         // (a whole database's entries, after one Notion hiccup). Only prune after a clean walk.

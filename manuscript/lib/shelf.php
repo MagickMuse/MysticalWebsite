@@ -40,6 +40,9 @@ function real_book(array $g, int $n, int $i): string
 /** Names this long don't fit standing up, so the book lies flat on a stack. */
 const LYING_FROM = 13;
 
+/** A plain book in a stack can carry a title and lead to a page: grimoire whose stack it's in => [title, page, section]. */
+const TITLED_UNDER = ['correspondence' => ['Shadow Work', 'begin-here/journal-prompts', 'shadow-work']];
+
 /** Grimoires that lie flat with a lit candle on top, one per shelf to balance the stacks (the Rituals). */
 const LYING_WITH_CANDLE = ['ritual'];
 
@@ -49,6 +52,16 @@ function candles_html(): string
 {
     $one = fn(string $c) => '<span class="candle ' . $c . '"><i class="wax"></i><i class="wick"></i><i class="flame"></i></span>';
     return '<span class="candles" aria-hidden="true"><i class="glow"></i>' . $one('c1') . $one('c2') . $one('c3') . '</span>';
+}
+
+/** The bottom book of a stack: plain, or titled and leading to a page (TITLED_UNDER) once that page is on the site. */
+function under_book(string $grimoire, string $classes): string
+{
+    [$title, $ref, $section] = TITLED_UNDER[$grimoire] ?? [null, null, null];
+    $page = $ref ? page_by_ref($ref) : null;
+    if (!$page) return '<span class="slab ' . $classes . '" aria-hidden="true"></span>';
+    return '<a class="slab titled ' . $classes . '" href="' . e(page_url($page) . '#' . $section) . '" aria-label="' . e($title . ': ' . $page['title']) . '">'
+        . '<span class="slab-title" aria-hidden="true">' . e($title) . '</span></a>';
 }
 
 function lying_book(array $g, int $n, int $i, bool $candle = false, string $side = 'at-end'): string
@@ -68,7 +81,7 @@ function lying_book(array $g, int $n, int $i, bool $candle = false, string $side
         . '<span class="bk-title">' . e($label) . '</span><i class="band right"></i></span></a>'
         // Plain books underneath, each bigger than the one on it, just for the look: not links, hidden from screen readers.
         . '<span class="slab s1 t' . (1 + ($i + 2) % 5) . '" aria-hidden="true"></span>'
-        . '<span class="slab s2 t' . (1 + ($i + 4) % 5) . '" aria-hidden="true"></span>'
+        . under_book($g['grimoire'], 's2 t' . (1 + ($i + 4) % 5))
         . '</div>';
 }
 

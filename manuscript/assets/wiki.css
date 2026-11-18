@@ -638,10 +638,10 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 
 /* ---------- every link in the Manuscript is underlined, so it always reads as a link ----------
    Buttons, book spines, pictures, the dashboard's tabs and pill-shaped filters keep their own look. */
-.mm-main a:where(:not(.btn, .bk, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn)) {
+.mm-main a:where(:not(.btn, .bk, .slab, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn)) {
   text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: .22em;
   text-decoration-color: color-mix(in srgb, currentColor 50%, transparent); }
-.mm-main a:where(:not(.btn, .bk, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn)):hover { text-decoration-color: currentColor; }
+.mm-main a:where(:not(.btn, .bk, .slab, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn)):hover { text-decoration-color: currentColor; }
 .mm-main .dash-tabs a { text-decoration-line: none; }
 /* links that used to draw their own line underneath: the underline replaces it */
 .rel span, .pg-head .eyebrow a, .pg-head .eyebrow a:hover, .mm-prose .page-link a { border-bottom-color: transparent; }
@@ -780,3 +780,14 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
   .tools-aside .col-group:first-of-type, .tools-aside > .entry-grid:first-of-type { margin-top: 0; }
   .tools-aside .col-group h3:first-child { margin-top: 0; }
 }
+
+/* a plain book in a stack that carries a title and leads to a page (Shadow Work, under Correspondences) */
+.slab.titled { position: relative; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #f1d9a0; transition: filter .25s; }
+.slab.titled::before, .slab.titled::after { content: ""; position: absolute; top: 0; bottom: 0; width: 2px; background: var(--gold); opacity: .8; }
+.slab.titled::before { left: 16px; box-shadow: 6px 0 0 -0.5px color-mix(in srgb, var(--gold) 55%, transparent); }
+.slab.titled::after { right: 18px; box-shadow: -6px 0 0 -0.5px color-mix(in srgb, var(--gold) 55%, transparent); }
+.slab-title { font-family: var(--display); font-weight: 600; font-size: .92rem; letter-spacing: .14em; text-transform: uppercase; }
+.slab.t5 .slab-title { color: #3a2224; }
+.slab.titled:hover { filter: brightness(1.15); }
+.slab.titled:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 640px) { .slab-title { font-size: .74rem; letter-spacing: .1em; } }
