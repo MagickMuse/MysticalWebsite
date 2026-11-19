@@ -203,7 +203,7 @@
     var prose = document.querySelector('.pg.with-aside > .mm-prose'); if (!prose) return;
     var heads = Array.prototype.filter.call(prose.querySelectorAll('h2[id], h3[id], h4[id]'), function (h) { return h.textContent.trim(); });
     if (heads.length < 2) return;
-    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var still = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.getAttribute('data-motion') === 'reduce';
     var nav = document.createElement('nav'); nav.className = 'toc'; nav.setAttribute('aria-label', 'On this page');
     var t = document.createElement('p'); t.className = 'toc-title'; t.textContent = 'On this page'; nav.appendChild(t);
     var ol = document.createElement('ol'); nav.appendChild(ol);
@@ -499,7 +499,7 @@
     if (wide.addEventListener) wide.addEventListener('change', apply);
   })();
 
-  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduceMotion = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.getAttribute('data-motion') === 'reduce';
 
   // Visitors: anything inside the Manuscript (a book, a connection, a link) opens the join pop-up,
   // except the pages anyone can read. Runs first (capture), so the book animation never starts for them.

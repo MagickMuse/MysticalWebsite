@@ -28,21 +28,43 @@
   --script: "Pinyon Script", "Brush Script MT", cursive;
   color-scheme: light;
 }
+/* Dark: a warm charcoal (not black), with the burgundy and gold lifted for contrast.
+   Follows the device unless a theme is chosen in Settings (prefs.js sets data-theme on <html>). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #1c1415; --surface: #281c1d; --ink: #f2e6de; --muted: #b39c96;
-    --accent: #c9545f; --line: #3e2c2c; --gold: #d6b062;
+    --bg: #262120; --surface: #312b2a; --ink: #f1e7df; --muted: #b9aaa3;
+    --accent: #c9545f; --line: #463c3b; --gold: #d6b062;
     --frame: linear-gradient(160deg, #4a2a2c 0%, #5e2a30 55%, #7a2f36 100%);
-    --accent-text: #d9737c; --on-btn: #f2e6de;
+    --accent-text: #e08a91; --on-btn: #f6efe8;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #1c1415; --surface: #281c1d; --ink: #f2e6de; --muted: #b39c96;
-  --accent: #c9545f; --line: #3e2c2c; --gold: #d6b062;
+  --bg: #262120; --surface: #312b2a; --ink: #f1e7df; --muted: #b9aaa3;
+  --accent: #c9545f; --line: #463c3b; --gold: #d6b062;
   --frame: linear-gradient(160deg, #4a2a2c 0%, #5e2a30 55%, #7a2f36 100%);
-  --accent-text: #d9737c; --on-btn: #f2e6de;
+  --accent-text: #e08a91; --on-btn: #f6efe8;
   color-scheme: dark;
+}
+
+/* ---------- accessibility settings (prefs.js) ---------- */
+@font-face { font-family: "OpenDyslexic"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/opendyslexic-400.woff2") format("woff2"); }
+@font-face { font-family: "OpenDyslexic"; font-style: italic; font-weight: 400; font-display: swap; src: url("fonts/opendyslexic-400-italic.woff2") format("woff2"); }
+@font-face { font-family: "OpenDyslexic"; font-style: normal; font-weight: 700; font-display: swap; src: url("fonts/opendyslexic-700.woff2") format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/atkinson-400.woff2") format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: italic; font-weight: 400; font-display: swap; src: url("fonts/atkinson-400-italic.woff2") format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-style: normal; font-weight: 700; font-display: swap; src: url("fonts/atkinson-700.woff2") format("woff2"); }
+:root[data-font="dyslexic"] { --body: "OpenDyslexic", "Comic Sans MS", sans-serif; --display: "OpenDyslexic", "Comic Sans MS", sans-serif; }
+:root[data-font="legible"] { --body: "Atkinson Hyperlegible", Verdana, sans-serif; --display: "Atkinson Hyperlegible", Verdana, sans-serif; }
+:root[data-font] .logo { font-family: var(--display); }
+/* OpenDyslexic runs wide: letter-spaced capitals are tightened so menus still fit */
+html[data-size="large"] { font-size: clamp(18.5px, 0.52vw + 12px, 22px); }
+html[data-size="larger"] { font-size: clamp(21px, 0.58vw + 14px, 25px); }
+html[data-spacing="wide"] body { line-height: 1.95; letter-spacing: .04em; word-spacing: .14em; }
+html[data-spacing="wide"] p, html[data-spacing="wide"] li { line-height: 1.95; }
+html[data-motion="reduce"] { scroll-behavior: auto; }
+html[data-motion="reduce"] *, html[data-motion="reduce"] *::before, html[data-motion="reduce"] *::after {
+  animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important;
 }
 
 /* ---------- base ---------- */
@@ -452,7 +474,8 @@ footer.site { padding-block: 4rem 2.5rem; border-top: 1px solid var(--line); }
 .foot ul a:hover { color: var(--accent-text); }
 .foot .email { font-size: .9rem; color: var(--muted); }
 .foot .email a, .foot .legal a { display: inline-flex; align-items: center; min-height: 44px; }
-.foot .legal { margin-top: -1.6rem; font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; }
+.foot .legal { margin-top: -1.6rem; font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0 1rem; }
+.foot .legal span { color: var(--gold); font-size: .6rem; }
 .foot .legal a { color: var(--muted); text-decoration: none; }
 .foot .legal a:hover { color: var(--accent-text); }
 .foot small { font-size: .72rem; color: var(--muted); letter-spacing: .05em; }
@@ -542,3 +565,34 @@ footer.site { padding-block: 4rem 2.5rem; border-top: 1px solid var(--line); }
   .marquee ul[aria-hidden="true"], .marquee li:last-child { display: none; }
   .grimoire .frame, .btn, a.card, .buybar, .carousel-nav button, .post a.frame img { transition: none; }
 }
+
+/* ---------- settings panel (prefs.js) ---------- */
+.prefs { display: grid; gap: 1.6rem; max-width: 760px; }
+.prefs fieldset { border: 0; border-top: 1px solid var(--line); margin: 0; padding: 1.2rem 0 0; display: flex; flex-wrap: wrap; gap: .6rem; }
+.prefs legend { float: left; width: 100%; margin-bottom: .8rem; font-size: .74rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-text); }
+.prefs label { position: relative; cursor: pointer; }
+.prefs input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.prefs label span { display: inline-block; padding: .55rem 1.05rem; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--ink); transition: border-color .2s, background .2s; }
+.prefs label:hover span { border-color: var(--accent); }
+.prefs input:checked + span { background: var(--btn); border-color: var(--btn); color: var(--on-btn); }
+:root[data-theme="dark"] .prefs input:checked + span { background: var(--accent); border-color: var(--accent); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .prefs input:checked + span { background: var(--accent); border-color: var(--accent); } }
+.prefs input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 3px; }
+.prefs .f-dyslexic span { font-family: "OpenDyslexic", sans-serif; }
+.prefs .f-legible span { font-family: "Atkinson Hyperlegible", sans-serif; }
+.prefs .s-large { font-size: 1.12em; } .prefs .s-larger { font-size: 1.25em; }
+.prefs-hint { flex-basis: 100%; margin: .2rem 0 0; font-size: .86rem; color: var(--muted); }
+.prefs-foot { display: flex; align-items: center; gap: 1.2rem; }
+.prefs-saved { margin: 0; color: var(--accent-text); font-size: .9rem; }
+.prefs [data-prefs-reset] { background: none; border: 0; border-bottom: 1px solid var(--accent); padding: .2rem 0; color: var(--ink); font: inherit; font-size: .9rem; cursor: pointer; }
+.prefs [data-prefs-reset]:hover { color: var(--accent-text); }
+/* OpenDyslexic is wide on its own: letter-spaced capitals (menus, labels, buttons) are tightened */
+:root[data-font="dyslexic"] body *:not(.shelves *, .book-pile *) { letter-spacing: 0.02em !important; }
+/* When the menu doesn't fit beside the logo (a wide font or larger text), it folds into the Menu button (prefs.js adds .nav-fold) */
+html.nav-fold .menu { display: block; }
+html.nav-fold .nav nav { display: none; grid-column: 1 / -1; grid-row: 2; flex-direction: column; align-items: stretch; gap: 0; padding-top: 1rem; }
+html.nav-fold .nav nav.open { display: flex; }
+html.nav-fold .nav ul { flex-direction: column; align-items: stretch; gap: 0; }
+html.nav-fold .nav li::before { display: none; }
+html.nav-fold .nav li { display: block; }
+html.nav-fold .nav ul a { align-content: center; min-height: 52px; }

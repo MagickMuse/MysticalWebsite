@@ -515,7 +515,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
   writing-mode: vertical-rl; text-orientation: upright; /* letters stacked upright, one under another */
   /* each letter takes about 1.12em, so the title shrinks to fit the room on the spine */
   font-family: var(--display); font-weight: 600; line-height: 1; letter-spacing: 0; text-transform: uppercase; color: var(--ink-on); white-space: nowrap;
-  font-size: min(1.12rem, calc(var(--room) / (var(--n, 8) * 1.12))); }
+  font-size: min(18px, calc(var(--room) / (var(--n, 8) * 1.12))); }
 .bk-title.n3 { --n: 3; } .bk-title.n4 { --n: 4; } .bk-title.n5 { --n: 5; } .bk-title.n6 { --n: 6; } .bk-title.n7 { --n: 7; } .bk-title.n8 { --n: 8; } .bk-title.n9 { --n: 9; } .bk-title.n10 { --n: 10; } .bk-title.n11 { --n: 11; } .bk-title.n12 { --n: 12; } .bk-title.n13 { --n: 13; } .bk-title.n14 { --n: 14; } .bk-title.n15 { --n: 15; } .bk-title.n16 { --n: 16; }
 .bk-star { position: absolute; left: 50%; bottom: 28px; width: 14px; height: 14px; margin-left: -7px; background: var(--gold); -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
 svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -webkit-mask: none; mask: none; color: var(--gold); }
@@ -528,9 +528,9 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .bk .cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .bk .cover::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in srgb, var(--bc) 92%, transparent) 0%, color-mix(in srgb, var(--bc) 55%, transparent) 26%, rgba(0,0,0,0) 48%, rgba(0,0,0,0) 70%, rgba(28,20,21,.55) 100%); z-index: 1; }
 .bk .cover::after { content: ""; position: absolute; inset: 9px; border: 1px solid color-mix(in srgb, var(--gold) 85%, transparent); border-radius: 2px; z-index: 2; pointer-events: none; }
-.cover-title { position: absolute; top: 22px; left: 16px; right: 16px; z-index: 3; text-align: center; font-family: var(--display); font-size: 1.55rem; line-height: 1.1; color: var(--ink-on); }
+.cover-title { position: absolute; top: 22px; left: 16px; right: 16px; z-index: 3; text-align: center; font-family: var(--display); font-size: 25px; line-height: 1.1; color: var(--ink-on); }
 .cover-title::after { content: ""; display: block; width: 12px; height: 12px; margin: .45rem auto 0; background: var(--gold); -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
-.cover-sub { position: absolute; bottom: 20px; left: 0; right: 0; z-index: 3; text-align: center; font-size: .66rem; letter-spacing: .2em; text-transform: uppercase; color: #f6efe8; }
+.cover-sub { position: absolute; bottom: 20px; left: 0; right: 0; z-index: 3; text-align: center; font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: #f6efe8; }
 .car-track:not([data-ready]) .bk:hover, .bk.open, .bk:focus-visible { width: 220px; transform: translateY(-10px); box-shadow: 0 24px 34px -16px rgba(46, 31, 32, .7); }
 .car-track:not([data-ready]) .bk:hover .spine, .bk.open .spine, .bk:focus-visible .spine { opacity: 0; }
 .car-track:not([data-ready]) .bk:hover .cover, .bk.open .cover, .bk:focus-visible .cover { opacity: 1; }
@@ -551,7 +551,7 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .bk.lying .band { top: 0; bottom: 0; width: 2px; height: auto; }
 .bk.lying .band.left { left: 16px; right: auto; box-shadow: 6px 0 0 -0.5px color-mix(in srgb, var(--gold) 60%, transparent); }
 .bk.lying .band.right { right: 18px; left: auto; box-shadow: -6px 0 0 -0.5px color-mix(in srgb, var(--gold) 60%, transparent); }
-.bk.lying .bk-title { top: 0; bottom: 0; left: 70px; right: 34px; writing-mode: horizontal-tb; letter-spacing: .1em; font-size: .92rem; }
+.bk.lying .bk-title { top: 0; bottom: 0; left: 70px; right: 34px; writing-mode: horizontal-tb; letter-spacing: .1em; font-size: 14.5px; }
 .bk.lying .bk-star { left: 46px; top: 50%; bottom: auto; margin-top: -11px; }
 .bk.lying i.bk-star { margin-top: -7px; }
 .slab { display: block; height: 34px; border-radius: 2px; box-shadow: var(--worn), 0 10px 16px -12px rgba(46, 31, 32, .6);
@@ -562,7 +562,7 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .slab.t1 { --bc: #7a1f2b; } .slab.t2 { --bc: #9c4a4f; } .slab.t3 { --bc: #2e1f20; } .slab.t4 { --bc: #a07a2c; } .slab.t5 { --bc: #c99a92; }
 /* lifted out and turned upright: the spine lettering turns with it */
 .b3d.lying .b3d-spine .t { text-orientation: mixed; }
-@media (max-width: 640px) { .shelves { gap: 1.6rem; } .bk.lying, .bk.lying.open, .bk.lying:focus-visible { width: 250px; height: 50px; } .bk.lying .bk-title { font-size: .74rem; left: 60px; right: 28px; letter-spacing: .08em; } .slab.s1 { width: 226px; } .slab.s2 { width: 258px; height: 36px; } }
+@media (max-width: 640px) { .shelves { gap: 1.6rem; } .bk.lying, .bk.lying.open, .bk.lying:focus-visible { width: 250px; height: 50px; } .bk.lying .bk-title { font-size: 12px; left: 60px; right: 28px; letter-spacing: .08em; } .slab.s1 { width: 226px; } .slab.s2 { width: 258px; height: 36px; } }
 @media (max-width: 640px) { .carousel { padding: 0 .4rem; } .car-btn { display: none; } .car-track { height: 320px; } .bk { height: 280px; width: 50px; --room: 194px; } .car-track:not([data-ready]) .bk:hover, .bk.open, .bk:focus-visible { width: 190px; } .bk .cover { width: 190px; } }
 
 /* ---------- visitors: the join pop-up and the sneak peek note ---------- */
@@ -766,11 +766,11 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .slab.titled::before, .slab.titled::after { content: ""; position: absolute; top: 0; bottom: 0; width: 2px; background: var(--gold); opacity: .8; }
 .slab.titled::before { left: 16px; box-shadow: 6px 0 0 -0.5px color-mix(in srgb, var(--gold) 55%, transparent); }
 .slab.titled::after { right: 18px; box-shadow: -6px 0 0 -0.5px color-mix(in srgb, var(--gold) 55%, transparent); }
-.slab-title { font-family: var(--display); font-weight: 600; font-size: .92rem; letter-spacing: .14em; text-transform: uppercase; }
+.slab-title { font-family: var(--display); font-weight: 600; font-size: 14.5px; letter-spacing: .14em; text-transform: uppercase; }
 .slab.t5 .slab-title { color: #3a2224; }
 .slab.titled:hover { filter: brightness(1.15); }
 .slab.titled:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-@media (max-width: 640px) { .slab-title { font-size: .74rem; letter-spacing: .1em; } }
+@media (max-width: 640px) { .slab-title { font-size: 12px; letter-spacing: .1em; } }
 
 /* ---------- phones: every grimoire lying flat in one alphabetical pile, candles on top ---------- */
 .book-pile { display: none; }
@@ -779,7 +779,7 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
   .book-pile { display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: .6rem; }
   .book-pile .candles { align-self: center; margin: 0 0 0 110px; height: 84px; }
   .book-pile .bk.lying, .book-pile .bk.lying.open, .book-pile .bk.lying:focus-visible { --pw: 280px; width: min(var(--pw), 86vw); height: 46px; flex: none; transform: translateX(var(--px, 0)); }
-  .book-pile .bk.lying .bk-title { left: 56px; right: 26px; font-size: .78rem; letter-spacing: .1em; }
+  .book-pile .bk.lying .bk-title { left: 56px; right: 26px; font-size: 12.5px; letter-spacing: .1em; }
   .book-pile .bk.lying .bk-star { left: 38px; }
   /* not a neat tower: slightly different lengths, nudged left and right */
   .book-pile .bk:nth-of-type(5n + 1) { --pw: 286px; --px: -6px; }
@@ -878,15 +878,15 @@ details.toggle > summary > h5 { margin: 0; display: inline; }
 .bk.faced .cover { opacity: 1; }
 .dive { position: absolute; z-index: 4; left: 50%; bottom: 46px; transform: translateX(-50%); white-space: nowrap;
   padding: .42rem .95rem .38rem; border: 1px solid var(--gold); border-radius: 999px; background: color-mix(in srgb, #2e1f20 72%, transparent);
-  font-family: var(--body); font-style: normal; font-size: .8rem; letter-spacing: .14em; text-transform: lowercase; color: #f3e2b4;
+  font-family: var(--body); font-style: normal; font-size: 13px; letter-spacing: .14em; text-transform: lowercase; color: #f3e2b4;
   animation: dive-glow 2.8s ease-in-out infinite; transition: background .3s, color .3s; }
-.dive i { font-style: normal; font-size: .7rem; color: var(--gold); display: inline-block; animation: dive-twinkle 2.8s ease-in-out infinite; }
+.dive i { font-style: normal; font-size: 11px; color: var(--gold); display: inline-block; animation: dive-twinkle 2.8s ease-in-out infinite; }
 .bk.faced:hover .dive, .bk.faced:focus-visible .dive, .bk.faced.open .dive { background: var(--gold); color: #2e1f20; }
 .bk.faced:hover .dive i, .bk.faced.open .dive i { color: #2e1f20; }
 @keyframes dive-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(243, 226, 180, 0); } 50% { box-shadow: 0 0 16px 3px rgba(243, 226, 180, .45); } }
 @keyframes dive-twinkle { 0%, 100% { transform: scale(.8) rotate(0); opacity: .7; } 50% { transform: scale(1.25) rotate(45deg); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .dive, .dive i { animation: none; } }
-@media (max-width: 640px) { .bk.faced, .bk.faced.open, .bk.faced:focus-visible { width: 190px; } .dive { font-size: .74rem; bottom: 42px; } }
+@media (max-width: 640px) { .bk.faced, .bk.faced.open, .bk.faced:focus-visible { width: 190px; } .dive { font-size: 12px; bottom: 42px; } }
 /* Top shelf: three tall candles on their own; bottom shelf: the four guide books in one stack, each a little bigger */
 .stack .slab.s3 { width: calc(var(--w) + 104px); height: 68px; margin: 0; transform: none; }
 .stack.at-end .candles.tall { align-self: center; margin: 0 6px; height: 190px; }
@@ -901,3 +901,14 @@ details.toggle > summary > h5 { margin: 0; display: inline; }
 }
 .book-pile .slab.s2, .book-pile .slab.s3, .book-pile .slab.s4 { width: min(310px, 90vw); height: 52px; }
 .book-pile .slab.s3 { width: min(318px, 92vw); } .book-pile .slab.s4 { width: min(326px, 93vw); height: 54px; }
+/* Account: display & accessibility settings (the panel's own styles are in styles.css) */
+.account-prefs { max-width: 760px; margin: 3.5rem auto 0; padding-top: 2rem; border-top: 1px solid var(--line); }
+.account-prefs h2 { font-family: var(--display); font-weight: 400; font-size: 2rem; margin: 0 0 .4rem; }
+.account-prefs .lede { margin: 0 0 1.6rem; }
+/* The bookshelf is a picture of real books: its lettering keeps the house fonts and fixed sizes whatever the
+   reading settings (the books' names are in their labels for screen readers). */
+.shelves, .book-pile { --display: "Cormorant", "Cormorant Garamond", Georgia, serif; --body: "Jost", "Helvetica Neue", Arial, sans-serif; }
+/* A wide font or larger text (header folded by prefs.js): the search bar gets its own full-width row, as on phones */
+html.nav-fold .mm-bar { display: flex; flex-wrap: wrap; gap: .5rem; }
+html.nav-fold .mm-search { flex-basis: 100%; }
+html.nav-fold .mm-acct { order: -1; margin-left: auto; }

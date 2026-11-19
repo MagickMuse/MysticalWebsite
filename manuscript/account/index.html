@@ -11,11 +11,12 @@
   <link rel="preload" href="../../fonts/cormorant-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../fonts/cormorant-400-italic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../../fonts/jost-400.woff2" as="font" type="font/woff2" crossorigin>
+  <script src="../../prefs.js"></script>
   <link rel="stylesheet" href="../../styles.css">
-  <link rel="stylesheet" href="../../manuscript/assets/wiki.css?v=58">
+  <link rel="stylesheet" href="../../manuscript/assets/wiki.css?v=59">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="../../manuscript/assets/wiki.js?v=48" defer></script>
+  <script src="../../manuscript/assets/wiki.js?v=49" defer></script>
 </head>
 <body class="mm">
 <a class="skip" href="#main">Skip to main content</a>
@@ -55,12 +56,46 @@
     <button class="btn" type="submit" disabled>Email me a sign-in link</button>
   </form>
   </div>
+</section>
+<section class="account-prefs" id="settings" aria-labelledby="prefs-title">
+  <h2 id="prefs-title">Display &amp; accessibility</h2>
+  <p class="lede small">Dark mode, an easier-to-read font, larger text, more spacing, fewer animations. Changes show straight away.</p>
+  <form class="prefs" data-prefs hidden aria-label="Display and accessibility settings">
+  <fieldset><legend>Theme</legend>
+    <label><input type="radio" name="theme" value="system"><span>Match my device</span></label>
+    <label><input type="radio" name="theme" value="light"><span>Light</span></label>
+    <label><input type="radio" name="theme" value="dark"><span>Dark</span></label>
+  </fieldset>
+  <fieldset><legend>Font</legend>
+    <label><input type="radio" name="font" value="default"><span>The Magick Muse</span></label>
+    <label class="f-dyslexic"><input type="radio" name="font" value="dyslexic"><span>OpenDyslexic</span></label>
+    <label class="f-legible"><input type="radio" name="font" value="legible"><span>Atkinson Hyperlegible</span></label>
+    <p class="prefs-hint">OpenDyslexic is made for readers with dyslexia; Atkinson Hyperlegible for low vision.</p>
+  </fieldset>
+  <fieldset><legend>Text size</legend>
+    <label><input type="radio" name="size" value="normal"><span>Standard</span></label>
+    <label><input type="radio" name="size" value="large"><span class="s-large">Large</span></label>
+    <label><input type="radio" name="size" value="larger"><span class="s-larger">Largest</span></label>
+  </fieldset>
+  <fieldset><legend>Spacing</legend>
+    <label><input type="radio" name="spacing" value="normal"><span>Standard</span></label>
+    <label><input type="radio" name="spacing" value="wide"><span>More space between lines and letters</span></label>
+  </fieldset>
+  <fieldset><legend>Motion</legend>
+    <label><input type="radio" name="motion" value="system"><span>Match my device</span></label>
+    <label><input type="radio" name="motion" value="reduce"><span>Stop animations</span></label>
+    <p class="prefs-hint">Stops the flickering candles, twinkling stars and page-turn effects.</p>
+  </fieldset>
+  <div class="prefs-foot"><button type="button" class="link as-button" data-prefs-reset>Back to the defaults</button><p class="prefs-saved" data-prefs-saved hidden role="status">Saved ✦</p></div>
+  <p class="prefs-hint">Saved in this browser, so set them once on each device you use.</p>
+</form>
+<p data-prefs-nojs>These settings need JavaScript turned on.</p>
 </section></main>
 <footer class="site">
   <div class="wrap foot">
     <div class="star-rule" aria-hidden="true"><i class="spark big"></i></div>
     <a class="logo" href="../../">Magick Muse</a>
-    <p class="legal"><a href="../../privacy-policy">Privacy Policy</a></p>
+    <p class="legal"><a href="../../settings">Accessibility &amp; display</a><span aria-hidden="true">✦</span><a href="../../privacy-policy">Privacy Policy</a></p>
     <small>&copy; 2026 The Magick Muse. All rights reserved. The Manuscript is for members only: please do not copy or share its pages.</small>
   </div>
 </footer>

@@ -65,7 +65,7 @@
     }).observe(hero);
   }
 
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.getAttribute('data-motion') === 'reduce';
 
   // Scroll reveals, arch "draw open" reveals and count-up numbers.
   // Only content that starts below the first screen is animated, so nothing visible on load is hidden.

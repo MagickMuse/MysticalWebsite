@@ -644,6 +644,8 @@ function view_account(): void
     $email = e($email);
     $admin = is_admin(current_email()) ? '<a class="link" href="' . e(url('dashboard')) . '">Dashboard</a>' : '';
     $library = '<a class="link" href="' . e(site_url('shop/library')) . '">Your library</a>';
+    // Display & accessibility: kept in the browser by prefs.js, the same panel as the website's /settings page.
+    $prefs = (string) @file_get_contents(__DIR__ . '/lib/prefs-panel.html');
     layout('Account', <<<HTML
 <section class="mm-hero narrow">
   <p class="eyebrow labelled">Account</p>
@@ -652,6 +654,11 @@ function view_account(): void
   <div class="actions">$join $billing $library $admin
     <form method="post" action="$logout"><input type="hidden" name="csrf" value="$csrf"><button class="link as-button" type="submit">Sign out</button></form>
   </div>
+</section>
+<section class="account-prefs" id="settings" aria-labelledby="prefs-title">
+  <h2 id="prefs-title">Display &amp; accessibility</h2>
+  <p class="lede small">Dark mode, an easier-to-read font, larger text, more spacing, fewer animations. Changes show straight away.</p>
+  $prefs
 </section>
 HTML, ['private' => true]);
 }

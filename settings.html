@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-nbBdGM04lrgdMJq57pnsBPi1/HSQ9f3P7tdsBKAfDj8=' 'sha256-/Pp8jRM4DkmNirYTjUf8l9DbufSTYqWMkiE9268C8rE=' https://*.googletagmanager.com; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.unsplash.com https://images.pexels.com https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Settings | The Magick Muse</title>
+  <meta name="description" content="Display and accessibility settings for The Magick Muse: dark mode, a dyslexia-friendly font, larger text, more spacing and fewer animations." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="The Magick Muse" />
+  <meta property="og:title" content="Settings | The Magick Muse" />
+  <meta property="og:description" content="Display and accessibility settings for The Magick Muse: dark mode, a dyslexia-friendly font, larger text, more spacing and fewer animations." />
+  <meta property="og:url" content="https://magickmuse.com/settings" />
+  <link rel="canonical" href="https://magickmuse.com/settings" />
+  <meta property="og:image" content="https://magickmuse.com/assets/og-manuscript.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Settings | The Magick Muse" />
+  <meta name="twitter:description" content="Display and accessibility settings for The Magick Muse: dark mode, a dyslexia-friendly font, larger text, more spacing and fewer animations." />
+  <meta name="twitter:image" content="https://magickmuse.com/assets/og-manuscript.jpg" />
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="alternate" type="application/rss+xml" title="Magick Mastery" href="feed.xml">
+  <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
+  <link rel="preload" href="fonts/jost-300.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/cormorant-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/cormorant-400-italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/jost-400.woff2" as="font" type="font/woff2" crossorigin>
+  <script src="prefs.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {analytics_storage: 'denied', ad_storage: 'denied'});
+  </script>
+  <script>
+    gtag('js', new Date());
+    gtag('config', 'G-0DV5GLQV05');
+  </script>
+  <script src="cookie-consent.js" defer></script>
+  <script src="site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="logo" href="./">Magick Muse</a>
+    <button class="menu" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
+    <nav id="site-menu" aria-label="Main">
+      <ul class="left">
+        <li><a href="manuscript/"><span>Manuscript</span><small>the grimoire</small></a></li>
+        <li><a href="meetup"><span>Muses</span><small>the coven</small></a></li>
+      </ul>
+      <ul class="right">
+        <li><a href="mastery"><span>Mastery</span><small>guides &amp; courses</small></a></li><li><a href="shop/"><span>Market</span><small>the shop</small></a></li>
+        <li><a href="story"><span>Mythos</span><small>our story</small></a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main id="main">
+  <article>
+    <section class="wrap">
+      <header class="article-head">
+        <p class="script">The Magick Muse</p>
+        <h1>Display &amp; accessibility</h1>
+        <ul class="meta"><li>Make the site easier on your eyes, your brain and your body</li></ul>
+      </header>
+      <div class="prose" id="settings">
+        <p>Choose how the website and the Manuscript look for you. Changes show straight away.</p>
+        <form class="prefs" data-prefs hidden aria-label="Display and accessibility settings">
+  <fieldset><legend>Theme</legend>
+    <label><input type="radio" name="theme" value="system"><span>Match my device</span></label>
+    <label><input type="radio" name="theme" value="light"><span>Light</span></label>
+    <label><input type="radio" name="theme" value="dark"><span>Dark</span></label>
+  </fieldset>
+  <fieldset><legend>Font</legend>
+    <label><input type="radio" name="font" value="default"><span>The Magick Muse</span></label>
+    <label class="f-dyslexic"><input type="radio" name="font" value="dyslexic"><span>OpenDyslexic</span></label>
+    <label class="f-legible"><input type="radio" name="font" value="legible"><span>Atkinson Hyperlegible</span></label>
+    <p class="prefs-hint">OpenDyslexic is made for readers with dyslexia; Atkinson Hyperlegible for low vision.</p>
+  </fieldset>
+  <fieldset><legend>Text size</legend>
+    <label><input type="radio" name="size" value="normal"><span>Standard</span></label>
+    <label><input type="radio" name="size" value="large"><span class="s-large">Large</span></label>
+    <label><input type="radio" name="size" value="larger"><span class="s-larger">Largest</span></label>
+  </fieldset>
+  <fieldset><legend>Spacing</legend>
+    <label><input type="radio" name="spacing" value="normal"><span>Standard</span></label>
+    <label><input type="radio" name="spacing" value="wide"><span>More space between lines and letters</span></label>
+  </fieldset>
+  <fieldset><legend>Motion</legend>
+    <label><input type="radio" name="motion" value="system"><span>Match my device</span></label>
+    <label><input type="radio" name="motion" value="reduce"><span>Stop animations</span></label>
+    <p class="prefs-hint">Stops the flickering candles, twinkling stars and page-turn effects.</p>
+  </fieldset>
+  <div class="prefs-foot"><button type="button" class="link as-button" data-prefs-reset>Back to the defaults</button><p class="prefs-saved" data-prefs-saved hidden role="status">Saved ✦</p></div>
+  <p class="prefs-hint">Saved in this browser, so set them once on each device you use.</p>
+</form>
+<p data-prefs-nojs>These settings need JavaScript turned on.</p>
+      </div>
+    </section>
+  </article>
+</main>
+<footer class="site">
+  <div class="wrap foot">
+    <div class="star-rule" aria-hidden="true"><i class="spark big"></i></div>
+    <a class="logo" href="./">Magick Muse</a>
+    <nav aria-label="Footer">
+      <ul>
+        <li><a href="manuscript/"><span>Manuscript</span><small>the grimoire</small></a></li>
+        <li><a href="meetup"><span>Muses</span><small>the coven</small></a></li>
+        <li><a href="mastery"><span>Mastery</span><small>guides &amp; courses</small></a></li><li><a href="shop/"><span>Market</span><small>the shop</small></a></li>
+        <li><a href="story"><span>Mythos</span><small>our story</small></a></li>
+      </ul>
+    </nav>
+    <ul class="social">
+      <li><a href="https://www.pinterest.com/themagickmuseco/" target="_blank" rel="noopener" aria-label="Pinterest"><span class="icon pinterest" aria-hidden="true"></span></a></li>
+      <li><a href="https://www.instagram.com/the_magick_muse/" target="_blank" rel="noopener" aria-label="Instagram"><span class="icon instagram" aria-hidden="true"></span></a></li>
+      <li><a href="https://www.tiktok.com/@the.magick.muse" target="_blank" rel="noopener" aria-label="TikTok"><span class="icon tiktok" aria-hidden="true"></span></a></li>
+      <li><a href="https://discord.com/invite/PBr2BtCpxk" target="_blank" rel="noopener" aria-label="Discord"><span class="icon discord" aria-hidden="true"></span></a></li>
+    </ul>
+    <p class="email"><a href="mailto:TheMagickMuse.co@gmail.com">TheMagickMuse.co@gmail.com</a></p>
+    <p class="legal"><a href="settings">Accessibility &amp; display</a><span aria-hidden="true">✦</span><a href="privacy-policy">Privacy Policy</a></p>
+    <small>&copy; 2026 The Magick Muse. All rights reserved.</small>
+  </div>
+</footer>
+</body>
+</html>
