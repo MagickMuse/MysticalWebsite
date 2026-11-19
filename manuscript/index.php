@@ -210,7 +210,7 @@ function view_page(array $p): void
                 . '<img src="' . e(media_url($f)) . '" alt="' . e($p['title']) . '" loading="lazy"></a></figure>', $images)) . '</div>';
         }
         // A spread's layout picture goes right above its Card Details, where the positions are explained.
-        $details = '<div class="prop-row"><div class="prop-name"><span class="prop-glyph" aria-hidden="true">◇</span>Card Details</div>';
+        $details = '<div class="prop-row"><div class="prop-name">' . prop_glyph('Card Details') . 'Card Details</div>';
         if ($gallery && str_contains($panel, $details)) {
             $panel = str_replace($details, str_replace('class="gallery"', 'class="gallery in-panel"', $gallery) . $details, $panel);
             $gallery = '';

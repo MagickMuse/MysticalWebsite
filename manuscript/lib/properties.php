@@ -91,9 +91,24 @@ function value_link_base(array $page): ?callable
         . '#list-' . $list['slug'];
 }
 
+/**
+ * The little icon before a property's name: a connection shows its grimoire's own icon (Plants: the leaf),
+ * every other property an icon of its own (lib/prop-icons.php). Drawn in gold by CSS (.pi-*, .pg-*).
+ */
+function prop_glyph(string $name, ?string $grimoire = null): string
+{
+    static $icons = null;
+    $icons ??= (array) require __DIR__ . '/prop-icons.php';
+    $glyphs = ['animal', 'astrology', 'card', 'correspondence', 'dream', 'entity', 'material', 'mineral', 'oil', 'plant', 'recipe', 'ritual', 'rune', 'symbol', 'timing'];
+    $cls = $grimoire !== null && in_array($grimoire, $glyphs, true) ? 'gi-' . $grimoire
+        : 'pi-' . ($icons[mb_strtolower(trim(html_entity_decode($name)))] ?? $icons['_default']);
+    return '<span class="prop-glyph ' . $cls . '" aria-hidden="true"></span>';
+}
+
 function properties_panel(array $page, array $tags, array $groups): string
 {
-    $rows = '';
+    $rows = ''; $last = '';
+    $lastNames = array_map('mb_strtolower', (array) config('after_connections', ['Interpretations', 'Dream Interpretation']));
     $to = value_link_base($page);
     // 1. The entry's own properties (Type, Planet…), as words separated by gold stars.
     foreach ($tags as $name => $vals) {
@@ -103,17 +118,21 @@ function properties_panel(array $page, array $tags, array $groups): string
             : implode('', array_map(fn($v) => mb_strlen($v) > 40 ? '<span class="prop-text">' . e($v) . '</span>'
                 : ($to ? '<a class="' . pill_class($v) . '" href="' . e($to((string) $name, (string) $v)) . '" title="All ' . e((string) $name) . ': ' . e((string) $v) . '">' . e($v) . '</a>'
                     : '<span class="' . pill_class($v) . '">' . e($v) . '</span>'), $vals));
-        $rows .= '<div class="prop-row"><div class="prop-name"><span class="prop-glyph" aria-hidden="true">◇</span>' . e($name) . '</div><div class="prop-val">' . $value . '</div></div>';
+        $row = '<div class="prop-row"><div class="prop-name">' . prop_glyph((string) $name) . e($name) . '</div><div class="prop-val">' . $value . '</div></div>';
+        // Long readings (a dream's Interpretations) come after the connections, so the correspondences are seen first.
+        if (in_array(mb_strtolower((string) $name), $lastNames, true)) $last .= $row; else $rows .= $row;
     }
     if ($page['aka']) {
-        $rows .= '<div class="prop-row"><div class="prop-name"><span class="prop-glyph" aria-hidden="true">≡</span>Also called</div><div class="prop-val"><span class="prop-text">' . e($page['aka']) . '</span></div></div>';
+        $rows .= '<div class="prop-row"><div class="prop-name">' . prop_glyph('Also called') . 'Also called</div><div class="prop-val"><span class="prop-text">' . e($page['aka']) . '</span></div></div>';
     }
     // 2. Relations: links to the rest of the Manuscript.
     $open = (string) ($_GET['all'] ?? '');
     foreach ($groups as $name => $items) {
-        $rows .= '<div class="prop-row rel-row" id="' . e('rel-' . slugify($name)) . '"><div class="prop-name"><span class="prop-glyph" aria-hidden="true">↗</span>' . e($name)
+        $first = reset($items);
+        $rows .= '<div class="prop-row rel-row" id="' . e('rel-' . slugify($name)) . '"><div class="prop-name">' . prop_glyph((string) $name, is_array($first) ? ($first['grimoire'] ?? null) : null) . e($name)
             . '<small>' . count($items) . '</small></div><div class="prop-val">' . relation_row($page, $name, array_values($items), $open === $name) . '</div></div>';
     }
+    $rows .= $last;
     return $rows ? '<section class="props-panel" aria-label="Properties">' . $rows . '</section>' : '';
 }
 
@@ -216,6 +235,9 @@ function prose_hierarchy(string $t): string
         'extreme toxicity', 'skin safety', 'contraindications'];
     static $void = ['img', 'br', 'hr', 'input', 'source', 'wbr', 'meta', 'link'];
     $t = preg_replace('~<strong>([^<]{1,60}?:)\s*</strong>~u', '<strong class="lbl">$1</strong>', $t);
+    // Headings never say where the facts came from ("Source-Named Blending Partners" is just "Blending Partners"): everything is sourced.
+    $t = preg_replace_callback('~<h([2-5]) id="source-named-([^"]*)"([^>]*)>Source[- ]Named ([^<]*)</h\1>~i',
+        fn($m) => '<h' . $m[1] . ' id="' . $m[2] . '"' . $m[3] . '>' . ucfirst($m[4]) . '</h' . $m[1] . '>', $t);
     // the index just past the element that starts at $i (null if none starts there)
     $end = function (string $t, int $i) use ($void): ?int {
         if (!preg_match('~\G<([a-zA-Z0-9]+)\b[^>]*?(/?)>~', $t, $m, 0, $i)) return null;

@@ -338,7 +338,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .prop-row:hover { background: color-mix(in srgb, var(--surface) 70%, transparent); }
 .prop-name { display: flex; align-items: center; gap: .5rem; color: var(--muted); font-size: .86rem; line-height: 1.9; min-width: 0; }
 .prop-name small { margin-left: .2rem; font-size: .72rem; color: var(--muted); opacity: .8; }
-.prop-glyph { width: 1rem; flex: none; text-align: center; color: var(--gold); font-size: .85rem; }
+.prop-glyph { display: inline-block; width: 1.05rem; height: 1.05rem; flex: none; background: var(--gold); -webkit-mask: var(--pi) center / contain no-repeat; mask: var(--pi) center / contain no-repeat; }
 .prop-val { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; min-width: 0; line-height: 1.6; padding-top: .15rem; }
 .prop-text { color: var(--ink); white-space: pre-line; } /* keep the line breaks typed in Notion, e.g. one card per line in a spread */
 .prop-val a:not(.rel):not(.rel-more) { color: var(--accent-text); }
@@ -641,7 +641,7 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .pg.with-aside .prop-row:hover { background: none; }
 .pg.with-aside .prop-name { display: flex; align-items: baseline; gap: .4rem; margin-bottom: .35rem; font-size: .64rem; line-height: 1.4; letter-spacing: .17em; text-transform: uppercase; color: var(--accent-text); }
 .pg.with-aside .prop-name small { font-size: .62rem; letter-spacing: .05em; color: var(--muted); }
-.pg.with-aside .prop-glyph { display: none; }
+.pg.with-aside .prop-glyph { width: .95rem; height: .95rem; margin-right: .1rem; align-self: center; }
 .pg.with-aside .prop-val { padding: 0; gap: .15rem .55rem; font-size: .9rem; line-height: 1.55; }
 .pg.with-aside .prop-text { font-size: .88rem; line-height: 1.55; }
 .pg.with-aside .rel { padding: .05rem 0; }
@@ -963,3 +963,84 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .credit-meta { display: block; margin-top: .3rem; font-size: .78rem; color: var(--muted); }
 .credit-meta a { color: var(--muted); }
 .lib-foot { margin-top: 2.6rem; padding-top: 1.2rem; border-top: 1px solid var(--line); font-size: .9rem; color: var(--muted); max-width: none; }
+
+/* Property icons (Phosphor light, like the grimoire icons): .pi-* for properties, .gi-* for connections to a grimoire */
+.pi-arrows-clockwise { --pi: url("icons/arrows-clockwise.svg"); }
+.pi-atom { --pi: url("icons/atom.svg"); }
+.pi-baby { --pi: url("icons/baby.svg"); }
+.pi-book-open-text { --pi: url("icons/book-open-text.svg"); }
+.pi-calendar-blank { --pi: url("icons/calendar-blank.svg"); }
+.pi-calendar-dots { --pi: url("icons/calendar-dots.svg"); }
+.pi-cards { --pi: url("icons/cards.svg"); }
+.pi-chart-bar { --pi: url("icons/chart-bar.svg"); }
+.pi-circles-three { --pi: url("icons/circles-three.svg"); }
+.pi-club { --pi: url("icons/club.svg"); }
+.pi-cube { --pi: url("icons/cube.svg"); }
+.pi-drop { --pi: url("icons/drop.svg"); }
+.pi-drop-half { --pi: url("icons/drop-half.svg"); }
+.pi-fire { --pi: url("icons/fire.svg"); }
+.pi-first-aid { --pi: url("icons/first-aid.svg"); }
+.pi-flame { --pi: url("icons/flame.svg"); }
+.pi-flower { --pi: url("icons/flower.svg"); }
+.pi-flower-tulip { --pi: url("icons/flower-tulip.svg"); }
+.pi-funnel { --pi: url("icons/funnel.svg"); }
+.pi-gender-intersex { --pi: url("icons/gender-intersex.svg"); }
+.pi-gift { --pi: url("icons/gift.svg"); }
+.pi-globe { --pi: url("icons/globe.svg"); }
+.pi-globe-hemisphere-west { --pi: url("icons/globe-hemisphere-west.svg"); }
+.pi-hammer { --pi: url("icons/hammer.svg"); }
+.pi-hand-palm { --pi: url("icons/hand-palm.svg"); }
+.pi-hands-praying { --pi: url("icons/hands-praying.svg"); }
+.pi-hash { --pi: url("icons/hash.svg"); }
+.pi-hourglass { --pi: url("icons/hourglass.svg"); }
+.pi-key { --pi: url("icons/key.svg"); }
+.pi-layout { --pi: url("icons/layout.svg"); }
+.pi-lightning { --pi: url("icons/lightning.svg"); }
+.pi-list-bullets { --pi: url("icons/list-bullets.svg"); }
+.pi-list-numbers { --pi: url("icons/list-numbers.svg"); }
+.pi-lock-simple { --pi: url("icons/lock-simple.svg"); }
+.pi-map-pin { --pi: url("icons/map-pin.svg"); }
+.pi-music-notes { --pi: url("icons/music-notes.svg"); }
+.pi-note-pencil { --pi: url("icons/note-pencil.svg"); }
+.pi-palette { --pi: url("icons/palette.svg"); }
+.pi-pill { --pi: url("icons/pill.svg"); }
+.pi-planet { --pi: url("icons/planet.svg"); }
+.pi-question { --pi: url("icons/question.svg"); }
+.pi-quotes { --pi: url("icons/quotes.svg"); }
+.pi-scissors { --pi: url("icons/scissors.svg"); }
+.pi-scroll { --pi: url("icons/scroll.svg"); }
+.pi-seal-question { --pi: url("icons/seal-question.svg"); }
+.pi-shapes { --pi: url("icons/shapes.svg"); }
+.pi-shield-check { --pi: url("icons/shield-check.svg"); }
+.pi-sparkle { --pi: url("icons/sparkle.svg"); }
+.pi-squares-four { --pi: url("icons/squares-four.svg"); }
+.pi-star-four { --pi: url("icons/star-four.svg"); }
+.pi-sun { --pi: url("icons/sun.svg"); }
+.pi-tag { --pi: url("icons/tag.svg"); }
+.pi-test-tube { --pi: url("icons/test-tube.svg"); }
+.pi-text-aa { --pi: url("icons/text-aa.svg"); }
+.pi-text-align-left { --pi: url("icons/text-align-left.svg"); }
+.pi-thermometer-simple { --pi: url("icons/thermometer-simple.svg"); }
+.pi-tree { --pi: url("icons/tree.svg"); }
+.pi-user { --pi: url("icons/user.svg"); }
+.pi-users { --pi: url("icons/users.svg"); }
+.pi-users-three { --pi: url("icons/users-three.svg"); }
+.pi-warning { --pi: url("icons/warning.svg"); }
+.pi-warning-circle { --pi: url("icons/warning-circle.svg"); }
+.pi-wind { --pi: url("icons/wind.svg"); }
+.pi-yin-yang { --pi: url("icons/yin-yang.svg"); }
+.gi-animal { --pi: url("glyphs/animal.svg"); }
+.gi-astrology { --pi: url("glyphs/astrology.svg"); }
+.gi-card { --pi: url("glyphs/card.svg"); }
+.gi-correspondence { --pi: url("glyphs/correspondence.svg"); }
+.gi-dream { --pi: url("glyphs/dream.svg"); }
+.gi-entity { --pi: url("glyphs/entity.svg"); }
+.gi-material { --pi: url("glyphs/material.svg"); }
+.gi-mineral { --pi: url("glyphs/mineral.svg"); }
+.gi-oil { --pi: url("glyphs/oil.svg"); }
+.gi-plant { --pi: url("glyphs/plant.svg"); }
+.gi-recipe { --pi: url("glyphs/recipe.svg"); }
+.gi-ritual { --pi: url("glyphs/ritual.svg"); }
+.gi-rune { --pi: url("glyphs/rune.svg"); }
+.gi-symbol { --pi: url("glyphs/symbol.svg"); }
+.gi-timing { --pi: url("glyphs/timing.svg"); }

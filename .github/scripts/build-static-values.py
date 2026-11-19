@@ -16,7 +16,7 @@ import re
 import urllib.parse
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'manuscript')
-ROW = re.compile(r'(<div class="prop-row"><div class="prop-name"><span class="prop-glyph" aria-hidden="true">◇</span>)([^<]+)(</div><div class="prop-val">)(.*?)(</div></div>)', re.S)
+ROW = re.compile(r'(<div class="prop-row"><div class="prop-name"><span class="prop-glyph[^"]*" aria-hidden="true">(?:◇)?</span>)([^<]+)(</div><div class="prop-val">)(.*?)(</div></div>)', re.S)
 PILL = re.compile(r'<(span|a) class="pill"[^>]*>(.*?)</\1>', re.S)
 
 
