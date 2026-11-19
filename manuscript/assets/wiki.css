@@ -959,3 +959,7 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .did-you-mean a { color: var(--accent-text); }
 .suggest .did a { font-style: normal; color: var(--muted); border-bottom: 1px solid var(--line); }
 .suggest .did em { font-family: var(--display); font-size: 1.15em; color: var(--accent-text); margin-left: .25rem; }
+/* Picture credits (and the link to it under The Library) */
+.credit-meta { display: block; margin-top: .3rem; font-size: .78rem; color: var(--muted); }
+.credit-meta a { color: var(--muted); }
+.lib-foot { margin-top: 2.6rem; padding-top: 1.2rem; border-top: 1px solid var(--line); font-size: .9rem; color: var(--muted); max-width: none; }

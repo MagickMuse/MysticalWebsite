@@ -227,6 +227,7 @@ function page_url(array $p): string
 function media_url(?string $file): ?string
 {
     if ($file && preg_match('~^https://~', $file)) return $file; // a picture the site links to (site-covers.php)
+    if ($file && str_starts_with($file, 'asset:')) return url('assets/' . substr($file, 6)); // a picture kept with the site (site-covers.php)
     return $file ? url('media/' . rawurlencode($file)) : null;
 }
 

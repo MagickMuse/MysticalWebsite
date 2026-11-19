@@ -54,6 +54,7 @@ function route(array $parts, string $method): void
         case 'suggest':       search_suggest(trim((string) ($_GET['q'] ?? ''))); return;
         case 'calendar':      view_calendar(); return;
         case 'library':       view_the_library(); return;
+        case 'picture-credits': view_picture_credits(); return;
         case 'sneak-peek':    ($p = sneak_peek_page()) ? view_page($p) : redirect(url()); return;
     }
     $p = match (count($parts)) {
@@ -192,7 +193,8 @@ function view_page(array $p): void
     // Cut-out pictures (transparent PNGs, like the Animal Grimoire's) are shown whole, standing on the page, not cropped into the arch.
     // Tall pictures (a tarot or Lenormand card) are shown whole too, and open full size when clicked: a wide banner would crop them to a strip.
     if (!$photo && $p['cover']) {
-        $whole = is_cutout($p['cover']) || is_portrait($p['cover']);
+        // pictures kept with the site (the mineral photos from Wikimedia Commons) are specimen shots: shown whole
+        $whole = str_starts_with((string) $p['cover'], 'asset:') || is_cutout($p['cover']) || is_portrait($p['cover']);
         $img = '<img src="' . e(media_url($p['cover'])) . '" alt="' . ($whole ? e($p['title']) : '') . '">';
         $cover = '<div class="pg-cover' . ($whole ? ' cutout' : '') . '">'
             . ($whole ? '<a class="zoom" href="' . e(media_url($p['cover'])) . '" data-zoom>' . $img . '</a>' : $img) . '</div>';
@@ -339,7 +341,29 @@ function the_library_html(array $books): string
     }
     return '<header class="pg-head"><p class="eyebrow">Sources</p><h1>The Library</h1>'
         . '<p class="lede small">The books behind the Manuscript: ' . count($books) . ' titles on witchcraft, folklore, herbs, crystals, divination and the spirits, gathered as the grimoires grew.</p></header>'
-        . $filters . '<ol class="library">' . $list . '</ol>';
+        . $filters . '<ol class="library">' . $list . '</ol>'
+        . '<p class="lib-foot"><a href="' . e(url('picture-credits')) . '">Picture credits</a> for the photos used across the Manuscript.</p>';
+}
+
+/** /picture-credits: who took the photos the site uses from Wikimedia Commons, and their licences (assets/minerals/credits.json). */
+function view_picture_credits(): void
+{
+    $credits = json_decode((string) @file_get_contents(__DIR__ . '/assets/minerals/credits.json'), true) ?: [];
+    layout('Picture credits', '<article class="pg pg-library">' . picture_credits_html($credits, fn($path) => url($path)) . '</article>');
+}
+
+function picture_credits_html(array $credits, callable $href): string
+{
+    $rows = '';
+    foreach ($credits as $c) {
+        $lic = $c['license_url'] !== '' ? '<a href="' . e($c['license_url']) . '" rel="noopener license">' . e($c['license']) . '</a>' : e($c['license']);
+        $rows .= '<li><a class="lib-title" href="' . e($href($c['page'])) . '">' . e($c['title']) . '</a>'
+            . '<span class="lib-author">' . e($c['artist']) . '</span>'
+            . '<span class="credit-meta">' . $lic . ' · <a href="' . e($c['source']) . '" rel="noopener">Wikimedia Commons</a></span></li>';
+    }
+    return '<header class="pg-head"><p class="eyebrow">Sources</p><h1>Picture credits</h1>'
+        . '<p class="lede small">Many of the mineral photos in the Manuscript come from Wikimedia Commons, shared under free licences by the photographers below. Thank you to each of them.</p></header>'
+        . '<ol class="library">' . $rows . '</ol>';
 }
 
 /** True for a picture taller than it is wide, read from the file itself. */
