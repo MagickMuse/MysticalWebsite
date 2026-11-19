@@ -254,6 +254,17 @@
       + (soon.length ? '<div><h2>Coming <em>up</em></h2><ul class="soon">' + soon.join('') + '</ul><p class="small"><a class="link" href="' + esc(url('calendar/')) + '">The full calendar</a></p></div>' : '') + '</section>', 'Today');
   }
 
+  /**
+   * A page worth landing on: one with plenty to read (250 words or more) and plenty of connections (8 or more).
+   * A grimoire is chosen first, so the small ones come up as often as the big ones, then a page inside it.
+   */
+  var RICH_WORDS = 250, RICH_LINKS = 8;
+  function surprise() {
+    var by = {};
+    D.p.forEach(function (p, i) { if ((p[6] || 0) >= RICH_WORDS && D.l[i].length >= RICH_LINKS) (by[p[0]] = by[p[0]] || []).push(i); });
+    var gs = Object.keys(by).filter(function (g) { return by[g].length >= 5; }), list = by[gs[Math.floor(Math.random() * gs.length)]];
+    return pg(list[Math.floor(Math.random() * list.length)]);
+  }
   /** The Manuscript home: today at a glance, under the shelves, leading to the full Today page. */
   function homeToday(after) {
     var day = new Date(); day.setHours(0, 0, 0, 0);
@@ -571,6 +582,15 @@
       Store.remove('notes', del.getAttribute('data-del-note')).then(function () { notesPage(document.querySelector('[data-static-tool="notes"]')); });
     }
   });
+  // The Manuscript home: "Surprise me" beside "Begin here" opens a random well-filled page from a random grimoire.
+  var begin = document.querySelector('.mm-hero .actions a.btn[href*="begin-here"]');
+  if (begin && !document.querySelector('[data-surprise]')) {
+    begin.insertAdjacentHTML('afterend', '<button class="btn ghost" type="button" data-surprise>Surprise me</button>');
+    document.querySelector('[data-surprise]').addEventListener('click', function () {
+      var btn = this; btn.disabled = true;
+      data().then(function () { location.href = surprise().url; }).catch(function () { btn.disabled = false; });
+    });
+  }
   // The Manuscript home: today at a glance under the shelves (the data loads once the shelves are showing).
   var shelves = document.querySelector('.book-pile') || document.querySelector('.shelves');
   if (shelves && !document.querySelector('[data-static-tool]')) {

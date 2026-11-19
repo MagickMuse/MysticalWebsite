@@ -3,8 +3,8 @@
 The members' tools on the GitHub Pages copy of the Manuscript, which has no server (assets/tools.js runs them in the
 browser, here and on the live site, where lib/tools.php serves the same data from the database):
 
-  1. manuscript/tools/data.json: every page (grimoire, address, title, icon, which part of a spell it can be,
-     its kinds and date range) and every connection between pages, both ways, plus each calendar day's festivals.
+  1. manuscript/tools/data.json: every page (grimoire, address, title, icon, its kinds, date range and how many
+     words it has) and every connection between pages, both ways, plus each calendar day's festivals.
      The same shape lib/tools.php serves on the live site (tools_data()); the tools themselves are only in tools.js.
   2. The tools' own pages: manuscript/today/, spell-builder/, wheel/ and notes/ (shells that tools.js fills in).
 
@@ -69,7 +69,9 @@ def main():
                     rng = ' '.join(vals)
             index[(g, slug)] = len(pages)
             kinds = sorted(types & KINDS) + (['Tarot'] if ('Suit' in props or 'Upright Correspondences' in props) else [])
-            pages.append([GRIMOIRES.index(g), slug, title, icon, '|'.join(kinds), rng])
+            body = re.search(r'<div class="mm-prose">(.*?)</div></article>', s, re.S)
+            words = len(text(body.group(1).replace('<', ' <')).split()) if body else 0  # how much the page has to read
+            pages.append([GRIMOIRES.index(g), slug, title, icon, '|'.join(kinds), rng, words])
     links = [set() for _ in pages]
     festivals = {}
     for a, prop, g, slug in rels:

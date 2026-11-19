@@ -38,7 +38,8 @@ const TOOL_KINDS = ['Planets', 'Moon Phases', 'Western Zodiac', 'Days of the Wee
 function serve_tools_data(): void
 {
     if (!has_access()) { http_response_code(403); exit; }
-    $cache = config('data_dir') . '/tools-data.json';
+    // The version changes when the data's shape does, so an older copy is never served.
+    $cache = config('data_dir') . '/tools-data-v2.json';
     $content = config('data_dir') . '/content.sqlite';
     if (!is_file($cache) || filemtime($cache) < (int) @filemtime($content)) {
         file_put_contents($cache . '.tmp', json_encode(tools_data(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
@@ -53,7 +54,7 @@ function serve_tools_data(): void
 }
 
 /**
- * Every page as [grimoire, slug, title, icon, kinds, date range], every connection (both ways, by position in
+ * Every page as [grimoire, slug, title, icon, kinds, date range, words of text], every connection (both ways, by position in
  * the list), and each calendar day's festivals. The same shape build-static-tools.py writes for the preview.
  */
 function tools_data(): array
@@ -62,7 +63,7 @@ function tools_data(): array
     $gi = array_flip($grimoires);
     $pages = [];
     $pos = [];
-    foreach (db()->query("SELECT id, grimoire, slug, kind, title, icon, tags_json FROM pages WHERE kind IN ('entry', 'guide') ORDER BY grimoire, slug") as $p) {
+    foreach (db()->query("SELECT id, grimoire, slug, kind, title, icon, tags_json, plain FROM pages WHERE kind IN ('entry', 'guide') ORDER BY grimoire, slug") as $p) {
         $tags = json_decode((string) $p['tags_json'], true) ?: [];
         $types = array_map('strval', (array) ($tags['Type'] ?? $tags['Category'] ?? []));
         $kinds = array_values(array_intersect($types, TOOL_KINDS));
@@ -70,7 +71,11 @@ function tools_data(): array
         $icon = (string) shown_icon($p);
         $icon = str_starts_with($icon, 'file:') ? 'm:' . substr($icon, 5) : (str_starts_with($icon, 'asset:') ? 'a:' . substr($icon, 6) : $icon);
         $pos[$p['id']] = count($pages);
-        $pages[] = [$gi[$p['grimoire']], $p['slug'], $p['title'], $icon, implode('|', $kinds), implode(' ', array_map('strval', (array) ($tags['Date Range'] ?? [])))];
+        // How much the page has to read: its text, and a recipe's or ritual's Description, Quantities and Directions.
+        $text = (string) $p['plain'];
+        foreach (CONTENT_PROPERTIES[$p['grimoire']] ?? [] as $name) $text .= ' ' . implode(' ', array_map('strval', (array) ($tags[$name] ?? [])));
+        $words = count(preg_split('/\s+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY));
+        $pages[] = [$gi[$p['grimoire']], $p['slug'], $p['title'], $icon, implode('|', $kinds), implode(' ', array_map('strval', (array) ($tags['Date Range'] ?? []))), $words];
     }
     $links = array_fill(0, count($pages), []);
     $festivals = [];
