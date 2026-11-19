@@ -401,8 +401,7 @@
   function tarot(tool) {
     var deck = D.t.filter(function (c) { return isTarotCard(D.p[c[0]][1], D.p[c[0]][4].split('|')); }), hand = shuffled(deck).slice(0, 7);
     tool.className = 'pg pg-tool pg-tarot';
-    render(tool, '<header class="pg-head tool-head">' + crumbs('card') + '<p class="eyebrow labelled">Draw a Card</p><h1>Draw <em>a card</em></h1>'
-      + '<p class="lede">Seven cards from the deck of ' + deck.length + ', face down. Hold your question in mind, and choose the one that calls to you.</p></header>'
+    render(tool, '<header class="pg-head tool-head">' + crumbs('card') + '<h1>Draw <em>a card</em></h1></header>'
       + '<div class="spread" role="group" aria-label="Seven face-down cards">' + hand.map(function (c, k) {
         return '<button class="tarot-back fan-' + k + '" type="button" data-pick="' + k + '" aria-label="Card ' + (k + 1) + ' of 7"><span class="back-art" aria-hidden="true"></span></button>';
       }).join('') + '</div><div class="drawn" aria-live="polite"></div>', 'Draw a Card');
