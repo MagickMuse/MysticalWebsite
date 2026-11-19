@@ -186,6 +186,13 @@ final class NotionImporter
             $set->execute(['asset:' . $file, $g, $slug]);
         }
         $this->intentionIcons();
+        // Covers the site chooses (site-covers.php) replace the Notion cover.
+        $covers = is_file(MM_ROOT . '/site-covers.php') ? (array) require MM_ROOT . '/site-covers.php' : [];
+        $setCover = db()->prepare('UPDATE pages SET cover = ? WHERE grimoire = ? AND slug = ?');
+        foreach ($covers as $ref => $src) {
+            [$g, $slug] = array_pad(explode('/', $ref, 2), 2, '');
+            $setCover->execute([$src, $g, $slug]);
+        }
         ($this->log)("Site rules: pictures taken off $n page(s); " . count($icons) . ' icons set by the site.');
     }
 
