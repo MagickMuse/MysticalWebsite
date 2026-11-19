@@ -128,3 +128,78 @@ function relations_json(): void
     $items = $groups[(string) ($_GET['prop'] ?? '')] ?? [];
     echo json_encode(['html' => implode('', array_map('chip', array_values($items))), 'count' => count($items)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 }
+
+/**
+ * Lines in a page's text that only repeat its sidebar, like "Day: Friday" on Venus when the Timing row
+ * already shows Friday, are left out. Only "Label: a, b, c" lines whose label names a correspondence
+ * (Day, Planet, Crystal, Deity…) and whose every value is in the sidebar; anything else stays as written.
+ * A heading left with nothing under it goes too. (The GitHub Pages copy was cleaned the same way.)
+ */
+function drop_sidebar_repeats(string $body, string $panel): string
+{
+    static $labels = ['day', 'days', 'planet', 'planets', 'ruling planet', 'planetary ruler', 'ruler', 'element', 'elements',
+        'sign', 'signs', 'astrological sign', 'astrological signs', 'zodiac', 'zodiac sign', 'zodiac signs',
+        'crystal', 'crystals', 'suggested crystal', 'suggested crystals', 'stone', 'stones', 'gemstone', 'gemstones', 'mineral', 'minerals',
+        'herb', 'herbs', 'plant', 'plants', 'oil', 'oils', 'incense', 'metal', 'metals',
+        'deity', 'deities', 'deity/spirit', 'deities/spirits', 'god', 'gods', 'goddess', 'goddesses', 'entity', 'entities', 'spirit', 'spirits',
+        'color', 'colors', 'colour', 'colours', 'number', 'numbers', 'animal', 'animals', 'tarot', 'tarot card', 'tarot cards', 'rune', 'runes',
+        'season', 'seasons', 'month', 'months', 'moon phase', 'direction', 'directions', 'chakra', 'chakras', 'gender', 'polarity',
+        'folk name', 'folk names', 'other names', 'also known as', 'aka'];
+    $norm = function (string $t): string {
+        $t = mb_strtolower(html_entity_decode(preg_replace('~<[^>]+>~', ' ', $t), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        $t = preg_replace('~[^\w\s\'&-]+~u', ' ', $t);
+        return trim(preg_replace('~\s+~u', ' ', $t));
+    };
+    $forms = function (string $t) use ($norm): array {
+        $t = $norm($t);
+        $out = [$t, $t . 's'];
+        if (str_ends_with($t, 'ies')) $out[] = substr($t, 0, -3) . 'y';
+        if (str_ends_with($t, 'es')) $out[] = substr($t, 0, -2);
+        if (str_ends_with($t, 's')) $out[] = substr($t, 0, -1);
+        return $out;
+    };
+    // everything the sidebar shows, one value at a time
+    $vals = [];
+    preg_match_all('~<div class="prop-val">(.*?)</div>~s', $panel, $rows);
+    foreach ($rows[1] as $v) {
+        preg_match_all('~<(?:a|span)[^>]*>(?:<[^>]+>)*([^<]+)~', $v, $chips);
+        foreach (array_merge($chips[1], [preg_replace('~<[^>]+>~', '|', $v)]) as $piece) {
+            foreach (preg_split('~[|,]~', $piece) as $x) {
+                if ($norm($x) !== '') foreach ($forms($x) as $f) $vals[$f] = true;
+            }
+        }
+    }
+    if (!$vals) return $body;
+    $emptyHeadings = function (string $t): array {
+        preg_match_all('~<h([2-5]) id="[^"]*"[^>]*>.*?</h\1>~s', $t, $h, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        $out = [];
+        foreach ($h as $i => $m) {
+            $end = $m[0][1] + strlen($m[0][0]);
+            $next = $h[$i + 1] ?? null;
+            $between = substr($t, $end, ($next ? $next[0][1] : strlen($t)) - $end);
+            if (trim($between) === '' && (!$next || (int) $next[1][0] <= (int) $m[1][0])) $out[] = $m[0][0];
+        }
+        return $out;
+    };
+    $new = preg_replace_callback('~<(p|li)>\s*<(strong|b)>([^<]{1,40}?):\s*</\2>\s*(.*?)</\1>~s', function ($m) use ($labels, $vals, $forms) {
+        [$all, , , $label, $value] = $m;
+        if (!in_array(preg_replace('~\s+~', ' ', mb_strtolower(trim($label))), $labels, true)) return $all;
+        if (str_contains($value, '<') && !preg_match('~^(?:\s*<a [^>]*>[^<]*</a>\s*[,;]?\s*(?:and\s*)?)+$~', $value)) return $all;
+        $plain = html_entity_decode(strip_tags($value), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $plain = preg_replace('~,?\s+and\s+(?=[^,]*$)~', ', ', rtrim(trim($plain), '.'));
+        $items = array_values(array_filter(array_map('trim', preg_split('~\s*[,;·]\s*~u', $plain)), 'strlen'));
+        if (!$items) return $all;
+        foreach ($items as $x) {
+            if (mb_strlen($x) > 40 || count(preg_split('~\s+~', $x)) > 5) return $all;   // a sentence, not a list
+            if (!array_intersect_key(array_flip($forms($x)), $vals)) return $all;         // not in the sidebar: keep the line
+        }
+        return '';
+    }, $body);
+    $new = preg_replace('~<ul>\s*</ul>~', '', $new);
+    if ($new === $body) return $body;
+    foreach (array_diff($emptyHeadings($new), $emptyHeadings($body)) as $h) {
+        $pos = strpos($new, $h);
+        if ($pos !== false) $new = substr_replace($new, '', $pos, strlen($h));
+    }
+    return $new;
+}
