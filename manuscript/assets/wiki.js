@@ -104,7 +104,7 @@
         return changed ? out.join(' ') : null;
       });
     }
-    return { find: find, correct: correct, action: action };
+    return { find: find, correct: correct, action: action, root: root };
   })();
 
   // Live search suggestions
@@ -160,7 +160,10 @@
               var a = document.createElement('a');
               a.href = r.url;
               a.setAttribute('role', 'option');
-              a.textContent = (r.icon ? r.icon + ' ' : '') + r.title;
+              if (r.icon && r.icon.indexOf('img:') === 0) {
+                var ii = document.createElement('img'); ii.className = 'pg-icon'; ii.alt = ''; ii.width = 24; ii.height = 24;
+                ii.src = staticSearch ? new URL(r.icon.slice(4), staticSearch.root).href : r.icon.slice(4); a.appendChild(ii); a.append(r.title);
+              } else a.textContent = (r.icon ? r.icon + ' ' : '') + r.title;
               if (r.where) { var s = document.createElement('small'); s.textContent = r.where; a.appendChild(s); }
               li.appendChild(a);
               list.appendChild(li);
@@ -245,7 +248,8 @@
       hits.slice(0, 100).forEach(function (h) {
         var li = put(out, 'li'), a = put(li, 'a');
         a.href = h.url;
-        if (h.icon) put(a, 'span', 'pg-icon', h.icon).setAttribute('aria-hidden', 'true');
+        if (h.icon && h.icon.indexOf('img:') === 0) { var im = put(a, 'img', 'pg-icon'); im.alt = ''; im.width = 24; im.height = 24; im.src = new URL(h.icon.slice(4), staticSearch.root).href; }
+        else if (h.icon) put(a, 'span', 'pg-icon', h.icon).setAttribute('aria-hidden', 'true');
         put(a, 'strong', '', h.title);
         if (h.where) put(li, 'small', '', h.where);
         if (h.aka) put(li, 'small', 'aka-s', 'Also: ' + h.aka);

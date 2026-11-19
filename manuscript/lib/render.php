@@ -185,7 +185,10 @@ function resolve_links(string $html): string
         // A link to a page that isn't on the site (archived, private, or a how-to-use-Notion guide) reads as plain words.
         // A mention of a page deleted in Notion comes through as "Untitled": it shows as nothing.
         if (!$p) return ($text === '' || trim(strip_tags($text)) === 'Untitled') ? '' : '<span class="unmoved">' . $text . '</span>';
-        return '<a href="' . e($p['url']) . '">' . $text . '</a>';
+        // Plants, oils, minerals, runes and astrology show their little picture (or symbol) beside their name.
+        $pic = in_array($p['grimoire'], (array) config('mention_icon_grimoires', ['plant', 'oil', 'mineral', 'rune', 'astrology']), true)
+            && $p['kind'] === 'entry' ? icon_html($p['icon'], 'inline-icon') : '';
+        return '<a href="' . e($p['url']) . '">' . $pic . $text . '</a>';
     }, $html);
     $html = str_replace('<p class="page-link"></p>', '', $html);
     $html = preg_replace_callback('/<div data-mm-collection="([0-9a-f]{32})"><\/div>/', fn($mm) => collection_block($mm[1], 60), $html);
@@ -314,10 +317,10 @@ function layout(string $title, string $body, array $opt = []): void
   <?php foreach (['jost-300', 'cormorant-400', 'cormorant-400-italic', 'jost-400'] as $font): ?><link rel="preload" href="<?= e(site_url('fonts/' . $font . '.woff2')) ?>" as="font" type="font/woff2" crossorigin>
   <?php endforeach ?>  <script src="<?= e(site_url('prefs.js')) ?>"></script>
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=66">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=67">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=50" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=51" defer></script>
 <?php if ($stripe): ?>
   <script src="https://js.stripe.com/dahlia/stripe.js" defer></script>
   <script src="<?= e(url('assets/checkout.js')) ?>?v=2" defer></script>

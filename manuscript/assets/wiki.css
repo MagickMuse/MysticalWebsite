@@ -1058,3 +1058,8 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
   75% { -webkit-mask-size: 3px 3px, 7px 7px, 4px 4px, 9px 9px; mask-size: 3px 3px, 7px 7px, 4px 4px, 9px 9px; }
 }
 @media (prefers-reduced-motion: reduce) { .pg-grimoire .mm-callout details.toggle:not([open]) > summary::after { animation: none; } }
+/* A plant, oil, mineral, rune or astrology page mentioned in the text: its little picture before its name */
+.mm-prose .inline-icon { display: inline-block; width: 1.25em; height: 1.25em; margin: 0 .22em 0 .05em; vertical-align: -.28em; object-fit: contain; }
+.mm-prose span.inline-icon { width: auto; height: auto; vertical-align: baseline; }
+.suggest a img.pg-icon { width: 22px; height: 22px; object-fit: contain; flex: none; }
+.results img.pg-icon { width: 26px; height: 26px; object-fit: contain; vertical-align: middle; margin-right: .4rem; }

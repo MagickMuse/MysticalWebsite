@@ -186,6 +186,7 @@ final class NotionImporter
             $set->execute(['asset:' . $file, $g, $slug]);
         }
         $this->intentionIcons();
+        $this->pictureIcons();
         // Tarot spreads: a "Cards" property ("3 cards") from the Number of Cards connection, to filter and group by.
         $setTags = db()->prepare('UPDATE pages SET tags_json = ? WHERE id = ?');
         foreach (db()->query("SELECT p.id, p.tags_json, n.title FROM pages p JOIN relations r ON r.from_id = p.id AND r.prop = 'Number of Cards'
@@ -204,6 +205,59 @@ final class NotionImporter
             $setCover->execute([$src, $g, $slug]);
         }
         ($this->log)("Site rules: pictures taken off $n page(s); " . count($icons) . ' icons set by the site.');
+    }
+
+    /**
+     * Plants, oils, minerals and runes show a little picture wherever their name appears. A page with a cover photo but no
+     * picture icon gets one made from the cover (96px square; a cut-out is trimmed to its subject, a photo cropped to its
+     * centre). An oil still without one takes the picture of the plant it comes from (its Plant connection).
+     */
+    private function pictureIcons(): void
+    {
+        if (!function_exists('imagecreatefromstring') || !function_exists('imagewebp')) return;
+        $grims = (array) config('picture_icon_grimoires', ['plant', 'oil', 'mineral', 'rune']);
+        $dir = config('data_dir') . '/media';
+        $set = db()->prepare('UPDATE pages SET icon = ? WHERE id = ?');
+        $place = implode(',', array_fill(0, count($grims), '?'));
+        $st = db()->prepare("SELECT id, cover FROM pages WHERE kind = 'entry' AND grimoire IN ($place) AND cover IS NOT NULL
+            AND (icon IS NULL OR (icon NOT LIKE 'file:%' AND icon NOT LIKE 'asset:%'))");
+        $st->execute($grims);
+        $made = 0;
+        foreach ($st->fetchAll() as $p) {
+            $c = (string) $p['cover'];
+            if (str_starts_with($c, 'http')) continue;
+            $src = str_starts_with($c, 'asset:') ? MM_ROOT . '/assets/' . substr($c, 6) : "$dir/$c";
+            $name = $p['id'] . '-thumb.webp';
+            if (!is_file("$dir/$name")) {
+                $im = @imagecreatefromstring((string) @file_get_contents($src));
+                if (!$im) continue;
+                imagepalettetotruecolor($im); imagealphablending($im, false); imagesavealpha($im, true);
+                $w = imagesx($im); $h = imagesy($im);
+                $cut = ((imagecolorat($im, 0, 0) >> 24) & 127) > 100 && ((imagecolorat($im, $w - 1, $h - 1) >> 24) & 127) > 100;
+                if ($cut) { // trim to the subject, then centre it on a clear square
+                    $x0 = $w; $y0 = $h; $x1 = $y1 = -1; $step = max(1, intdiv(max($w, $h), 400));
+                    for ($y = 0; $y < $h; $y += $step) for ($x = 0; $x < $w; $x += $step) {
+                        if (((imagecolorat($im, $x, $y) >> 24) & 127) < 115) { $x0 = min($x0, $x); $y0 = min($y0, $y); $x1 = max($x1, $x); $y1 = max($y1, $y); }
+                    }
+                    if ($x1 < 0) continue;
+                    $cw = $x1 - $x0 + 1; $ch = $y1 - $y0 + 1; $side = max($cw, $ch);
+                    $dx = $x0 - intdiv($side - $cw, 2); $dy = $y0 - intdiv($side - $ch, 2);
+                } else { $side = min($w, $h); $dx = intdiv($w - $side, 2); $dy = intdiv($h - $side, 2); }
+                $out = imagecreatetruecolor(96, 96); imagealphablending($out, false); imagesavealpha($out, true);
+                imagefill($out, 0, 0, imagecolorallocatealpha($out, 0, 0, 0, 127));
+                imagecopyresampled($out, $im, 0, 0, $dx, $dy, 96, 96, $side, $side);
+                if (!imagewebp($out, "$dir/$name", 88)) continue;
+                $made++;
+            }
+            $set->execute(['file:' . $name, $p['id']]);
+        }
+        // Oils without a picture: the plant they come from.
+        db()->exec("UPDATE pages SET icon = (SELECT pl.icon FROM relations r JOIN pages pl ON pl.id = r.to_id
+                WHERE r.from_id = pages.id AND r.prop = 'Plant' AND (pl.icon LIKE 'file:%' OR pl.icon LIKE 'asset:%') ORDER BY r.sort LIMIT 1)
+            WHERE grimoire = 'oil' AND kind = 'entry' AND (icon IS NULL OR (icon NOT LIKE 'file:%' AND icon NOT LIKE 'asset:%'))
+            AND EXISTS (SELECT 1 FROM relations r JOIN pages pl ON pl.id = r.to_id
+                WHERE r.from_id = pages.id AND r.prop = 'Plant' AND (pl.icon LIKE 'file:%' OR pl.icon LIKE 'asset:%'))");
+        ($this->log)("Picture icons: $made made from covers.");
     }
 
     /** Scientific or Latin names on a Notion page (property name contains "scientific", "latin" or "botanical"). */
