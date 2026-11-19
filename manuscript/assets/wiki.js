@@ -34,6 +34,24 @@
 
   // The GitHub Pages copy has no server: its search form points at search/ (with a slash), and searching
   // happens here in the browser, over the titles and other names in search/index.json.
+  // Typo distance: insertions, deletions, substitutions and swapped neighbours; stops early (returning more than "limit") once it can't be within it.
+  function maxEdits(t) { return t.length <= 4 ? 1 : t.length <= 8 ? 2 : 3; }
+  function edits(a, b, limit) {
+    var prev2 = null, prev = [], cur, i, j;
+    for (j = 0; j <= b.length; j++) prev[j] = j;
+    for (i = 1; i <= a.length; i++) {
+      cur = [i]; var low = i;
+      for (j = 1; j <= b.length; j++) {
+        var c = a[i - 1] === b[j - 1] ? 0 : 1;
+        var v = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + c);
+        if (prev2 && i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) v = Math.min(v, prev2[j - 2] + 1);
+        cur[j] = v; if (v < low) low = v;
+      }
+      if (low > limit) return limit + 1;  // already past the best so far
+      prev2 = prev; prev = cur;
+    }
+    return prev[b.length];
+  }
   var staticSearch = (function () {
     var f = document.querySelector('.mm-search'), action = f && f.getAttribute('action');
     if (!action || !/search\/$/.test(action)) return null;
@@ -41,7 +59,12 @@
     var fold = function (t) { return (t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); };
     function load() {
       return loaded || (loaded = fetch(new URL('search/index.json', root)).then(function (r) { return r.json(); }).then(function (d) {
-        d.p.forEach(function (r) { r.t = fold(r[0]); r.a = fold(r[1]); r.w = (r.t + ' ' + r.a).split(/[^\p{L}\p{N}]+/u); });
+        d.vocab = {};
+        d.p.forEach(function (r) {
+          r.t = fold(r[0]); r.a = fold(r[1]); r.w = (r.t + ' ' + r.a).split(/[^\p{L}\p{N}]+/u);
+          r.w.forEach(function (w) { if (w.length > 2) d.vocab[w] = (d.vocab[w] || 0) + 1; });
+        });
+        d.words = Object.keys(d.vocab);
         return d;
       }));
     }
@@ -61,7 +84,27 @@
         return { hits: hits, grimoires: d.g };
       });
     }
-    return { find: find, action: action };
+    // "Did you mean": each word that starts no word in any title is swapped for the closest word that does
+    // (a typo or two away; common words win ties). Null when nothing needs changing.
+    function correct(q) {
+      return load().then(function (d) {
+        var terms = fold(q).split(/[^\p{L}\p{N}]+/u).filter(Boolean).slice(0, 8), changed = false;
+        var out = terms.map(function (t) {
+          if (t.length < 3 || d.words.some(function (w) { return w.indexOf(t) === 0; })) return t;
+          var best = null, bestD = maxEdits(t) + 1, bestN = 0;
+          d.words.forEach(function (w) {
+            if (Math.abs(w.length - t.length) > maxEdits(t)) return;
+            var e = edits(t, w, bestD);
+            if (e > maxEdits(t)) return;  // too far off to be a typo
+            if (e < bestD || (e === bestD && d.vocab[w] > bestN)) { best = w; bestD = e; bestN = d.vocab[w]; }
+          });
+          if (best) { changed = true; return best; }
+          return t;
+        });
+        return changed ? out.join(' ') : null;
+      });
+    }
+    return { find: find, correct: correct, action: action };
   })();
 
   // Live search suggestions
@@ -92,11 +135,26 @@
       if (q.length < 2) { close(); return; }
       timer = setTimeout(function () {
         var mine = ++seq;
-        (staticSearch ? staticSearch.find(q).then(function (res) { return res.hits.slice(0, 8); })
-          : fetch(endpoint + '?q=' + encodeURIComponent(q), { credentials: 'same-origin' }).then(function (r) { return r.json(); }))
+        var didMean = null;
+        (staticSearch ? staticSearch.find(q).then(function (res) {
+            if (res.hits.length) return res.hits.slice(0, 8);
+            return staticSearch.correct(q).then(function (c) {
+              if (!c) return [];
+              didMean = c;
+              return staticSearch.find(c).then(function (r2) { return r2.hits.slice(0, 8); });
+            });
+          })
+          : fetch(endpoint + '?q=' + encodeURIComponent(q), { credentials: 'same-origin' }).then(function (r) { return r.json(); })
+              .then(function (j) { if (Array.isArray(j)) return j; didMean = j.did || null; return j.rows || []; }))
           .then(function (rows) {
             if (mine !== seq) return;
             list.textContent = '';
+            if (didMean) {
+              var dm = document.createElement('li'); dm.className = 'did';
+              var da = document.createElement('a'); da.href = form.getAttribute('action') + '?q=' + encodeURIComponent(didMean);
+              da.append('Did you mean '); var de = document.createElement('em'); de.textContent = didMean; da.appendChild(de); da.append('?');
+              dm.appendChild(da); list.appendChild(dm);
+            }
             rows.forEach(function (r) {
               var li = document.createElement('li');
               var a = document.createElement('a');
@@ -110,7 +168,8 @@
             var all = document.createElement('li');
             all.className = 'all';
             var aa = document.createElement('a');
-            aa.href = form.getAttribute('action') + '?q=' + encodeURIComponent(q);
+            aa.href = form.getAttribute('action') + '?q=' + encodeURIComponent(didMean || q);
+            if (didMean) q = didMean;
             aa.textContent = rows.length ? 'Search all pages for “' + q + '”' : staticSearch ? 'No titles match “' + q + '”' : 'No titles match. Search all text for “' + q + '”';
             all.appendChild(aa);
             list.appendChild(all);
@@ -146,6 +205,24 @@
     };
     if (!q) { head.textContent = 'Search the Manuscript'; out.hidden = true; }
     else staticSearch.find(q).then(function (res) {
+      if (res.hits.length >= 5) return [res, null, null];
+      return staticSearch.correct(q).then(function (c) {
+        if (!c) return [res, null, null];
+        return staticSearch.find(c).then(function (r2) {
+          if (!r2.hits.length) return [res, null, null];
+          return res.hits.length ? [res, c, null] : [r2, null, c];  // a few hits: offer it; none: show its results
+        });
+      });
+    }).then(function (x) {
+      var res = x[0], offer = x[1], used = x[2];
+      var note = results.querySelector('.did-you-mean');
+      if (offer || used) {
+        note = put(results, 'p', 'did-you-mean'); head.after(note);
+        var go = function (word, label) { var a = put(note, 'a', '', ''); a.href = staticSearch.action + '?q=' + encodeURIComponent(word); put(a, 'em', '', word); return a; };
+        if (offer) { note.append('Did you mean '); go(offer); note.append('?'); }
+        else { note.append('No pages match “' + q + '”. Showing results for '); put(note, 'em', '', used); note.append('.'); }
+      }
+      if (used) q = used;
       var counts = {};
       res.hits.forEach(function (h) { counts[h.grimoire] = (counts[h.grimoire] || 0) + 1; });
       var hits = only ? res.hits.filter(function (h) { return h.grimoire === only; }) : res.hits;

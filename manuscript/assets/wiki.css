@@ -953,3 +953,9 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .mm-prose h5 { font-size: 1.3rem; margin-top: 2rem; }
 .mm-prose :is(h2, h3, h4, h5) + * { margin-top: .9rem; }
 .mm-callout :is(h2, h3, h4, h5) { font-size: 1.3rem; }
+/* Search: "Did you mean …?" */
+.did-you-mean { margin: -.4rem 0 1.4rem; font-size: 1.05rem; color: var(--muted); }
+.did-you-mean em { font-family: var(--display); font-size: 1.2em; color: var(--accent-text); }
+.did-you-mean a { color: var(--accent-text); }
+.suggest .did a { font-style: normal; color: var(--muted); border-bottom: 1px solid var(--line); }
+.suggest .did em { font-family: var(--display); font-size: 1.15em; color: var(--accent-text); margin-left: .25rem; }
