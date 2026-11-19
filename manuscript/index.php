@@ -352,7 +352,10 @@ function the_library_html(array $books): string
 /** /picture-credits: who took the photos the site uses from Wikimedia Commons, and their licences (assets/minerals/credits.json). */
 function view_picture_credits(): void
 {
-    $credits = json_decode((string) @file_get_contents(__DIR__ . '/assets/minerals/credits.json'), true) ?: [];
+    $credits = [];
+    foreach (['minerals', 'plants'] as $kind) {
+        $credits = array_merge($credits, json_decode((string) @file_get_contents(__DIR__ . "/assets/$kind/credits.json"), true) ?: []);
+    }
     layout('Picture credits', '<article class="pg pg-library">' . picture_credits_html($credits, fn($path) => url($path)) . '</article>');
 }
 
@@ -366,7 +369,7 @@ function picture_credits_html(array $credits, callable $href): string
             . '<span class="credit-meta">' . $lic . ' · <a href="' . e($c['source']) . '" rel="noopener">Wikimedia Commons</a></span></li>';
     }
     return '<header class="pg-head"><p class="eyebrow">Sources</p><h1>Picture credits</h1>'
-        . '<p class="lede small">Many of the mineral photos in the Manuscript come from Wikimedia Commons, shared under free licences by the photographers below. Thank you to each of them.</p></header>'
+        . '<p class="lede small">Many of the mineral and plant photos in the Manuscript come from Wikimedia Commons, shared under free licences by the photographers below. Thank you to each of them.</p></header>'
         . '<ol class="library">' . $rows . '</ol>';
 }
 
