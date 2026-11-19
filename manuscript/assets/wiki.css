@@ -1399,3 +1399,5 @@ html.nav-fold .mm-mine { order: -2; }
 .mm-prose [data-extras] + h2 { margin-top: 1.4rem; }
 .mm-prose details.extras-fold > .safety-box { padding: 1.1rem 1.3rem .6rem; }
 @media (max-width: 600px) { .mm-prose details.extras-fold > .safety-box { padding: .9rem 1rem .4rem; } }
+.share-btn::before { content: "↗"; margin-right: .5rem; letter-spacing: 0; }
+.share-btn[disabled] { opacity: .5; cursor: progress; }

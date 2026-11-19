@@ -389,6 +389,103 @@
     Store.remove('workings', b.getAttribute('data-del-working')).then(function () { showWorkings(document.querySelector('[data-static-tool]'), false); });
   });
 
+  // ------------------------------------------------------------------ share a pull
+  // A story-sized picture (1080 × 1920) of what was pulled, in the Muse's colours, with the logo in the corner; no link.
+  // Phones: the share menu (TikTok, Instagram, Messages…) opens with the picture. Elsewhere: the picture downloads.
+  // The picture is made as soon as the card or stone turns over, so the Share tap opens the menu straight away.
+  var SITE_ROOT = new URL('../', ROOT).toString();
+  function loadImage(src) {
+    return new Promise(function (ok, fail) { var im = new Image(); im.onload = function () { ok(im); }; im.onerror = fail; im.src = src; });
+  }
+  function spaced(ctx, text, x, y, gap) { // letter-spaced capitals, centred on x
+    var w = 0, chars = text.split('');
+    chars.forEach(function (c) { w += ctx.measureText(c).width + gap; }); w -= gap;
+    var cx = x - w / 2;
+    chars.forEach(function (c) { ctx.fillText(c, cx + ctx.measureText(c).width / 2, y); cx += ctx.measureText(c).width + gap; });
+  }
+  function wrapLines(ctx, words, maxW) {
+    var lines = [], line = '';
+    words.forEach(function (w) { var t = line ? line + '  ✦  ' + w : w; if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; });
+    if (line) lines.push(line);
+    return lines;
+  }
+  /** The picture: o = {eyebrow, title, state ('Upright', 'Reversed' or ''), words: [...], card: Image | null, reversed, glyph, tone}. */
+  function shareCanvas(o) {
+    var W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H;
+    var x = c.getContext('2d');
+    x.fillStyle = '#f6efe8'; x.fillRect(0, 0, W, H);
+    var glow = x.createRadialGradient(W / 2, 820, 60, W / 2, 820, 760); glow.addColorStop(0, 'rgba(201,154,146,.32)'); glow.addColorStop(1, 'rgba(201,154,146,0)');
+    x.fillStyle = glow; x.fillRect(0, 0, W, H);
+    x.strokeStyle = '#c9a356'; x.lineWidth = 3; x.strokeRect(44, 44, W - 88, H - 88);
+    x.globalAlpha = .45; x.lineWidth = 1.5; x.strokeRect(60, 60, W - 120, H - 120); x.globalAlpha = 1;
+    x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+    x.fillStyle = '#7a1f2b'; x.font = '500 34px Jost, sans-serif'; spaced(x, o.eyebrow.toUpperCase(), W / 2, 200, 9);
+    x.fillStyle = '#c9a356'; x.font = '40px serif'; x.fillText('✦', W / 2 - 250, 202); x.fillText('✦', W / 2 + 250, 202);
+    var top = 270, artH = 1000;
+    if (o.card) { // the card, upside-down when reversed
+      var ar = o.card.naturalWidth / o.card.naturalHeight, h = artH, w = h * ar;
+      if (w > 640) { w = 640; h = w / ar; }
+      var cx = W / 2, cy = top + artH / 2;
+      x.save(); x.translate(cx, cy); if (o.reversed) x.rotate(Math.PI);
+      x.shadowColor = 'rgba(46,31,32,.35)'; x.shadowBlur = 50; x.shadowOffsetY = 24;
+      x.beginPath(); if (x.roundRect) x.roundRect(-w / 2, -h / 2, w, h, 22); else x.rect(-w / 2, -h / 2, w, h); x.fillStyle = '#efe5da'; x.fill();
+      x.shadowColor = 'transparent'; x.clip(); x.drawImage(o.card, -w / 2, -h / 2, w, h); x.restore();
+    } else { // the rune stone: an uneven pebble, the rune gilded on it
+      var sx = W / 2, sy = top + artH / 2, R = 360, k = [1, .93, 1.05, .9, 1.02, .95, .98, .91];
+      x.save(); x.shadowColor = 'rgba(46,31,32,.4)'; x.shadowBlur = 60; x.shadowOffsetY = 30;
+      // eight uneven points round the stone, joined by a smooth curve through their midpoints
+      var pts = k.map(function (f, i) { var a = i / 8 * Math.PI * 2 - Math.PI / 2; return [sx + R * f * Math.cos(a), sy + R * 1.12 * f * Math.sin(a)]; });
+      var midOf = function (a, b) { return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; };
+      x.beginPath();
+      var m0 = midOf(pts[7], pts[0]); x.moveTo(m0[0], m0[1]);
+      pts.forEach(function (p, i) { var m = midOf(p, pts[(i + 1) % 8]); x.quadraticCurveTo(p[0], p[1], m[0], m[1]); });
+      x.closePath(); x.fillStyle = o.tone || '#77706b'; x.fill(); x.restore();
+      x.save(); x.clip();
+      var hl = x.createRadialGradient(sx - 120, sy - 160, 20, sx - 120, sy - 160, 420); hl.addColorStop(0, 'rgba(255,255,255,.3)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
+      x.fillStyle = hl; x.fillRect(0, 0, W, H);
+      var sh = x.createRadialGradient(sx + 140, sy + 260, 20, sx + 140, sy + 260, 480); sh.addColorStop(0, 'rgba(0,0,0,.32)'); sh.addColorStop(1, 'rgba(0,0,0,0)');
+      x.fillStyle = sh; x.fillRect(0, 0, W, H); x.restore();
+      if (o.glyph) {
+        x.font = '440px "Segoe UI Historic", "Noto Sans Runic", "Junicode", serif'; x.textBaseline = 'middle';
+        x.fillStyle = 'rgba(0,0,0,.45)'; x.fillText(o.glyph, sx, sy + 6);
+        x.fillStyle = '#e3c27a'; x.fillText(o.glyph, sx, sy); x.textBaseline = 'alphabetic';
+      }
+    }
+    var y = top + artH + 150;
+    x.fillStyle = '#2e1f20'; x.font = '400 112px Cormorant, Georgia, serif'; x.fillText(o.title, W / 2, y);
+    if (o.state) { y += 74; x.fillStyle = '#7a1f2b'; x.font = 'italic 400 56px Cormorant, Georgia, serif'; x.fillText(o.state, W / 2, y); }
+    x.fillStyle = '#5c4a4b'; x.font = '300 40px Jost, sans-serif';
+    wrapLines(x, o.words.slice(0, 6), W - 260).forEach(function (l) { y += 64; x.fillText(l, W / 2, y); });
+    return c;
+  }
+  /** Makes the picture now; returns what the Share button does with it. */
+  function prepareShare(o, name) {
+    var fonts = document.fonts ? Promise.all(['400 112px Cormorant', 'italic 400 56px Cormorant', '300 40px Jost', '500 34px Jost'].map(function (f) { return document.fonts.load(f); })) : Promise.resolve();
+    var logo = loadImage(SITE_ROOT + 'assets/logo.svg').catch(function () { return null; });
+    return Promise.all([fonts, logo]).then(function (r) {
+      var c = shareCanvas(o), lg = r[1];
+      if (lg) { var x = c.getContext('2d'), w = 230, h = w * 879 / 1585; x.globalAlpha = .92; x.drawImage(lg, 1080 - 100 - w, 1920 - 100 - h, w, h); x.globalAlpha = 1; }
+      return new Promise(function (ok) { c.toBlob(function (b) { ok(new File([b], name + '.png', { type: 'image/png' })); }, 'image/png'); });
+    });
+  }
+  /** The Share button under a reading: share menu on phones, download elsewhere. */
+  function shareButton(holder, filePromise, text) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'btn ghost share-btn'; b.disabled = true; b.textContent = 'Share';
+    holder.appendChild(b);
+    var file = null;
+    filePromise.then(function (f) {
+      file = f; b.disabled = false;
+      if (!(navigator.canShare && navigator.canShare({ files: [f] }))) b.textContent = 'Save picture';
+    }).catch(function () { b.remove(); });
+    b.addEventListener('click', function () {
+      if (!file) return;
+      if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], text: text }).catch(function () {}); return; }
+      var a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name;
+      document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    });
+  }
+
   // ------------------------------------------------------------------ Draw a Card
   // Seven face-down cards, shuffled from the tarot deck, fanned out. The one picked turns over: upright, or (one time
   // in three) reversed, with that side's keywords and a way into the card's page.
@@ -422,6 +519,10 @@
         var flip = drawn.querySelector('.drawn-card');
         if (quiet) flip.classList.add('turned'); else requestAnimationFrame(function () { requestAnimationFrame(function () { flip.classList.add('turned'); }); });
         drawn.querySelector('[data-again]').addEventListener('click', function () { tarot(tool); window.scrollTo({ top: 0, behavior: quiet ? 'auto' : 'smooth' }); });
+        var front = drawn.querySelector('.front img');
+        shareButton(drawn.querySelector('.reading .actions'), (front ? loadImage(front.src) : Promise.resolve(null)).then(function (im) {
+          return prepareShare({ eyebrow: 'My card', title: card.title, state: rev ? 'Reversed' : 'Upright', reversed: rev, card: im, words: words.map(function (p) { return p.title; }) }, 'my-card-' + card.slug);
+        }), 'I drew ' + card.title + (rev ? ', reversed' : '') + ' ✦');
       }, quiet ? 0 : 450);
     });
   }
@@ -461,6 +562,9 @@
         var flip = drawn.querySelector('.drawn-card');
         if (quiet) flip.classList.add('turned'); else requestAnimationFrame(function () { requestAnimationFrame(function () { flip.classList.add('turned'); }); });
         drawn.querySelector('[data-again]').addEventListener('click', function () { runes(tool); window.scrollTo({ top: 0, behavior: quiet ? 'auto' : 'smooth' }); });
+        var tone = getComputedStyle(drawn.querySelector('.front.stone')).getPropertyValue('--tone').trim();
+        shareButton(drawn.querySelector('.reading .actions'), prepareShare({ eyebrow: 'My rune', title: rune.title, state: 'Elder Futhark', card: null, glyph: glyph, tone: tone,
+          words: words.map(function (p) { return p.title; }) }, 'my-rune-' + rune.slug), 'I pulled ' + rune.title + ' ✦');
       }, quiet ? 0 : 450);
     });
   }
