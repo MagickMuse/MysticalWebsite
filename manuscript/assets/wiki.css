@@ -1044,3 +1044,17 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .gi-rune { --pi: url("glyphs/rune.svg"); }
 .gi-symbol { --pi: url("glyphs/symbol.svg"); }
 .gi-timing { --pi: url("glyphs/timing.svg"); }
+/* Grimoire intro: tiny twinkling four-pointed stars around "Guide Pages" while it's closed, so it reads as something to open */
+.pg-grimoire .mm-callout details.toggle > summary { position: relative; width: max-content; }
+.pg-grimoire .mm-callout details.toggle:not([open]) > summary::after {
+  content: ""; position: absolute; left: -.7rem; right: -1.6rem; top: -.75rem; bottom: -.7rem; pointer-events: none; background: var(--gold);
+  -webkit-mask: var(--star) 96% 6% / 9px 9px no-repeat, var(--star) 0% 92% / 6px 6px no-repeat, var(--star) 55% 0% / 5px 5px no-repeat, var(--star) 74% 100% / 7px 7px no-repeat;
+  mask: var(--star) 96% 6% / 9px 9px no-repeat, var(--star) 0% 92% / 6px 6px no-repeat, var(--star) 55% 0% / 5px 5px no-repeat, var(--star) 74% 100% / 7px 7px no-repeat;
+  animation: guide-sparkle 3.6s ease-in-out infinite; }
+@keyframes guide-sparkle {
+  0%, 100% { -webkit-mask-size: 9px 9px, 6px 6px, 5px 5px, 7px 7px; mask-size: 9px 9px, 6px 6px, 5px 5px, 7px 7px; }
+  25% { -webkit-mask-size: 4px 4px, 9px 9px, 2px 2px, 5px 5px; mask-size: 4px 4px, 9px 9px, 2px 2px, 5px 5px; }
+  50% { -webkit-mask-size: 7px 7px, 3px 3px, 8px 8px, 3px 3px; mask-size: 7px 7px, 3px 3px, 8px 8px, 3px 3px; }
+  75% { -webkit-mask-size: 3px 3px, 7px 7px, 4px 4px, 9px 9px; mask-size: 3px 3px, 7px 7px, 4px 4px, 9px 9px; }
+}
+@media (prefers-reduced-motion: reduce) { .pg-grimoire .mm-callout details.toggle:not([open]) > summary::after { animation: none; } }
