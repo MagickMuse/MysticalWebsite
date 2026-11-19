@@ -853,3 +853,5 @@ button.rel-more { cursor: pointer; font: inherit; background: none; }
   .toc a { font-size: .78rem; padding: .22rem .35rem; }
   .toc .lvl-3 a { padding-left: .8rem; font-size: .75rem; } .toc .lvl-4 a { padding-left: 1.2rem; font-size: .72rem; }
 }
+.mm-prose h5 { font-size: 1.12rem; margin-top: 2rem; }
+details.toggle > summary > h5 { margin: 0; display: inline; }

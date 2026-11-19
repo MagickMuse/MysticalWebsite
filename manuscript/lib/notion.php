@@ -539,10 +539,10 @@ final class NotionImporter
             case 'paragraph':
                 $kids = $this->kids($b, $ctx);
                 return ($text !== '' ? "<p$color>$text</p>" : '') . ($kids ? "<div class=\"indent\">$kids</div>" : '');
-            case 'heading_1': case 'heading_2': case 'heading_3':
+            case 'heading_1': case 'heading_2': case 'heading_3': case 'heading_4':
                 // Notion-only sections (e.g. "Notion tips for new readers") are left out, with their contents.
                 if (!empty($d['is_toggleable']) && self::skipSection($this->plainText($d['rich_text'] ?? []))) return '';
-                // Page titles are h1, so Notion's three heading levels map to h2–h4.
+                // Page titles are h1, so Notion's heading levels map to h2–h5.
                 $lvl = (int) substr($type, -1) + 1;
                 $h = "<h$lvl id=\"" . e(slugify(strip_tags($text))) . "\"$color>$text</h$lvl>";
                 if (!empty($d['is_toggleable'])) return "<details class=\"toggle h$lvl\"><summary>$h</summary>" . $this->kids($b, $ctx) . '</details>';
@@ -694,7 +694,11 @@ final class NotionImporter
     private function pageTitle(array $page): string
     {
         foreach ($page['properties'] ?? [] as $prop) {
-            if (($prop['type'] ?? '') === 'title') return $this->plainText($prop['title']) ?: 'Untitled';
+            if (($prop['type'] ?? '') === 'title') {
+                // a title of "0" is a real title (PHP would treat it as empty with ?:)
+                $t = $this->plainText($prop['title']);
+                return $t !== '' ? $t : 'Untitled';
+            }
         }
         return 'Untitled';
     }
