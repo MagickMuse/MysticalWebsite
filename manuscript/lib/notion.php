@@ -235,7 +235,7 @@ final class NotionImporter
         $dir = config('data_dir') . '/media';
         $set = db()->prepare('UPDATE pages SET icon = ? WHERE id = ?');
         $place = implode(',', array_fill(0, count($grims), '?'));
-        $st = db()->prepare("SELECT id, cover FROM pages WHERE kind = 'entry' AND grimoire IN ($place) AND cover IS NOT NULL
+        $st = db()->prepare("SELECT id, grimoire, cover FROM pages WHERE kind = 'entry' AND grimoire IN ($place) AND cover IS NOT NULL
             AND (icon IS NULL OR (icon NOT LIKE 'file:%' AND icon NOT LIKE 'asset:%'))");
         $st->execute($grims);
         $made = 0;
@@ -258,10 +258,15 @@ final class NotionImporter
                     if ($x1 < 0) continue;
                     $cw = $x1 - $x0 + 1; $ch = $y1 - $y0 + 1; $side = max($cw, $ch);
                     $dx = $x0 - intdiv($side - $cw, 2); $dy = $y0 - intdiv($side - $ch, 2);
+                } elseif ($p['grimoire'] === 'mineral') { // the whole specimen, fitted
+                    $side = 0; $dx = $dy = 0;
                 } else { $side = min($w, $h); $dx = intdiv($w - $side, 2); $dy = intdiv($h - $side, 2); }
                 $out = imagecreatetruecolor(96, 96); imagealphablending($out, false); imagesavealpha($out, true);
                 imagefill($out, 0, 0, imagecolorallocatealpha($out, 0, 0, 0, 127));
-                imagecopyresampled($out, $im, 0, 0, $dx, $dy, 96, 96, $side, $side);
+                if ($side === 0) {
+                    $k = 96 / max($w, $h); $ow = (int) round($w * $k); $oh = (int) round($h * $k);
+                    imagecopyresampled($out, $im, intdiv(96 - $ow, 2), intdiv(96 - $oh, 2), 0, 0, $ow, $oh, $w, $h);
+                } else imagecopyresampled($out, $im, 0, 0, $dx, $dy, 96, 96, $side, $side);
                 if (!imagewebp($out, "$dir/$name", 88)) continue;
                 $made++;
             }
@@ -313,6 +318,13 @@ final class NotionImporter
                     if ($x1 < 0) continue;
                     $cw = $x1 - $x0 + 1; $ch = $y1 - $y0 + 1; $side = (int) round(max($cw, $ch) * 1.08);
                     $dx = $x0 - intdiv($side - $cw, 2); $dy = $y0 - intdiv($side - $ch, 2);
+                } elseif ($p['grimoire'] === 'mineral') { // a mineral photo: the whole specimen, fitted inside the square
+                    $k = 320 / max($w, $h); $ow = (int) round($w * $k); $oh = (int) round($h * $k);
+                    $out = imagecreatetruecolor(320, 320); imagealphablending($out, false); imagesavealpha($out, true);
+                    imagefill($out, 0, 0, imagecolorallocatealpha($out, 0, 0, 0, 127));
+                    imagecopyresampled($out, $im, intdiv(320 - $ow, 2), intdiv(320 - $oh, 2), 0, 0, $ow, $oh, $w, $h);
+                    if (imagewebp($out, "$dir/$name", 84)) $made++;
+                    continue;
                 } else { $side = min($w, $h); $dx = intdiv($w - $side, 2); $dy = intdiv($h - $side, 2); }
                 $out = imagecreatetruecolor(320, 320); imagealphablending($out, false); imagesavealpha($out, true);
                 imagefill($out, 0, 0, imagecolorallocatealpha($out, 0, 0, 0, 127));

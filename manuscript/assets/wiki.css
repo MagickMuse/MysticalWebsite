@@ -1087,3 +1087,4 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .mm-main .entry-grid.gallery a { text-decoration-line: none; }
 .mm-main .entry-grid.gallery a > span:not(.gal-pic) { text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: .22em; text-decoration-color: color-mix(in srgb, currentColor 50%, transparent); }
 .mm-main .entry-grid.gallery a:hover > span:not(.gal-pic) { text-decoration-color: currentColor; }
+.gal-mineral .gal-pic:not(.none) { background: none; }
