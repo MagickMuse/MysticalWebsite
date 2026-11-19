@@ -133,6 +133,35 @@ final class NotionImporter
      *    no pictures in the text or in picture properties
      *  - icons set by the site (manuscript/site-icons.php), e.g. the astrological symbols for planets and signs
      */
+    /**
+     * The Library (config "library_db"): the books the Manuscript draws on, saved to data_dir/library.json for /library.
+     * Only title, author and topics are kept: the reading-progress columns (status, pages read) stay in Notion.
+     */
+    public function importLibrary(): void
+    {
+        $db = normalize_id((string) config('library_db', '22e16dcf71648045bb89f82e5ebefc8c'));
+        $books = []; $cursor = null;
+        do {
+            $r = $this->call('POST', "/databases/$db/query", ['page_size' => 100] + ($cursor ? ['start_cursor' => $cursor] : []));
+            foreach ($r['results'] ?? [] as $row) {
+                if (!empty($row['archived']) || !empty($row['in_trash'])) continue;
+                $title = $author = ''; $topics = [];
+                foreach ($row['properties'] ?? [] as $name => $prop) {
+                    $t = $prop['type'] ?? '';
+                    if ($t === 'title') $title = $this->plainText($prop['title']);
+                    elseif ($t === 'rich_text' && strcasecmp(trim($name), 'Author') === 0) $author = $this->plainText($prop['rich_text']);
+                    elseif ($t === 'multi_select' && stripos($name, 'Topic') !== false) $topics = array_column($prop['multi_select'], 'name');
+                }
+                if ($title !== '') $books[] = ['title' => $title, 'author' => $author, 'topics' => $topics];
+            }
+            $cursor = !empty($r['has_more']) ? ($r['next_cursor'] ?? null) : null;
+        } while ($cursor);
+        if (!$books) return; // keep the last good list if Notion returned nothing
+        usort($books, fn($a, $b) => strnatcasecmp(preg_replace('/^(the|a|an)\s+/i', '', $a['title']), preg_replace('/^(the|a|an)\s+/i', '', $b['title'])));
+        file_put_contents(config('data_dir') . '/library.json', json_encode($books, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        ($this->log)('  ◦ The Library: ' . count($books) . ' books');
+    }
+
     public function applySiteRules(): void
     {
         $none = (array) config('no_pictures', ['entity']);

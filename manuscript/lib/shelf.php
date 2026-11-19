@@ -28,13 +28,16 @@ function real_book(array $g, int $n, int $i): string
     $photo = grimoire_photo($g['grimoire'], 440, 600);
     $tone = 't' . (1 + $i % 5); // burgundy, rose, ink, gold, blush, in turn
     $len = ' n' . max(3, min(16, mb_strlen($label))); // letters on the spine, so the title can size itself to fit
-    return '<a class="bk ' . $tone . '" href="' . e(page_url($g)) . '"'
+    // One grimoire stands face out, its cover showing, with an "Open me" seal: it shows at a glance that the books open.
+    $faced = $g['grimoire'] === (string) config('shelf_facing', 'correspondence');
+    return '<a class="bk ' . $tone . ($faced ? ' faced' : '') . '" href="' . e(page_url($g)) . '"'
         . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '')) . '"'
         . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'
         . '<span class="spine" aria-hidden="true"><i class="band top"></i><span class="bk-title' . $len . '">' . e($label) . '</span>' . (grimoire_glyph($g['grimoire'], 'bk-star') ?: '<i class="bk-star"></i>') . '<i class="band bottom"></i></span>'
         . '<span class="cover" aria-hidden="true">' . ($photo ? '<img src="' . e($photo) . '" alt="" loading="lazy">' : '')
         . '<span class="cover-title">' . e($label) . '</span>'
-        . '<span class="cover-sub">' . ($n ? number_format($n) . ' entries' : 'Guides') . '</span></span></a>';
+        . '<span class="cover-sub">' . ($n ? number_format($n) . ' entries' : 'Guides') . '</span>'
+        . ($faced ? '<span class="dive">Open me <i>✦</i></span>' : '') . '</span></a>';
 }
 
 /**
@@ -49,7 +52,7 @@ const SHELF_STACKS = [
         ['Journal Prompts', 'begin-here/journal-prompts', 't3'],
     ]],
     'bottom' => ['candles' => true, 'books' => [
-        [null, null, 't4'],
+        ['The Library', 'route:library', 't4'],
         ['Tarot Spreads', 'card/tarot-spreads', 't2'],
     ]],
 ];

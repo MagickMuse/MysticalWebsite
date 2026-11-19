@@ -53,6 +53,7 @@ function route(array $parts, string $method): void
         case 'shop':          route_shop(array_slice($parts, 1), $method); return;
         case 'suggest':       search_suggest(trim((string) ($_GET['q'] ?? ''))); return;
         case 'calendar':      view_calendar(); return;
+        case 'library':       view_library(); return;
         case 'sneak-peek':    ($p = sneak_peek_page()) ? view_page($p) : redirect(url()); return;
     }
     $p = match (count($parts)) {
@@ -301,6 +302,40 @@ function calendar_html(array $days, callable $href, ?callable $events = null): s
 function echo_calendar_page(string $html): void
 {
     layout('Calendar', '<article class="pg pg-calendar">' . $html . '</article>', ['private' => true, 'protect' => true]);
+}
+
+/**
+ * /library: The Library, the books the Manuscript draws on (data_dir/library.json, written by the import), A to Z,
+ * each with its author and the grimoires it informs. Buttons above the list show only the books on one topic (assets/wiki.js).
+ */
+function view_library(): void
+{
+    if (!has_access()) { view_gate(['locked' => true]); return; }
+    record_view('route:/manuscript/library');
+    $books = json_decode((string) @file_get_contents(config('data_dir') . '/library.json'), true) ?: [];
+    layout('The Library', '<article class="pg pg-library">' . library_html($books) . '</article>', ['private' => true, 'protect' => true]);
+}
+
+function library_html(array $books): string
+{
+    $topics = [];
+    foreach ($books as $b) foreach ($b['topics'] as $t) $topics[$t] = ($topics[$t] ?? 0) + 1;
+    ksort($topics, SORT_NATURAL | SORT_FLAG_CASE);
+    $filters = '';
+    if ($topics) {
+        $filters = '<nav class="lib-filter" aria-label="Show books by topic" hidden><button type="button" class="lib-t on" data-lib="" aria-pressed="true">All</button>';
+        foreach ($topics as $t => $n) $filters .= '<button type="button" class="lib-t" data-lib="' . e($t) . '" aria-pressed="false">' . e($t) . ' <small>' . $n . '</small></button>';
+        $filters .= '</nav>';
+    }
+    $list = '';
+    foreach ($books as $b) {
+        $tags = $b['topics'] ? '<span class="lib-topics">' . implode('', array_map(fn($t) => '<span>' . e($t) . '</span>', $b['topics'])) . '</span>' : '';
+        $list .= '<li data-topics="' . e(implode('|', $b['topics'])) . '"><span class="lib-title">' . e($b['title']) . '</span>'
+            . ($b['author'] !== '' ? '<span class="lib-author">' . e($b['author']) . '</span>' : '') . $tags . '</li>';
+    }
+    return '<header class="pg-head"><p class="eyebrow">Sources</p><h1>The Library</h1>'
+        . '<p class="lede small">The books behind the Manuscript: ' . count($books) . ' titles on witchcraft, folklore, herbs, crystals, divination and the spirits, gathered as the grimoires grew.</p></header>'
+        . $filters . '<ol class="library">' . $list . '</ol>';
 }
 
 /** True for a picture taller than it is wide, read from the file itself. */

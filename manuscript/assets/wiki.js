@@ -248,6 +248,19 @@
     mark();
   })();
 
+  // The Library: topic buttons show only the books on that topic.
+  (function () {
+    var bar = document.querySelector('.lib-filter'); if (!bar) return;
+    var books = document.querySelectorAll('.library li');
+    bar.hidden = false;
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-lib]'); if (!b) return;
+      var t = b.getAttribute('data-lib');
+      bar.querySelectorAll('[data-lib]').forEach(function (x) { var on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+      books.forEach(function (li) { li.hidden = t !== '' && ('|' + li.getAttribute('data-topics') + '|').indexOf('|' + t + '|') < 0; });
+    });
+  })();
+
   // The Calendar: one month at a time, days under their weekdays for the year shown, today marked.
   (function () {
     var cal = document.querySelector('[data-calendar]'); if (!cal) return;
