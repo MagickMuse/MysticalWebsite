@@ -172,10 +172,8 @@
   function addDays(day, n) { var d = new Date(day); d.setDate(d.getDate() + n); return d; }
 
   // ------------------------------------------------------------------ Today
-  function today(tool) {
-    var q = params(), m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(q.get('d') || ''), south = q.get('h') === 's';
-    var day = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date();
-    day.setHours(0, 0, 0, 0);
+  /** What a day holds: its moon, weekday and ruling planet, the Sun's sign, the season, and the intentions they favour. */
+  function dayReading(day, south) {
     var age = moonAge(day), ph = moonPhase(age), phases = ofKind('astrology', 'Moon Phases'), planets = ofKind('astrology', 'Planets'), signs = ofKind('astrology', 'Western Zodiac');
     var weekday = find('timing', DAYS[day.getDay()].toLowerCase()), dayPage = find('timing', daySlug(day)), seas = find('timing', season(day, south));
     var moon = phases[ph[0]] || null, sign = sunSign(day, signs), fullName = null, ruler = null;
@@ -191,22 +189,36 @@
     var src = [];
     infl.forEach(function (x) { src.push(x[1].i); if (x[3]) src.push(x[3].i); });
     if (dayPage) src.push(dayPage.i);
-
-    var cards = infl.map(function (x) {
-      var corr = D.l[x[1].i].filter(function (i) { return D.g[D.p[i][0]] === 'correspondence'; })
-        .sort(function (a, b) { return D.l[b].length - D.l[a].length; }).slice(0, 6).map(pg);
-      var pic = x[0] === 'The moon' ? moonSvg(age) : '<span class="today-icon">' + iconHtml(x[1].icon, 'pg-icon big') + '</span>';
-      return '<section class="today-card"><p class="eyebrow">' + esc(x[0]) + '</p>' + pic + '<h2><a href="' + esc(x[1].url) + '">' + esc(x[1].title) + '</a></h2>'
-        + (x[2] ? '<p class="small">' + esc(x[2]) + (x[3] ? ' <a class="link" href="' + esc(x[3].url) + '">Read about ' + esc(x[3].title) + '</a>' : '') + '</p>' : '')
-        + (corr.length ? '<div class="rels">' + corr.map(chip).join('') + '</div>' : '') + '</section>';
-    }).join('');
-
     var counts = linkedCounts(src), intents = [];
     counts.forEach(function (n, i) { if (n >= 2 && D.g[D.p[i][0]] === 'correspondence') intents.push([pg(i), n]); });
     intents.sort(function (a, b) { return b[1] - a[1] || a[0].title.localeCompare(b[0].title); });
-    var favours = intents.slice(0, 12).map(function (x) {
-      return '<a class="fav" href="' + esc(url('spell-builder/?i=' + encodeURIComponent(x[0].slug))) + '">' + iconHtml(x[0].icon, 'rel-icon') + esc(x[0].title) + '<small>' + x[1] + ' of today’s influences</small></a>';
-    }).join('');
+    var lede = [moon ? 'a ' + ph[1] : '', ruler ? 'a ' + ruler.title + ' day' : '', sign ? 'the Sun in ' + sign.title : '', seas ? seas.title.toLowerCase() : ''].filter(Boolean).join(', ');
+    return { age: age, ph: ph, moon: moon, weekday: weekday, ruler: ruler, sign: sign, seas: seas, dayPage: dayPage, infl: infl, src: src, intents: intents,
+      lede: lede ? lede.charAt(0).toUpperCase() + lede.slice(1) + '.' : '' };
+  }
+  /** The day's four influences as cards: the moon, the day, the Sun's sign, the season (Today page and Manuscript home). */
+  function influenceCards(R) {
+    return '<div class="today-cards">' + R.infl.map(function (x) {
+      var pic = x[0] === 'The moon' ? moonSvg(R.age) : '<span class="today-icon">' + iconHtml(x[1].icon, 'pg-icon big') + '</span>';
+      var sub = { 'The moon': x[3] ? 'The ' + x[3].title : (R.ph[2] ? 'Waxing: draw in, build' : 'Waning: release, clear'),
+        'The day': x[3] ? 'Ruled by ' + x[3].title : '', 'The sun': 'The Sun’s sign', 'The season': x[2].replace(/\.$/, '') }[x[0]];
+      return '<a class="today-card" href="' + esc(x[1].url) + '"><span class="eyebrow">' + esc(x[0]) + '</span>' + pic
+        + '<span class="today-name">' + esc(x[1].title) + '</span>' + (sub ? '<span class="today-sub">' + esc(sub) + '</span>' : '') + '</a>';
+    }).join('') + '</div>';
+  }
+  function favourLink(x, plain) {
+    return '<a class="fav" href="' + esc(url('spell-builder/?i=' + encodeURIComponent(x[0].slug))) + '">' + iconHtml(x[0].icon, 'rel-icon') + esc(x[0].title) + (plain ? '' : '<small>' + x[1] + ' of today’s influences</small>') + '</a>';
+  }
+
+  function today(tool) {
+    var q = params(), m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(q.get('d') || ''), south = q.get('h') === 's';
+    var day = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date();
+    day.setHours(0, 0, 0, 0);
+    var R = dayReading(day, south), ph = R.ph, moon = R.moon, ruler = R.ruler, sign = R.sign, seas = R.seas, dayPage = R.dayPage, src = R.src;
+
+    var cards = influenceCards(R);
+
+    var favours = R.intents.slice(0, 12).map(function (x) { return favourLink(x, false); }).join('');
     var work = rankedParts(src, ['colours', 'plants', 'stones', 'oils', 'rituals']).map(function (pt) {
       var top = pt[1].filter(function (x) { return x[1] >= 2; }).slice(0, 6);
       if (!top.length) top = pt[1].slice(0, 3);
@@ -228,19 +240,35 @@
       (D.f[daySlug(d2)] || []).forEach(function (i) { if (soon.length < 8) soon.push('<li><time datetime="' + iso(d2) + '">' + short(d2) + '</time>' + chip(pg(i)) + '</li>'); });
     }
     var h = south ? '&h=s' : '', prev = addDays(day, -1), next = addDays(day, 1);
-    var lede = [moon ? 'a ' + ph[1] : '', ruler ? 'a ' + ruler.title + ' day' : '', sign ? 'the Sun in ' + sign.title : '', seas ? seas.title.toLowerCase() : ''].filter(Boolean).join(', ');
     tool.className = 'pg pg-tool pg-today';
     render(tool, '<header class="pg-head tool-head">' + crumbs('timing') + '<p class="eyebrow labelled">Today in the Manuscript</p>'
       + '<h1>' + DAYS[day.getDay()] + ', <em>' + MONTHS[day.getMonth()] + ' ' + day.getDate() + '</em></h1>'
-      + (lede ? '<p class="lede">' + esc(lede.charAt(0).toUpperCase() + lede.slice(1)) + '.</p>' : '')
+      + (R.lede ? '<p class="lede">' + esc(R.lede) + '</p>' : '')
       + '<p class="small day-nav"><a class="link" href="?d=' + iso(prev) + h + '">‹ ' + short(prev) + '</a><span aria-hidden="true">·</span>'
       + '<a class="link" href="?d=' + iso(day) + (south ? '' : '&h=s') + '">' + (south ? 'Use the northern hemisphere' : 'Use the southern hemisphere') + '</a><span aria-hidden="true">·</span>'
       + '<a class="link" href="?d=' + iso(next) + h + '">' + short(next) + ' ›</a></p></header>'
-      + '<div class="today-cards">' + cards + '</div>'
+      + cards
       + (favours ? '<section class="tool-section"><h2>Today <em>favours</em></h2><p class="small">Intentions tied to more than one of today’s influences. Choose one to build a spell for it.</p><div class="favs">' + favours + '</div></section>' : '')
       + (work ? '<section class="tool-section"><h2>Work <em>with today</em></h2><p class="small">Tied to the most of today’s moon, day, sign and season.</p><div class="work-parts">' + work + '</div></section>' : '')
       + '<section class="tool-section two-col">' + (onDay ? '<div><h2>On <em>this day</em></h2>' + onDay + '</div>' : '')
       + (soon.length ? '<div><h2>Coming <em>up</em></h2><ul class="soon">' + soon.join('') + '</ul><p class="small"><a class="link" href="' + esc(url('calendar/')) + '">The full calendar</a></p></div>' : '') + '</section>', 'Today');
+  }
+
+  /** The Manuscript home: today at a glance, under the shelves, leading to the full Today page. */
+  function homeToday(after) {
+    var day = new Date(); day.setHours(0, 0, 0, 0);
+    var R = dayReading(day, false);
+
+    var box = document.createElement('section');
+    box.className = 'today-glance';
+    box.setAttribute('aria-labelledby', 'glance-h');
+    box.innerHTML = '<header class="glance-head"><p class="eyebrow labelled">Today in the Manuscript</p>'
+      + '<h2 id="glance-h">' + DAYS[day.getDay()] + ', <em>' + MONTHS[day.getMonth()] + ' ' + day.getDate() + '</em></h2>'
+      + (R.lede ? '<p class="lede">' + esc(R.lede) + '</p>' : '') + '</header>'
+      + influenceCards(R)
+      + (R.intents.length ? '<div class="glance-favs"><p class="eyebrow">Today favours</p><div class="favs">' + R.intents.slice(0, 6).map(function (x) { return favourLink(x, true); }).join('') + '</div></div>' : '')
+      + '<p class="glance-more"><a class="btn ghost" href="' + esc(url('today/')) + '">Open Today</a></p>';
+    after.after(box);
   }
 
   // ------------------------------------------------------------------ Spell Builder
@@ -543,6 +571,12 @@
       Store.remove('notes', del.getAttribute('data-del-note')).then(function () { notesPage(document.querySelector('[data-static-tool="notes"]')); });
     }
   });
+  // The Manuscript home: today at a glance under the shelves (the data loads once the shelves are showing).
+  var shelves = document.querySelector('.book-pile') || document.querySelector('.shelves');
+  if (shelves && !document.querySelector('[data-static-tool]')) {
+    var later = window.requestIdleCallback || function (f) { setTimeout(f, 300); };
+    later(function () { data().then(function () { homeToday(shelves); }).catch(function (e) { ; }); });
+  }
   var tool = document.querySelector('[data-static-tool]');
   if (!tool) return;
   var kind = tool.getAttribute('data-static-tool');

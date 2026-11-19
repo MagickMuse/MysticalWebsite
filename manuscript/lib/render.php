@@ -303,10 +303,11 @@ function layout(string $title, string $body, array $opt = []): void
         ? '<a href="' . e(url('account')) . '">Account</a>'
         : '<a href="' . e(url('login')) . '">Sign in</a>';
     $q = e($_GET['q'] ?? '');
-    // Members: their saved pages and their notes, at the top left. "Notes" opens the note pop-up (tools.js); without JavaScript it's the list.
+    // Members: their saved pages, their notes and Today, at the top left. "Notes" opens the note pop-up (tools.js); without JavaScript it's the list.
     $mine = $email && has_access()
         ? '<p class="mm-mine"><a href="' . e(url('saved')) . '"><span aria-hidden="true">★</span> Saved</a><span class="dot" aria-hidden="true">·</span>'
-          . '<a href="' . e(url('notes')) . '" data-note-open aria-haspopup="dialog"><span aria-hidden="true">✎</span> Notes</a></p>'
+          . '<a href="' . e(url('notes')) . '" data-note-open aria-haspopup="dialog"><span aria-hidden="true">✎</span> Notes</a>'
+          . '<span class="dot" aria-hidden="true">·</span><a href="' . e(url('today')) . '"><span aria-hidden="true">☾</span> Today</a></p>'
         : '';
     $robots = !empty($opt['index']) ? 'index, follow' : 'noindex, nofollow';
     ?>
@@ -324,10 +325,10 @@ function layout(string $title, string $body, array $opt = []): void
   <?php foreach (['jost-300', 'cormorant-400', 'cormorant-400-italic', 'jost-400'] as $font): ?><link rel="preload" href="<?= e(site_url('fonts/' . $font . '.woff2')) ?>" as="font" type="font/woff2" crossorigin>
   <?php endforeach ?>  <script src="<?= e(site_url('prefs.js')) ?>"></script>
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=72">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=77">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=56" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=59" defer></script>
 <?php if ($stripe): ?>
   <script src="https://js.stripe.com/dahlia/stripe.js" defer></script>
   <script src="<?= e(url('assets/checkout.js')) ?>?v=2" defer></script>
