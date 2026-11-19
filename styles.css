@@ -10,6 +10,7 @@
 
 /* ---------- tokens ---------- */
 :root {
+  --logo-color: #7a1f2b;
   --bg: #f6efe8;
   --surface: #ede0d6;
   --ink: #2e1f20;
@@ -35,7 +36,7 @@
     --bg: #262120; --surface: #312b2a; --ink: #f1e7df; --muted: #b9aaa3;
     --accent: #c9545f; --line: #463c3b; --gold: #d6b062;
     --frame: linear-gradient(160deg, #4a2a2c 0%, #5e2a30 55%, #7a2f36 100%);
-    --accent-text: #e08a91; --on-btn: #f6efe8;
+    --accent-text: #e08a91; --on-btn: #f6efe8; --logo-color: #ffe1e2;
     color-scheme: dark;
   }
 }
@@ -43,7 +44,7 @@
   --bg: #262120; --surface: #312b2a; --ink: #f1e7df; --muted: #b9aaa3;
   --accent: #c9545f; --line: #463c3b; --gold: #d6b062;
   --frame: linear-gradient(160deg, #4a2a2c 0%, #5e2a30 55%, #7a2f36 100%);
-  --accent-text: #e08a91; --on-btn: #f6efe8;
+  --accent-text: #e08a91; --on-btn: #f6efe8; --logo-color: #ffe1e2;
   color-scheme: dark;
 }
 
@@ -56,7 +57,6 @@
 @font-face { font-family: "Atkinson Hyperlegible"; font-style: normal; font-weight: 700; font-display: swap; src: url("fonts/atkinson-700.woff2") format("woff2"); }
 :root[data-font="dyslexic"] { --body: "OpenDyslexic", "Comic Sans MS", sans-serif; --display: "OpenDyslexic", "Comic Sans MS", sans-serif; }
 :root[data-font="legible"] { --body: "Atkinson Hyperlegible", Verdana, sans-serif; --display: "Atkinson Hyperlegible", Verdana, sans-serif; }
-:root[data-font] .logo { font-family: var(--display); }
 /* OpenDyslexic runs wide: letter-spaced capitals are tightened so menus still fit */
 html[data-size="large"] { font-size: clamp(18.5px, 0.52vw + 12px, 22px); }
 html[data-size="larger"] { font-size: clamp(21px, 0.58vw + 14px, 25px); }
@@ -168,8 +168,13 @@ header.site {
 /* The logo sits on the left; the five sections (Manuscript, Muses, Mastery, Market, Mythos) line up on the right,
    with a gold star between each. The markup keeps two lists (left and right of where the logo used to be), shown as one row. */
 .nav { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 2rem; padding-block: 1.1rem; }
-.logo { font-family: var(--display); font-style: italic; text-decoration: none; letter-spacing: .02em; white-space: nowrap; }
-.nav .logo { grid-column: 1; grid-row: 1; font-size: 2rem; }
+/* The logo (assets/logo.svg), drawn in the theme's colour: dark red, or blush pink in dark mode.
+   Its text ("Magick Muse") stays in the link for screen readers and search, but isn't shown. */
+.logo { --logo-h: 56px; display: inline-block; height: var(--logo-h); aspect-ratio: 1585 / 879; flex: none;
+  background-color: var(--logo-color, #7a1f2b); -webkit-mask: url("assets/logo.svg") center / contain no-repeat; mask: url("assets/logo.svg") center / contain no-repeat;
+  color: transparent; font-size: 0; line-height: 0; text-decoration: none; overflow: hidden; white-space: nowrap; }
+.nav .logo { grid-column: 1; grid-row: 1; }
+@media (max-width: 640px) { .nav .logo { --logo-h: 44px; } }
 .nav nav { grid-column: 2; grid-row: 1; display: flex; justify-content: flex-end; align-items: center; gap: 1.2rem; }
 .nav ul { display: flex; align-items: center; gap: 1.2rem; list-style: none; margin: 0; padding: 0; }
 .nav li { display: flex; align-items: center; gap: 1.2rem; }
@@ -468,7 +473,7 @@ mark { background: none; color: var(--accent-text); font-weight: 400; }
 /* ---------- footer ---------- */
 footer.site { padding-block: 4rem 2.5rem; border-top: 1px solid var(--line); }
 .foot { display: grid; gap: 2rem; justify-items: center; text-align: center; }
-.foot .logo { font-size: 2.4rem; }
+.foot .logo { --logo-h: 92px; margin-bottom: .8rem; }
 .foot ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 2rem; list-style: none; padding: 0; margin: 0; }
 .foot ul a { display: inline-grid; justify-items: center; align-content: center; min-height: 44px; text-decoration: none; font-size: .78rem; letter-spacing: .22em; text-transform: uppercase; }
 .foot ul a:hover { color: var(--accent-text); }
