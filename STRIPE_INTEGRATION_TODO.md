@@ -86,7 +86,7 @@ No packages to install: the site talks to Stripe's API directly (PHP + curl), an
    (CSRF-protected) to the server, which creates the Checkout Session ([manuscript/lib/stripe.php](manuscript/lib/stripe.php)).
 2. The server shows our own **Secure checkout** page with the session's client secret; [checkout.js](manuscript/assets/checkout.js)
    starts `stripe.initCheckoutFormSdk`, mounts the form in `#checkout-form` and confirms the payment.
-3. Stripe returns the buyer to `/manuscript/welcome` or `/shop/thanks`.
+3. Stripe returns the buyer to `/manuscript/welcome` or `/market/thanks`.
 4. The **webhook** (`/manuscript/stripe-webhook`) verifies Stripe's signature and grants access on
    `checkout.session.completed`, or on `checkout.session.async_payment_succeeded` for payments that clear later.
    Refunds remove access. A chargeback pauses access, restores it if won and ends it if lost. Each event is handled once.

@@ -319,10 +319,10 @@ function layout(string $title, string $body, array $opt = []): void
   <?php foreach (['jost-300', 'cormorant-400', 'cormorant-400-italic', 'jost-400'] as $font): ?><link rel="preload" href="<?= e(site_url('fonts/' . $font . '.woff2')) ?>" as="font" type="font/woff2" crossorigin>
   <?php endforeach ?>  <script src="<?= e(site_url('prefs.js')) ?>"></script>
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=68">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=69">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=52" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=53" defer></script>
 <?php if ($stripe): ?>
   <script src="https://js.stripe.com/dahlia/stripe.js" defer></script>
   <script src="<?= e(url('assets/checkout.js')) ?>?v=2" defer></script>
@@ -338,12 +338,12 @@ function layout(string $title, string $body, array $opt = []): void
     <nav id="site-menu" aria-label="Main">
       <ul class="left">
         <li><a href="<?= e(url()) ?>" aria-current="page"><span>Manuscript</span><small>the grimoire</small></a></li>
-        <li><a href="<?= e(site_url('meetup')) ?>"><span>Muses</span><small>the coven</small></a></li>
+        <li><a href="<?= e(site_url('muses')) ?>"><span>Muses</span><small>the coven</small></a></li>
       </ul>
       <ul class="right">
         <li><a href="<?= e(site_url('mastery')) ?>"><span>Mastery</span><small>guides &amp; courses</small></a></li>
-        <li><a href="<?= e(site_url('shop/')) ?>"><span>Market</span><small>the shop</small></a></li>
-        <li><a href="<?= e(site_url('story')) ?>"><span>Mythos</span><small>our story</small></a></li>
+        <li><a href="<?= e(site_url('market/')) ?>"><span>Market</span><small>the shop</small></a></li>
+        <li><a href="<?= e(site_url('mythos')) ?>"><span>Mythos</span><small>our story</small></a></li>
       </ul>
     </nav>
   </div>

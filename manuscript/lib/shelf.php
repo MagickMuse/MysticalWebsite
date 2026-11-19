@@ -21,6 +21,16 @@ function grimoire_label(array $g): string
     return $names[$g['grimoire']] ?? trim(preg_replace('/\s*Grimoire\s*$/i', '', $g['title']));
 }
 
+/**
+ * Each grimoire's thickness (wa thin … wd thick) and height (ha short … hd tall), so the shelf looks lived-in.
+ * Fixed per grimoire rather than random, so the shelf looks the same on every visit. Unlisted grimoires get the middle size.
+ */
+const SPINE_SIZES = [
+    'animal' => 'wc hc', 'astrology' => 'wb hd', 'card' => 'wa hb', 'correspondence' => 'hc', 'dream' => 'wd ha',
+    'entity' => 'wb hc', 'material' => 'wc hd', 'mineral' => 'wa hb', 'oil' => 'wd hb', 'plant' => 'wb hd',
+    'recipe' => 'wc ha', 'ritual' => 'wa hc', 'rune' => 'wd hb', 'symbol' => 'wb hd', 'timing' => 'wc hc',
+];
+
 function real_book(array $g, int $n, int $i): string
 {
     $label = grimoire_label($g);
@@ -30,7 +40,8 @@ function real_book(array $g, int $n, int $i): string
     $len = ' n' . max(3, min(16, mb_strlen($label))); // letters on the spine, so the title can size itself to fit
     // One grimoire stands face out, its cover showing, with an "Open me" seal: it shows at a glance that the books open.
     $faced = $g['grimoire'] === (string) config('shelf_facing', 'correspondence');
-    return '<a class="bk ' . $tone . ($faced ? ' faced' : '') . '" href="' . e(page_url($g)) . '"'
+    $size = isset(SPINE_SIZES[$g['grimoire']]) ? ' ' . SPINE_SIZES[$g['grimoire']] : '';
+    return '<a class="bk ' . $tone . $size . ($faced ? ' faced' : '') . '" href="' . e(page_url($g)) . '"'
         . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '')) . '"'
         . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'
         . '<span class="spine" aria-hidden="true"><i class="band top"></i><span class="bk-title' . $len . '">' . e($label) . '</span>' . (grimoire_glyph($g['grimoire'], 'bk-star') ?: '<i class="bk-star"></i>') . '<i class="band bottom"></i></span>'

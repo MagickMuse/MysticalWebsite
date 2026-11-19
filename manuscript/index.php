@@ -50,7 +50,11 @@ function route(array $parts, string $method): void
         case 'relations':     relations_json(); return;
         case 'saved':         $method === 'POST' ? toggle_saved() : view_saved(); return;
         case 'dashboard':     route_dashboard(array_slice($parts, 1), $method); return;
-        case 'shop':          route_shop(array_slice($parts, 1), $method); return;
+        case 'market':        route_shop(array_slice($parts, 1), $method); return;
+        case 'shop':          // the Market's old address: links forward, posts from open tabs still work
+            if ($method === 'POST') { route_shop(array_slice($parts, 1), $method); return; }
+            $q = (string) ($_SERVER['QUERY_STRING'] ?? '');
+            redirect(site_url(implode('/', array_merge(['market'], array_slice($parts, 1)))) . ($q !== '' ? '?' . $q : ''), 301);
         case 'suggest':       search_suggest(trim((string) ($_GET['q'] ?? ''))); return;
         case 'calendar':      view_calendar(); return;
         case 'library':       view_the_library(); return;
@@ -735,7 +739,7 @@ function view_account(): void
     $logout = e(url('logout'));
     $email = e($email);
     $admin = is_admin(current_email()) ? '<a class="link" href="' . e(url('dashboard')) . '">Dashboard</a>' : '';
-    $library = '<a class="link" href="' . e(site_url('shop/library')) . '">Your library</a>';
+    $library = '<a class="link" href="' . e(site_url('market/library')) . '">Your library</a>';
     // Display & accessibility: kept in the browser by prefs.js, the same panel as the website's /settings page.
     $prefs = (string) @file_get_contents(__DIR__ . '/lib/prefs-panel.html');
     layout('Account', <<<HTML

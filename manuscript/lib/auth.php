@@ -8,7 +8,7 @@ function start_session(): void
     session_name('mm_session');
     session_set_cookie_params([
         'lifetime' => 60 * 60 * 24 * 60,          // stay signed in for 60 days
-        'path'     => '/',                   // shared by the wiki and the /shop pages
+        'path'     => '/',                   // shared by the wiki and the /market pages
         'secure'   => $secure,
         'httponly' => true,
         'samesite' => 'Lax',

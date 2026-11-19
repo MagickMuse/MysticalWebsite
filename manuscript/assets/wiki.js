@@ -613,7 +613,7 @@
     if (!body.hasAttribute('data-visitor') || !pop || !pop.showModal) return;
     var base = (body.getAttribute('data-base') || '').replace(/\/$/, '');
     var open = []; try { open = JSON.parse(body.getAttribute('data-open') || '[]'); } catch (err) {}
-    var free = ['join', 'login', 'shop', 'checkout', 'account', 'welcome', 'sneak-peek', 'media', 'auth', 'logout'];
+    var free = ['join', 'login', 'market', 'shop', 'checkout', 'account', 'welcome', 'sneak-peek', 'media', 'auth', 'logout'];
     function locked(a) {
       var u; try { u = new URL(a.href, location.href); } catch (err) { return false; }
       if (u.origin !== location.origin) return false;

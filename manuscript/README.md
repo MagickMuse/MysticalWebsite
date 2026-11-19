@@ -3,7 +3,7 @@
 Everything Gumroad did, on magickmuse.com:
 
 - **magickmuse.com/manuscript**: the members-only Manuscript, moved over from Notion.
-- **magickmuse.com/shop**: courses, templates and free downloads, with a "library" for each buyer.
+- **magickmuse.com/market**: courses, templates and free downloads, with a "library" for each buyer.
 - **magickmuse.com/manuscript/dashboard**: private sales and members dashboard (only the `admins` emails).
 
 It runs as a small PHP app inside the existing site. Hostinger already runs PHP, so there is no new
@@ -87,15 +87,15 @@ php manuscript/cli/gumroad-import.php gumroad-sales.csv
 - The `gumroad_products` list in the config decides which Gumroad product becomes what. The dry run
   lists anything it didn't recognise.
 
-Everyone signs in at `/manuscript/login` (or `/shop/library`) with the email they bought with.
+Everyone signs in at `/manuscript/login` (or `/market/library`) with the email they bought with.
 
 ### 5. Test, then go live
 1. With Stripe **test** keys, buy each plan using card `4242 4242 4242 4242`. Check you land signed in and can read entries.
 2. Swap in the **live** keys, live price ids, and a live webhook secret.
 3. Point the site's Gumroad links at the new pages: `…/l/manuscript` → `/manuscript/join`,
-   `…/l/witchcraft101` → `/shop/witchcraft-101`, `…/l/witchcraft111` → `/shop/witchcraft-111`,
-   `…/l/blankgrimoire` → `/shop/blank-grimoire`, `…/l/freesample` → `/shop/crystal-grimoire`,
-   the store link → `/shop`. Recreate the SEEKER10 code in Stripe (Coupons → promotion code).
+   `…/l/witchcraft101` → `/market/witchcraft-101`, `…/l/witchcraft111` → `/market/witchcraft-111`,
+   `…/l/blankgrimoire` → `/market/blank-grimoire`, `…/l/freesample` → `/market/crystal-grimoire`,
+   the store link → `/market`. Recreate the SEEKER10 code in Stripe (Coupons → promotion code).
 
 ---
 
@@ -108,7 +108,7 @@ Everyone signs in at `/manuscript/login` (or `/shop/library`) with the email the
 | Remove pages deleted in Notion | `php manuscript/cli/import.php --prune` (skipped for a grimoire if any page failed to load that run, so a Notion hiccup never deletes pages) |
 | Gift access / remove access | Dashboard → Members, or `php manuscript/cli/member.php add|remove email` |
 | Refund someone | In Stripe (Payments → the payment → Refund). The dashboard updates, and a full refund removes their access. |
-| Add a product | Add it to `products` in the config. Its page is `/shop/<slug>` |
+| Add a product | Add it to `products` in the config. Its page is `/market/<slug>` |
 | Old Notion links (Discord, bookmarks) | `magickmuse.com/manuscript/go/<notion-page-id>` redirects to the wiki page |
 
 ## What non-members see
