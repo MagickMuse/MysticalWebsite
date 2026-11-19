@@ -194,6 +194,14 @@
     document.addEventListener('click', function (e) { if (!form.contains(e.target)) close(); });
   }
 
+  // The GitHub Pages copy: the members' tools and notes run in the browser (assets/tools-static.js), as there's no server.
+  if (staticSearch) {
+    var tools = document.createElement('script');
+    tools.src = new URL('../assets/tools-static.js?v=1', new URL(document.querySelector('.mm-search').getAttribute('action'), location.href)).toString();
+    tools.defer = true;
+    document.head.appendChild(tools);
+  }
+
   // The search results page of the GitHub Pages copy: filled in here from the index.
   var results = document.querySelector('[data-static-results]');
   if (results && staticSearch) {

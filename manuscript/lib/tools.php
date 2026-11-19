@@ -670,7 +670,7 @@ function view_wheel(): void
         $tabs .= '<a class="fchip' . ($k === $of ? ' on' : '') . '" href="' . e(url('wheel') . '?of=' . $k) . '"' . ($k === $of ? ' aria-current="true"' : '') . '>' . e($label) . '</a>';
     }
     $detail = $sel
-        ? '<header class="wheel-head"><p class="eyebrow">' . e($glyphs[$sel['slug']] ?? '') . ' ' . e(['planets' => 'Planet', 'signs' => 'Zodiac sign', 'moon' => 'Moon phase'][$of]) . '</p>'
+        ? '<header class="wheel-head"><p class="eyebrow">' . e(isset($glyphs[$sel['slug']]) ? $glyphs[$sel['slug']] . "\u{FE0E}" : '') . ' ' . e(['planets' => 'Planet', 'signs' => 'Zodiac sign', 'moon' => 'Moon phase'][$of]) . '</p>'
           . '<h2><a href="' . e($sel['url']) . '">' . e($sel['title']) . '</a></h2>'
           . '<p class="small">Tied to ' . number_format($total) . ' pages across the grimoires.</p></header>' . $groups
         : '<p class="lede">These pages haven’t been moved over from Notion yet.</p>';
