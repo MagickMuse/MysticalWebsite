@@ -1,22 +1,56 @@
 /*
- * The members' tools on the GitHub Pages copy of the Manuscript, which has no server. On the live site PHP does all of
- * this (lib/tools.php); here the browser does it, from tools/data.json (built by .github/scripts/build-static-tools.py):
- * Today, the Spell Builder, the Planet / Zodiac / Moon Phase Wheels, the Enchanted Tools on grimoire pages, and notes.
- * Notes and saved workings are kept in this browser (localStorage), since there's nowhere else to keep them.
- * wiki.js loads this file only on the GitHub Pages copy.
+ * The members' tools: Today, the Spell Builder, the Planet / Zodiac / Moon Phase Wheels, the "Enchanted Tools" list on
+ * grimoire pages, the spell and wheel links on entries, and notes. This is the only implementation of them: it runs in
+ * the browser on the live site and on the GitHub Pages preview alike, from tools/data.json (on the live site served to
+ * members by lib/tools.php from the database; on the preview a copy built by .github/scripts/build-static-tools.py).
+ * Notes and saved workings are kept in the member's account on the live site, and in this browser on the preview,
+ * which has no server. wiki.js loads this file on every Manuscript page.
  */
 (function () {
   'use strict';
+  var me = document.currentScript;
+  var ROOT = new URL('../', me ? me.src : location.href).toString(); // …/manuscript/
+  // The preview has no server: its search form points at search/ (with a slash). See wiki.js.
   var searchForm = document.querySelector('.mm-search'), action = searchForm && searchForm.getAttribute('action');
-  if (!action || !/search\/$/.test(action)) return; // the live site: PHP does all of this
-  var ROOT = new URL(action + '../', location.href).toString(); // …/manuscript/
+  var PREVIEW = !!action && /search\/$/.test(action);
+  var CSRF = document.body.getAttribute('data-csrf') || '';
+  var MEMBER = PREVIEW || !!CSRF; // the live site gives members (only) a form token
 
   // ------------------------------------------------------------------ small helpers
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function url(path) { return ROOT + path; }
   function params() { return new URLSearchParams(location.search); }
-  function store(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch (e) { return fallback; } }
-  function keep(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
+
+  // Notes and workings: the member's account on the live site (lib/tools.php), this browser on the preview.
+  var Store = {
+    local: function (kind) { try { return JSON.parse(localStorage.getItem('mm-' + kind + '-v1')) || []; } catch (e) { return []; } },
+    keepLocal: function (kind, list) { try { localStorage.setItem('mm-' + kind + '-v1', JSON.stringify(list)); } catch (e) {} },
+    list: function (kind) {
+      if (PREVIEW) return Promise.resolve(Store.local(kind));
+      return fetch(url(kind + '?json=1'), { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error(); return r.json(); });
+    },
+    post: function (kind, fields) {
+      var body = new FormData(); body.append('csrf', CSRF);
+      Object.keys(fields).forEach(function (k) { body.append(k, typeof fields[k] === 'object' ? JSON.stringify(fields[k]) : fields[k] == null ? '' : fields[k]); });
+      return fetch(url(kind), { method: 'POST', body: body, credentials: 'same-origin', headers: { 'X-Requested-With': 'fetch' } })
+        .then(function (r) { if (!r.ok) throw new Error(); return r.json(); });
+    },
+    /** Saves one (new when it has no id); resolves to its id (0: an empty new note, not kept). */
+    save: function (kind, item) {
+      if (!PREVIEW) return Store.post(kind, item).then(function (d) { return d.id; });
+      var list = Store.local(kind), now = new Date().toISOString();
+      if (kind === 'notes' && !item.id && !(item.body || '').trim()) return Promise.resolve(0);
+      if (!item.id) { item.id = Date.now(); item.created = kind === 'notes' ? now : now.slice(0, 10); list.unshift(item); }
+      item.updated = now;
+      Store.keepLocal(kind, list.map(function (x) { return x.id === item.id ? item : x; }).slice(0, 2000));
+      return Promise.resolve(item.id);
+    },
+    remove: function (kind, id) {
+      if (!PREVIEW) return Store.post(kind, { do: 'delete', id: id });
+      Store.keepLocal(kind, Store.local(kind).filter(function (x) { return String(x.id) !== String(id); }));
+      return Promise.resolve();
+    }
+  };
   var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -25,6 +59,7 @@
   function data() {
     if (!dataP) dataP = fetch(url('tools/data.json')).then(function (r) { if (!r.ok) throw new Error(); return r.json(); }).then(function (d) {
       D = d;
+      d.part = d.p.map(function (p) { return partOf(d.g[p[0]], p[4] ? p[4].split('|') : []); });
       d.p.forEach(function (p, i) { bySlug[d.g[p[0]] + '/' + p[1]] = i; });
       return d;
     });
@@ -32,16 +67,17 @@
   }
   function pg(i) {
     var p = D.p[i];
-    return { i: i, g: D.g[p[0]], slug: p[1], title: p[2], icon: p[3], part: p[4], kinds: p[5] ? p[5].split('|') : [], range: p[6], url: url(D.g[p[0]] + '/' + p[1] + '/') };
+    return { i: i, g: D.g[p[0]], slug: p[1], title: p[2], icon: p[3], part: D.part[i], kinds: p[4] ? p[4].split('|') : [], range: p[5], url: url(D.g[p[0]] + '/' + p[1] + '/') };
   }
   function find(g, slug) { var i = bySlug[g + '/' + slug]; return i == null ? null : pg(i); }
   function ofKind(g, kind) {
     var out = {};
-    D.p.forEach(function (p, i) { if (D.g[p[0]] === g && p[5] && p[5].split('|').indexOf(kind) !== -1) out[p[1]] = pg(i); });
+    D.p.forEach(function (p, i) { if (D.g[p[0]] === g && p[4] && p[4].split('|').indexOf(kind) !== -1) out[p[1]] = pg(i); });
     return out;
   }
   function iconHtml(icon, cls) {
     if (!icon) return '';
+    if (icon.indexOf('a:') === 0) return '<img class="' + cls + '" src="' + esc(url('assets/' + icon.slice(2))) + '" alt="" width="24" height="24" loading="lazy">';
     if (icon.indexOf('m:') === 0) return '<img class="' + cls + '" src="' + esc(url('media/' + icon.slice(2))) + '" alt="" width="24" height="24" loading="lazy">';
     return '<span class="' + cls + '" aria-hidden="true">' + esc(icon) + '</span>';
   }
@@ -53,6 +89,15 @@
     return h + '</ol></nav>';
   }
 
+  /** Which part of a working a page can be: timing, a colour, a herb… (none: it isn't one). */
+  function partOf(g, kinds) {
+    var has = function (k) { return kinds.indexOf(k) !== -1; };
+    if (g === 'astrology') return has('Planets') || has('Moon Phases') ? 'when' : '';
+    if (g === 'timing') return has('Days of the Week') || has('Holidays') || has('Seasons') || has('Time of Day') ? 'when' : '';
+    if (g === 'symbol') return has('Color') ? 'colours' : '';
+    if (g === 'card') return has('Tarot') ? 'tarot' : '';
+    return { plant: 'plants', mineral: 'stones', oil: 'oils', entity: 'deities', rune: 'runes', recipe: 'recipes', ritual: 'rituals' }[g] || '';
+  }
   /** Pages linked to any of ids: Map(index → how many of ids). */
   function linkedCounts(ids) {
     var out = new Map(), set = new Set(ids);
@@ -68,7 +113,7 @@
   function rankedParts(ids, only) {
     var counts = linkedCounts(ids), parts = {};
     counts.forEach(function (n, i) {
-      var part = D.p[i][4];
+      var part = D.part[i];
       if (!part || (only && only.indexOf(part) === -1)) return;
       (parts[part] = parts[part] || []).push([i, n, D.l[i].length]);
     });
@@ -199,7 +244,6 @@
   }
 
   // ------------------------------------------------------------------ Spell Builder
-  var WORKINGS = 'mm-workings-v1';
   function spell(tool) {
     var q = params(), corr = [];
     D.p.forEach(function (p, i) { if (D.g[p[0]] === 'correspondence') corr.push(i); });
@@ -255,28 +299,37 @@
           + '<div class="spell-parts">' + rows + '</div><div class="spell-save"><h2>Keep <em>this working</em></h2>'
           + '<label for="w-title">Name</label><input id="w-title" name="title" maxlength="120" value="' + esc(title) + '">'
           + '<label for="w-notes">Your notes <small>(optional)</small></label><textarea id="w-notes" name="notes" rows="4" maxlength="5000" placeholder="What you’ll do, when, and anything you want to remember."></textarea>'
-          + '<button class="btn" type="submit">Save the working</button><p class="small">On this preview, workings are kept in this browser, and listed below.</p></div></form>'
+          + '<button class="btn" type="submit">Save the working</button><p class="small">Saved workings are listed at the end of this page.</p></div></form>'
         : '<p class="lede">Nothing in the Manuscript is tied to this yet. Try a broader intention.</p>';
     }
     tool.className = 'pg pg-tool pg-spell';
     render(tool, '<header class="pg-head tool-head">' + crumbs('ritual') + '<p class="eyebrow labelled">Spell Builder</p><h1>Build <em>a working</em></h1>'
       + '<p class="lede">Choose what the spell is for. The Manuscript gathers the days, colours, herbs, stones, oils, deities and rituals tied to it.</p></header>'
-      + (chips ? '<div class="intents">' + chips + '</div>' : '') + box + starters + result + workingsHtml(), 'Spell Builder');
+      + (chips ? '<div class="intents">' + chips + '</div>' : '') + box + starters + result, 'Spell Builder');
     var save = tool.querySelector('[data-spell-save]');
     if (save) save.addEventListener('submit', function (e) {
       e.preventDefault();
       var picks = [].map.call(save.querySelectorAll('input[name="pick"]:checked'), function (c) { var p = pg(+c.value); return [p.g, p.slug]; });
-      var list = store(WORKINGS, []);
-      list.unshift({ id: Date.now(), title: save.title.value.trim() || 'My working', intents: slugs, items: picks, notes: save.notes.value.trim(), created: iso(new Date()) });
-      keep(WORKINGS, list.slice(0, 300));
-      spell(tool);
-      var w = tool.querySelector('.workings'); if (w) { w.querySelector('details').open = true; w.scrollIntoView({ behavior: 'smooth' }); }
+      Store.save('workings', { title: save.title.value.trim() || 'My working', intents: slugs, items: picks, notes: save.notes.value.trim() })
+        .then(function () { return showWorkings(tool, true); })
+        .catch(function () { alert('The working couldn’t be saved. Check your connection and try again.'); });
     });
+    showWorkings(tool, false);
   }
-  function workingsHtml() {
-    var list = store(WORKINGS, []);
-    if (!list.length) return '';
-    return '<section class="tool-section workings"><h2>Your <em>workings</em></h2><p class="small">Kept in this browser (on the live site they’re under ★ Saved).</p>' + list.map(function (w) {
+  /** "Your workings" under the Spell Builder ($open: open the newest and scroll to it, just after saving). */
+  function showWorkings(tool, open) {
+    return Store.list('workings').then(function (list) {
+      var old = tool.querySelector('.workings'); if (old) old.remove();
+      if (!list.length) return;
+      tool.insertAdjacentHTML('beforeend', workingsHtml(list));
+      var w = tool.querySelector('.workings');
+      if (open) { w.querySelector('details').open = true; w.scrollIntoView({ behavior: 'smooth' }); }
+      else if (location.hash === '#workings') w.scrollIntoView();
+    }).catch(function () {});
+  }
+  function workingsHtml(list) {
+    return '<section class="tool-section workings" id="workings"><h2>Your <em>workings</em></h2>'
+      + (PREVIEW ? '<p class="small">On this preview, workings are kept in this browser.</p>' : '') + list.map(function (w) {
       var groups = {};
       w.items.forEach(function (it) { var p = find(it[0], it[1]); if (p) (groups[p.part || 'other'] = groups[p.part || 'other'] || []).push(p); });
       var parts = PARTS.filter(function (pt) { return groups[pt[0]]; }).map(function (pt) {
@@ -292,8 +345,7 @@
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-del-working]');
     if (!b || !confirm('Delete this working? This can’t be undone.')) return;
-    keep(WORKINGS, store(WORKINGS, []).filter(function (w) { return String(w.id) !== b.getAttribute('data-del-working'); }));
-    var t = document.querySelector('[data-static-tool]'); if (t) spell(t);
+    Store.remove('workings', b.getAttribute('data-del-working')).then(function () { showWorkings(document.querySelector('[data-static-tool]'), false); });
   });
 
   // ------------------------------------------------------------------ the wheels
@@ -362,16 +414,17 @@
     return '<div class="wheel-layout"><div class="wheel-wrap">' + svg + '</div><div class="wheel-detail" aria-live="polite">' + detail + '</div></div>';
   }
 
-  // ------------------------------------------------------------------ notes (kept in this browser)
-  var NOTES = 'mm-notes-v1';
-  function notes() { return store(NOTES, []); }
+  // ------------------------------------------------------------------ notes
+  // "✎ Notes" at the top opens the note pop-up: the note already written on this page if there is one, else a new one
+  // named after the page (it can be renamed). It saves a moment after typing stops, and on closing. "New note" starts
+  // another. The notes page (/notes) lists every note with its first lines; each opens in the pop-up.
   function pageTitle() {
     var h1 = document.querySelector('.mm-main h1'), t = document.title.split(' | ')[0];
     if (h1) { var c = h1.cloneNode(true); c.querySelectorAll('.pg-icon').forEach(function (x) { x.remove(); }); t = c.textContent.trim() || t; }
     return t.replace(/\s+/g, ' ') || 'A note';
   }
   function noteDialog() {
-    var path = location.pathname, mine = notes().filter(function (n) { return n.page === path; })[0], def = pageTitle();
+    var path = location.pathname, def = pageTitle(), onNotesPage = !!document.querySelector('[data-static-tool="notes"]');
     var d = document.createElement('dialog');
     d.className = 'note-pop'; d.id = 'note-pop'; d.setAttribute('aria-labelledby', 'note-pop-h');
     d.innerHTML = '<form class="note-form"><div class="note-top"><p class="eyebrow" id="note-pop-h"><span aria-hidden="true">✎</span> Your note</p>'
@@ -380,66 +433,76 @@
       + '<label class="sr-only" for="note-body">Note</label><textarea class="note-body" id="note-body" rows="9" maxlength="20000" placeholder="Write in the margin… only you can see this."></textarea>'
       + '<div class="note-foot"><button class="btn" type="submit">Save</button><span class="notes-status" role="status"></span>'
       + '<span class="note-links"><button class="link as-button" type="button" data-note-new>New note</button><a class="link" href="' + esc(url('notes/')) + '">All notes</a></span></div>'
-      + '<p class="small note-local">On this preview, notes are kept in this browser only.</p></form>';
+      + (PREVIEW ? '<p class="small">On this preview, notes are kept in this browser only.</p>' : '') + '</form>';
     document.body.appendChild(d);
-    var title = d.querySelector('.note-title'), body = d.querySelector('.note-body'), status = d.querySelector('.notes-status'), cur = null, timer;
-    function load(n) { cur = n; title.value = n ? n.title : def; body.value = n ? n.body : ''; status.textContent = ''; }
+    var title = d.querySelector('.note-title'), body = d.querySelector('.note-body'), status = d.querySelector('.notes-status');
+    var cur = null, last = '', timer, busy = Promise.resolve(), changed = false;
+    function snap() { return title.value + '\n' + body.value; }
+    function load(n) { cur = n || null; title.value = n ? n.title : def; body.value = n ? n.body : ''; last = snap(); status.textContent = ''; }
     function save() {
       clearTimeout(timer);
-      if (!cur && !body.value.trim()) return;
-      var list = notes(), now = new Date().toISOString();
-      if (!cur) { cur = { id: Date.now(), page: path, pageTitle: def, created: now }; list.unshift(cur); }
-      cur.title = title.value.trim() || 'Untitled note'; cur.body = body.value; cur.updated = now;
-      list = list.map(function (n) { return n.id === cur.id ? cur : n; });
-      if (!list.some(function (n) { return n.id === cur.id; })) list.unshift(cur);
-      keep(NOTES, list); status.textContent = 'Saved';
+      busy = busy.then(function () {
+        if (snap() === last || (!cur && !body.value.trim())) return;
+        var sent = snap(), item = cur || { page: path, pageTitle: def };
+        item.title = title.value.trim() || 'Untitled note'; item.body = body.value;
+        status.textContent = 'Saving…';
+        return Store.save('notes', item).then(function (id) {
+          if (id) { item.id = id; cur = item; }
+          last = sent; changed = true; status.textContent = 'Saved';
+        }).catch(function () { status.textContent = 'Not saved. Check your connection.'; });
+      });
+      return busy;
     }
-    function later() { status.textContent = ''; clearTimeout(timer); timer = setTimeout(save, 700); }
-    function close() { save(); d.close(); if (document.querySelector('[data-static-tool="notes"]')) notesPage(document.querySelector('[data-static-tool="notes"]')); }
+    function later() { status.textContent = ''; clearTimeout(timer); timer = setTimeout(save, 900); }
+    function close() { save().then(function () { d.close(); if (changed && onNotesPage) notesPage(document.querySelector('[data-static-tool="notes"]')); changed = false; }); }
     title.addEventListener('input', later); body.addEventListener('input', later);
     d.querySelector('form').addEventListener('submit', function (e) { e.preventDefault(); save(); });
     d.querySelector('[data-note-close]').addEventListener('click', close);
     d.addEventListener('cancel', function (e) { e.preventDefault(); close(); });
     d.addEventListener('click', function (e) { if (e.target === d) close(); });
-    d.querySelector('[data-note-new]').addEventListener('click', function () { save(); load(null); title.select(); title.focus(); });
-    window.addEventListener('pagehide', save);
-    load(mine);
-    return { open: function (n) { if (n !== undefined) load(n); if (!d.open) d.showModal(); body.focus(); } };
+    d.querySelector('[data-note-new]').addEventListener('click', function () { save().then(function () { load(null); title.select(); title.focus(); }); });
+    window.addEventListener('pagehide', function () {
+      if (snap() === last || (!cur && !body.value.trim())) return;
+      if (PREVIEW) { save(); return; }
+      var f = new FormData(); f.append('csrf', CSRF); f.append('id', cur ? cur.id : ''); f.append('title', title.value); f.append('body', body.value);
+      f.append('page', path); f.append('pageTitle', def);
+      if (navigator.sendBeacon) navigator.sendBeacon(url('notes'), f);
+    });
+    function show() { if (!d.open) d.showModal(); body.focus(); }
+    return {
+      // The note written on this page, if any; else a new one.
+      openHere: function () {
+        if (d.open) return;
+        Store.list('notes').then(function (list) { load(onNotesPage ? null : list.filter(function (n) { return n.page === path; })[0]); show(); })
+          .catch(function () { load(null); show(); });
+      },
+      openNote: function (n) { load(n); show(); }
+    };
   }
+  var notesCache = [];
   function notesPage(tool) {
-    var list = notes().sort(function (a, b) { return (b.updated || '').localeCompare(a.updated || ''); });
-    tool.className = 'saved notes-page';
-    render(tool, '<p class="eyebrow labelled">Your Manuscript</p><h1>Your <em>notes</em></h1>'
-      + '<p class="small">Only you can see these. Each one opens to read, rename or change it. On this preview they’re kept in this browser.</p>'
-      + (list.length ? '<ul class="note-cards">' + list.map(function (n) {
-        var snip = (n.body || '').replace(/\s+/g, ' ').trim();
-        return '<li class="note-card"><a class="note-open" href="#note-' + n.id + '" data-local-note="' + n.id + '"><span class="note-card-title">' + esc(n.title) + '</span>'
-          + '<span class="note-card-snip">' + esc(snip.length > 190 ? snip.slice(0, 189) + '…' : snip) + '</span></a>'
-          + '<p class="note-card-meta">' + esc(new Date(n.updated || n.created).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }))
-          + (n.page && n.page !== location.pathname ? ' · from <a href="' + esc(n.page) + '">' + esc(n.pageTitle || 'this page') + '</a>' : '')
-          + ' · <button class="link as-button" type="button" data-del-note="' + n.id + '">Delete</button></p></li>';
-      }).join('') + '</ul>' : '<p class="lede">No notes yet. Tap <strong>✎ Notes</strong> at the top of any page to write one.</p>'), 'Your notes');
+    return Store.list('notes').then(function (list) {
+      notesCache = list.sort(function (a, b) { return String(b.updated || '').localeCompare(String(a.updated || '')); });
+      tool.className = 'saved notes-page';
+      render(tool, '<p class="eyebrow labelled">Your Manuscript</p><h1>Your <em>notes</em></h1>'
+        + '<p class="small">Only you can see these. Each one opens to read, rename or change it.' + (PREVIEW ? ' On this preview they’re kept in this browser.' : '') + '</p>'
+        + (list.length ? '<ul class="note-cards">' + list.map(function (n) {
+          var snip = (n.body || '').replace(/\s+/g, ' ').trim(), when = new Date(String(n.updated || n.created).replace(' ', 'T'));
+          return '<li class="note-card"><a class="note-open" href="#note-' + n.id + '" data-note-id="' + n.id + '"><span class="note-card-title">' + esc(n.title) + '</span>'
+            + '<span class="note-card-snip">' + esc(snip.length > 190 ? snip.slice(0, 189) + '…' : snip) + '</span></a>'
+            + '<p class="note-card-meta">' + esc(isNaN(when) ? '' : when.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }))
+            + (n.page ? ' · from <a href="' + esc(n.page) + '">' + esc(n.pageTitle || 'this page') + '</a>' : '')
+            + ' · <button class="link as-button" type="button" data-del-note="' + n.id + '">Delete</button></p></li>';
+        }).join('') + '</ul>' : '<p class="lede">No notes yet. Tap <strong>✎ Notes</strong> at the top of any page to write one.</p>'), 'Your notes');
+    }).catch(function () { tool.innerHTML = '<p class="lede">Your notes couldn’t load. Refresh the page to try again.</p>'; });
   }
 
-  // ------------------------------------------------------------------ on every page of the copy
+  // ------------------------------------------------------------------ on every Manuscript page
   var GRIMOIRE_TOOLS = {
     ritual: [['spell-builder/', 'Spell Builder']],
     astrology: [['wheel/?of=planets', 'Planet Wheel'], ['wheel/?of=signs', 'Zodiac Wheel'], ['wheel/?of=moon', 'Moon Phase Wheel']],
     timing: [['today/', 'Today'], ['calendar/', 'Calendar']]
   };
-  function header() {
-    var bar = document.querySelector('.mm-bar'), acct = bar && bar.querySelector('.mm-acct');
-    if (!bar || bar.querySelector('.mm-mine')) return;
-    if (acct) {
-      var saved = acct.querySelector('a[href$="saved/"]');
-      if (saved) { var dot = saved.nextElementSibling; saved.remove(); if (dot && dot.classList.contains('dot')) dot.remove(); }
-    }
-    var mine = document.createElement('p');
-    mine.className = 'mm-mine';
-    mine.innerHTML = '<a href="' + esc(url('saved/')) + '"><span aria-hidden="true">★</span> Saved</a><span class="dot" aria-hidden="true">·</span>'
-      + '<a href="' + esc(url('notes/')) + '" data-note-open aria-haspopup="dialog"><span aria-hidden="true">✎</span> Notes</a>';
-    bar.insertBefore(mine, bar.firstChild);
-  }
   function grimoireTools() {
     var art = document.querySelector('article.pg-grimoire'), m = /\/manuscript\/([a-z-]+)\/?$/.exec(location.pathname);
     if (!art || !m || !GRIMOIRE_TOOLS[m[1]] || art.querySelector('.tools-toggle')) return;
@@ -462,24 +525,22 @@
     if (links.length) head.insertAdjacentHTML('afterend', '<p class="tool-links small">' + links.join('') + '</p>');
   }
 
-  header();
+  if (!MEMBER) return; // visitors: nothing here is theirs to use
   grimoireTools();
   toolLinks();
   var pop = null;
   document.addEventListener('click', function (e) {
-    var open = e.target.closest('[data-note-open]');
-    if (open) { e.preventDefault(); pop = pop || noteDialog(); pop.open(); return; }
-    var card = e.target.closest('[data-local-note]');
+    if (e.target.closest('[data-note-open]')) { e.preventDefault(); (pop = pop || noteDialog()).openHere(); return; }
+    var card = e.target.closest('a[data-note-id]');
     if (card) {
       e.preventDefault();
-      var n = notes().filter(function (x) { return String(x.id) === card.getAttribute('data-local-note'); })[0];
-      if (n) { pop = pop || noteDialog(); pop.open(n); }
+      var n = notesCache.filter(function (x) { return String(x.id) === card.getAttribute('data-note-id'); })[0];
+      if (n) (pop = pop || noteDialog()).openNote(n);
       return;
     }
     var del = e.target.closest('[data-del-note]');
     if (del && confirm('Delete this note? This can’t be undone.')) {
-      keep(NOTES, notes().filter(function (x) { return String(x.id) !== del.getAttribute('data-del-note'); }));
-      notesPage(document.querySelector('[data-static-tool="notes"]'));
+      Store.remove('notes', del.getAttribute('data-del-note')).then(function () { notesPage(document.querySelector('[data-static-tool="notes"]')); });
     }
   });
   var tool = document.querySelector('[data-static-tool]');

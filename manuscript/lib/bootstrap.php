@@ -189,12 +189,12 @@ function migrate(PDO $pdo): void
     );
     CREATE INDEX IF NOT EXISTS bookmarks_page ON bookmarks(page_id);
 
-    -- Members' notes: titled (the page they were written on, to start with), and the page they belong to.
+    -- Members' notes: titled (the page they were written on, to start with), and which page that was.
     CREATE TABLE IF NOT EXISTS member_notes (
         id         INTEGER PRIMARY KEY AUTOINCREMENT,
         email      TEXT NOT NULL,
-        page_id    TEXT,                        -- the Manuscript page it was written on (NULL: another page, see page_path)
-        page_path  TEXT NOT NULL DEFAULT '',
+        page_path  TEXT NOT NULL DEFAULT '',     -- the address it was written on
+        page_title TEXT NOT NULL DEFAULT '',
         title      TEXT NOT NULL,
         body       TEXT NOT NULL,
         created_at TEXT NOT NULL,
@@ -222,10 +222,12 @@ function migrate(PDO $pdo): void
     // Columns added after the first release: CREATE TABLE IF NOT EXISTS leaves existing tables as they were.
     $cols = array_column($pdo->query('PRAGMA table_info(payments)')->fetchAll(), 'name');
     if (!in_array('dispute', $cols, true)) $pdo->exec('ALTER TABLE payments ADD COLUMN dispute TEXT');
+    $cols = array_column($pdo->query('PRAGMA table_info(member_notes)')->fetchAll(), 'name');
+    if (!in_array('page_title', $cols, true)) $pdo->exec("ALTER TABLE member_notes ADD COLUMN page_title TEXT NOT NULL DEFAULT ''");
     // The first notes (one untitled note per page) become titled notes, named after their page.
     if ($pdo->query("SELECT 1 FROM main.sqlite_master WHERE type = 'table' AND name = 'notes'")->fetchColumn()) {
-        $pdo->exec("INSERT INTO member_notes (email, page_id, page_path, title, body, created_at, updated_at)
-            SELECT n.email, n.page_id, '', COALESCE(p.title, 'Note'), n.body, n.updated_at, n.updated_at FROM main.notes n LEFT JOIN content.pages p ON p.id = n.page_id;
+        $pdo->exec("INSERT INTO member_notes (email, page_path, page_title, title, body, created_at, updated_at)
+            SELECT n.email, '', COALESCE(p.title, ''), COALESCE(p.title, 'Note'), n.body, n.updated_at, n.updated_at FROM main.notes n LEFT JOIN content.pages p ON p.id = n.page_id;
             DROP TABLE main.notes;");
     }
 }

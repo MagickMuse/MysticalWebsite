@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-The members' tools on the GitHub Pages copy of the Manuscript, which has no server (the PHP site builds them in
-manuscript/lib/tools.php; assets/tools-static.js does the same in the browser here):
+The members' tools on the GitHub Pages copy of the Manuscript, which has no server (assets/tools.js runs them in the
+browser, here and on the live site, where lib/tools.php serves the same data from the database):
 
   1. manuscript/tools/data.json: every page (grimoire, address, title, icon, which part of a spell it can be,
      its kinds and date range) and every connection between pages, both ways, plus each calendar day's festivals.
-  2. The tools' own pages: manuscript/today/, spell-builder/, wheel/ and notes/ (shells that tools-static.js fills in).
+     The same shape lib/tools.php serves on the live site (tools_data()); the tools themselves are only in tools.js.
+  2. The tools' own pages: manuscript/today/, spell-builder/, wheel/ and notes/ (shells that tools.js fills in).
 
 Run after the Manuscript's pages are regenerated:  python3 .github/scripts/build-static-tools.py
 """
@@ -30,20 +31,6 @@ def text(s):
     return html.unescape(re.sub(r'<[^>]+>', '', s)).strip()
 
 
-def spell_part(g, types, props):
-    """Which part of a working a page can be (the same rules as spell_part() in lib/tools.php)."""
-    if g == 'astrology':
-        return 'when' if types & {'Planets', 'Moon Phases'} else ''
-    if g == 'timing':
-        return 'when' if types & {'Days of the Week', 'Holidays', 'Seasons', 'Time of Day'} else ''
-    if g == 'symbol':
-        return 'colours' if 'Color' in types else ''
-    if g == 'card':
-        return 'tarot' if ('Suit' in props or 'Upright Correspondences' in props) else ''
-    return {'plant': 'plants', 'mineral': 'stones', 'oil': 'oils', 'entity': 'deities', 'rune': 'runes',
-            'recipe': 'recipes', 'ritual': 'rituals'}.get(g, '')
-
-
 def main():
     pages, index, rels = [], {}, []
     for g in GRIMOIRES:
@@ -62,9 +49,9 @@ def main():
             m = re.search(r'<span class="pg-icon big" aria-hidden="true">([^<]*)</span>', h1.group(1))
             if m:
                 icon = html.unescape(m.group(1))
-            m = re.search(r'<img class="pg-icon big" src="[^"]*/media/([^"]+)"', h1.group(1))
+            m = re.search(r'<img class="pg-icon big" src="[^"]*/(media|assets)/([^"]+)"', h1.group(1))
             if m:
-                icon = 'm:' + m.group(1)
+                icon = ('m:' if m.group(1) == 'media' else 'a:') + m.group(2)
             if g == 'entity':
                 icon = ''  # the Entity Grimoire shows no icons
             title = text(re.sub(r'<span class="pg-icon[^"]*"[^>]*>[^<]*</span>', '', h1.group(1)))
@@ -81,8 +68,8 @@ def main():
                     vals = [text(v) for v in PILL.findall(r.group(3))] or [text(r.group(3))]
                     rng = ' '.join(vals)
             index[(g, slug)] = len(pages)
-            pages.append([GRIMOIRES.index(g), slug, title, icon, spell_part(g, types, props),
-                          '|'.join(sorted(types & KINDS)), rng])
+            kinds = sorted(types & KINDS) + (['Tarot'] if ('Suit' in props or 'Upright Correspondences' in props) else [])
+            pages.append([GRIMOIRES.index(g), slug, title, icon, '|'.join(kinds), rng])
     links = [set() for _ in pages]
     festivals = {}
     for a, prop, g, slug in rels:
@@ -99,7 +86,7 @@ def main():
         json.dump(out, fh, ensure_ascii=False, separators=(',', ':'))
     print(f'tools/data.json: {len(pages)} pages, {sum(len(x) for x in links) // 2} connections')
 
-    # The tools' pages: the Saved page's frame (header, footer, styles) around a shell tools-static.js fills in.
+    # The tools' pages: the Saved page's frame (header, footer, styles) around a shell tools.js fills in.
     frame = open(os.path.join(ROOT, 'saved', 'index.html'), encoding='utf-8').read()
     shells = {
         'today': ('Today', 'today'),

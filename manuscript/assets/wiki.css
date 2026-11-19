@@ -621,10 +621,10 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 
 /* ---------- every link in the Manuscript is underlined, so it always reads as a link ----------
    Buttons, book spines, pictures, the dashboard's tabs and pill-shaped filters keep their own look. */
-.mm-main a:where(:not(.btn, .bk, .slab, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn, .card, .tool-link, .fav, .seg, .intent-x, .note-open)) {
+.mm-main a:where(:not(.btn, .bk, .slab, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn, .card, .fav, .seg, .intent-x, .note-open)) {
   text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: .22em;
   text-decoration-color: color-mix(in srgb, currentColor 50%, transparent); }
-.mm-main a:where(:not(.btn, .bk, .slab, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn, .card, .tool-link, .fav, .seg, .intent-x, .note-open)):hover { text-decoration-color: currentColor; }
+.mm-main a:where(:not(.btn, .bk, .slab, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn, .card, .fav, .seg, .intent-x, .note-open)):hover { text-decoration-color: currentColor; }
 .mm-main .dash-tabs a { text-decoration-line: none; }
 /* links that used to draw their own line underneath: the underline replaces it */
 .rel span, .pg-head .eyebrow a, .pg-head .eyebrow a:hover, .mm-prose .page-link a { border-bottom-color: transparent; }
@@ -1070,17 +1070,10 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .results img.pg-icon { width: 26px; height: 26px; object-fit: contain; vertical-align: middle; margin-right: .4rem; }
 
 /* ---------- members' tools: Today, the spell builder, the correspondence wheel (lib/tools.php) ---------- */
-.tools-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; margin: .4rem 0 0; }
-.tool-link { display: inline-flex; align-items: center; gap: .55rem; padding: .55rem 1.1rem; min-height: 44px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg);
-  color: var(--ink); text-decoration: none; font: 400 .74rem/1 var(--body); letter-spacing: .18em; text-transform: uppercase; transition: border-color .2s, background .2s; }
-.tool-link i { font-style: normal; color: var(--gold); font-size: 1rem; letter-spacing: 0; }
-.tool-link:hover { border-color: var(--accent); }
-.tool-link.here { border-color: var(--gold); background: var(--surface); }
 .pg-tool { max-width: 1180px; margin-inline: auto; }
-.pg-tool > .tools-nav { justify-content: flex-start; margin-bottom: 1.6rem; }
 .tool-head { text-align: left; }
 .tool-head h1 { display: block; }
-.tool-head h1 em, .tool-section h2 em, .spell-save h2 em, .margin-notes h2 em { font-style: italic; }
+.tool-head h1 em, .tool-section h2 em, .spell-save h2 em { font-style: italic; }
 .tool-section { margin-top: clamp(2.2rem, 5vw, 3.4rem); display: grid; gap: .8rem; }
 .tool-section h2 { font-size: clamp(1.8rem, 3.6vw, 2.4rem); }
 .tool-section.two-col { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem 3rem; }
@@ -1147,9 +1140,6 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .spell-save label small { text-transform: none; letter-spacing: 0; color: var(--muted); }
 .spell-save input, .spell-save textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); padding: .75rem .9rem; }
 .spell-save .btn { justify-self: start; margin-top: .4rem; }
-.pg-working .work-parts { margin-top: 1rem; }
-.pg-working .margin-notes { margin-top: 2.4rem; }
-.delete-working { margin-top: 1.4rem; }
 
 /* Correspondence wheel */
 .wheel-tabs { display: flex; flex-wrap: wrap; gap: .3rem .9rem; margin-top: .3rem; }
@@ -1186,29 +1176,8 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
   .wheel-wrap { position: static; width: min(100%, 440px); margin-inline: auto; }
 }
 
-/* Links to the tools under a page's title */
-.tool-links { display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; margin: -.2rem 0 0; }
 
-/* Margin notes: a member's private notes on a page, written like a note in a book's margin */
-.margin-notes { margin-top: 2.6rem; max-width: 72ch; }
-.notes-form { display: grid; gap: .6rem; padding: 1.4rem 1.5rem 1.2rem; border: 1px solid color-mix(in srgb, var(--gold) 70%, transparent); border-left: 3px solid var(--gold); border-radius: 2px 6px 6px 2px; background: var(--surface); }
-.notes-form h2, .margin-notes > label { font-size: 1.7rem; }
-.notes-form h2 span { color: var(--gold); font-size: 1.3rem; margin-right: .2rem; }
-.notes-form .small { margin: 0; color: var(--muted); }
-.margin-notes textarea { width: 100%; min-height: 8.5rem; resize: vertical; padding: .4rem .2rem; border: 0; border-radius: 0; color: var(--ink);
-  font: italic 400 1.22rem/2rem var(--display); background: transparent repeating-linear-gradient(180deg, transparent 0 calc(2rem - 1px), color-mix(in srgb, var(--accent) 22%, transparent) calc(2rem - 1px) 2rem); background-attachment: local; }
-.margin-notes textarea:focus { outline: none; box-shadow: 0 2px 0 0 var(--gold); }
-.margin-notes textarea::placeholder { color: color-mix(in srgb, var(--ink) 40%, transparent); }
-.notes-foot { display: flex; align-items: center; gap: 1rem; }
 .notes-status { font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-.pg-working .margin-notes { display: grid; gap: .6rem; width: min(100%, 72ch); margin-inline: 0; padding: 1.4rem 1.5rem 1.2rem; border: 1px solid color-mix(in srgb, var(--gold) 70%, transparent); border-left: 3px solid var(--gold); background: var(--surface); }
-.pg-working .margin-notes .btn { justify-self: start; }
-@media (min-width: 900px) {
-  .pg.with-aside { grid-template-areas: "cover cover" "note note" "head head" "side gallery" "side body" "side notes"; grid-template-rows: auto auto auto auto auto 1fr; }
-  .pg.with-aside > .margin-notes { grid-area: notes; }
-}
-.notes-list .note-item { display: grid; justify-content: stretch; gap: .2rem; }
-.note-snip { margin: 0 0 0 2rem; font-family: var(--display); font-style: italic; font-size: 1.05rem; color: var(--muted); }
 .saved-list small { color: var(--muted); font-size: .76rem; flex: none; }
 /* Gallery lists: plants, minerals, runes, symbols and cards show a larger picture above each name. */
 .entry-grid.gallery { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: .7rem; }
@@ -1274,3 +1243,5 @@ html.nav-fold .mm-mine { order: -2; }
 
 /* the tools fold-out beside Guide Pages on a grimoire */
 .mm-callout.tools-only { margin-bottom: 2rem; }
+/* Links to the tools under an entry's title ("Build a spell for Protection", "See Venus on the wheel"), added by tools.js */
+.tool-links { display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; margin: -.2rem 0 0; }

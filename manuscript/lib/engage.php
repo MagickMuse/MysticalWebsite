@@ -94,7 +94,6 @@ function view_saved(): void
         }
         $html .= '</ul></section>';
     }
-    $html .= saved_extras($email);
     if (!$html) $html = '<p class="lede">Nothing saved yet. Tap <strong>☆ Save</strong> at the top of any page to keep it here.</p>';
     layout('Saved pages', '<section class="saved"><p class="eyebrow labelled">Your Manuscript</p><h1>Saved <em>pages</em></h1>' . $html . '</section>', ['private' => true]);
 }

@@ -19,13 +19,15 @@ hosting, no database server to set up, and nothing to install. Stripe takes the 
   links delivered in the buyer's library, discount codes (made in Stripe → Product catalog → Coupons).
 - **Dashboard:** revenue (30 days, this month, all time), active members,
   new and canceled members, sales by product, refunds, email sign-ups, and CSV downloads.
-- **Members' tools** (members only), each listed under *Enchanted Tools* beside *Guide Pages* in its grimoire's intro
-  (`GRIMOIRE_TOOLS` in `lib/tools.php`): the *Spell Builder* in Rituals (`/manuscript/spell-builder`: up to three intentions →
-  ranked timing, colours, herbs, stones, oils, deities and rituals, saved as a working), the *Planet, Zodiac and Moon Phase
-  Wheels* in Astrology (`/manuscript/wheel`), and *Today* and the *Calendar* in Timing (`/manuscript/today`: the moon phase,
-  the day's planet, the Sun's sign, the season and the day's festivals, with what they favour).
+- **Members' tools** (members only), each listed under *Enchanted Tools* beside *Guide Pages* in its grimoire's intro:
+  the *Spell Builder* in Rituals (`/manuscript/spell-builder`), the *Planet, Zodiac and Moon Phase Wheels* in Astrology
+  (`/manuscript/wheel`), and *Today* and the *Calendar* in Timing (`/manuscript/today`).
 - **Notes:** "✎ Notes" at the top left (beside ★ Saved) opens a pop-up note, named after the page it's written on and
   renamable; `/manuscript/notes` lists every note with its first lines, and each opens in the pop-up.
+- **One copy of the tools:** they all live in `assets/tools.js`, which runs in the browser on this site and on the
+  GitHub Pages preview. `lib/tools.php` only serves their data (`/manuscript/tools/data.json`, members only, rebuilt when
+  the content changes) and keeps members' notes and workings. On the preview, notes and workings stay in the browser,
+  and `python3 .github/scripts/build-static-tools.py` rebuilds its copy of the data after the pages are regenerated.
 - **Importer:** pulls straight from Notion, including images, and can be re-run any time to pick up new pages.
 
 > **The paid content never goes into GitHub.** This repository is public. The wiki's database and
@@ -128,7 +130,7 @@ everyone (a sampler, say), list them under `public_pages` in the config.
 manuscript/
   index.php          the wiki (pages, search, sign-in, membership checkout)
   lib/               notion importer, shop, dashboard, Stripe, auth, email, page rendering
-  lib/tools.php      Today, the spell builder, the correspondence wheel and margin notes
+  lib/tools.php      the tools' data, their pages, and members' notes and workings (the tools are assets/tools.js)
   cli/import.php     Notion → wiki
   cli/gumroad-import.php   Gumroad sales history + customers → here
   cli/member.php     manage members from the command line
