@@ -435,7 +435,7 @@ final class NotionImporter
         // Grimoire pages use the website's photos (grimoire-photos.php), not their Notion covers.
         $cover = $kind === 'grimoire' ? null : $this->fileUrl($page['cover'] ?? null);
         // The file name changes when the picture does, so a new cover in Notion replaces the old one.
-        $cover = $cover ? $this->download($cover, $id . '-cover-' . self::version($cover)) : null;
+        $cover = $cover ? $this->transparent($this->download($cover, $id . '-cover-' . self::version($cover))) : null;
 
         $this->savePage([
             'id' => $id, 'slug' => $slug, 'grimoire' => $this->grimoire, 'kind' => $kind,
@@ -808,7 +808,7 @@ final class NotionImporter
         if (!$icon) return null;
         if (($icon['type'] ?? '') === 'emoji') return $icon['emoji'];
         $u = $this->fileUrl($icon);
-        $file = $u ? $this->download($u, $name . '-' . self::version($u)) : null;
+        $file = $u ? $this->transparent($this->download($u, $name . '-' . self::version($u))) : null;
         return $file ? 'file:' . $file : null; // a picture that failed to download leaves no icon, not an empty one
     }
 
@@ -835,6 +835,60 @@ final class NotionImporter
         file_put_contents("$dir/$file", $bytes);
         $this->stats['images']++;
         return $file;
+    }
+
+    /**
+     * A page icon or cover on a plain background (a stone photographed on white) gets that background made transparent,
+     * saved as a PNG: from the edges, pixels close to the background colour are cleared, so a white stone in the middle
+     * keeps its white. Card grimoire images (tarot, spreads, Lenormand: hand-made and hand-picked) are never touched; rune images keep theirs too ( black line runes would vanish
+     * in dark mode). Busy photo backgrounds are left alone. Returns the file to use.
+     */
+    private function transparent(?string $file): ?string
+    {
+        if (!$file || in_array($this->grimoire, array_merge(['card'], (array) config('keep_backgrounds', ['rune'])), true) || !function_exists('imagecreatefromstring')) return $file;
+        $dir = config('data_dir') . '/media';
+        $png = preg_replace('/\.[a-z0-9]+$/', '', $file) . '-t.png';
+        if (is_file("$dir/$png")) return $png;
+        if (str_ends_with($file, '.svg')) return $file;
+        $im = @imagecreatefromstring((string) @file_get_contents("$dir/$file"));
+        if (!$im) return $file;
+        if (max(imagesx($im), imagesy($im)) > 1400) { $im = imagescale($im, imagesx($im) >= imagesy($im) ? 1400 : (int) round(imagesx($im) * 1400 / imagesy($im))); }
+        $w = imagesx($im); $h = imagesy($im);
+        $rgb = function (int $x, int $y) use ($im): array { $c = imagecolorat($im, $x, $y); return [($c >> 16) & 255, ($c >> 8) & 255, $c & 255, ($c >> 24) & 127]; };
+        // already transparent at the edges: nothing to do
+        if ($rgb(0, 0)[3] > 100 && $rgb($w - 1, $h - 1)[3] > 100) return $file;
+        $pts = [];
+        for ($x = 0; $x < $w; $x += max(1, intdiv($w, 60))) { $pts[] = $rgb($x, 0); $pts[] = $rgb($x, $h - 1); }
+        for ($y = 0; $y < $h; $y += max(1, intdiv($h, 60))) { $pts[] = $rgb(0, $y); $pts[] = $rgb($w - 1, $y); }
+        $keys = array_count_values(array_map(fn($p) => "$p[0],$p[1],$p[2]", $pts)); arsort($keys);
+        $ref = array_map('intval', explode(',', (string) array_key_first($keys)));
+        $diff = fn(array $p): int => max(abs($p[0] - $ref[0]), abs($p[1] - $ref[1]), abs($p[2] - $ref[2]));
+        $near = count(array_filter($pts, fn($p) => $diff($p) <= 24)) / max(1, count($pts));
+        if ($near < 0.9) return $file;
+        $tol = 26; $clear = new \SplFixedArray($w * $h); $queue = new \SplQueue(); $n = 0;
+        for ($x = 0; $x < $w; $x++) { $queue->enqueue([$x, 0]); $queue->enqueue([$x, $h - 1]); }
+        for ($y = 0; $y < $h; $y++) { $queue->enqueue([0, $y]); $queue->enqueue([$w - 1, $y]); }
+        while (!$queue->isEmpty()) {
+            [$x, $y] = $queue->dequeue(); $i = $y * $w + $x;
+            if ($clear[$i] !== null) continue;
+            $clear[$i] = false;
+            if ($diff($rgb($x, $y)) > $tol) continue;
+            $clear[$i] = true; $n++;
+            if ($x > 0) $queue->enqueue([$x - 1, $y]); if ($x < $w - 1) $queue->enqueue([$x + 1, $y]);
+            if ($y > 0) $queue->enqueue([$x, $y - 1]); if ($y < $h - 1) $queue->enqueue([$x, $y + 1]);
+        }
+        $share = $n / ($w * $h);
+        if ($share < 0.05 || $share > 0.97) return $file;
+        $out = imagecreatetruecolor($w, $h); imagealphablending($out, false); imagesavealpha($out, true);
+        for ($y = 0; $y < $h; $y++) for ($x = 0; $x < $w; $x++) {
+            [$r, $g, $b] = $rgb($x, $y); $i = $y * $w + $x;
+            $alpha = 0;
+            if ($clear[$i]) $alpha = 127;
+            elseif (($x > 0 && $clear[$i - 1]) || ($x < $w - 1 && $clear[$i + 1]) || ($y > 0 && $clear[$i - $w]) || ($y < $h - 1 && $clear[$i + $w])) $alpha = 60; // soft edge
+            imagesetpixel($out, $x, $y, imagecolorallocatealpha($out, $r, $g, $b, $alpha));
+        }
+        imagepng($out, "$dir/$png", 6);
+        return $png;
     }
 
     private function uniqueSlug(string $title, string $id): string

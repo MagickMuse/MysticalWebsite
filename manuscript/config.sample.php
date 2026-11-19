@@ -38,6 +38,7 @@ return [
     // 'skip_sections' => ['Notion tips for new readers', 'Using search and comments'],
 
     // Properties never offered in a grimoire list's Sort & filter (entries still show them).
+    // 'keep_backgrounds' => ['rune'],   // grimoires whose pictures keep their backgrounds (the Card grimoire always does)
     // 'hidden_filters' => ['Precautions', 'Notes/Warnings', 'Notes', 'Cleavage', 'Luster', 'Description', 'Directions', 'Quantities'],
 
     // Links left out of the Manuscript because they only work inside Notion (pattern). Default: the widgets.
