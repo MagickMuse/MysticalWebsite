@@ -334,6 +334,7 @@ function layout(string $title, string $body, array $opt = []): void
       </ul>
       <ul class="right">
         <li><a href="<?= e(site_url('mastery')) ?>"><span>Mastery</span><small>guides &amp; courses</small></a></li>
+        <li><a href="<?= e(site_url('shop/')) ?>"><span>Market</span><small>the shop</small></a></li>
         <li><a href="<?= e(site_url('story')) ?>"><span>Mythos</span><small>our story</small></a></li>
       </ul>
     </nav>

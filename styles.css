@@ -163,7 +163,7 @@ header.site {
   border: 1px solid var(--line); background: none; color: var(--ink); cursor: pointer;
   font-family: var(--body); font-size: .78rem; letter-spacing: .22em; text-transform: uppercase;
 }
-@media (max-width: 760px) {
+@media (max-width: 1060px) {
   .menu { display: block; }
   .nav nav { display: none; grid-row: 2; grid-template-columns: 1fr; padding-top: 1rem; }
   .nav nav.open { display: grid; }

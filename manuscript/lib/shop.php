@@ -103,10 +103,10 @@ function view_shop(): void
     // The Manuscript itself leads the shop.
     $ms = '<a class="card shop-card featured" href="' . e(url('join')) . '"><div class="frame arch shop-art"><img src="' . e(site_url('assets/grimoire-selection-screenshot-700.webp')) . '" alt="" loading="lazy"></div>'
         . '<h3>The Magick Manuscript</h3><p>15 cross-linked grimoires, 20,000+ pages, growing weekly.</p><p class="price">Membership</p></a>';
-    layout('Shop', <<<HTML
+    layout('Market', <<<HTML
 <section class="mm-hero">
   <p class="eyebrow labelled">The Magick Muse</p>
-  <h1>The <em>Shop</em></h1>
+  <h1>The <em>Market</em></h1>
   <p class="lede">Courses, grimoire templates and the Manuscript. Everything you buy stays in your library, ready whenever you are.</p>
 </section>
 <section class="cards shop-grid">$ms$cards</section>

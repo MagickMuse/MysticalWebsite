@@ -53,7 +53,7 @@ function route(array $parts, string $method): void
         case 'shop':          route_shop(array_slice($parts, 1), $method); return;
         case 'suggest':       search_suggest(trim((string) ($_GET['q'] ?? ''))); return;
         case 'calendar':      view_calendar(); return;
-        case 'library':       view_library(); return;
+        case 'library':       view_the_library(); return;
         case 'sneak-peek':    ($p = sneak_peek_page()) ? view_page($p) : redirect(url()); return;
     }
     $p = match (count($parts)) {
@@ -308,15 +308,15 @@ function echo_calendar_page(string $html): void
  * /library: The Library, the books the Manuscript draws on (data_dir/library.json, written by the import), A to Z,
  * each with its author and the grimoires it informs. Buttons above the list show only the books on one topic (assets/wiki.js).
  */
-function view_library(): void
+function view_the_library(): void
 {
     if (!has_access()) { view_gate(['locked' => true]); return; }
     record_view('route:/manuscript/library');
     $books = json_decode((string) @file_get_contents(config('data_dir') . '/library.json'), true) ?: [];
-    layout('The Library', '<article class="pg pg-library">' . library_html($books) . '</article>', ['private' => true, 'protect' => true]);
+    layout('The Library', '<article class="pg pg-library">' . the_library_html($books) . '</article>', ['private' => true, 'protect' => true]);
 }
 
-function library_html(array $books): string
+function the_library_html(array $books): string
 {
     $topics = [];
     foreach ($books as $b) foreach ($b['topics'] as $t) $topics[$t] = ($topics[$t] ?? 0) + 1;
