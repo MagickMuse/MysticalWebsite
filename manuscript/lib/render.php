@@ -328,7 +328,7 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=79">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=62" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=63" defer></script>
 <?php if ($stripe): ?>
   <script src="https://js.stripe.com/dahlia/stripe.js" defer></script>
   <script src="<?= e(url('assets/checkout.js')) ?>?v=2" defer></script>

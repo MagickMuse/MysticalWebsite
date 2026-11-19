@@ -59,7 +59,7 @@
   function data() {
     if (!dataP) dataP = fetch(url('tools/data.json')).then(function (r) { if (!r.ok) throw new Error(); return r.json(); }).then(function (d) {
       D = d;
-      d.part = d.p.map(function (p) { return partOf(d.g[p[0]], p[4] ? p[4].split('|') : []); });
+      d.part = d.p.map(function (p) { return partOf(d.g[p[0]], p[4] ? p[4].split('|') : [], p[1]); });
       d.p.forEach(function (p, i) { bySlug[d.g[p[0]] + '/' + p[1]] = i; });
       return d;
     });
@@ -90,12 +90,14 @@
   }
 
   /** Which part of a working a page can be: timing, a colour, a herb… (none: it isn't one). */
-  function partOf(g, kinds) {
+  /** One of the 78 tarot cards (the "Suit of Cups"-style overview pages have meanings too, but aren't cards). */
+  function isTarotCard(slug, kinds) { return kinds.indexOf('Tarot') !== -1 && !/^suit-of-/.test(slug); }
+  function partOf(g, kinds, slug) {
     var has = function (k) { return kinds.indexOf(k) !== -1; };
     if (g === 'astrology') return has('Planets') || has('Moon Phases') ? 'when' : '';
     if (g === 'timing') return has('Days of the Week') || has('Holidays') || has('Seasons') || has('Time of Day') ? 'when' : '';
     if (g === 'symbol') return has('Color') ? 'colours' : '';
-    if (g === 'card') return has('Tarot') ? 'tarot' : '';
+    if (g === 'card') return isTarotCard(slug, kinds) ? 'tarot' : '';
     return { plant: 'plants', mineral: 'stones', oil: 'oils', entity: 'deities', rune: 'runes', recipe: 'recipes', ritual: 'rituals' }[g] || '';
   }
   /** Pages linked to any of ids: Map(index → how many of ids). */
@@ -397,8 +399,7 @@
     return a;
   }
   function tarot(tool) {
-    // The deck: the tarot cards, without the "Suit of Cups"-style overview pages (they have meanings too, but aren't cards).
-    var deck = D.t.filter(function (c) { return !/^suit-of-/.test(D.p[c[0]][1]); }), hand = shuffled(deck).slice(0, 7);
+    var deck = D.t.filter(function (c) { return isTarotCard(D.p[c[0]][1], D.p[c[0]][4].split('|')); }), hand = shuffled(deck).slice(0, 7);
     tool.className = 'pg pg-tool pg-tarot';
     render(tool, '<header class="pg-head tool-head">' + crumbs('card') + '<p class="eyebrow labelled">Draw a Card</p><h1>Draw <em>a card</em></h1>'
       + '<p class="lede">Seven cards from the deck of ' + deck.length + ', face down. Hold your question in mind, and choose the one that calls to you.</p></header>'
