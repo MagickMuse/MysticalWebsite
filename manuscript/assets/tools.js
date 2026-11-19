@@ -511,6 +511,17 @@
       return hit == null ? '<span>' + esc(n) + '</span>' : chip(pg(hit));
     });
   }
+  /**
+   * Is this working eaten or drunk? Read from the page's own Type (recipes) or Form (rituals). Then "Before you begin"
+   * starts open, so its warnings are seen first.
+   */
+  var SWALLOWED = { Type: ['Drink', 'Food', 'Potion', 'Infusion', 'Elixir', 'Syrup', 'Tincture'], Form: ['Food/Edible', 'Potion', 'Elixir'] };
+  function swallowed() {
+    return [].some.call(document.querySelectorAll('.props-panel .prop-row'), function (row) {
+      var name = row.querySelector('.prop-name'), list = name && SWALLOWED[name.textContent.replace(/\d+$/, '').trim()];
+      return !!list && [].some.call(row.querySelectorAll('.pill'), function (p) { return list.indexOf(p.textContent.trim()) !== -1; });
+    });
+  }
   function workingExtras() {
     var m = /\/manuscript\/(ritual|recipe)\/([^/?#]+)\/?$/.exec(location.pathname), prose = document.querySelector('.pg-entry .mm-prose');
     if (!m || !prose || prose.querySelector('[data-extras]')) return;
@@ -554,8 +565,8 @@
     var parts = prose.querySelectorAll('ul.ingredients, ol.steps'), text = parts.length ? [].map.call(parts, function (n) { return n.textContent; }).join(' ') : prose.textContent, fire = FIRE_WORDS.test(text) || ingredients.some(function (j) { return FIRE_WORDS.test(D.p[j][2]); });
 
     // Each section folds away (closed to start), so the Directions stay right under Quantities; the closed heading says what's inside.
-    var fold = function (id, title, sub, body) {
-      return '<details class="toggle extras-fold"><summary><h2 id="' + id + '">' + title + '</h2><span class="fold-sub">' + sub + '</span></summary>' + body + '</details>';
+    var fold = function (id, title, sub, body, open) {
+      return '<details class="toggle extras-fold"' + (open ? ' open' : '') + '><summary><h2 id="' + id + '">' + title + '</h2><span class="fold-sub">' + sub + '</span></summary>' + body + '</details>';
     };
     var plural = function (n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); };
     var html = '';
@@ -567,7 +578,7 @@
       html += fold('before-you-begin', 'Before you begin', [warn.length ? plural(warn.length, 'ingredient') + ' with warnings' : '', fire ? 'fire safety' : ''].filter(Boolean).join(' · '),
         '<aside class="safety-box">'
         + (fire ? '<p class="label">Fire safety</p><ul class="fire-list">' + FIRE_SAFETY.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '')
-        + (warn.length ? '<p class="label">From the ingredients’ pages</p><ul class="extras-list warn">' + warn.join('') + '</ul>' : '') + '</aside>');
+        + (warn.length ? '<p class="label">From the ingredients’ pages</p><ul class="extras-list warn">' + warn.join('') + '</ul>' : '') + '</aside>', swallowed());
     }
     if (!html) return;
     var box = document.createElement('div');
