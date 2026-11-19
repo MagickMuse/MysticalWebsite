@@ -189,6 +189,27 @@ function migrate(PDO $pdo): void
     );
     CREATE INDEX IF NOT EXISTS bookmarks_page ON bookmarks(page_id);
 
+    -- Members' private notes on pages ("margin notes").
+    CREATE TABLE IF NOT EXISTS notes (
+        email      TEXT NOT NULL,
+        page_id    TEXT NOT NULL,
+        body       TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        PRIMARY KEY (email, page_id)
+    );
+
+    -- Workings saved from the spell builder: the intentions and the entries ticked.
+    CREATE TABLE IF NOT EXISTS workings (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        email      TEXT NOT NULL,
+        title      TEXT NOT NULL,
+        intentions_json TEXT NOT NULL,
+        items_json TEXT NOT NULL,
+        notes      TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS workings_email ON workings(email);
+
     CREATE TABLE IF NOT EXISTS stripe_events (
         id TEXT PRIMARY KEY,
         received_at TEXT NOT NULL

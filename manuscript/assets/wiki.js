@@ -786,4 +786,73 @@
   }
   window.addEventListener('pageshow', restoreShelf);
   window.addEventListener('hashchange', restoreShelf);
+  // ---------- members' tools (lib/tools.php) ----------
+
+  // Today's page: show the reader's own date, not the server's (a reader in Sydney is already on tomorrow).
+  (function () {
+    var page = document.querySelector('[data-today]');
+    if (!page || /[?&]d=/.test(location.search)) return;
+    var n = new Date();
+    var local = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+    if (local === page.getAttribute('data-today')) return;
+    var q = new URLSearchParams(location.search); q.set('d', local);
+    location.replace(location.pathname + '?' + q.toString());
+  })();
+
+  // Margin notes: saved a moment after typing stops (and when leaving the page); the button still works without JavaScript.
+  document.querySelectorAll('form[data-notes]').forEach(function (form) {
+    var box = form.querySelector('textarea'), status = form.querySelector('.notes-status');
+    var last = box.value, timer, busy = false;
+    function save() {
+      clearTimeout(timer);
+      if (box.value === last || busy) return;
+      busy = true; status.textContent = 'Saving…';
+      var sent = box.value;
+      fetch(form.action, { method: 'POST', body: new FormData(form), credentials: 'same-origin', headers: { 'X-Requested-With': 'fetch' } })
+        .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+        .then(function (d) { last = sent; status.textContent = d.empty ? 'Note removed' : 'Saved'; })
+        .catch(function () { status.textContent = 'Not saved. Check your connection.'; })
+        .then(function () { busy = false; if (box.value !== last) timer = setTimeout(save, 1200); });
+    }
+    box.addEventListener('input', function () { status.textContent = ''; clearTimeout(timer); timer = setTimeout(save, 1200); });
+    box.addEventListener('blur', save);
+    form.addEventListener('submit', function (e) { e.preventDefault(); save(); if (box.value === last) status.textContent = 'Saved'; });
+    window.addEventListener('pagehide', function () {
+      if (box.value === last || !navigator.sendBeacon) return;
+      navigator.sendBeacon(form.action, new FormData(form));
+    });
+  });
+
+  // "Delete" buttons that ask first
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-confirm]');
+    if (b && !window.confirm(b.getAttribute('data-confirm'))) e.preventDefault();
+  });
+
+  // Correspondence wheel: choosing a point swaps in its connections without reloading the page.
+  (function () {
+    var holder = document.querySelector('[data-wheel]');
+    if (!holder || !window.fetch) return;
+    function load(href, push) {
+      var detail = holder.querySelector('.wheel-detail');
+      if (detail) detail.setAttribute('aria-busy', 'true');
+      var u = new URL(href, location.href); u.searchParams.set('part', '1');
+      fetch(u.toString(), { credentials: 'same-origin' })
+        .then(function (r) { if (!r.ok) throw new Error(); return r.text(); })
+        .then(function (html) {
+          holder.innerHTML = html;
+          if (push) history.pushState({ wheel: true }, '', href);
+          var name = holder.querySelector('.wheel-head h2');
+          if (name && push && window.matchMedia('(max-width: 860px)').matches) name.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        })
+        .catch(function () { location.href = href; });
+    }
+    holder.addEventListener('click', function (e) {
+      var seg = e.target.closest('a.seg');
+      if (!seg || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();
+      load(seg.getAttribute('href'), true);
+    });
+    window.addEventListener('popstate', function () { load(location.href, false); });
+  })();
 })();

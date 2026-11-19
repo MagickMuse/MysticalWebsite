@@ -13,6 +13,7 @@ require __DIR__ . '/lib/properties.php';
 require __DIR__ . '/lib/collection.php';
 require __DIR__ . '/lib/glyphs.php';
 require __DIR__ . '/lib/shelf.php';
+require __DIR__ . '/lib/tools.php';
 
 // Path relative to the wiki's base, e.g. "correspondence/protection".
 $base = parse_url(config('base_url'), PHP_URL_PATH) ?: '';
@@ -57,6 +58,11 @@ function route(array $parts, string $method): void
             redirect(site_url(implode('/', array_merge(['market'], array_slice($parts, 1)))) . ($q !== '' ? '?' . $q : ''), 301);
         case 'suggest':       search_suggest(trim((string) ($_GET['q'] ?? ''))); return;
         case 'calendar':      view_calendar(); return;
+        case 'today':         view_today(); return;
+        case 'spell-builder': route_spell_builder($method); return;
+        case 'workings':      route_workings(array_slice($parts, 1), $method); return;
+        case 'wheel':         view_wheel(); return;
+        case 'notes':         if ($method === 'POST') save_note(); else redirect(url('saved')); return;
         case 'library':       view_the_library(); return;
         case 'picture-credits': view_picture_credits(); return;
         case 'sneak-peek':    ($p = sneak_peek_page()) ? view_page($p) : redirect(url()); return;
@@ -97,6 +103,7 @@ function view_home(): void
         $cards = '<p class="lede">Nothing has been moved over yet. Run the importer (see README) to bring grimoires in from Notion.</p>';
     }
     $join = $begin ? '<div class="actions"><a class="btn" href="' . e(page_url($begin)) . '">Begin here</a></div>' : '';
+    if ($member) $join .= tools_nav();
     if (!$member) {
         $join = '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a>'
             . (sneak_peek_page() ? '<a class="btn ghost" href="' . e(url('sneak-peek')) . '">Take a sneak peek</a>' : '') . '</div>'
@@ -174,7 +181,7 @@ function view_page(array $p): void
     // On a grimoire, "The Magick Manuscript" above the title leads back to the Manuscript's home.
     $eyebrowHtml = $p['kind'] === 'grimoire' ? '<a href="' . e(url()) . '">' . e($eyebrow) . '</a>' : e($eyebrow);
     $head = '<header class="pg-head">' . $crumbs . '<p class="eyebrow">' . $eyebrowHtml . '</p>'
-        . '<div class="pg-title"><h1>' . icon_html($p['icon'], 'pg-icon big') . e($p['title']) . '</h1>' . save_button($p) . '</div></header>';
+        . '<div class="pg-title"><h1>' . icon_html($p['icon'], 'pg-icon big') . e($p['title']) . '</h1>' . save_button($p) . '</div>' . tool_links($p) . '</header>';
     $panel = in_array($p['kind'], ['entry', 'guide'], true) ? properties_panel($p, $tags, connections($p)) : '';
     // Visitors reading the sneak peek get a note above it; every link inside opens the join pop-up.
     $peek = !has_access() && ($sp = sneak_peek_page()) && $sp['id'] === $p['id'];
@@ -237,7 +244,7 @@ function view_page(array $p): void
             '~<p><strong>([^<]{2,80}:)</strong>\s*(.*?)</p>~s',
             fn($m) => '<p class="label">' . $m[1] . '</p>' . (trim(strip_tags($m[2])) !== '' ? '<p>' . $m[2] . '</p>' : ''),
             $box[0]), $bodyHtml);
-        $body = $panel . $gallery . '<div class="mm-prose">' . $bodyHtml . '</div>';
+        $body = $panel . $gallery . '<div class="mm-prose">' . $bodyHtml . '</div>' . (in_array($p['kind'], ['entry', 'guide'], true) ? notes_box($p) : '');
     }
     // With written content, the properties become a sidebar beside it (and wiki.js adds a table of contents).
     // A page that is only properties keeps them across the page: sidebars beside nothing would only show the gap.

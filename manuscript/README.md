@@ -19,6 +19,12 @@ hosting, no database server to set up, and nothing to install. Stripe takes the 
   links delivered in the buyer's library, discount codes (made in Stripe → Product catalog → Coupons).
 - **Dashboard:** revenue (30 days, this month, all time), active members,
   new and canceled members, sales by product, refunds, email sign-ups, and CSV downloads.
+- **Members' tools:** *Today* (`/manuscript/today`: the moon phase, the day's planet, the Sun's sign, the season and
+  the day's festivals, with the intentions, herbs, stones and rituals they favour), the *Spell builder*
+  (`/manuscript/spell-builder`: up to three intentions → ranked timing, colours, herbs, stones, oils, deities and rituals,
+  saved as a working), the *Correspondence wheel* (`/manuscript/wheel`: planets, zodiac signs or moon phases, each lighting
+  up everything tied to it) and *margin notes* (private notes at the end of every page). Workings and notes are listed
+  under ★ Saved. All of it is built from the Notion connections, so it grows as the Manuscript does.
 - **Importer:** pulls straight from Notion, including images, and can be re-run any time to pick up new pages.
 
 > **The paid content never goes into GitHub.** This repository is public. The wiki's database and
@@ -121,6 +127,7 @@ everyone (a sampler, say), list them under `public_pages` in the config.
 manuscript/
   index.php          the wiki (pages, search, sign-in, membership checkout)
   lib/               notion importer, shop, dashboard, Stripe, auth, email, page rendering
+  lib/tools.php      Today, the spell builder, the correspondence wheel and margin notes
   cli/import.php     Notion → wiki
   cli/gumroad-import.php   Gumroad sales history + customers → here
   cli/member.php     manage members from the command line
