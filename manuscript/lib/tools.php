@@ -36,12 +36,16 @@ function view_tool_page(string $route): void
 /** Kinds of page the tools look for (an entry's Type), plus "Tarot" for a tarot card. */
 const TOOL_KINDS = ['Planets', 'Moon Phases', 'Western Zodiac', 'Days of the Week', 'Days of the Year', 'Holidays', 'Seasons', 'Time of Day', 'Color', 'Elder Futhark Runes'];
 
+/** The fields copied, word for word, for the safety notes on rituals and recipes, and the grimoires they come from. */
+const SAFETY_FIELDS = ['Safety & Uses', 'Pregnancy', 'Drug Interactions', 'Notes/Warnings', 'Water Safe?', 'Sun Safe?'];
+const SAFETY_GRIMOIRES = ['plant', 'oil', 'mineral', 'material'];
+
 /** /tools/data.json: built from the database when the content changes, then served from the cache. */
 function serve_tools_data(): void
 {
     if (!has_access()) { http_response_code(403); exit; }
     // The version changes when the data's shape does, so an older copy is never served.
-    $cache = config('data_dir') . '/tools-data-v4.json';
+    $cache = config('data_dir') . '/tools-data-v5.json';
     $content = config('data_dir') . '/content.sqlite';
     if (!is_file($cache) || filemtime($cache) < (int) @filemtime($content)) {
         file_put_contents($cache . '.tmp', json_encode(tools_data(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
@@ -66,11 +70,18 @@ function tools_data(): array
     $pages = [];
     $pos = [];
     $pageRow = [];
+    $safety = [];
     foreach (db()->query("SELECT id, grimoire, slug, kind, title, icon, cover, tags_json, plain FROM pages WHERE kind IN ('entry', 'guide') ORDER BY grimoire, slug") as $p) {
         $tags = json_decode((string) $p['tags_json'], true) ?: [];
         $types = array_map('strval', (array) ($tags['Type'] ?? $tags['Category'] ?? []));
         $kinds = array_values(array_intersect($types, TOOL_KINDS));
         $pageRow[$p['id']] = $p;
+        // Safety fields, exactly as written, for the safety notes on rituals and recipes (tools.js decides what to show).
+        if (in_array($p['grimoire'], SAFETY_GRIMOIRES, true)) {
+            $f = [];
+            foreach (SAFETY_FIELDS as $name) if (!empty($tags[$name])) $f[] = [$name, array_values(array_map('strval', (array) $tags[$name]))];
+            if ($f) $safety[count($pages)] = $f;
+        }
         $icon = (string) shown_icon($p);
         $icon = str_starts_with($icon, 'file:') ? 'm:' . substr($icon, 5) : (str_starts_with($icon, 'asset:') ? 'a:' . substr($icon, 6) : $icon);
         $pos[$p['id']] = count($pages);
@@ -102,7 +113,7 @@ function tools_data(): array
         $pages[$i][4] = ltrim($pages[$i][4] . '|Tarot', '|');
         $cards[] = [$i, $cover, $t[1] ?? [], $t[2] ?? []];
     }
-    return ['g' => $grimoires, 'p' => $pages, 'l' => array_map(fn($l) => array_keys($l), $links), 'f' => (object) $festivals, 't' => $cards];
+    return ['g' => $grimoires, 'p' => $pages, 'l' => array_map(fn($l) => array_keys($l), $links), 'f' => (object) $festivals, 't' => $cards, 'w' => (object) $safety];
 }
 
 // ------------------------------------------------------------------ notes and workings, kept for each member

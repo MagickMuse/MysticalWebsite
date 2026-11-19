@@ -465,6 +465,113 @@
     });
   }
 
+  // ------------------------------------------------------------------ rituals and recipes: substitutions, the why, safety
+  // Added after a ritual's or recipe's Quantities, all from the Manuscript's own pages, nothing made up:
+  //   Substitutions        substitutions written on an ingredient's own page ("Substitution: Tobacco"), then other herbs,
+  //                        stones and oils that share every correspondence the ingredient brings to this working and
+  //                        carry no warnings of their own
+  //   Why these ingredients each ingredient's correspondences that this working also has
+  //   Before you begin     standard fire safety when the working uses fire, and each ingredient's own warnings, word for word
+  var INGREDIENT_GRIMOIRES = ['plant', 'mineral', 'oil', 'material'];
+  var SWAP_GRIMOIRES = ['plant', 'mineral', 'oil'];
+  var FIRE_WORDS = /\b(candles?|tealights?|incense|charcoal|matches|lighters?|flames?|bonfires?|burn(?:s|ed|ing|t)?|ignite[sd]?)\b/i;
+  var FIRE_SAFETY = ['Never leave a candle, incense or charcoal burning unattended.',
+    'Use a fire-safe holder on a heat-proof, stable surface.',
+    'Keep flames away from curtains, paper, hair and loose sleeves.',
+    'Keep children and pets away, and have water or a fire extinguisher close by.',
+    'Burn incense, herbs and charcoal in a well-ventilated room.',
+    'Make sure everything is completely out before you leave it.'];
+  /** An ingredient page's warnings, as written on it: [label, text]… (general notes and "safe" entries are left out). */
+  function warnings(i) {
+    var out = [];
+    (D.w[i] || []).forEach(function (f) {
+      var name = f[0], vals = f[1];
+      if (name === 'Safety & Uses') vals.forEach(function (v) { if (/^(Toxic to Humans|Toxic to Pets|Skin Irritant)$/.test(v)) out.push(['', v]); });
+      else if (name === 'Pregnancy' && /^(Avoid|Consult)$/.test(vals[0])) out.push(['Pregnancy', vals[0]]);
+      else if (name === 'Drug Interactions' && vals[0] && !/^None known/i.test(vals[0])) out.push(['Drug interactions', vals.join(' ')]);
+      else if ((name === 'Water Safe?' || name === 'Sun Safe?') && vals[0] === 'No') out.push(['', name === 'Water Safe?' ? 'Not water safe' : 'Not sun safe']);
+      else if (name === 'Notes/Warnings') {
+        var t = vals.join('\n').replace(/^\s*Substitution:.*$/gim, '').trim();
+        if (t && !/^(non-toxic|generally safe)/i.test(t) && /\b(poison\w*|toxic|not (?:recommended|safe)|avoid|do not|don.t|never|irritant|irritat\w*|pregnan\w*|allerg\w*|caution|harmful|danger\w*|fatal\w*|lethal|abortifacient|phototoxic|unsafe)\b/i.test(t)) out.push(['', t]);
+      }
+    });
+    return out;
+  }
+  /** Substitutions written on an ingredient's own page, as page links where the name matches a page in its grimoire. */
+  function ownSubstitutions(i) {
+    var out = [];
+    (D.w[i] || []).forEach(function (f) {
+      if (f[0] !== 'Notes/Warnings') return;
+      f[1].join('\n').replace(/^\s*Substitution:\s*(.+)$/gim, function (m, names) { names.split(/\s*(?:,|;|\bor\b)\s*/).forEach(function (n) { if (n.trim()) out.push(n.trim()); }); });
+    });
+    var g = D.p[i][0];
+    out = out.filter(function (n, k) { return out.map(function (x) { return x.toLowerCase(); }).indexOf(n.toLowerCase()) === k; });
+    return out.map(function (n) {
+      var hit = null; D.p.forEach(function (p, j) { if (!hit && p[0] === g && p[2].toLowerCase() === n.toLowerCase()) hit = j; });
+      return hit == null ? '<span>' + esc(n) + '</span>' : chip(pg(hit));
+    });
+  }
+  function workingExtras() {
+    var m = /\/manuscript\/(ritual|recipe)\/([^/?#]+)\/?$/.exec(location.pathname), prose = document.querySelector('.pg-entry .mm-prose');
+    if (!m || !prose || prose.querySelector('[data-extras]')) return;
+    var me = find(m[1], m[2]);
+    if (!me) return;
+    var corr = {}, ingredients = [];
+    D.l[me.i].forEach(function (j) {
+      var g = D.g[D.p[j][0]];
+      if (g === 'correspondence') corr[j] = true;
+      else if (INGREDIENT_GRIMOIRES.indexOf(g) !== -1) ingredients.push(j);
+    });
+    ingredients.sort(function (a, b) { return D.p[a][2].localeCompare(D.p[b][2]); });
+    var inWorking = {}; ingredients.forEach(function (j) { inWorking[j] = true; });
+    var corrOf = function (j) { return D.l[j].filter(function (k) { return D.g[D.p[k][0]] === 'correspondence'; }); };
+    var names = function (list) { return list.map(function (k) { return '<a href="' + esc(pg(k).url) + '">' + esc(D.p[k][2]) + '</a>'; }).join(', '); };
+
+    var why = [], subs = [], warn = [];
+    ingredients.forEach(function (j) {
+      var shared = corrOf(j).filter(function (k) { return corr[k]; }).sort(function (a, b) { return D.p[a][2].localeCompare(D.p[b][2]); });
+      if (shared.length) why.push('<li>' + chip(pg(j)) + '<span class="why-for">' + names(shared) + '</span></li>');
+      var own = ownSubstitutions(j), swaps = [];
+      if (shared.length && SWAP_GRIMOIRES.indexOf(D.g[D.p[j][0]]) !== -1) {
+        // A swap must carry every correspondence the ingredient brings here (at least three of them, if it brings more).
+        var need = Math.min(shared.length, 3), cands = {};
+        shared.forEach(function (k) { D.l[k].forEach(function (c) { if (D.p[c][0] === D.p[j][0] && c !== j && !inWorking[c]) cands[c] = (cands[c] || 0) + 1; }); });
+        // Never suggest a swap that carries any warning on its own page (toxic, irritant, pregnancy…): it may be eaten or worn.
+        swaps = Object.keys(cands).map(Number).filter(function (c) { return cands[c] >= need && !warnings(c).length; })
+          .sort(function (a, b) { return D.l[b].length - D.l[a].length; }).slice(0, 4).map(function (c) { return chip(pg(c)); });
+      }
+      if (own.length || swaps.length) {
+        subs.push('<li>' + chip(pg(j)) + '<span class="sub-for">'
+          + (own.length ? '<span class="sub-own">Suggested on its page: ' + own.join(' ') + '</span>' : '')
+          + (swaps.length ? '<span class="sub-shared">' + (shared.length <= 3 ? 'Also ' + names(shared) : 'Share 3 or more of its correspondences here') + ': ' + swaps.join(' ') + '</span>' : '') + '</span></li>');
+      }
+      var w = warnings(j);
+      if (w.length) warn.push('<li>' + chip(pg(j)) + '<span class="warn-for">' + w.map(function (x) {
+        return '<span>' + (x[0] ? '<strong>' + esc(x[0]) + ':</strong> ' : '') + esc(x[1]).replace(/\n/g, '<br>') + '</span>';
+      }).join('') + '</span></li>');
+    });
+    // Fire: in what the working uses or does (its Quantities and Directions; the whole text if it has neither).
+    var parts = prose.querySelectorAll('ul.ingredients, ol.steps'), text = parts.length ? [].map.call(parts, function (n) { return n.textContent; }).join(' ') : prose.textContent, fire = FIRE_WORDS.test(text) || ingredients.some(function (j) { return FIRE_WORDS.test(D.p[j][2]); });
+
+    var html = '';
+    if (subs.length) html += '<h2 id="substitutions">Substitutions</h2><p class="small extras-note">Out of something? These carry the same correspondences in this working. They match in meaning, not in physical effect: check a swap’s own page before it goes on skin or into food.</p><ul class="extras-list subs">' + subs.join('') + '</ul>';
+    if (why.length) html += '<h2 id="why">Why these ingredients</h2><p class="small extras-note">What each one brings to this working, from its correspondences.</p><ul class="extras-list why">' + why.join('') + '</ul>';
+    if (fire || warn.length) {
+      html += '<h2 id="before-you-begin">Before you begin</h2><aside class="safety-box">'
+        + (fire ? '<p class="label">Fire safety</p><ul class="fire-list">' + FIRE_SAFETY.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '')
+        + (warn.length ? '<p class="label">From the ingredients’ pages</p><ul class="extras-list warn">' + warn.join('') + '</ul>' : '') + '</aside>';
+    }
+    if (!html) return;
+    var box = document.createElement('div');
+    box.setAttribute('data-extras', '');
+    box.innerHTML = html;
+    // Right after Quantities; else before Directions; else at the end of the page's text.
+    var q = prose.querySelector('#quantities'), dir = prose.querySelector('#directions');
+    if (q) { var after = q; while (after.nextElementSibling && !/^H2$/.test(after.nextElementSibling.tagName)) after = after.nextElementSibling; after.after(box); }
+    else if (dir) dir.before(box);
+    else prose.appendChild(box);
+  }
+
   // ------------------------------------------------------------------ the next sabbat
   // The Wheel of the Year (northern hemisphere dates; the southern hemisphere keeps each one six months later).
   var SABBATS = [['Imbolc', 'imbolc', 2, 1], ['Ostara', 'ostara', 3, 20], ['Beltane', 'beltane', 5, 1], ['Litha', 'summer-solstice', 6, 21],
@@ -671,6 +778,7 @@
   if (!MEMBER) return; // visitors: nothing here is theirs to use
   grimoireTools();
   toolLinks();
+  if (/\/manuscript\/(ritual|recipe)\/[^/]+\/?$/.test(location.pathname)) data().then(workingExtras).catch(function () {});
   var pop = null;
   document.addEventListener('click', function (e) {
     if (e.target.closest('[data-note-open]')) { e.preventDefault(); (pop = pop || noteDialog()).openHere(); return; }

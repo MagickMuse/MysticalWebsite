@@ -25,6 +25,10 @@ hosting, no database server to set up, and nothing to install. Stripe takes the 
   (`/manuscript/draw-a-card`: seven face-down cards, one picked turns over, upright or reversed, with its keywords), and
   *Pull a Rune* in Runes (`/manuscript/pull-a-rune`: seven river stones; the one picked turns over to its Elder Futhark rune).
   Today and the Manuscript home also count down to the next sabbat.
+- **On every ritual and recipe** (after Quantities, from the Manuscript's own pages only): *Substitutions* (those written
+  on an ingredient's page, then herbs, stones and oils sharing the same correspondences in that working and carrying no
+  warnings of their own), *Why these ingredients* (each one's correspondences that the working shares), and *Before you
+  begin* (standard fire safety when the working uses fire, and each ingredient's own warnings, word for word).
 - **Notes:** "✎ Notes" at the top left (beside ★ Saved) opens a pop-up note, named after the page it's written on and
   renamable; `/manuscript/notes` lists every note with its first lines, and each opens in the pop-up.
 - **One copy of the tools:** they all live in `assets/tools.js`, which runs in the browser on this site and on the

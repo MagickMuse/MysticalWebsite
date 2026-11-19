@@ -24,6 +24,8 @@ LINK = re.compile(r'href="(?:\.\./)+manuscript/([a-z-]+)/([^/"#?]+)/"')
 PILL = re.compile(r'<(?:span|a) class="pill"[^>]*>(.*?)</(?:span|a)>', re.S)
 # Kinds of page the tools look for (an entry's Type)
 KINDS = {'Planets', 'Moon Phases', 'Western Zodiac', 'Days of the Week', 'Days of the Year', 'Holidays', 'Seasons', 'Time of Day', 'Color', 'Elder Futhark Runes'}
+SAFETY_FIELDS = ['Safety & Uses', 'Pregnancy', 'Drug Interactions', 'Notes/Warnings', 'Water Safe?', 'Sun Safe?']
+SAFETY_GRIMOIRES = ['plant', 'oil', 'mineral', 'material']
 MONTHS = 'january|february|march|april|may|june|july|august|september|october|november|december'
 
 
@@ -32,7 +34,7 @@ def text(s):
 
 
 def main():
-    pages, index, rels, covers = [], {}, [], {}
+    pages, index, rels, covers, safety = [], {}, [], {}, {}
     for g in GRIMOIRES:
         gdir = os.path.join(ROOT, g)
         if not os.path.isdir(gdir):
@@ -55,7 +57,7 @@ def main():
             if g == 'entity':
                 icon = ''  # the Entity Grimoire shows no icons
             title = text(re.sub(r'<span class="pg-icon[^"]*"[^>]*>[^<]*</span>', '', h1.group(1)))
-            props, types, rng = {}, set(), ''
+            props, types, rng, fields = {}, set(), '', []
             for r in ROW.finditer(s):
                 name = html.unescape(r.group(2)).strip()
                 props[name] = True
@@ -64,9 +66,13 @@ def main():
                         rels.append((len(pages), name, l.group(1), l.group(2)))
                 elif name in ('Type', 'Category'):
                     types |= {text(v) for v in PILL.findall(r.group(3))}
-                elif name == 'Date Range':
+                if not r.group(1) and name in SAFETY_FIELDS and g in SAFETY_GRIMOIRES:  # word for word, for the safety notes
+                    fields.append([name, [text(v) for v in PILL.findall(r.group(3))] or [text(r.group(3).replace('<br>', '\n'))]])
+                if not r.group(1) and name == 'Date Range':
                     vals = [text(v) for v in PILL.findall(r.group(3))] or [text(r.group(3))]
                     rng = ' '.join(vals)
+            if fields:
+                safety[len(pages)] = fields
             index[(g, slug)] = len(pages)
             kinds = sorted(types & KINDS) + (['Tarot'] if 'Upright Correspondences' in props else [])
             if 'Upright Correspondences' in props:  # a tarot card: its picture, for Draw a Card
@@ -88,7 +94,7 @@ def main():
             tarot[a][2 if prop.startswith('Upright') else 3].append(b)
         if prop == 'Related Timing' and re.match(rf'^({MONTHS})-\d+$', pages[a][1]) and GRIMOIRES[pages[a][0]] == 'timing':
             festivals.setdefault(pages[a][1], []).append(b)
-    out = {'g': GRIMOIRES, 'p': pages, 'l': [sorted(x) for x in links], 'f': festivals, 't': list(tarot.values())}
+    out = {'g': GRIMOIRES, 'p': pages, 'l': [sorted(x) for x in links], 'f': festivals, 't': list(tarot.values()), 'w': safety}
     os.makedirs(os.path.join(ROOT, 'tools'), exist_ok=True)
     with open(os.path.join(ROOT, 'tools', 'data.json'), 'w', encoding='utf-8') as fh:
         json.dump(out, fh, ensure_ascii=False, separators=(',', ':'))

@@ -931,8 +931,8 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .mm-prose strong.lbl, .mm-prose h2 strong, .mm-prose h3 strong, .mm-prose h4 strong, .mm-prose h5 strong, .mm-prose th strong, .mm-prose summary strong { color: var(--ink); }
 /* bullets are gold stars, as on the blog */
 .mm-prose ul:not(.todo, .entry-grid, .ingredients) { list-style: none; padding-left: 0; }
-.mm-prose ul:not(.todo, .entry-grid, .ingredients) > li { position: relative; padding-left: 1.8rem; }
-.mm-prose ul:not(.todo, .entry-grid, .ingredients) > li::before {
+.mm-prose ul:not(.todo, .entry-grid, .ingredients, .extras-list) > li { position: relative; padding-left: 1.8rem; }
+.mm-prose ul:not(.todo, .entry-grid, .ingredients, .extras-list) > li::before {
   content: ""; position: absolute; left: 0; top: .5em; width: .75rem; height: .75rem; background: var(--gold);
   -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
 .mm-prose ul ul > li::before { width: .55rem; height: .55rem; top: .6em; opacity: .75; }
@@ -1362,3 +1362,22 @@ html.nav-fold .mm-mine { order: -2; }
 .sabbat-count a { color: var(--accent-text); }
 .sabbat-count strong { font-weight: 600; }
 .sabbat-date { margin-left: .4rem; font-family: var(--body); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+
+/* Rituals and recipes: Substitutions, Why these ingredients, Before you begin (tools.js) */
+.extras-note { margin: -.4rem 0 .8rem; color: var(--muted); }
+.extras-list { list-style: none; margin: 0 0 1.6rem; padding: 0; display: grid; gap: .1rem; }
+.extras-list li { display: grid; grid-template-columns: minmax(9rem, 13rem) minmax(0, 1fr); gap: .3rem 1.2rem; align-items: baseline; padding: .55rem 0; border-bottom: 1px solid var(--line); }
+.mm-prose .extras-list > li { padding-left: 0; margin: 0; }
+.mm-prose .extras-list > li::before { content: none; display: none; }
+.extras-list li > .rel { padding-left: 0; }
+.why-for { display: block; font-size: .95rem; line-height: 1.6; }
+.sub-for, .warn-for { display: grid; gap: .3rem; font-size: .95rem; line-height: 1.5; }
+.sub-own, .sub-shared { display: block; color: var(--muted); font-size: .88rem; }
+.sub-own .rel, .sub-shared .rel, .sub-own > span { color: var(--ink); font-size: .95rem; margin-right: .2rem; }
+.safety-box { margin: 0 0 1.8rem; padding: 1.1rem 1.3rem .6rem; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-left: 3px solid var(--accent); border-radius: 2px 6px 6px 2px; background: var(--surface); }
+.safety-box .label { margin: 0 0 .5rem; }
+.fire-list { margin: 0 0 1.1rem; padding-left: 1.2rem; }
+.fire-list li { margin: .2rem 0; }
+.safety-box .extras-list { margin-bottom: .6rem; }
+.warn-for strong { font-weight: 500; }
+@media (max-width: 600px) { .extras-list li { grid-template-columns: minmax(0, 1fr); } }
