@@ -999,6 +999,8 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .pi-list-bullets { --pi: url("icons/list-bullets.svg"); }
 .pi-list-numbers { --pi: url("icons/list-numbers.svg"); }
 .pi-lock-simple { --pi: url("icons/lock-simple.svg"); }
+.pi-eye-slash { --pi: url("icons/eye-slash.svg"); }
+.pi-door-open { --pi: url("icons/door-open.svg"); }
 .pi-map-pin { --pi: url("icons/map-pin.svg"); }
 .pi-music-notes { --pi: url("icons/music-notes.svg"); }
 .pi-note-pencil { --pi: url("icons/note-pencil.svg"); }

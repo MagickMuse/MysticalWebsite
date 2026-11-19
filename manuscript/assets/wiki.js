@@ -403,7 +403,15 @@
         seen[m[1]] = true;
         if ((!keep || keep.has(m[1])) && (!letter || firstLetter(nameOf(li)) === letter)) { var c = li.cloneNode(true); c.hidden = false; items.push(c); }
       });
-      items.sort(function (x, y) { return nameOf(x).localeCompare(nameOf(y), undefined, { numeric: true, sensitivity: 'base' }); });
+      var az = function (x, y) { return nameOf(x).localeCompare(nameOf(y), undefined, { numeric: true, sensitivity: 'base' }); };
+      // Timing lists filtered by type read in calendar order: Monday to Sunday, January to December, January 1 to December 31.
+      var calendar = /\/timing\//.test(location.pathname) && wanted.some(function (w) { return w[0] === 'type'; });
+      items.sort(calendar ? function (x, y) {
+        var a = calKey(nameOf(x)), b = calKey(nameOf(y));
+        if (a !== null && b !== null) return a - b || az(x, y);
+        if (a !== null || b !== null) return a === null ? 1 : -1;
+        return az(x, y);
+      } : az);
       section.querySelectorAll('.col-group, ul[data-col-list], .col-more, .collection > .lede').forEach(function (n) { n.remove(); });
       var ul = document.createElement('ul'); ul.className = 'entry-grid';
       items.forEach(function (li) { ul.appendChild(li); });
@@ -430,6 +438,22 @@
       section.scrollIntoView();
     }).catch(function () {});
   })();
+
+  // Where a day, month or date falls in the year (the same rules as calendar_key() in lib/collection.php); null otherwise.
+  function calKey(t) {
+    var MON = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+    var ATT = ['hekatombaion', 'metageitnion', 'boidromion', 'boedromion', 'puanepsion', 'pyanepsion', 'maimakterion', 'poseideon',
+      'gamelion', 'anthesterion', 'elaphebolion', 'mounikhion', 'mounichion', 'thargelion', 'skirophorion'];
+    var DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    var FIX = { 'spring equinox': 320, 'vernal equinox': 320, 'summer solstice': 621, 'autumn equinox': 922, 'autumnal equinox': 922, 'fall equinox': 922, 'winter solstice': 1221 };
+    t = t.trim().toLowerCase();
+    if (DAYS.indexOf(t) >= 0) return DAYS.indexOf(t);
+    if (MON.indexOf(t) >= 0) return 100 + MON.indexOf(t);
+    if (ATT.indexOf(t) >= 0) return 200 + ATT.indexOf(t);
+    if (FIX[t]) return 1000 + FIX[t] * 10 + 5;
+    var m = t.match(new RegExp('^(' + MON.join('|') + ')\\s+(\\d{1,2})$'));
+    return m ? 1000 + (MON.indexOf(m[1]) + 1) * 1000 + parseInt(m[2], 10) * 10 : null;
+  }
 
   // GitHub Pages copy: a long connection list shows its first links; "Show all" reveals the rest in place.
   document.addEventListener('click', function (e) {

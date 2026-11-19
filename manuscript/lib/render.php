@@ -105,6 +105,8 @@ function grimoire_root(string $slug): ?array
 function shown_icon(array $p): ?string
 {
     $icon = $p['icon'] ?? null;
+    // Entities show no icon at all: no picture, no emoji.
+    if (in_array($p['grimoire'] ?? '', (array) config('no_icons', ['entity']), true) && ($p['kind'] ?? 'entry') === 'entry') return null;
     return $icon && str_starts_with((string) $icon, 'file:') && in_array($p['grimoire'] ?? '', (array) config('no_pictures', ['entity']), true) ? null : $icon;
 }
 

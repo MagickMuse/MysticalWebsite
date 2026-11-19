@@ -111,7 +111,10 @@ function properties_panel(array $page, array $tags, array $groups): string
     $lastNames = array_map('mb_strtolower', (array) config('after_connections', ['Interpretations', 'Dream Interpretation']));
     $to = value_link_base($page);
     // 1. The entry's own properties (Type, Planet…), as words separated by gold stars.
+    // Properties made only for Sort & filter (a ritual's Open/Closed Practice: the Closed Practice row already says which one).
+    $filterOnly = array_map('mb_strtolower', (array) config('filter_only', ['Practice']));
     foreach ($tags as $name => $vals) {
+        if (in_array(mb_strtolower((string) $name), $filterOnly, true)) continue;
         $isLink = count($vals) === 1 && preg_match('~^https?://~', (string) $vals[0]);
         $value = $isLink
             ? '<a href="' . e($vals[0]) . '" rel="noopener" target="_blank">' . e(preg_replace('~^https?://(www\.)?~', '', $vals[0])) . '</a>'

@@ -32,7 +32,7 @@ function collection_entries(string $collectionId): array
 /** Properties never offered in Sort & filter, though entries still show them (config "hidden_filters" can replace the list). */
 function hidden_filters(): array
 {
-    return array_map('mb_strtolower', (array) config('hidden_filters', ['Precautions', 'Notes/Warnings', 'Notes', 'Cleavage', 'Luster', 'Description', 'Directions', 'Quantities', 'Date Range']));
+    return array_map('mb_strtolower', (array) config('hidden_filters', ['Precautions', 'Notes/Warnings', 'Notes', 'Cleavage', 'Luster', 'Description', 'Directions', 'Quantities', 'Date Range', 'Closed Practice']));
 }
 
 /** Properties that work as filters: a handful of short values shared by many entries. */
@@ -163,7 +163,10 @@ function collection_view(array $c, string $base, string $listKey): array
         'za' => fn($a, $b) => strnatcasecmp($b['title'], $a['title']),
         'updated' => fn($a, $b) => strcmp((string) $b['notion_edited'], (string) $a['notion_edited']),
         'connected', 'popular' => fn($a, $b) => (($metric[$b['id']] ?? 0) <=> ($metric[$a['id']] ?? 0)) ?: strnatcasecmp($a['title'], $b['title']),
-        default => fn($a, $b) => strnatcasecmp($a['title'], $b['title']),
+        // Timing lists grouped or filtered by type read in calendar order: Monday to Sunday, January to December, January 1 to December 31.
+        default => calendar_order($c, $state)
+            ? fn($a, $b) => calendar_cmp($a['title'], $b['title'])
+            : fn($a, $b) => strnatcasecmp($a['title'], $b['title']),
     });
     return compact('c', 'base', 'listKey', 'all', 'facets', 'state', 'rows', 'lettersPresent', 'metric');
 }
@@ -317,4 +320,36 @@ function collection_items(array $rows, string $sort, array $metric): string
         $out .= '<li><a href="' . e(page_url($e)) . '">' . icon_html($e['icon']) . '<span>' . e($e['title']) . '</span>' . $badge . '</a></li>';
     }
     return $out;
+}
+
+function calendar_order(array $c, array $state): bool
+{
+    return in_array($c['grimoire'] ?? '', (array) config('calendar_order', ['timing']), true)
+        && ($state['group'] === 'Type' || isset($state['filters']['Type']));
+}
+
+/** Where a day, month or date falls in the year, for calendar order; null for anything else. */
+function calendar_key(string $title): ?int
+{
+    static $months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+    static $attic = ['hekatombaion', 'metageitnion', 'boidromion', 'boedromion', 'puanepsion', 'pyanepsion', 'maimakterion', 'poseideon',
+        'gamelion', 'anthesterion', 'elaphebolion', 'mounikhion', 'mounichion', 'thargelion', 'skirophorion'];
+    static $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    static $fixed = ['spring equinox' => 320, 'vernal equinox' => 320, 'summer solstice' => 621, 'autumn equinox' => 922,
+        'autumnal equinox' => 922, 'fall equinox' => 922, 'winter solstice' => 1221];
+    $t = strtolower(trim($title));
+    if (($i = array_search($t, $days, true)) !== false) return $i;
+    if (($i = array_search($t, $months, true)) !== false) return 100 + $i;
+    if (($i = array_search($t, $attic, true)) !== false) return 200 + $i;
+    if (isset($fixed[$t])) return 1000 + $fixed[$t] * 10 + 5;
+    if (preg_match('/^(' . implode('|', $months) . ')\s+(\d{1,2})$/', $t, $m)) return 1000 + ((int) array_search($m[1], $months, true) + 1) * 1000 + (int) $m[2] * 10;
+    return null;
+}
+
+function calendar_cmp(string $a, string $b): int
+{
+    $x = calendar_key($a); $y = calendar_key($b);
+    if ($x !== null && $y !== null) return $x <=> $y ?: strnatcasecmp($a, $b);
+    if ($x !== null || $y !== null) return $x === null ? 1 : -1;
+    return strnatcasecmp($a, $b);
 }

@@ -178,7 +178,14 @@ final class NotionImporter
                 $n++;
             }
         }
+        // A blank row left in a Notion database (no title, no text, no connections) isn't a page anyone wants to read.
+        foreach (db()->query("SELECT id FROM pages p WHERE kind = 'entry' AND title IN ('Untitled', 'New page')
+                AND TRIM(COALESCE(body_html, '')) = '' AND NOT EXISTS (SELECT 1 FROM relations WHERE from_id = p.id)")->fetchAll(PDO::FETCH_COLUMN) as $id) {
+            $this->deletePage($id);
+        }
         db()->exec("UPDATE pages SET icon = NULL WHERE icon = 'file:'"); // icons whose picture never downloaded
+        // Entities have no icon at all (no picture, no emoji).
+        foreach ((array) config('no_icons', ['entity']) as $g) db()->prepare("UPDATE pages SET icon = NULL WHERE grimoire = ? AND kind = 'entry'")->execute([$g]);
         $icons = is_file(MM_ROOT . '/site-icons.php') ? (array) require MM_ROOT . '/site-icons.php' : [];
         $set = db()->prepare('UPDATE pages SET icon = ? WHERE grimoire = ? AND slug = ?');
         foreach ($icons as $ref => $file) {
@@ -187,6 +194,14 @@ final class NotionImporter
         }
         $this->intentionIcons();
         $this->pictureIcons();
+        // Rituals: Open or Closed Practice, to filter by (from the Closed Practice property, which stays on the page).
+        foreach (db()->query("SELECT id, tags_json FROM pages WHERE grimoire = 'ritual' AND kind = 'entry'")->fetchAll() as $row) {
+            $tags = json_decode((string) $row['tags_json'], true) ?: [];
+            $want = !empty($tags['Closed Practice']) ? 'Closed Practice' : 'Open Practice';
+            if (($tags['Practice'] ?? null) === [$want]) continue;
+            $tags['Practice'] = [$want];
+            db()->prepare('UPDATE pages SET tags_json = ? WHERE id = ?')->execute([json_encode($tags, JSON_UNESCAPED_UNICODE), $row['id']]);
+        }
         // Tarot spreads: a "Cards" property ("3 cards") from the Number of Cards connection, to filter and group by.
         $setTags = db()->prepare('UPDATE pages SET tags_json = ? WHERE id = ?');
         foreach (db()->query("SELECT p.id, p.tags_json, n.title FROM pages p JOIN relations r ON r.from_id = p.id AND r.prop = 'Number of Cards'
@@ -623,6 +638,11 @@ final class NotionImporter
                     break;
                 case 'select':
                     if ($prop['select']) $tags[$name] = [$prop['select']['name']];
+                    break;
+                case 'checkbox':
+                    // A few checkboxes are worth filtering by: "Discreet?" becomes Discreet: Yes / No.
+                    $boxes = (array) config('checkbox_filters', ['Discreet?' => 'Discreet']);
+                    if (isset($boxes[$name])) $tags[$boxes[$name]] = [$prop['checkbox'] ? 'Yes' : 'No'];
                     break;
                 case 'status':
                     break; // workflow status is for the curator, not readers

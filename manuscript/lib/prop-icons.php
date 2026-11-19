@@ -12,7 +12,7 @@ return [
     'origin' => 'globe', 'favored people' => 'users', 'offerings' => 'gift', 'scientific name' => 'test-tube',
     'safety & uses' => 'shield-check', 'usda hardiness zone' => 'thermometer-simple', 'sun safe?' => 'sun', 'water safe?' => 'drop',
     'mohs hardness' => 'hammer', 'crystal system' => 'cube', 'cleavage' => 'scissors', 'luster' => 'sparkle', 'fracture' => 'lightning',
-    'closed practice' => 'lock-simple', 'card details' => 'cards', 'cards' => 'cards', 'number of cards' => 'cards', 'description' => 'text-align-left', 'question style' => 'question',
+    'closed practice' => 'lock-simple', 'practice' => 'door-open', 'discreet' => 'eye-slash', 'card details' => 'cards', 'cards' => 'cards', 'number of cards' => 'cards', 'description' => 'text-align-left', 'question style' => 'question',
     'spread type' => 'layout', 'pregnancy' => 'baby', 'drug interactions' => 'pill', 'habitat' => 'tree', 'scent' => 'wind',
     'growing season' => 'flower-tulip', 'chemical family' => 'atom', 'absorbs' => 'drop-half', 'extraction method' => 'funnel',
     'shelf life' => 'hourglass', 'medicinal uses' => 'first-aid', 'scent group' => 'flower', 'suit' => 'club',
