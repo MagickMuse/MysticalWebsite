@@ -1,0 +1,51 @@
+# To do: the Magick Muse
+
+Things only you can do (accounts, Notion, decisions). Claude keeps this list up to date: say “add it to my to-do list”
+in any session. Tick a box by changing `[ ]` to `[x]`, or ask Claude to.
+
+_Last updated: November 19, 2026_
+
+## Before launch
+- [ ] **Stripe:** the four things blocking live checkout: dispute events on the webhook, Stripe's account review, tax
+      registrations, and the live secret key. Steps in [STRIPE_INTEGRATION_TODO.md](STRIPE_INTEGRATION_TODO.md).
+- [ ] **Email settings:** put your Hostinger mailbox login in the private settings (`smtp_host` = smtp.hostinger.com,
+      `smtp_user`, `smtp_pass`, and `mail_from`). Sign-in links and the beginner path emails need it.
+- [ ] **Daily backups on Hostinger:** included on the Business plan; a small add-on on Premium. Members' notes live on the site.
+- [ ] **First upload:** GitHub → Actions → “Deploy live site” → Run workflow (Claude can walk you through it).
+- [ ] **Beginner path at 11:11:** hPanel → Advanced → Cron Jobs → Custom: minute `11,26,41,56`, everything else `*`, command
+      `php /home/YOUR-USERNAME/domains/magickmuse.com/public_html/manuscript/cli/beginner-path.php`
+- [ ] **Try Share on your phone:** Draw a Card or Pull a Rune → Share should open your phone's share menu with the picture.
+- [ ] **Review the beginner path's 30 days:** `manuscript/beginner-path.php`, one line per day; reorder or swap freely.
+
+## After launch
+- [ ] **Google Search Console:** resubmit `sitemap.xml` so Google picks up the new addresses (/muses, /mythos, /market).
+- [ ] **Social bios:** change any `/shop` links to `/market` (the old ones still forward).
+- [ ] **Monthly plan:** decide whether to offer it. If yes: make a monthly price in Stripe and add it to the settings
+      (Claude can do the settings part). Cancellations remove access automatically at the end of the paid month.
+- [ ] **Making the repository private:** on GitHub's free plan, the GitHub Pages preview switches off for private repositories.
+
+## Fix in Notion (the site shows what's there)
+- [ ] **Hellebore:** its notes say “Substitution: Magickal Uses or Nettle”. Probably meant “For magickal uses: Nettle”.
+- [ ] **Mugwort** and **Wormwood:** each has an empty “Substitution:” line.
+- [ ] **Cinquefoil:** “Substitution: Clover; Clover” (Clover twice).
+- [ ] **Spell-casting Using the Power of Planets:** its opening paragraph is about stones, so it was taken off the beginner
+      path (The Nature of Symbols is in its place). Fix the opening and ask Claude to put it back if you like.
+- [ ] **Optional, a “Warnings” field:** “Notes/Warnings” mixes warnings with general notes, so the safety notes on rituals
+      only quote sentences with clear warning words. A separate Warnings field would let the site show exactly what you write.
+
+## Write in Notion (your Discord members asked for these)
+- [ ] Guide pages: **fire safety**, **energy work** (grounding, raising, directing, shielding), **warding**, **sigil-making**.
+- [ ] A **Paths** database, one page per tradition: history, how to practice it, open or closed, the DO NOT list. Link
+      each to its deities and herbs. (Rituals already carry 25 traditions.)
+- [ ] Entity properties **Temperament** (volatile, patient…) and **Good for beginners**. Filters for them appear on their own.
+- [ ] A guide page on **working with your sun, moon and rising sign**.
+- [ ] **Merkstave (reversed) rune meanings**, if you want Pull a Rune to land stones upside-down like reversed tarot cards.
+
+## Ideas for later (ask Claude when you're ready)
+- Give the Manuscript as a gift (worth doing before Yule, December 21)
+- Your birthday in the Manuscript (sun and moon sign, birthstone, Celtic tree, the day's profile)
+- Referral codes, guest passes for a friend, coven (group) plans
+- Free public daily pages: today's moon, a card of the day, the sabbat countdown
+- A weekly email: the week's moon phases, festivals and a featured page
+- The full book of shadows (entries, @mentions of Manuscript pages, backlinks)
+- Public previews of Manuscript entries for Google

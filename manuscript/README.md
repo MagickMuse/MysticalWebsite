@@ -42,8 +42,9 @@ hosting, no database server to set up, and nothing to install. Stripe takes the 
   and `python3 .github/scripts/build-static-tools.py` rebuilds its copy of the data after the pages are regenerated.
 - **Importer:** pulls straight from Notion, including images, and can be re-run any time to pick up new pages.
 
-> **The paid content never goes into GitHub.** This repository is public. The wiki's database and
-> images live in a `manuscript-data` folder *next to* `public_html` on the server. Only the code is here.
+> **The live Manuscript's database** lives in a `manuscript-data` folder *next to* `public_html` on the server, never
+> in GitHub. This repository also holds a static copy of the Manuscript's pages for the GitHub Pages preview, so keep the
+> repository private (on GitHub's free plan, Pages only works for public repositories).
 
 ---
 

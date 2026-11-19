@@ -16,7 +16,7 @@ return [
     ['page' => 'material/caring-for-your-magick-tools'],
     ['page' => 'ritual/elements-in-spell-casting'],
     ['page' => 'astrology/using-the-moon-phases-in-magick', 'try' => 'today'],
-    ['page' => 'astrology/spell-casting-using-the-power-of-planets', 'try' => 'wheel?of=planets'],
+    ['page' => 'symbol/the-nature-of-symbols'], // in place of 'Spell-casting Using the Power of Planets', whose opening is about stones (see TODO.md)
     ['page' => 'symbol/color-magick-practices'],
     ['page' => 'plant/introduction-to-plant-magick'],
     ['page' => 'mineral/introduction-to-crystal-magick'],
