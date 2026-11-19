@@ -233,6 +233,8 @@ function migrate(PDO $pdo): void
     // Columns added after the first release: CREATE TABLE IF NOT EXISTS leaves existing tables as they were.
     $cols = array_column($pdo->query('PRAGMA table_info(payments)')->fetchAll(), 'name');
     if (!in_array('dispute', $cols, true)) $pdo->exec('ALTER TABLE payments ADD COLUMN dispute TEXT');
+    $cols = array_column($pdo->query('PRAGMA table_info(beginner_path)')->fetchAll(), 'name');
+    if (!in_array('tz', $cols, true)) $pdo->exec("ALTER TABLE beginner_path ADD COLUMN tz TEXT NOT NULL DEFAULT 'UTC'");
     $cols = array_column($pdo->query('PRAGMA table_info(member_notes)')->fetchAll(), 'name');
     if (!in_array('page_title', $cols, true)) $pdo->exec("ALTER TABLE member_notes ADD COLUMN page_title TEXT NOT NULL DEFAULT ''");
     // The first notes (one untitled note per page) become titled notes, named after their page.

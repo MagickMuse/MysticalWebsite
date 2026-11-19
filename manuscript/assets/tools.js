@@ -905,6 +905,8 @@
   }
 
   if (!MEMBER) return; // visitors: nothing here is theirs to use
+  // The beginner path: the member's time zone goes with "Start", so its emails come at 11:11 their time (lib/path.php).
+  document.querySelectorAll('input[data-tz]').forEach(function (i) { try { i.value = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {} });
   grimoireTools();
   toolLinks();
   if (/\/manuscript\/(ritual|recipe)\/[^/]+\/?$/.test(location.pathname)) data().then(workingExtras).catch(function () {});

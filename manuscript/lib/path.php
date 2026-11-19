@@ -5,9 +5,13 @@ declare(strict_types=1);
  * The 30-day beginner path: members choose to start it, then get one Manuscript page a day by email
  * (the days are in manuscript/beginner-path.php). Each email has the page's title, its own opening lines word for
  * word, a button to read it, sometimes a tool to try, and a link to stop the emails. Members can also follow the path
- * at their own pace on /path. The day's emails go out once a day: from a cron job (cli/beginner-path.php) or, without
- * one, with the first visit of the day. A member whose access has ended gets no more emails.
+ * at their own pace on /path. Each day's email goes out at 11:11 in the member's own time zone (taken from their browser
+ * when they start). A cron job running cli/beginner-path.php at minutes 11, 26, 41 and 56 of every hour sends them on
+ * time in every time zone (whole, half and quarter hours); without one, they go out with the first visit after 11:11.
+ * A member whose access has ended gets no more emails.
  */
+
+const PATH_SEND_AT = '11:11'; // each member's local time
 
 const PATH_TOOLS = [
     'today' => 'Today', 'spell-builder' => 'the Spell Builder', 'draw-a-card' => 'Draw a Card', 'pull-a-rune' => 'Pull a Rune',
@@ -81,15 +85,33 @@ function send_path_day(array $row, int $n): bool
     return send_mail($row['email'], "Day $n of $total: {$p['title']}", $text, $html);
 }
 
-/** Today's emails: the next day for everyone on the path who hasn't had one today. Returns how many went out. */
-function run_beginner_path(int $limit = 200): int
+/** A member's local time zone (what their browser said when they started; UTC if unknown). */
+function path_tz(array $row): DateTimeZone
 {
-    $today = gmdate('Y-m-d');
+    try { return new DateTimeZone((string) ($row['tz'] ?? 'UTC')); } catch (Throwable $ex) { return new DateTimeZone('UTC'); }
+}
+
+/** Is it time for this member's next email? After 11:11 their time, and not yet sent on their today. */
+function path_due(array $row, ?DateTimeImmutable $now = null): bool
+{
+    $tz = path_tz($row);
+    $local = ($now ?? new DateTimeImmutable('now', new DateTimeZone('UTC')))->setTimezone($tz);
+    if ($local->format('H:i') < PATH_SEND_AT) return false;
+    if (!$row['sent_at']) return true;
+    $last = (new DateTimeImmutable($row['sent_at'], new DateTimeZone('UTC')))->setTimezone($tz);
+    return $last->format('Y-m-d') < $local->format('Y-m-d');
+}
+
+/** Sends the next day to everyone on the path whose 11:11 has come and who hasn't had today's. Returns how many went out. */
+function run_beginner_path(int $limit = 500): int
+{
     $total = count(path_days());
-    $st = db()->prepare("SELECT * FROM beginner_path WHERE stopped_at IS NULL AND day < ? AND substr(COALESCE(sent_at, ''), 1, 10) < ? ORDER BY sent_at LIMIT ?");
-    $st->execute([$total, $today, $limit]);
+    $st = db()->prepare('SELECT * FROM beginner_path WHERE stopped_at IS NULL AND day < ?');
+    $st->execute([$total]);
     $sent = 0;
     foreach ($st->fetchAll() as $row) {
+        if ($sent >= $limit) break;
+        if (!path_due($row)) continue;
         $m = member_row($row['email']);
         $active = $m && ($m['status'] === 'active' || ($m['paid_through'] && $m['paid_through'] >= now()));
         if (!$active && !is_admin($row['email'])) continue; // no access, no emails (they resume if access comes back)
@@ -102,11 +124,11 @@ function run_beginner_path(int $limit = 200): int
     return $sent;
 }
 
-/** Once a day, with the first visit (for sites without a cron job). */
+/** Without a cron job: check at most every 15 minutes, with whatever visit comes. */
 function maybe_run_beginner_path(): void
 {
     $stamp = config('data_dir') . '/last-path-run';
-    if (is_file($stamp) && gmdate('Y-m-d', (int) filemtime($stamp)) === gmdate('Y-m-d')) return;
+    if (is_file($stamp) && filemtime($stamp) > time() - 15 * 60) return;
     @touch($stamp);
     run_beginner_path(60);
 }
@@ -136,10 +158,13 @@ function route_path(array $parts, string $method): void
         if (($_POST['do'] ?? '') === 'stop' && $row) {
             db()->prepare('UPDATE beginner_path SET stopped_at = ? WHERE email = ?')->execute([now(), strtolower($email)]);
         } elseif (($_POST['do'] ?? '') === 'start') {
+            // The member's time zone, from their browser (tools.js fills it in), so the emails come at 11:11 their time.
+            $tz = (string) ($_POST['tz'] ?? '');
+            if (!in_array($tz, DateTimeZone::listIdentifiers(), true)) $tz = (string) ($row['tz'] ?? 'UTC');
             if (!$row) {
-                db()->prepare('INSERT INTO beginner_path (email, started_at, day, token) VALUES (?, ?, 0, ?)')->execute([strtolower($email), now(), bin2hex(random_bytes(16))]);
+                db()->prepare('INSERT INTO beginner_path (email, started_at, day, token, tz) VALUES (?, ?, 0, ?, ?)')->execute([strtolower($email), now(), bin2hex(random_bytes(16)), $tz]);
             } else {
-                db()->prepare('UPDATE beginner_path SET stopped_at = NULL WHERE email = ?')->execute([strtolower($email)]);
+                db()->prepare('UPDATE beginner_path SET stopped_at = NULL, tz = ? WHERE email = ?')->execute([$tz, strtolower($email)]);
             }
             $row = path_row($email);
             if ((int) $row['day'] === 0 && send_path_day($row, 1)) { // day one straight away
@@ -165,11 +190,11 @@ function view_path(?array $row): void
             . '<a href="' . e(page_url($p)) . '">' . e($p['title']) . '</a>'
             . ($try ? '<small>Try it: <a href="' . e(url($try)) . '">' . e(PATH_TOOLS[$try]) . '</a></small>' : '') . '</li>';
     }
-    $status = !$row ? '<p class="lede">One page of the Manuscript a day for ' . $total . ' days, by email, from the basics to working with deities and spirits. Read along here at your own pace, or have each day sent to you.</p>'
-        . '<form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="start"><button class="btn" type="submit">Start the emails</button></form>'
-        : ($row['stopped_at'] ? '<p class="lede">The emails are stopped. You’re on day ' . $done . ' of ' . $total . '.</p><form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="start"><button class="btn" type="submit">Start them again</button></form>'
+    $status = !$row ? '<p class="lede">One page of the Manuscript a day for ' . $total . ' days, by email at 11:11 each morning, from the basics to working with deities and spirits. Read along here at your own pace, or have each day sent to you.</p>'
+        . '<form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="start"><input type="hidden" name="tz" value="" data-tz><button class="btn" type="submit">Start the emails</button></form>'
+        : ($row['stopped_at'] ? '<p class="lede">The emails are stopped. You’re on day ' . $done . ' of ' . $total . '.</p><form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="start"><input type="hidden" name="tz" value="" data-tz><button class="btn" type="submit">Start them again</button></form>'
         : ($done >= $total ? '<p class="lede">You’ve finished the path. Every page is still here whenever you want it.</p>'
-        : '<p class="lede">Day ' . $done . ' of ' . $total . '. The next page arrives by email tomorrow.</p><form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="stop"><button class="link as-button" type="submit">Stop the emails</button></form>'));
+        : '<p class="lede">Day ' . $done . ' of ' . $total . '. The next page arrives by email tomorrow at 11:11.</p><form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="stop"><button class="link as-button" type="submit">Stop the emails</button></form>'));
     layout('The beginner path', '<section class="saved path-page"><p class="eyebrow labelled">Your Manuscript</p><h1>The beginner <em>path</em></h1>' . $status
         . '<ol class="path-list">' . $list . '</ol></section>', ['private' => true]);
 }

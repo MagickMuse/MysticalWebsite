@@ -1,8 +1,9 @@
 <?php
 /*
- * Sends today's beginner path emails (lib/path.php). The site also does this with the first visit of the day, so a
- * cron job is optional; with one, emails go out at a set time. In hPanel → Advanced → Cron Jobs, once a day:
+ * Sends the beginner path emails that are due: each member's next day at 11:11 in their own time zone (lib/path.php).
+ * In hPanel → Advanced → Cron Jobs, add a custom job with minute 11,26,41,56 and every hour, day, month and weekday:
  *   php /home/USER/domains/magickmuse.com/public_html/manuscript/cli/beginner-path.php
+ * Those four minutes catch 11:11 in every time zone, including half- and quarter-hour ones.
  */
 declare(strict_types=1);
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }

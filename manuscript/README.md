@@ -30,8 +30,9 @@ hosting, no database server to set up, and nothing to install. Stripe takes the 
   warnings of their own), *Why these ingredients* (each one's correspondences that the working shares), and *Before you
   begin* (standard fire safety when the working uses fire, and each ingredient's own warnings, word for word).
 - **Beginner path:** members can start a 30-day email course, one Manuscript page a day (its title, its own opening lines
-  word for word, and a link to read it). The days are listed in `manuscript/beginner-path.php` (edit freely). Emails go
-  out once a day with the first visit, or set a daily cron job: `php …/public_html/manuscript/cli/beginner-path.php`.
+  word for word, and a link to read it). The days are listed in `manuscript/beginner-path.php` (edit freely). Each email
+  goes out at 11:11 in the member's own time zone. For exact timing, add a cron job in hPanel (minute `11,26,41,56`,
+  every hour): `php …/public_html/manuscript/cli/beginner-path.php`; without it they go out with the first visit after 11:11.
   Members follow along at `/manuscript/path`, and every email has a link to stop them.
 - **Notes:** "✎ Notes" at the top left (beside ★ Saved) opens a pop-up note, named after the page it's written on and
   renamable; `/manuscript/notes` lists every note with its first lines, and each opens in the pop-up.
