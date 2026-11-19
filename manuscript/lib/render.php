@@ -333,12 +333,12 @@ function layout(string $title, string $body, array $opt = []): void
     <nav id="site-menu" aria-label="Main">
       <ul class="left">
         <li><a href="<?= e(url()) ?>" aria-current="page"><span>Manuscript</span><small>the grimoire</small></a></li>
-        <li><a href="<?= e(site_url('meetup')) ?>"><span>Muses</span><small>the coven</small></a></li>
+        <li><a href="<?= e(site_url('muses')) ?>"><span>Muses</span><small>the coven</small></a></li>
       </ul>
       <ul class="right">
         <li><a href="<?= e(site_url('mastery')) ?>"><span>Mastery</span><small>guides &amp; courses</small></a></li>
-        <li><a href="<?= e(site_url('shop/')) ?>"><span>Market</span><small>the shop</small></a></li>
-        <li><a href="<?= e(site_url('story')) ?>"><span>Mythos</span><small>our story</small></a></li>
+        <li><a href="<?= e(site_url('market/')) ?>"><span>Market</span><small>the shop</small></a></li>
+        <li><a href="<?= e(site_url('mythos')) ?>"><span>Mythos</span><small>our story</small></a></li>
       </ul>
     </nav>
   </div>

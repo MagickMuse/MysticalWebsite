@@ -39,7 +39,7 @@ function community_links(): string
 {
     $discord = (string) config('discord_url', 'https://discord.com/invite/PBr2BtCpxk');
     return '<div class="actions community"><a class="link" href="' . e($discord) . '" target="_blank" rel="noopener">Join our Discord coven</a>'
-        . '<a class="link" href="' . e(site_url('story')) . '">Curious about the Curator?</a></div>';
+        . '<a class="link" href="' . e(site_url('mythos')) . '">Curious about the Curator?</a></div>';
 }
 
 function product(string $slug): ?array
@@ -97,7 +97,7 @@ function view_shop(): void
     foreach (products() as $slug => $p) {
         $p['slug'] = $slug;
         if (!empty($p['hidden'])) continue;
-        $cards .= '<a class="card shop-card" href="' . e(site_url('shop/' . $slug)) . '">' . product_image($p)
+        $cards .= '<a class="card shop-card" href="' . e(site_url('market/' . $slug)) . '">' . product_image($p)
             . '<h3>' . e(short_name($p)) . '</h3><p>' . e($p['tagline'] ?? '') . '</p><p class="price">' . e(price_label($p)) . '</p></a>';
     }
     // The Manuscript itself leads the shop.
@@ -127,9 +127,9 @@ function view_product(array $p): void
 
     $code = preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($_GET['code'] ?? ''));
     if ($email && owns($email, $p['slug'])) {
-        $action = '<p class="notice">You own this. <a href="' . e(site_url('shop/library')) . '">Open your library</a></p>';
+        $action = '<p class="notice">You own this. <a href="' . e(site_url('market/library')) . '">Open your library</a></p>';
     } elseif (!empty($p['free'])) {
-        $action = '<form class="mm-form buy" method="post" action="' . e(site_url('shop/claim')) . '">'
+        $action = '<form class="mm-form buy" method="post" action="' . e(site_url('market/claim')) . '">'
             . "<input type=\"hidden\" name=\"csrf\" value=\"$csrf\"><input type=\"hidden\" name=\"product\" value=\"$slug\">"
             . '<label for="claim-email">Where should we send it?</label><input id="claim-email" type="email" name="email" autocomplete="email" required value="' . e($email) . '">'
             . '<button class="btn" type="submit">Send it to me free</button><p class="small">You’ll also hear from The Magick Muse now and then. Unsubscribe anytime.</p></form>';
@@ -138,7 +138,7 @@ function view_product(array $p): void
         $amount = !empty($p['pay_what_you_want'])
             ? '<label for="amount">Pay what you can (minimum ' . e(money($min)) . ')</label><div class="amount"><span aria-hidden="true">$</span><input id="amount" name="amount" type="number" inputmode="decimal" min="' . ($min / 100) . '" step="1" value="' . ($min / 100) . '" required></div>'
             : '';
-        $action = '<form class="mm-form buy" method="post" action="' . e(site_url('shop/buy')) . '">'
+        $action = '<form class="mm-form buy" method="post" action="' . e(site_url('market/buy')) . '">'
             . "<input type=\"hidden\" name=\"csrf\" value=\"$csrf\"><input type=\"hidden\" name=\"product\" value=\"$slug\"><input type=\"hidden\" name=\"code\" value=\"" . e($code) . '">'
             . ($code ? '<p class="notice">Code <strong>' . e($code) . '</strong> will be applied at checkout.</p>' : '')
             . $amount . '<button class="btn" type="submit">' . (!empty($p['pay_what_you_want']) ? 'Buy now' : 'Buy for ' . e(price_label($p))) . '</button>'
@@ -161,7 +161,7 @@ function do_buy(): void
     if (!$p || !empty($p['free'])) { not_found(); return; }
     $amount = isset($_POST['amount']) ? (int) round((float) $_POST['amount'] * 100) : null;
     $session = create_product_checkout($slug, $amount, current_email(), (string) ($_POST['code'] ?? ''));
-    show_checkout($session, short_name($p), site_url('shop/' . $slug));
+    show_checkout($session, short_name($p), site_url('market/' . $slug));
 }
 
 function do_claim(): void
@@ -176,11 +176,11 @@ function do_claim(): void
     db()->prepare('INSERT OR IGNORE INTO leads (email, product, created_at) VALUES (?, ?, ?)')->execute([$email, $p['slug'], now()]);
     grant($email, $p['slug'], 'free');
     // Delivered by email, which also confirms the address is real.
-    $link = url('auth?token=' . issue_login_token($email) . '&next=' . rawurlencode('/shop/library'));
+    $link = url('auth?token=' . issue_login_token($email) . '&next=' . rawurlencode('/market/library'));
     $nm = short_name($p);
     send_mail($email, 'Your ' . $nm . ' is here',
-        "Thank you for picking up {$nm}.\n\nOpen your library to get it:\n$link\n\nThe link signs you in and works for 30 minutes. After that, sign in any time at " . site_url('shop/library') . "\n\nThe Magick Muse",
-        '<p>Thank you for picking up <strong>' . e($nm) . '</strong>.</p><p><a href="' . e($link) . '">Open your library</a> to get it.</p><p>The link signs you in and works for 30 minutes. After that, sign in any time at ' . e(site_url('shop/library')) . '.</p><p>The Magick Muse</p>');
+        "Thank you for picking up {$nm}.\n\nOpen your library to get it:\n$link\n\nThe link signs you in and works for 30 minutes. After that, sign in any time at " . site_url('market/library') . "\n\nThe Magick Muse",
+        '<p>Thank you for picking up <strong>' . e($nm) . '</strong>.</p><p><a href="' . e($link) . '">Open your library</a> to get it.</p><p>The link signs you in and works for 30 minutes. After that, sign in any time at ' . e(site_url('market/library')) . '.</p><p>The Magick Muse</p>');
     layout('Check your email', '<section class="mm-hero narrow"><p class="eyebrow labelled">On its way</p><h1>Check your <em>inbox</em></h1><p class="lede">We sent ' . e($nm) . ' to ' . e($email) . '. If it isn’t there in a few minutes, look in spam or promotions.</p></section>', ['private' => true]);
 }
 
@@ -202,14 +202,14 @@ function view_shop_thanks(): void
             error_log('[shop] thanks: ' . $ex->getMessage());
         }
     }
-    redirect(site_url('shop/library' . ($slug ? '?new=' . rawurlencode($slug) : '')));
+    redirect(site_url('market/library' . ($slug ? '?new=' . rawurlencode($slug) : '')));
 }
 
 function view_library(): void
 {
     $email = current_email();
     if (!$email) {
-        view_login('<p class="notice">Sign in with the email you bought with to open your library.</p>', '/shop/library');
+        view_login('<p class="notice">Sign in with the email you bought with to open your library.</p>', '/market/library');
         return;
     }
     $st = db()->prepare('SELECT product, created_at FROM purchases WHERE email = ? ORDER BY created_at DESC');
@@ -229,7 +229,7 @@ function view_library(): void
             $links .= '<a class="btn" href="' . e($href) . '" target="_blank" rel="noopener">' . e($label) . '</a>';
         }
         foreach (product_files($p['slug']) as $f) {
-            $links .= '<a class="btn ghost" href="' . e(site_url('shop/download/' . rawurlencode($p['slug']) . '/' . rawurlencode($f))) . '">Download ' . e($f) . '</a>';
+            $links .= '<a class="btn ghost" href="' . e(site_url('market/download/' . rawurlencode($p['slug']) . '/' . rawurlencode($f))) . '">Download ' . e($f) . '</a>';
         }
         $badge = $new === $p['slug'] ? '<span class="tag">Just added</span>' : '';
         $items .= '<li class="lib-item"><div><h3>' . e(short_name($p)) . " $badge</h3>"
@@ -239,7 +239,7 @@ function view_library(): void
     $thanks = $new ? '<p class="notice">Thank you! Your purchase is below, and a receipt from Stripe is in your email.</p>' : '';
     $body = $items
         ? '<ul class="library">' . $items . '</ul>'
-        : '<p class="lede">Nothing here yet. <a href="' . e(site_url('shop')) . '">Visit the shop</a>.</p>';
+        : '<p class="lede">Nothing here yet. <a href="' . e(site_url('market')) . '">Visit the shop</a>.</p>';
     layout('Your library', '<section class="lib"><p class="eyebrow labelled">' . e($email) . '</p><h1>Your <em>library</em></h1>' . $thanks . $body
         . '<p class="small"><a href="' . e(url('account')) . '">Account &amp; billing</a></p></section>', ['private' => true]);
 }

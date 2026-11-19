@@ -3,14 +3,14 @@
 
   // Shop / join clicks: analytics event, and never show the exit offer afterwards
   document.addEventListener('click', function (e) {
-    var link = e.target.closest('a[href^="/shop"], a[href^="/manuscript/join"]');
+    var link = e.target.closest('a[href^="/market"], a[href^="/manuscript/join"]');
     if (!link) return;
     try { localStorage.setItem(SEEN_KEY, '1'); } catch (err) {}
     if (typeof gtag !== 'function') return;
     var href = link.getAttribute('href');
     var type = 'store';
     if (href.indexOf('/manuscript/join') === 0) type = 'manuscript';
-    else if (href.indexOf('/shop/') === 0) type = href.split('/')[2] || 'store';
+    else if (href.indexOf('/market/') === 0) type = href.split('/')[2] || 'store';
     gtag('event', 'click_shop', {
       link_type: type,
       link_text: link.textContent.trim() || 'icon',
