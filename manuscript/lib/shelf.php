@@ -37,7 +37,7 @@ function real_book(array $g, int $n, int $i): string
         . '<span class="cover" aria-hidden="true">' . ($photo ? '<img src="' . e($photo) . '" alt="" loading="lazy">' : '')
         . '<span class="cover-title">' . e($label) . '</span>'
         . '<span class="cover-sub">' . ($n ? number_format($n) . ' entries' : 'Guides') . '</span>'
-        . ($faced ? '<span class="dive">Open me <i>✦</i></span>' : '') . '</span></a>';
+        . ($faced ? '<span class="dive">open me <i>✦</i></span>' : '') . '</span></a>';
 }
 
 /**

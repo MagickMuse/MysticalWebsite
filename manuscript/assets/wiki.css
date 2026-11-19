@@ -877,7 +877,7 @@ details.toggle > summary > h5 { margin: 0; display: inline; }
 .bk.faced .cover { opacity: 1; }
 .dive { position: absolute; z-index: 4; left: 50%; bottom: 46px; transform: translateX(-50%); white-space: nowrap;
   padding: .42rem .95rem .38rem; border: 1px solid var(--gold); border-radius: 999px; background: color-mix(in srgb, #2e1f20 72%, transparent);
-  font-family: var(--display); font-style: italic; font-size: 1.02rem; letter-spacing: .02em; color: #f3e2b4;
+  font-family: var(--body); font-style: normal; font-size: .8rem; letter-spacing: .14em; text-transform: lowercase; color: #f3e2b4;
   animation: dive-glow 2.8s ease-in-out infinite; transition: background .3s, color .3s; }
 .dive i { font-style: normal; font-size: .7rem; color: var(--gold); display: inline-block; animation: dive-twinkle 2.8s ease-in-out infinite; }
 .bk.faced:hover .dive, .bk.faced:focus-visible .dive, .bk.faced.open .dive { background: var(--gold); color: #2e1f20; }
@@ -885,7 +885,7 @@ details.toggle > summary > h5 { margin: 0; display: inline; }
 @keyframes dive-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(243, 226, 180, 0); } 50% { box-shadow: 0 0 16px 3px rgba(243, 226, 180, .45); } }
 @keyframes dive-twinkle { 0%, 100% { transform: scale(.8) rotate(0); opacity: .7; } 50% { transform: scale(1.25) rotate(45deg); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .dive, .dive i { animation: none; } }
-@media (max-width: 640px) { .bk.faced, .bk.faced.open, .bk.faced:focus-visible { width: 190px; } .dive { font-size: .9rem; bottom: 42px; } }
+@media (max-width: 640px) { .bk.faced, .bk.faced.open, .bk.faced:focus-visible { width: 190px; } .dive { font-size: .74rem; bottom: 42px; } }
 /* Top shelf: three tall candles on their own; bottom shelf: the four guide books in one stack, each a little bigger */
 .stack .slab.s3 { width: calc(var(--w) + 104px); height: 68px; margin: 0; transform: none; }
 .stack.at-end .candles.tall { align-self: center; margin: 0 6px; height: 190px; }
