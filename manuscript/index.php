@@ -24,6 +24,8 @@ $parts = $path === '' ? [] : explode('/', $path);
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 try {
+    // Once a day: clear the notes of members whose access ended more than 90 days ago (lib/tools.php).
+    try { clear_lapsed_member_data(); } catch (Throwable $ex) { error_log('[manuscript] cleanup: ' . $ex->getMessage()); }
     route($parts, $method);
 } catch (Throwable $ex) {
     error_log('[manuscript] ' . $ex);

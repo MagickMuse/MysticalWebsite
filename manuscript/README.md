@@ -119,6 +119,7 @@ Everyone signs in at `/manuscript/login` (or `/market/library`) with the email t
 | Add a whole grimoire | Add its slug and Notion id to `grimoires` in the config, then run `php manuscript/cli/import.php <slug>` |
 | Remove pages deleted in Notion | `php manuscript/cli/import.php --prune` (skipped for a grimoire if any page failed to load that run, so a Notion hiccup never deletes pages) |
 | Gift access / remove access | Dashboard → Members, or `php manuscript/cli/member.php add|remove email` |
+| Send a member their notes | Dashboard → Members → "Export" beside their email downloads a text file of their notes, workings and saved pages to email them |
 | Refund someone | In Stripe (Payments → the payment → Refund). The dashboard updates, and a full refund removes their access. |
 | Add a product | Add it to `products` in the config. Its page is `/market/<slug>` |
 | Old Notion links (Discord, bookmarks) | `magickmuse.com/manuscript/go/<notion-page-id>` redirects to the wiki page |

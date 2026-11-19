@@ -16,6 +16,7 @@ function route_dashboard(array $parts, string $method): void
     match (true) {
         $tab === '' => dash_overview(),
         $tab === 'members' && $method === 'POST' => dash_members_post(),
+        $tab === 'members' && isset($_GET['export']) => dash_member_export(),
         $tab === 'members' => dash_members(),
         $tab === 'sales' => dash_sales(),
         $tab === 'emails' => dash_leads(),
@@ -289,10 +290,12 @@ function dash_members(string $notice = ''): void
     $st = db()->prepare($sql . ' ORDER BY m.created_at DESC LIMIT 500');
     $st->execute($args);
     $tr = '';
+    $kept = member_data_counts();
     foreach ($st->fetchAll() as $r) {
         $plan = ['monthly' => 'Monthly', 'lifetime' => 'Paid', 'comp' => 'Gifted / Gumroad'][$r['plan']] ?? '—';
         $status = $r['status'] === 'active' ? 'Active' : ucfirst(str_replace('_', ' ', $r['status'])) . ($r['paid_through'] && $r['paid_through'] >= now() ? ' (access until ' . substr($r['paid_through'], 0, 10) . ')' : '');
-        $tr .= '<tr><td>' . e($r['email']) . '</td><td>' . e($plan) . '</td><td>' . e($status) . '</td><td class="num">' . e(money((int) $r['spent'], cur())) . '</td><td>' . e(substr($r['created_at'], 0, 10)) . '</td><td>' . e($r['note']) . '</td></tr>';
+        $tr .= '<tr><td>' . e($r['email']) . '</td><td>' . e($plan) . '</td><td>' . e($status) . '</td><td class="num">' . e(money((int) $r['spent'], cur())) . '</td><td>' . e(substr($r['created_at'], 0, 10)) . '</td><td>' . e($r['note']) . '</td>'
+            . '<td>' . (!empty($kept[$r['email']]) ? '<a href="' . e(url('dashboard/members') . '?export=1&email=' . rawurlencode($r['email'])) . '">Export (' . $kept[$r['email']] . ')</a>' : '') . '</td></tr>';
     }
     $csrf = e(csrf_token());
     $action = e(url('dashboard/members'));
@@ -306,8 +309,9 @@ function dash_members(string $notice = ''): void
 <div class="dash-grid">
 <div class="dash-card wide">
   <form class="dash-filter" method="get" action="$action"><label class="sr-only" for="mq">Find a member</label><input id="mq" name="q" type="search" value="$qv" placeholder="Find by email"><button class="btn ghost" type="submit">Find</button></form>
-  <div class="table-wrap"><table><tr><th>Email</th><th>Plan</th><th>Status</th><th class="num">Spent</th><th>Joined</th><th>Note</th></tr>$tr</table></div>
+  <div class="table-wrap"><table><tr><th>Email</th><th>Plan</th><th>Status</th><th class="num">Spent</th><th>Joined</th><th>Note</th><th>Their notes</th></tr>$tr</table></div>
   <p class="dash-actions"><a class="btn ghost" href="$export">Download CSV</a></p>
+  <p class="small">“Export” downloads that member’s notes, saved workings and saved pages as a text file to send them. Members whose access ended more than 90 days ago have theirs cleared automatically.</p>
 </div>
 <div class="dash-card">
   <h2>Give or remove access</h2>

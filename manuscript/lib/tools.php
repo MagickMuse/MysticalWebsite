@@ -191,3 +191,94 @@ function save_member_working(string $email, array $in): array
     ]);
     return ['id' => (int) db()->lastInsertId()];
 }
+
+// ------------------------------------------------------------------ members' data: copies on request, cleared after access ends
+
+/** How long a member's notes, workings and saved pages are kept after their access ends (see the privacy policy). */
+const MEMBER_DATA_DAYS = 90;
+
+/** Everything a member has kept in the Manuscript: their notes, saved workings and saved pages. */
+function member_data(string $email): array
+{
+    $email = strtolower(trim($email));
+    $st = db()->prepare('SELECT page_id, created_at FROM bookmarks WHERE email = ? ORDER BY created_at');
+    $st->execute([$email]);
+    $marks = $st->fetchAll();
+    $idx = page_index(array_column($marks, 'page_id'));
+    $saved = [];
+    foreach ($marks as $b) if (isset($idx[$b['page_id']])) $saved[] = ['title' => $idx[$b['page_id']]['title'], 'url' => $idx[$b['page_id']]['url'], 'saved' => $b['created_at']];
+    return ['notes' => member_notes($email), 'workings' => member_workings($email), 'saved' => $saved];
+}
+
+/** A member's data as a plain text file anyone can open: for answering "please send me my notes". */
+function member_data_text(string $email): string
+{
+    $d = member_data($email);
+    $site = rtrim((string) config('site_url', ''), '/');
+    $line = str_repeat('-', 60);
+    $out = "Your notes from The Magick Manuscript\n" . $email . "\nExported " . gmdate('F j, Y') . "\n\n";
+    $out .= "NOTES (" . count($d['notes']) . ")\n" . $line . "\n";
+    foreach (array_reverse($d['notes']) as $n) {
+        $out .= "\n" . $n['title'] . "\nWritten " . substr($n['created'], 0, 10) . ($n['pageTitle'] ? ' on ' . $n['pageTitle'] : '')
+            . ($n['page'] ? ' (' . $site . $n['page'] . ')' : '') . "\n\n" . $n['body'] . "\n\n" . $line . "\n";
+    }
+    $out .= "\n\nWORKINGS (" . count($d['workings']) . ")\n" . $line . "\n";
+    foreach (array_reverse($d['workings']) as $w) {
+        $items = array_map(function ($it) { $p = find_page($it[0], $it[1]); return $p ? $p['title'] : $it[1]; }, $w['items']);
+        $out .= "\n" . $w['title'] . "\nSaved " . $w['created'] . "\nFor: " . implode(', ', $w['intents']) . "\nUsing: " . implode(', ', $items)
+            . ($w['notes'] !== '' ? "\n\n" . $w['notes'] : '') . "\n\n" . $line . "\n";
+    }
+    $out .= "\n\nSAVED PAGES (" . count($d['saved']) . ")\n" . $line . "\n";
+    foreach ($d['saved'] as $s) $out .= $s['title'] . "  " . $s['url'] . "\n";
+    return $out;
+}
+
+/** Dashboard → Members → Export: downloads one member's notes, workings and saved pages. */
+function dash_member_export(): void
+{
+    $email = strtolower(trim((string) ($_GET['email'] ?? '')));
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { not_found(); return; }
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Content-Disposition: attachment; filename="manuscript-notes-' . preg_replace('/[^a-z0-9]+/', '-', $email) . '.txt"');
+    header('Cache-Control: private, no-store');
+    echo member_data_text($email);
+}
+
+/** How much each member has kept, for the dashboard: email => number of notes, workings and saved pages. */
+function member_data_counts(): array
+{
+    $out = [];
+    foreach (['member_notes', 'workings', 'bookmarks'] as $t) {
+        foreach (db()->query("SELECT email, COUNT(*) FROM $t GROUP BY email")->fetchAll(PDO::FETCH_KEY_PAIR) as $e => $n) $out[$e] = ($out[$e] ?? 0) + (int) $n;
+    }
+    return $out;
+}
+
+/**
+ * Clears the notes, workings and saved pages of members whose access ended more than MEMBER_DATA_DAYS ago
+ * (a canceled monthly plan, a refund, a lost chargeback, access removed in the dashboard). If they come back
+ * before then, everything is still there. Runs at most once a day, on whatever visit comes first; the admins'
+ * own data is never touched. Returns how many members were cleared.
+ */
+function clear_lapsed_member_data(bool $force = false): int
+{
+    $stamp = config('data_dir') . '/last-cleanup';
+    if (!$force && is_file($stamp) && filemtime($stamp) > time() - 86400) return 0;
+    @touch($stamp);
+    $cutoff = gmdate('Y-m-d H:i:s', time() - MEMBER_DATA_DAYS * 86400);
+    $st = db()->prepare("SELECT email FROM members WHERE status != 'active' AND MAX(COALESCE(paid_through, ''), updated_at) < ?");
+    $st->execute([$cutoff]);
+    $admins = array_map('strtolower', (array) config('admins', []));
+    $n = 0;
+    foreach ($st->fetchAll(PDO::FETCH_COLUMN) as $email) {
+        if (in_array(strtolower($email), $admins, true)) continue;
+        $had = 0;
+        foreach (['member_notes', 'workings', 'bookmarks'] as $t) {
+            $del = db()->prepare("DELETE FROM $t WHERE email = ?");
+            $del->execute([$email]);
+            $had += $del->rowCount();
+        }
+        if ($had) { $n++; error_log('[manuscript] cleared the notes of ' . $email . ' (access ended over ' . MEMBER_DATA_DAYS . ' days ago)'); }
+    }
+    return $n;
+}
