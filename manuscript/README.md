@@ -19,12 +19,13 @@ hosting, no database server to set up, and nothing to install. Stripe takes the 
   links delivered in the buyer's library, discount codes (made in Stripe → Product catalog → Coupons).
 - **Dashboard:** revenue (30 days, this month, all time), active members,
   new and canceled members, sales by product, refunds, email sign-ups, and CSV downloads.
-- **Members' tools:** *Today* (`/manuscript/today`: the moon phase, the day's planet, the Sun's sign, the season and
-  the day's festivals, with the intentions, herbs, stones and rituals they favour), the *Spell builder*
-  (`/manuscript/spell-builder`: up to three intentions → ranked timing, colours, herbs, stones, oils, deities and rituals,
-  saved as a working), the *Correspondence wheel* (`/manuscript/wheel`: planets, zodiac signs or moon phases, each lighting
-  up everything tied to it) and *margin notes* (private notes at the end of every page). Workings and notes are listed
-  under ★ Saved. All of it is built from the Notion connections, so it grows as the Manuscript does.
+- **Members' tools** (members only), each listed under *Enchanted Tools* beside *Guide Pages* in its grimoire's intro
+  (`GRIMOIRE_TOOLS` in `lib/tools.php`): the *Spell Builder* in Rituals (`/manuscript/spell-builder`: up to three intentions →
+  ranked timing, colours, herbs, stones, oils, deities and rituals, saved as a working), the *Planet, Zodiac and Moon Phase
+  Wheels* in Astrology (`/manuscript/wheel`), and *Today* and the *Calendar* in Timing (`/manuscript/today`: the moon phase,
+  the day's planet, the Sun's sign, the season and the day's festivals, with what they favour).
+- **Notes:** "✎ Notes" at the top left (beside ★ Saved) opens a pop-up note, named after the page it's written on and
+  renamable; `/manuscript/notes` lists every note with its first lines, and each opens in the pop-up.
 - **Importer:** pulls straight from Notion, including images, and can be re-run any time to pick up new pages.
 
 > **The paid content never goes into GitHub.** This repository is public. The wiki's database and

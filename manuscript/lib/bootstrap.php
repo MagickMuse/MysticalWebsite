@@ -189,14 +189,18 @@ function migrate(PDO $pdo): void
     );
     CREATE INDEX IF NOT EXISTS bookmarks_page ON bookmarks(page_id);
 
-    -- Members' private notes on pages ("margin notes").
-    CREATE TABLE IF NOT EXISTS notes (
+    -- Members' notes: titled (the page they were written on, to start with), and the page they belong to.
+    CREATE TABLE IF NOT EXISTS member_notes (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
         email      TEXT NOT NULL,
-        page_id    TEXT NOT NULL,
+        page_id    TEXT,                        -- the Manuscript page it was written on (NULL: another page, see page_path)
+        page_path  TEXT NOT NULL DEFAULT '',
+        title      TEXT NOT NULL,
         body       TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        PRIMARY KEY (email, page_id)
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
     );
+    CREATE INDEX IF NOT EXISTS member_notes_email ON member_notes(email, updated_at);
 
     -- Workings saved from the spell builder: the intentions and the entries ticked.
     CREATE TABLE IF NOT EXISTS workings (
@@ -218,6 +222,12 @@ function migrate(PDO $pdo): void
     // Columns added after the first release: CREATE TABLE IF NOT EXISTS leaves existing tables as they were.
     $cols = array_column($pdo->query('PRAGMA table_info(payments)')->fetchAll(), 'name');
     if (!in_array('dispute', $cols, true)) $pdo->exec('ALTER TABLE payments ADD COLUMN dispute TEXT');
+    // The first notes (one untitled note per page) become titled notes, named after their page.
+    if ($pdo->query("SELECT 1 FROM main.sqlite_master WHERE type = 'table' AND name = 'notes'")->fetchColumn()) {
+        $pdo->exec("INSERT INTO member_notes (email, page_id, page_path, title, body, created_at, updated_at)
+            SELECT n.email, n.page_id, '', COALESCE(p.title, 'Note'), n.body, n.updated_at, n.updated_at FROM main.notes n LEFT JOIN content.pages p ON p.id = n.page_id;
+            DROP TABLE main.notes;");
+    }
 }
 
 function now(): string { return gmdate('Y-m-d H:i:s'); }

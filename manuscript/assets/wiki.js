@@ -799,29 +799,62 @@
     location.replace(location.pathname + '?' + q.toString());
   })();
 
-  // Margin notes: saved a moment after typing stops (and when leaving the page); the button still works without JavaScript.
-  document.querySelectorAll('form[data-notes]').forEach(function (form) {
-    var box = form.querySelector('textarea'), status = form.querySelector('.notes-status');
-    var last = box.value, timer, busy = false;
+  // Notes: "✎ Notes" at the top opens the note pop-up (lib/tools.php note_dialog). It saves a moment after typing stops,
+  // and on closing; the title can be changed; "New note" starts another. On the notes page, each note opens in it.
+  (function () {
+    var pop = document.getElementById('note-pop');
+    if (!pop || typeof pop.showModal !== 'function') return;
+    var form = pop.querySelector('[data-note-form]'), idIn = form.querySelector('[name="id"]');
+    var title = form.querySelector('.note-title'), body = form.querySelector('.note-body'), status = form.querySelector('.notes-status');
+    var snap = function () { return idIn.value + '\n' + title.value + '\n' + body.value; };
+    var last = snap(), timer, busy = null, changed = false;
     function save() {
       clearTimeout(timer);
-      if (box.value === last || busy) return;
-      busy = true; status.textContent = 'Saving…';
-      var sent = box.value;
-      fetch(form.action, { method: 'POST', body: new FormData(form), credentials: 'same-origin', headers: { 'X-Requested-With': 'fetch' } })
+      if (snap() === last) return Promise.resolve();
+      if (busy) return busy.then(save);
+      if (!idIn.value && !body.value.trim()) { last = snap(); return Promise.resolve(); } // nothing written yet
+      var sent = snap(); status.textContent = 'Saving…';
+      busy = fetch(form.action, { method: 'POST', body: new FormData(form), credentials: 'same-origin', headers: { 'X-Requested-With': 'fetch' } })
         .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
-        .then(function (d) { last = sent; status.textContent = d.empty ? 'Note removed' : 'Saved'; })
+        .then(function (d) { if (d.id) idIn.value = d.id; last = sent.replace(/^[^\n]*/, idIn.value); changed = true; status.textContent = 'Saved'; })
         .catch(function () { status.textContent = 'Not saved. Check your connection.'; })
-        .then(function () { busy = false; if (box.value !== last) timer = setTimeout(save, 1200); });
+        .then(function () { busy = null; });
+      return busy;
     }
-    box.addEventListener('input', function () { status.textContent = ''; clearTimeout(timer); timer = setTimeout(save, 1200); });
-    box.addEventListener('blur', save);
-    form.addEventListener('submit', function (e) { e.preventDefault(); save(); if (box.value === last) status.textContent = 'Saved'; });
-    window.addEventListener('pagehide', function () {
-      if (box.value === last || !navigator.sendBeacon) return;
-      navigator.sendBeacon(form.action, new FormData(form));
+    function later() { status.textContent = ''; clearTimeout(timer); timer = setTimeout(save, 1000); }
+    function load(note) {
+      idIn.value = note.id || ''; title.value = note.title; body.value = note.body || '';
+      last = snap(); status.textContent = '';
+    }
+    function open() {
+      if (!pop.open) pop.showModal();
+      body.focus(); body.setSelectionRange(body.value.length, body.value.length);
+    }
+    function close() { save().then(function () { pop.close(); if (changed && document.querySelector('.note-cards, .notes-page')) location.reload(); }); }
+    title.addEventListener('input', later);
+    body.addEventListener('input', later);
+    form.addEventListener('submit', function (e) { e.preventDefault(); save().then(function () { status.textContent = 'Saved'; }); });
+    pop.querySelector('[data-note-close]').addEventListener('click', close);
+    pop.addEventListener('cancel', function (e) { e.preventDefault(); close(); });
+    pop.addEventListener('click', function (e) { if (e.target === pop) close(); });
+    pop.querySelector('[data-note-new]').addEventListener('click', function () {
+      save().then(function () { load({ id: '', title: pop.getAttribute('data-default-title'), body: '' }); title.select(); title.focus(); });
     });
-  });
+    document.addEventListener('click', function (e) {
+      var opener = e.target.closest('[data-note-open]');
+      if (opener) { e.preventDefault(); open(); return; }
+      var card = e.target.closest('a[data-note-id]');
+      if (!card || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();
+      fetch(card.getAttribute('href') + '?json=1', { credentials: 'same-origin' })
+        .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
+        .then(function (n) { load(n); open(); })
+        .catch(function () { location.href = card.getAttribute('href'); });
+    });
+    window.addEventListener('pagehide', function () {
+      if (snap() !== last && navigator.sendBeacon && (idIn.value || body.value.trim())) navigator.sendBeacon(form.action, new FormData(form));
+    });
+  })();
 
   // "Delete" buttons that ask first
   document.addEventListener('click', function (e) {

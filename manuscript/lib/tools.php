@@ -150,16 +150,38 @@ function tool_chip(array $p, string $extra = ''): string
     return '<a class="rel" href="' . e($p['url']) . '">' . icon_html($p['icon'] ?? null, 'rel-icon') . '<span>' . e($p['title']) . '</span>' . $extra . '</a>';
 }
 
-/** The three tools, as a row of buttons (the Manuscript home and each tool's page). */
-function tools_nav(string $here = ''): string
+/**
+ * Each grimoire's tools, listed in its intro box beside "Guide Pages" (members only): grimoire => [[address, name]…].
+ * The heading is TOOLS_HEADING.
+ */
+const TOOLS_HEADING = 'Enchanted Tools';
+const GRIMOIRE_TOOLS = [
+    'ritual' => [['spell-builder', 'Spell Builder']],
+    'astrology' => [['wheel?of=planets', 'Planet Wheel'], ['wheel?of=signs', 'Zodiac Wheel'], ['wheel?of=moon', 'Moon Phase Wheel']],
+    'timing' => [['today', 'Today'], ['calendar', 'Calendar']],
+];
+
+/** A grimoire's intro box with its tools added as a fold-out, right after "Guide Pages" (or at the end of the box). */
+function grimoire_tools_html(string $grimoire, string $body): string
 {
-    $tools = ['today' => ['Today', '☾'], 'spell-builder' => ['Spell builder', '✦'], 'wheel' => ['Correspondence wheel', '✺']];
-    $html = '';
-    foreach ($tools as $k => [$label, $mark]) {
-        $html .= '<a class="tool-link' . ($k === $here ? ' here' : '') . '" href="' . e(url($k)) . '"' . ($k === $here ? ' aria-current="page"' : '') . '>'
-            . '<i aria-hidden="true">' . $mark . '</i>' . e($label) . '</a>';
-    }
-    return '<nav class="tools-nav" aria-label="Manuscript tools">' . $html . '</nav>';
+    $tools = GRIMOIRE_TOOLS[$grimoire] ?? [];
+    if (!$tools || !has_access()) return $body;
+    $links = implode('', array_map(fn($t) => '<p class="page-link tool-page"><a href="' . e(url($t[0])) . '">' . e($t[1]) . '</a></p>', $tools));
+    $box = '<details class="toggle tools-toggle"><summary>' . e(TOOLS_HEADING) . '</summary><div class="link-flow">' . $links . '</div></details>';
+    $guide = preg_replace('~(<details class="toggle"><summary>Guide Pages</summary>.*?</details>)~s', '$1' . str_replace(['\\', '$'], ['\\\\', '\$'], $box), $body, 1, $done);
+    if ($done) return $guide;
+    $inBox = preg_replace('~(<aside class="mm-callout[^"]*"><div>.*?)(</div></aside>)~s', '$1' . str_replace(['\\', '$'], ['\\\\', '\$'], $box) . '$2', $body, 1, $done);
+    return $done ? $inBox : '<aside class="mm-callout tools-only"><div>' . $box . '</div></aside>' . $body;
+}
+
+/** Breadcrumbs from a tool page back to its grimoire (and on, for a working, to the spell builder). */
+function tool_crumbs(string $grimoire, array $more = []): string
+{
+    $g = grimoire_root($grimoire);
+    $html = '<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' . e(url()) . '">Manuscript</a></li>'
+        . ($g ? '<li><a href="' . e(page_url($g)) . '">' . e($g['title']) . '</a></li>' : '');
+    foreach ($more as [$label, $href]) $html .= '<li><a href="' . e($href) . '">' . e($label) . '</a></li>';
+    return $html . '</ol></nav>';
 }
 
 function members_only_tool(): bool
@@ -376,8 +398,8 @@ function view_today(): void
     $prev = $day->modify('-1 day')->format('Y-m-d');
     $next = $day->modify('+1 day')->format('Y-m-d');
     $h = $south ? '&h=s' : '';
-    layout('Today', '<article class="pg pg-tool pg-today" data-today="' . e($date) . '">' . tools_nav('today')
-        . '<header class="pg-head tool-head"><p class="eyebrow labelled">Today in the Manuscript</p>'
+    layout('Today', '<article class="pg pg-tool pg-today" data-today="' . e($date) . '">'
+        . '<header class="pg-head tool-head">' . tool_crumbs('timing') . '<p class="eyebrow labelled">Today in the Manuscript</p>'
         . '<h1>' . e($day->format('l')) . ', <em>' . e($day->format('F j')) . '</em></h1>'
         . ($lede ? '<p class="lede">' . e(ucfirst($lede)) . '.</p>' : '')
         . '<p class="small day-nav"><a class="link" href="' . e(url('today') . '?d=' . $prev . $h) . '" rel="nofollow">‹ ' . e($day->modify('-1 day')->format('M j')) . '</a>'
@@ -508,8 +530,8 @@ function view_spell_builder(): void
             : '<p class="lede">Nothing in the Manuscript is tied to this yet. Try a broader intention.</p>';
     }
 
-    layout('Spell builder', '<article class="pg pg-tool pg-spell">' . tools_nav('spell-builder')
-        . '<header class="pg-head tool-head"><p class="eyebrow labelled">Spell builder</p><h1>Build <em>a working</em></h1>'
+    layout('Spell Builder', '<article class="pg pg-tool pg-spell">'
+        . '<header class="pg-head tool-head">' . tool_crumbs('ritual') . '<p class="eyebrow labelled">Spell Builder</p><h1>Build <em>a working</em></h1>'
         . '<p class="lede">Choose what the spell is for. The Manuscript gathers the days, colours, herbs, stones, oils, deities and rituals tied to it.</p></header>'
         . ($chips ? '<div class="intents">' . $chips . '</div>' : '') . $box . $starters . $result . '</article>', ['private' => true, 'protect' => true]);
 }
@@ -569,8 +591,8 @@ function route_workings(array $parts, string $method): void
     }
     $csrf = '<input type="hidden" name="csrf" value="' . e(csrf_token()) . '">';
     $again = $intents ? '<a class="link" href="' . e(url('spell-builder') . '?i=' . rawurlencode(implode(',', array_column($intents, 'slug')))) . '">Open in the spell builder</a>' : '';
-    layout($w['title'], '<article class="pg pg-tool pg-working">' . tools_nav()
-        . '<header class="pg-head tool-head"><p class="eyebrow labelled">Your working</p><h1>' . e($w['title']) . '</h1>'
+    layout($w['title'], '<article class="pg pg-tool pg-working">'
+        . '<header class="pg-head tool-head">' . tool_crumbs('ritual', [['Spell Builder', url('spell-builder')]]) . '<p class="eyebrow labelled">Your working</p><h1>' . e($w['title']) . '</h1>'
         . '<p class="small">Saved ' . e(date('F j, Y', strtotime($w['created_at']))) . ($again ? ' · ' . $again : '') . '</p></header>'
         . ($intents ? '<div class="intents">' . implode('', array_map(fn($p) => '<span class="intent">' . icon_html($p['icon'], 'rel-icon') . '<a href="' . e($p['url']) . '">' . e($p['title']) . '</a></span>', $intents)) . '</div>' : '')
         . '<div class="work-parts">' . ($html ?: '<p class="lede">Nothing was ticked in this working.</p>') . '</div>'
@@ -588,11 +610,11 @@ function route_workings(array $parts, string $method): void
 function wheels(): array
 {
     return [
-        'planets' => ['Planets', 'Planets', ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'],
+        'planets' => ['Planet Wheel', 'Planets', ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'],
             ['sun' => '☉', 'moon' => '☽', 'mercury' => '☿', 'venus' => '♀', 'mars' => '♂', 'jupiter' => '♃', 'saturn' => '♄', 'uranus' => '♅', 'neptune' => '♆', 'pluto' => '♇']],
-        'signs' => ['Zodiac signs', 'Western Zodiac', ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'],
+        'signs' => ['Zodiac Wheel', 'Western Zodiac', ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'],
             ['aries' => '♈', 'taurus' => '♉', 'gemini' => '♊', 'cancer' => '♋', 'leo' => '♌', 'virgo' => '♍', 'libra' => '♎', 'scorpio' => '♏', 'sagittarius' => '♐', 'capricorn' => '♑', 'aquarius' => '♒', 'pisces' => '♓']],
-        'moon' => ['Moon phases', 'Moon Phases', ['new-moon', 'waxing-crescent-moon', 'first-quarter-moon', 'waxing-gibbous-moon', 'full-moon', 'waning-gibbous-moon', 'third-quarter-moon', 'waning-crescent-moon'],
+        'moon' => ['Moon Phase Wheel', 'Moon Phases', ['new-moon', 'waxing-crescent-moon', 'first-quarter-moon', 'waxing-gibbous-moon', 'full-moon', 'waning-gibbous-moon', 'third-quarter-moon', 'waning-crescent-moon'],
             ['new-moon' => '●', 'waxing-crescent-moon' => '☽', 'first-quarter-moon' => '◑', 'waxing-gibbous-moon' => '◖', 'full-moon' => '○', 'waning-gibbous-moon' => '◗', 'third-quarter-moon' => '◐', 'waning-crescent-moon' => '☾']],
     ];
 }
@@ -648,16 +670,18 @@ function view_wheel(): void
         $tabs .= '<a class="fchip' . ($k === $of ? ' on' : '') . '" href="' . e(url('wheel') . '?of=' . $k) . '"' . ($k === $of ? ' aria-current="true"' : '') . '>' . e($label) . '</a>';
     }
     $detail = $sel
-        ? '<header class="wheel-head"><p class="eyebrow">' . e($glyphs[$sel['slug']] ?? '') . ' ' . e(rtrim($name, 's')) . '</p>'
+        ? '<header class="wheel-head"><p class="eyebrow">' . e($glyphs[$sel['slug']] ?? '') . ' ' . e(['planets' => 'Planet', 'signs' => 'Zodiac sign', 'moon' => 'Moon phase'][$of]) . '</p>'
           . '<h2><a href="' . e($sel['url']) . '">' . e($sel['title']) . '</a></h2>'
           . '<p class="small">Tied to ' . number_format($total) . ' pages across the grimoires.</p></header>' . $groups
-        : '<p class="lede">The ' . e(mb_strtolower($name)) . ' haven’t been moved over from Notion yet.</p>';
+        : '<p class="lede">These pages haven’t been moved over from Notion yet.</p>';
 
     $body = '<div class="wheel-layout"><div class="wheel-wrap">' . $wheel . '</div><div class="wheel-detail" id="wheel-detail" aria-live="polite">' . $detail . '</div></div>';
     if (!empty($_GET['part'])) { header('Content-Type: text/html; charset=utf-8'); header('Cache-Control: private, no-store'); echo $body; return; }
-    layout('Correspondence wheel', '<article class="pg pg-tool pg-wheel">' . tools_nav('wheel')
-        . '<header class="pg-head tool-head"><p class="eyebrow labelled">Correspondence wheel</p><h1>Turn <em>the wheel</em></h1>'
-        . '<p class="lede">Choose a ' . e(mb_strtolower(rtrim($name, 's'))) . ' to light up everything tied to it: the intentions it rules, its herbs, stones, oils, deities and days.</p>'
+    $wheelName = ['planets' => 'Planet Wheel', 'signs' => 'Zodiac Wheel', 'moon' => 'Moon Phase Wheel'][$of];
+    $one = ['planets' => 'planet', 'signs' => 'zodiac sign', 'moon' => 'moon phase'][$of];
+    layout($wheelName, '<article class="pg pg-tool pg-wheel">'
+        . '<header class="pg-head tool-head">' . tool_crumbs('astrology') . '<p class="eyebrow labelled">Correspondence wheel</p><h1>The ' . e(str_replace(' Wheel', '', $wheelName)) . ' <em>Wheel</em></h1>'
+        . '<p class="lede">Choose a ' . e($one) . ' to light up everything tied to it: the intentions it rules, its herbs, stones, oils, deities and days.</p>'
         . '<nav class="fchips wheel-tabs" aria-label="Wheels">' . $tabs . '</nav></header>'
         . '<div data-wheel>' . $body . '</div></article>', ['private' => true, 'protect' => true]);
 }
@@ -695,82 +719,170 @@ function wheel_svg(string $of, array $points, array $glyphs, string $sel, array 
         . '<text class="wheel-hub-star" x="' . $c . '" y="' . $c . '" text-anchor="middle" dominant-baseline="central">✦</text></svg>';
 }
 
-// ------------------------------------------------------------------ margin notes
+// ------------------------------------------------------------------ notes
 
-function page_note(string $pageId): string
+/*
+ * A member's notes: each has a title (the page it was written on, to start with) and text, and remembers that page.
+ * "✎ Notes" at the top of every Manuscript page opens the note pop-up (layout() puts it in the page; wiki.js runs it):
+ * the note already written on this page if there is one, else a new one. /notes lists them all; each opens in the pop-up.
+ */
+
+const NOTE_MAX = 20000;
+
+function note_row(int $id, string $email): ?array
 {
-    $email = current_email();
-    if (!$email) return '';
-    $st = db()->prepare('SELECT body FROM notes WHERE email = ? AND page_id = ?');
-    $st->execute([$email, $pageId]);
-    return (string) ($st->fetchColumn() ?: '');
+    $st = db()->prepare('SELECT * FROM member_notes WHERE id = ? AND email = ?');
+    $st->execute([$id, $email]);
+    return $st->fetch() ?: null;
 }
 
-/** The margin-notes box at the end of a page (members only). */
-function notes_box(array $p): string
+/** The note a member last wrote on a page (by page id, or by address for pages that aren't entries). */
+function note_for_page(string $email, ?string $pageId, string $path): ?array
 {
-    if (!current_email() || !has_access()) return '';
-    $note = page_note($p['id']);
-    return '<aside class="margin-notes" aria-labelledby="notes-h">'
-        . '<form class="notes-form" method="post" action="' . e(url('notes')) . '" data-notes>'
-        . '<input type="hidden" name="csrf" value="' . e(csrf_token()) . '"><input type="hidden" name="page" value="' . e($p['id']) . '">'
-        . '<h2 id="notes-h"><span aria-hidden="true">✎</span> In your <em>margins</em></h2>'
-        . '<p class="small">Private notes on this page: what worked, what you changed, what you want to try. Only you can see them.</p>'
-        . '<label class="sr-only" for="note-text">Your notes on ' . e($p['title']) . '</label>'
-        . '<textarea id="note-text" name="body" rows="5" maxlength="10000" placeholder="Write in the margin…">' . e($note) . '</textarea>'
-        . '<div class="notes-foot"><button class="btn ghost" type="submit">Save note</button><span class="notes-status" role="status"></span></div>'
-        . '</form></aside>';
+    $st = $pageId
+        ? db()->prepare('SELECT * FROM member_notes WHERE email = ? AND page_id = ? ORDER BY updated_at DESC LIMIT 1')
+        : db()->prepare('SELECT * FROM member_notes WHERE email = ? AND page_id IS NULL AND page_path = ? ORDER BY updated_at DESC LIMIT 1');
+    $st->execute([$email, $pageId ?: $path]);
+    return $st->fetch() ?: null;
 }
 
-/** POST /notes: save (or, when empty, remove) a member's note on a page. JSON for the page's script, else back to the page. */
-function save_note(): void
+/** The pop-up itself, added to every page a member reads ($ctx: the page's id, if any, and its title). */
+function note_dialog(array $ctx): string
 {
-    check_csrf();
     $email = current_email();
-    $page = page_by_id((string) ($_POST['page'] ?? ''));
-    if (!$email || !has_access() || !$page) { http_response_code(403); exit; }
-    $body = rtrim(mb_substr(str_replace("\r\n", "\n", (string) ($_POST['body'] ?? '')), 0, 10000));
-    if (trim($body) === '') {
-        db()->prepare('DELETE FROM notes WHERE email = ? AND page_id = ?')->execute([$email, $page['id']]);
-    } else {
-        db()->prepare('INSERT INTO notes (email, page_id, body, updated_at) VALUES (?, ?, ?, ?)
-            ON CONFLICT(email, page_id) DO UPDATE SET body = excluded.body, updated_at = excluded.updated_at')->execute([$email, $page['id'], $body, now()]);
+    if (!$email || !has_access()) return '';
+    $path = (string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+    $pageId = $ctx['page'] ?? null;
+    $title = trim((string) ($ctx['title'] ?? '')) ?: 'A note';
+    $n = note_for_page($email, $pageId, $path);
+    $count = (int) db()->query('SELECT COUNT(*) FROM member_notes WHERE email = ' . db()->quote($email))->fetchColumn();
+    return '<dialog class="note-pop" id="note-pop" aria-labelledby="note-pop-h" data-default-title="' . e($title) . '">'
+        . '<form class="note-form" method="post" action="' . e(url('notes')) . '" data-note-form>'
+        . '<input type="hidden" name="csrf" value="' . e(csrf_token()) . '">'
+        . '<input type="hidden" name="id" value="' . e((string) ($n['id'] ?? '')) . '">'
+        . '<input type="hidden" name="page" value="' . e((string) $pageId) . '"><input type="hidden" name="path" value="' . e($path) . '">'
+        . '<div class="note-top"><p class="eyebrow" id="note-pop-h"><span aria-hidden="true">✎</span> Your note</p>'
+        . '<button class="note-x" type="button" data-note-close aria-label="Close">&times;</button></div>'
+        . '<label class="sr-only" for="note-title">Note title</label>'
+        . '<input class="note-title" id="note-title" name="title" maxlength="160" value="' . e($n['title'] ?? $title) . '" placeholder="Name this note">'
+        . '<label class="sr-only" for="note-body">Note</label>'
+        . '<textarea class="note-body" id="note-body" name="body" rows="9" maxlength="' . NOTE_MAX . '" placeholder="Write in the margin… only you can see this.">' . e($n['body'] ?? '') . '</textarea>'
+        . '<div class="note-foot"><button class="btn" type="submit">Save</button><span class="notes-status" role="status"></span>'
+        . '<span class="note-links"><button class="link as-button" type="button" data-note-new>New note</button>'
+        . '<a class="link" href="' . e(url('notes')) . '">All notes' . ($count ? ' (' . $count . ')' : '') . '</a></span></div>'
+        . '</form></dialog>';
+}
+
+/** Saves a note from the pop-up or the note's own page: [id, deleted?]. An empty new note isn't kept. */
+function store_note(string $email, array $in): array
+{
+    $id = (int) ($in['id'] ?? 0);
+    $title = trim(mb_substr(preg_replace('/\s+/', ' ', (string) ($in['title'] ?? '')), 0, 160)) ?: 'Untitled note';
+    $body = rtrim(mb_substr(str_replace("\r\n", "\n", (string) ($in['body'] ?? '')), 0, NOTE_MAX));
+    if ($id && note_row($id, $email)) {
+        db()->prepare('UPDATE member_notes SET title = ?, body = ?, updated_at = ? WHERE id = ? AND email = ?')->execute([$title, $body, now(), $id, $email]);
+        return [$id, false];
     }
-    if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'fetch') {
-        header('Content-Type: application/json');
-        echo json_encode(['saved' => true, 'empty' => trim($body) === '']);
+    if (trim($body) === '') return [0, false];
+    $page = page_by_id((string) ($in['page'] ?? ''));
+    $path = (string) ($in['path'] ?? '');
+    if (!preg_match('~^/[^\s]*$~', $path) || strlen($path) > 300) $path = '';
+    $st = db()->prepare('SELECT COUNT(*) FROM member_notes WHERE email = ?');
+    $st->execute([$email]);
+    if ((int) $st->fetchColumn() >= 2000) return [0, false];
+    db()->prepare('INSERT INTO member_notes (email, page_id, page_path, title, body, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+        ->execute([$email, $page['id'] ?? null, $path, $title, $body, now(), now()]);
+    return [(int) db()->lastInsertId(), false];
+}
+
+/** Where a note was written, as [title, address], for "from …" under it. */
+function note_source(array $n): ?array
+{
+    if ($n['page_id'] && ($p = page_index([$n['page_id']])[$n['page_id']] ?? null)) return [$p['title'], $p['url']];
+    if ($n['page_path']) return [null, $n['page_path']];
+    return null;
+}
+
+/** /notes (list; POST saves), /notes/<n> (one note; ?json for the pop-up; POST saves or deletes). */
+function route_notes(array $parts, string $method): void
+{
+    $email = current_email();
+    if (!$email) redirect(url('login') . '?next=' . rawurlencode((string) parse_url(url('notes'), PHP_URL_PATH)));
+    if (!has_access()) { view_gate(['locked' => true]); return; }
+    $fetch = ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'fetch';
+    $id = (int) ($parts[0] ?? 0);
+    if ($method === 'POST') {
+        check_csrf();
+        if (($_POST['do'] ?? '') === 'delete') {
+            db()->prepare('DELETE FROM member_notes WHERE id = ? AND email = ?')->execute([$id ?: (int) ($_POST['id'] ?? 0), $email]);
+            if ($fetch) { header('Content-Type: application/json'); echo json_encode(['deleted' => true]); return; }
+            redirect(url('notes'));
+        }
+        [$saved] = store_note($email, $id ? ['id' => $id] + $_POST : $_POST);
+        if ($fetch) { header('Content-Type: application/json'); echo json_encode(['id' => $saved]); return; }
+        redirect($saved ? url('notes/' . $saved) : url('notes'));
+    }
+    if ($id) {
+        $n = note_row($id, $email);
+        if (!$n) { not_found(); return; }
+        if (isset($_GET['json'])) {
+            header('Content-Type: application/json');
+            header('Cache-Control: private, no-store');
+            echo json_encode(['id' => (int) $n['id'], 'title' => $n['title'], 'body' => $n['body']]);
+            return;
+        }
+        view_note($n);
         return;
     }
-    redirect(page_url($page) . '#notes-h');
+    view_notes($email);
 }
 
-/** For the Saved page: the member's workings and the pages they've written notes on. */
+function view_notes(string $email): void
+{
+    $st = db()->prepare('SELECT * FROM member_notes WHERE email = ? ORDER BY updated_at DESC, id DESC');
+    $st->execute([$email]);
+    $notes = $st->fetchAll();
+    $items = '';
+    foreach ($notes as $n) {
+        $src = note_source($n);
+        $snip = trim(preg_replace('/\s+/', ' ', $n['body']));
+        $items .= '<li class="note-card"><a class="note-open" href="' . e(url('notes/' . $n['id'])) . '" data-note-id="' . (int) $n['id'] . '">'
+            . '<span class="note-card-title">' . e($n['title']) . '</span>'
+            . '<span class="note-card-snip">' . e(mb_strimwidth($snip, 0, 190, '…')) . '</span></a>'
+            . '<p class="note-card-meta">' . e(date('M j, Y', strtotime($n['updated_at'])))
+            . ($src && $src[0] ? ' · from <a href="' . e($src[1]) . '">' . e($src[0]) . '</a>' : '') . '</p></li>';
+    }
+    $body = $items ? '<ul class="note-cards">' . $items . '</ul>'
+        : '<p class="lede">No notes yet. Tap <strong>✎ Notes</strong> at the top of any page to write one.</p>';
+    layout('Your notes', '<section class="saved notes-page"><p class="eyebrow labelled">Your Manuscript</p><h1>Your <em>notes</em></h1>'
+        . '<p class="small">Only you can see these. Each one opens to read, rename or change it.</p>' . $body . '</section>', ['private' => true, 'note' => ['title' => 'A note']]);
+}
+
+/** One note on its own page (without JavaScript, or opened from a link): edit, rename, delete. */
+function view_note(array $n): void
+{
+    $csrf = '<input type="hidden" name="csrf" value="' . e(csrf_token()) . '">';
+    $src = note_source($n);
+    layout($n['title'], '<section class="saved notes-page one-note"><p class="eyebrow labelled"><a href="' . e(url('notes')) . '">Your notes</a></p>'
+        . '<form class="note-form on-page" method="post" action="' . e(url('notes/' . $n['id'])) . '">' . $csrf
+        . '<label class="sr-only" for="np-title">Note title</label><input class="note-title" id="np-title" name="title" maxlength="160" value="' . e($n['title']) . '">'
+        . ($src ? '<p class="small">Written on ' . ($src[0] ? '<a class="link" href="' . e($src[1]) . '">' . e($src[0]) . '</a>' : '<a class="link" href="' . e($src[1]) . '">this page</a>') . ', ' . e(date('F j, Y', strtotime($n['created_at']))) . '</p>' : '')
+        . '<label class="sr-only" for="np-body">Note</label><textarea class="note-body" id="np-body" name="body" rows="14" maxlength="' . NOTE_MAX . '">' . e($n['body']) . '</textarea>'
+        . '<div class="note-foot"><button class="btn" type="submit">Save</button></div></form>'
+        . '<form method="post" action="' . e(url('notes/' . $n['id'])) . '">' . $csrf . '<input type="hidden" name="do" value="delete">'
+        . '<button class="link as-button" type="submit" data-confirm="Delete this note? This can’t be undone.">Delete this note</button></form></section>', ['private' => true]);
+}
+
+/** For the Saved page: the member's saved workings. */
 function saved_extras(string $email): string
 {
     $st = db()->prepare('SELECT id, title, created_at FROM workings WHERE email = ? ORDER BY created_at DESC, id DESC');
     $st->execute([$email]);
     $workings = $st->fetchAll();
-    $st = db()->prepare('SELECT page_id, body, updated_at FROM notes WHERE email = ? ORDER BY updated_at DESC');
-    $st->execute([$email]);
-    $notes = $st->fetchAll();
-    $html = '';
-    if ($workings) {
-        $html .= '<section class="saved-group"><h2>Your workings</h2><ul class="saved-list">';
-        foreach ($workings as $w) $html .= '<li><a href="' . e(url('workings/' . $w['id'])) . '"><span aria-hidden="true">✦</span><span>' . e($w['title']) . '</span></a><small>' . e(date('M j, Y', strtotime($w['created_at']))) . '</small></li>';
-        $html .= '</ul></section>';
-    }
-    if ($notes) {
-        $idx = page_index(array_column($notes, 'page_id'));
-        $items = '';
-        foreach ($notes as $n) {
-            $p = $idx[$n['page_id']] ?? null;
-            if (!$p) continue;
-            $snip = mb_strimwidth(preg_replace('/\s+/', ' ', $n['body']), 0, 140, '…');
-            $items .= '<li class="note-item"><a href="' . e($p['url']) . '#notes-h">' . icon_html($p['icon']) . '<span>' . e($p['title']) . '</span></a><p class="small note-snip">' . e($snip) . '</p></li>';
-        }
-        if ($items) $html .= '<section class="saved-group"><h2>Your margin notes</h2><ul class="saved-list notes-list">' . $items . '</ul></section>';
-    }
-    return $html;
+    if (!$workings) return '';
+    $html = '<section class="saved-group"><h2>Your workings</h2><ul class="saved-list">';
+    foreach ($workings as $w) $html .= '<li><a href="' . e(url('workings/' . $w['id'])) . '"><span aria-hidden="true">✦</span><span>' . e($w['title']) . '</span></a><small>' . e(date('M j, Y', strtotime($w['created_at']))) . '</small></li>';
+    return $html . '</ul></section>';
 }
 
 /** Under a page's title: "Build a spell for Protection" on intentions, "See Venus on the wheel" on planets, signs and moon phases. */

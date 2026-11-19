@@ -300,9 +300,14 @@ function layout(string $title, string $body, array $opt = []): void
 
     $email = current_email();
     $acct = $email
-        ? (has_access() ? '<a href="' . e(url('saved')) . '"><span aria-hidden="true">★</span> Saved</a><span class="dot" aria-hidden="true">·</span>' : '') . '<a href="' . e(url('account')) . '">Account</a>'
+        ? '<a href="' . e(url('account')) . '">Account</a>'
         : '<a href="' . e(url('login')) . '">Sign in</a>';
     $q = e($_GET['q'] ?? '');
+    // Members: their saved pages and their notes, at the top left. "Notes" opens the note pop-up (wiki.js); without JavaScript it's the list.
+    $mine = $email && has_access()
+        ? '<p class="mm-mine"><a href="' . e(url('saved')) . '"><span aria-hidden="true">★</span> Saved</a><span class="dot" aria-hidden="true">·</span>'
+          . '<a href="' . e(url('notes')) . '" data-note-open aria-haspopup="dialog"><span aria-hidden="true">✎</span> Notes</a></p>'
+        : '';
     $robots = !empty($opt['index']) ? 'index, follow' : 'noindex, nofollow';
     ?>
 <!doctype html>
@@ -319,10 +324,10 @@ function layout(string $title, string $body, array $opt = []): void
   <?php foreach (['jost-300', 'cormorant-400', 'cormorant-400-italic', 'jost-400'] as $font): ?><link rel="preload" href="<?= e(site_url('fonts/' . $font . '.woff2')) ?>" as="font" type="font/woff2" crossorigin>
   <?php endforeach ?>  <script src="<?= e(site_url('prefs.js')) ?>"></script>
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=70">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=71">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=54" defer></script>
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=55" defer></script>
 <?php if ($stripe): ?>
   <script src="https://js.stripe.com/dahlia/stripe.js" defer></script>
   <script src="<?= e(url('assets/checkout.js')) ?>?v=2" defer></script>
@@ -348,6 +353,7 @@ function layout(string $title, string $body, array $opt = []): void
     </nav>
   </div>
   <div class="wrap mm-bar">
+    <?= $mine ?>
     <?php if (has_access()): ?>
     <form class="mm-search" action="<?= e(url('search')) ?>" method="get" role="search">
       <label class="sr-only" for="mm-q">Search the Manuscript</label>
@@ -362,6 +368,7 @@ function layout(string $title, string $body, array $opt = []): void
 <?= $body ?>
 </main>
 <?= $visitor ? join_popup(!empty($opt['peek'])) : '' ?>
+<?= $visitor ? '' : note_dialog($opt['note'] ?? ['title' => $title]) ?>
 <footer class="site">
   <div class="wrap foot">
     <div class="star-rule" aria-hidden="true"><i class="spark big"></i></div>

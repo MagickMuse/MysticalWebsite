@@ -62,7 +62,7 @@ function route(array $parts, string $method): void
         case 'spell-builder': route_spell_builder($method); return;
         case 'workings':      route_workings(array_slice($parts, 1), $method); return;
         case 'wheel':         view_wheel(); return;
-        case 'notes':         if ($method === 'POST') save_note(); else redirect(url('saved')); return;
+        case 'notes':         route_notes(array_slice($parts, 1), $method); return;
         case 'library':       view_the_library(); return;
         case 'picture-credits': view_picture_credits(); return;
         case 'sneak-peek':    ($p = sneak_peek_page()) ? view_page($p) : redirect(url()); return;
@@ -103,7 +103,6 @@ function view_home(): void
         $cards = '<p class="lede">Nothing has been moved over yet. Run the importer (see README) to bring grimoires in from Notion.</p>';
     }
     $join = $begin ? '<div class="actions"><a class="btn" href="' . e(page_url($begin)) . '">Begin here</a></div>' : '';
-    if ($member) $join .= tools_nav();
     if (!$member) {
         $join = '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a>'
             . (sneak_peek_page() ? '<a class="btn ghost" href="' . e(url('sneak-peek')) . '">Take a sneak peek</a>' : '') . '</div>'
@@ -244,12 +243,14 @@ function view_page(array $p): void
             '~<p><strong>([^<]{2,80}:)</strong>\s*(.*?)</p>~s',
             fn($m) => '<p class="label">' . $m[1] . '</p>' . (trim(strip_tags($m[2])) !== '' ? '<p>' . $m[2] . '</p>' : ''),
             $box[0]), $bodyHtml);
-        $body = $panel . $gallery . '<div class="mm-prose">' . $bodyHtml . '</div>' . (in_array($p['kind'], ['entry', 'guide'], true) ? notes_box($p) : '');
+        // A grimoire's tools (the Spell Builder in Rituals, the wheels in Astrology…) beside its Guide Pages.
+        if ($p['kind'] === 'grimoire') $bodyHtml = grimoire_tools_html($p['grimoire'], $bodyHtml);
+        $body = $panel . $gallery . '<div class="mm-prose">' . $bodyHtml . '</div>';
     }
     // With written content, the properties become a sidebar beside it (and wiki.js adds a table of contents).
     // A page that is only properties keeps them across the page: sidebars beside nothing would only show the gap.
     $aside = $panel !== '' && trim(html_entity_decode(strip_tags($bodyHtml))) !== '';
-    layout($p['title'], '<article class="pg pg-' . e($p['kind']) . ($aside ? ' with-aside' : '') . '">' . $cover . $head . $body . '</article>', ['private' => true, 'protect' => true, 'peek' => $peek]);
+    layout($p['title'], '<article class="pg pg-' . e($p['kind']) . ($aside ? ' with-aside' : '') . '">' . $cover . $head . $body . '</article>', ['private' => true, 'protect' => true, 'peek' => $peek, 'note' => ['page' => $p['id'], 'title' => $p['title']]]);
 }
 
 /** True for a PNG with transparency (colour type with alpha), read from the file's header. */
