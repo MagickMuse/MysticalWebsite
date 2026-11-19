@@ -185,10 +185,68 @@ final class NotionImporter
             [$g, $slug] = explode('/', $ref, 2);
             $set->execute(['asset:' . $file, $g, $slug]);
         }
+        $this->intentionIcons();
         ($this->log)("Site rules: pictures taken off $n page(s); " . count($icons) . ' icons set by the site.');
     }
 
     /** Scientific or Latin names on a Notion page (property name contains "scientific", "latin" or "botanical"). */
+    /**
+     * Rituals and recipes without an icon get the icon of their intention, from the correspondences:
+     * one they link to that their title names ("Protection Oil"), else the one their category names (Divination),
+     * else the first linked action, else the first linked one, else an intention their title names,
+     * else an icon for their type (Oil, Powder, Incense…). The same rules made the GitHub Pages copy's icons.
+     */
+    private function intentionIcons(): void
+    {
+        $tagList = function (?string $json, string $name): array {
+            $v = (json_decode((string) $json, true) ?: [])[$name] ?? [];
+            return array_values(array_filter(array_map('strval', is_array($v) ? $v : [$v]), 'strlen'));
+        };
+        $words = fn(string $t): array => preg_match_all('/[a-z]+/', mb_strtolower($t), $m) ? $m[0] : [];
+        $namedIn = function (string $title, string $name) use ($words): bool {
+            $tw = $words($title); $nw = $words($name);
+            if (!$nw) return false;
+            if (count($nw) === 1) {
+                foreach ($tw as $w) if ($w === $nw[0] || (strlen($nw[0]) >= 5 && strlen($w) >= 5 && substr($w, 0, 5) === substr($nw[0], 0, 5))) return true;
+                return false;
+            }
+            return str_contains(implode(' ', $tw), implode(' ', $nw));
+        };
+        $cors = [];
+        $rows = db()->query("SELECT id, title, icon, tags_json FROM pages WHERE grimoire = 'correspondence' AND kind = 'entry' AND icon IS NOT NULL AND icon NOT LIKE 'file:%' AND icon NOT LIKE 'asset:%'");
+        foreach ($rows as $c) {
+            $type = $tagList($c['tags_json'], 'Type');
+            $cors[$c['id']] = [$c['title'], $c['icon'], in_array('Action', $type, true), (bool) array_intersect($type, ['Action', 'State/Quality', 'Emotion'])];
+        }
+        if (!$cors) return;
+        uasort($cors, fn($a, $b) => mb_strlen($b[0]) <=> mb_strlen($a[0]));
+        $fallback = ['oil' => '💧', 'powder' => '🧂', 'incense' => '🔥', 'ink' => '🖋️', 'bath blend' => '🛁', 'bath' => '🛁', 'tea' => '🍵', 'water' => '💧'];
+        $links = db()->prepare("SELECT to_id FROM relations WHERE from_id = ? AND prop = 'Correspondences' ORDER BY sort");
+        $set = db()->prepare('UPDATE pages SET icon = ? WHERE id = ?');
+        $n = 0;
+        foreach (db()->query("SELECT id, grimoire, title, tags_json FROM pages WHERE grimoire IN ('ritual', 'recipe') AND kind = 'entry' AND (icon IS NULL OR icon = '')")->fetchAll() as $p) {
+            $links->execute([$p['id']]);
+            $linked = array_values(array_filter($links->fetchAll(PDO::FETCH_COLUMN), fn($id) => isset($cors[$id])));
+            $cat = $tagList($p['tags_json'], $p['grimoire'] === 'recipe' ? 'Type' : 'Category')[0] ?? '';
+            $icon = null;
+            foreach ($linked as $c) if ($namedIn($p['title'], $cors[$c][0])) { $icon = $cors[$c][1]; break; }
+            if (!$icon && $cat !== '') foreach ($cors as $c) if (mb_strtolower($c[0]) === mb_strtolower($cat)) { $icon = $c[1]; break; }
+            if (!$icon) foreach ($linked as $c) if ($cors[$c][2]) { $icon = $cors[$c][1]; break; }
+            if (!$icon && $linked) $icon = $cors[$linked[0]][1];
+            if (!$icon) {
+                $tw = ' ' . implode(' ', $words($p['title'])) . ' ';
+                foreach ($cors as $c) {
+                    if ($c[3] && $words($c[0]) && !in_array(mb_strtolower($c[0]), ['sweet', 'construction'], true)
+                        && str_contains($tw, ' ' . implode(' ', $words($c[0])) . ' ')) { $icon = $c[1]; break; }
+                }
+            }
+            $icon ??= $fallback[mb_strtolower($cat)] ?? ($p['grimoire'] === 'recipe' ? '🌿' : '✨');
+            $set->execute([$icon, $p['id']]);
+            $n++;
+        }
+        if ($n) ($this->log)("Site rules: $n ritual/recipe page(s) given their intention's icon.");
+    }
+
     private function scientificNames(array $page): array
     {
         $out = [];
