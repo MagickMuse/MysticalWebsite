@@ -10,6 +10,27 @@
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(self \"https://js.stripe.com\")"
 </IfModule>
 
+# Speed: compress text files, and let browsers keep files that rarely change.
+# Page speed is part of how Google ranks pages. Only static files are matched here, so the
+# Manuscript's pages (served by PHP) keep their own private, no-cache headers.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript application/json application/xml application/rss+xml application/manifest+json image/svg+xml
+</IfModule>
+<IfModule mod_headers.c>
+  # Fonts and photos: kept for a year (a changed photo gets a new file name).
+  <FilesMatch "\.(woff2|webp|jpe?g|png|ico)$">
+    Header set Cache-Control "public, max-age=31536000"
+  </FilesMatch>
+  # Styles and scripts: kept for a day, so design changes show up by the next day at the latest.
+  <FilesMatch "\.(css|js|svg)$">
+    Header set Cache-Control "public, max-age=86400"
+  </FilesMatch>
+  # Pages, the sitemap and the feed: always checked for a newer copy.
+  <FilesMatch "\.(html|xml|txt|webmanifest)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
 # Custom error pages
 ErrorDocument 404 /404.html
 ErrorDocument 403 /404.html
@@ -24,10 +45,21 @@ ServerSignature Off
 # so shared links and search rankings carry over.
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # One address per page: http:// → https://, and www.magickmuse.com → magickmuse.com,
+  # so search engines never see two copies of the same page. (The X-Forwarded-Proto check
+  # stops a redirect loop if the site is ever put behind a CDN.)
+  RewriteCond %{HTTP_HOST} ^www\.magickmuse\.com$ [NC]
+  RewriteRule ^ https://magickmuse.com%{REQUEST_URI} [R=301,L]
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
   # Blog posts moved into /blog/ (old address, with or without .html)
   RewriteRule ^(astrology-for-witches|candle-magick-for-beginners|crystals-for-beginners|essential-witch-tools-for-beginners|herbalism-for-witches|how-my-witchcraft-practice-has-changed|how-to-cast-a-spell-for-beginners|how-to-celebrate-samhain|how-to-dispose-of-a-spell|how-to-find-reliable-witchcraft-information|how-to-research-witchcraft|how-to-work-with-ancestors-witchcraft|how-to-work-with-deities-witchcraft|how-to-work-with-greek-gods|law-of-similars-witchcraft|meditation-for-witches-beginners|protection-magick-for-beginners|runes-for-beginners|what-is-a-correspondence-in-witchcraft|what-is-baneful-magick|what-is-divination-witchcraft|what-is-shadow-work-witchcraft|what-to-do-with-your-first-tarot-deck|what-to-include-in-a-grimoire|witch-without-wicca|witchcraft-books-for-beginners)(?:\.html)?$ /blog/$1 [R=301,L]
   RewriteCond %{THE_REQUEST} \s/+blog/[^?\s]+\.html[\s?]
   RewriteRule ^blog/([a-z0-9-]+)\.html$ /blog/$1 [R=301,L]
+  # Sections renamed to match the menu: Muses (was /meetup) and Mythos (was /story)
+  RewriteRule ^meetup(?:\.html)?/?$ /muses [R=301,L]
+  RewriteRule ^story(?:\.html)?/?$ /mythos [R=301,L]
   # The blog's list of posts is the Mastery page
   RewriteRule ^blog/?$ /mastery [R=301,L]
   # /index.html → /, and any other /page.html → /page (only when asked for directly, not after a rewrite below)
@@ -41,8 +73,9 @@ ServerSignature Off
   RewriteCond %{REQUEST_FILENAME}.html -f
   RewriteRule ^(.+?)/?$ $1.html [L]
 
-  # The shop (/shop, /shop/library, /shop/<product>) is served by the Manuscript app.
-  RewriteRule ^shop(/.*)?$ manuscript/index.php [L,QSA]
+  # The Market (/market, /market/library, /market/<product>) is served by the Manuscript app.
+  # Old /shop addresses are forwarded there by the app (it keeps form posts from open tabs working).
+  RewriteRule ^(market|shop)(/.*)?$ manuscript/index.php [L,QSA]
 </IfModule>
 
 # Never serve the Manuscript's private settings or data, wherever they end up.
