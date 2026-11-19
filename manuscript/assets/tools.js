@@ -481,6 +481,7 @@
     'Keep children and pets away, and have water or a fire extinguisher close by.',
     'Burn incense, herbs and charcoal in a well-ventilated room.',
     'Make sure everything is completely out before you leave it.'];
+  var WARNING_WORDS = /\b(poison(?:s|ous|ing)?|toxic|toxins?|not (?:recommended|safe)|avoid|do not|don.t|never (?:use|be|ingest|take|apply)|irritant|irritat\w*|pregnan\w*|allerg\w*|caution|harmful|dangerous(?:ly)?|fatal(?:ly)?|lethal|abortifacient|phototoxic|unsafe|miscarriage|contraindicated|overdose)\b/i;
   /** An ingredient page's warnings, as written on it: [label, text]… (general notes and "safe" entries are left out). */
   function warnings(i) {
     var out = [];
@@ -491,8 +492,12 @@
       else if (name === 'Drug Interactions' && vals[0] && !/^None known/i.test(vals[0])) out.push(['Drug interactions', vals.join(' ')]);
       else if ((name === 'Water Safe?' || name === 'Sun Safe?') && vals[0] === 'No') out.push(['', name === 'Water Safe?' ? 'Not water safe' : 'Not sun safe']);
       else if (name === 'Notes/Warnings') {
-        var t = vals.join('\n').replace(/^\s*Substitution:.*$/gim, '').trim();
-        if (t && !/^(non-toxic|generally safe)/i.test(t) && /\b(poison\w*|toxic|not (?:recommended|safe)|avoid|do not|don.t|never|irritant|irritat\w*|pregnan\w*|allerg\w*|caution|harmful|danger\w*|fatal\w*|lethal|abortifacient|phototoxic|unsafe)\b/i.test(t)) out.push(['', t]);
+        // Only the sentences that are warnings, each exactly as written; descriptions and history are left out.
+        var t = vals.join('\n').replace(/^[ \t]*Substitution:.*$/gim, '');
+        var sentences = t.split(/\n+|(?<=[.!?])\s+(?=[A-Z0-9⚠])/).map(function (x) { return x.trim(); }).filter(function (x) {
+          return x && !/^(non-toxic|generally safe)/i.test(x) && !/poison arrows?/i.test(x) && WARNING_WORDS.test(x);
+        });
+        if (sentences.length) out.push(['', sentences.join('\n')]);
       }
     });
     return out;
@@ -502,13 +507,14 @@
     var out = [];
     (D.w[i] || []).forEach(function (f) {
       if (f[0] !== 'Notes/Warnings') return;
-      f[1].join('\n').replace(/^\s*Substitution:\s*(.+)$/gim, function (m, names) { names.split(/\s*(?:,|;|\bor\b)\s*/).forEach(function (n) { if (n.trim()) out.push(n.trim()); }); });
+      // Exactly as written: only semicolons separate suggestions ("Mace; Nutmeg"); "or", "and" and commas are left alone.
+      f[1].join('\n').replace(/^[ \t]*Substitution:[ \t]*(.+)$/gim, function (m, names) { names.split(/\s*;\s*/).forEach(function (n) { if (n.trim()) out.push(n.trim()); }); });
     });
     var g = D.p[i][0];
     out = out.filter(function (n, k) { return out.map(function (x) { return x.toLowerCase(); }).indexOf(n.toLowerCase()) === k; });
     return out.map(function (n) {
       var hit = null; D.p.forEach(function (p, j) { if (!hit && p[0] === g && p[2].toLowerCase() === n.toLowerCase()) hit = j; });
-      return hit == null ? '<span>' + esc(n) + '</span>' : chip(pg(hit));
+      return hit == null ? '<span>' + esc(n) + '</span>' : '<a href="' + esc(pg(hit).url) + '">' + esc(D.p[hit][2]) + '</a>';
     });
   }
   /**
@@ -549,12 +555,12 @@
         shared.forEach(function (k) { D.l[k].forEach(function (c) { if (D.p[c][0] === D.p[j][0] && c !== j && !inWorking[c]) cands[c] = (cands[c] || 0) + 1; }); });
         // Never suggest a swap that carries any warning on its own page (toxic, irritant, pregnancy…): it may be eaten or worn.
         swaps = Object.keys(cands).map(Number).filter(function (c) { return cands[c] >= need && !warnings(c).length; })
-          .sort(function (a, b) { return D.l[b].length - D.l[a].length; }).slice(0, 4).map(function (c) { return chip(pg(c)); });
+          .sort(function (a, b) { return D.l[b].length - D.l[a].length; }).slice(0, 4).map(function (c) { return '<a href="' + esc(pg(c).url) + '">' + esc(D.p[c][2]) + '</a>'; });
       }
       if (own.length || swaps.length) {
         subs.push('<li>' + chip(pg(j)) + '<span class="sub-for">'
-          + (own.length ? '<span class="sub-own">Suggested on its page: ' + own.join(' ') + '</span>' : '')
-          + (swaps.length ? '<span class="sub-shared">' + (shared.length <= 3 ? 'Also ' + names(shared) : 'Share 3 or more of its correspondences here') + ': ' + swaps.join(' ') + '</span>' : '') + '</span></li>');
+          + (own.length ? '<span class="sub-line"><span class="sub-label">On its page</span>' + own.join('; ') + '</span>' : '')
+          + (swaps.length ? '<span class="sub-line"><span class="sub-label">' + (shared.length <= 3 ? 'Also ' + names(shared) : 'Shares 3+ of its correspondences') + '</span>' + swaps.join(', ') + '</span>' : '') + '</span></li>');
       }
       var w = warnings(j);
       if (w.length) warn.push('<li>' + chip(pg(j)) + '<span class="warn-for">' + w.map(function (x) {
