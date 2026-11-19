@@ -412,8 +412,9 @@
         if (a !== null || b !== null) return a === null ? 1 : -1;
         return az(x, y);
       } : az);
+      var was = section.querySelector('.entry-grid');
       section.querySelectorAll('.col-group, ul[data-col-list], .col-more, .collection > .lede').forEach(function (n) { n.remove(); });
-      var ul = document.createElement('ul'); ul.className = 'entry-grid';
+      var ul = document.createElement('ul'); ul.className = was ? was.className : 'entry-grid';
       items.forEach(function (li) { ul.appendChild(li); });
       var bar = section.querySelector('.col-bar');
       bar.after(ul);

@@ -280,11 +280,11 @@ function collection_html(array $v, bool $withHeading): string
             $name = str_starts_with($val, 'No ') ? '<span class="' . pill_class($val) . '">' . e($val) . '</span>'
                 : '<a class="' . pill_class($val) . '" href="' . e($link(['filters' => $f, 'group' => ''])) . '" title="Only ' . e($val) . '">' . e($val) . '</a>';
             $list .= '<section class="col-group"><h3>' . $name . ' <small>' . count($items) . '</small></h3>'
-                . '<ul class="entry-grid">' . collection_items(array_slice($items, 0, GROUP_PREVIEW), $state['sort'], $metric) . '</ul>' . $more . '</section>';
+                . '<ul class="entry-grid' . gallery_class($v['c']) . '">' . collection_items(array_slice($items, 0, GROUP_PREVIEW), $state['sort'], $metric) . '</ul>' . $more . '</section>';
         }
     } else {
         $offset = 0;
-        $list = '<ul class="entry-grid" data-col-list>' . collection_items(array_slice($rows, 0, COLLECTION_PAGE * $state['page']), $state['sort'], $metric) . '</ul>';
+        $list = '<ul class="entry-grid' . gallery_class($v['c']) . '" data-col-list>' . collection_items(array_slice($rows, 0, COLLECTION_PAGE * $state['page']), $state['sort'], $metric) . '</ul>';
         if (COLLECTION_PAGE * $state['page'] < $total) {
             $next = view_link($v, ['page' => $state['page'] + 1]);
             $part = preg_replace('/#.*$/', '', $next);
@@ -317,7 +317,7 @@ function collection_items(array $rows, string $sort, array $metric): string
             'popular' => isset($metric[$e['id']]) ? '<small class="metric">' . $metric[$e['id']] . ' views</small>' : '',
             default => '',
         };
-        $out .= '<li><a href="' . e(page_url($e)) . '">' . icon_html($e['icon']) . '<span>' . e($e['title']) . '</span>' . $badge . '</a></li>';
+        $out .= '<li><a href="' . e(page_url($e)) . '">' . (is_gallery($e['grimoire']) ? gallery_pic($e) : icon_html($e['icon'])) . '<span>' . e($e['title']) . '</span>' . $badge . '</a></li>';
     }
     return $out;
 }
@@ -352,4 +352,26 @@ function calendar_cmp(string $a, string $b): int
     if ($x !== null && $y !== null) return $x <=> $y ?: strnatcasecmp($a, $b);
     if ($x !== null || $y !== null) return $x === null ? 1 : -1;
     return strnatcasecmp($a, $b);
+}
+
+/** Grimoires whose lists are galleries: a larger picture above each name (config "gallery_grimoires"). */
+function is_gallery(string $grimoire): bool
+{
+    return in_array($grimoire, (array) config('gallery_grimoires', ['plant', 'mineral', 'rune', 'symbol', 'card']), true);
+}
+
+function gallery_class(array $c): string
+{
+    return is_gallery((string) $c['grimoire']) ? ' gallery gal-' . e((string) $c['grimoire']) : '';
+}
+
+/** The entry's gallery picture: its preview (made on import from the cover), else its picture icon or emoji, else a ✦. */
+function gallery_pic(array $e): string
+{
+    $card = $e['id'] . '-card.webp';
+    if (is_file(config('data_dir') . '/media/' . $card)) return '<span class="gal-pic"><img src="' . e(media_url($card)) . '" alt="" loading="lazy"></span>';
+    $icon = (string) ($e['icon'] ?? '');
+    if (preg_match('/^(file|asset):/', $icon)) return '<span class="gal-pic">' . icon_html($icon, 'gal-img') . '</span>';
+    if ($icon !== '') return '<span class="gal-pic emoji" aria-hidden="true">' . e($icon) . '</span>';
+    return '<span class="gal-pic none" aria-hidden="true"></span>';
 }
