@@ -487,7 +487,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
   font-size: min(calc(var(--t) * .42), calc(var(--w) * 1.42 * .74 / (var(--n) * 1.12))); }
 
 /* ---------- leather: a fine dark grain and soft light pebbling, laid over each book's colour ---------- */
-.bk, .slab, .b3d, .tarot-back { --leather: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0 0 0 -.18'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='turbulence' baseFrequency='.42' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -.35 .1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+.bk, .slab, .b3d, .tarot-back, .stone { --leather: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0 0 0 -.18'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='turbulence' baseFrequency='.42' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -.35 .1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
   --worn: inset 0 0 0 1px rgba(0,0,0,.22), inset 0 0 10px rgba(0,0,0,.28); }
 
 /* ---------- the Manuscript home: the grimoire spines on two shelves, in the site's colours ---------- */
@@ -1319,3 +1319,46 @@ html.nav-fold .mm-mine { order: -2; }
 }
 @media (prefers-reduced-motion: reduce) { .drawn-card .flip, .reading, .spread .tarot-back { transition: none; } }
 :root[data-motion="reduce"] .drawn-card .flip, :root[data-motion="reduce"] .reading { transition: none; }
+
+/* ---------- Pull a Rune (tools.js): seven river stones, each its own shape; the one picked turns over ---------- */
+.stone { position: relative; display: block; padding: 0; border: 0; cursor: pointer; aspect-ratio: 5 / 6;
+  --tone: #77706b; background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, .3), transparent 52%), radial-gradient(circle at 70% 82%, rgba(0, 0, 0, .32), transparent 62%), var(--leather), var(--tone);
+  box-shadow: 0 16px 18px -12px rgba(46, 31, 32, .6), inset 0 -6px 12px rgba(0, 0, 0, .22), inset 0 4px 8px rgba(255, 255, 255, .12); }
+/* every stone its own shape and colour: slate, sandstone, basalt, river grey, a touch of the Muse's rose */
+.stone.st-0 { --tone: #6f6865; border-radius: 62% 38% 47% 53% / 44% 62% 38% 56%; }
+.stone.st-1 { --tone: #9a8b7b; border-radius: 38% 62% 66% 34% / 58% 42% 58% 42%; aspect-ratio: 6 / 6.4; }
+.stone.st-2 { --tone: #4f4849; border-radius: 68% 32% 40% 60% / 37% 52% 48% 63%; }
+.stone.st-3 { --tone: #857e78; border-radius: 45% 55% 30% 70% / 62% 38% 62% 38%; aspect-ratio: 5 / 5.6; }
+.stone.st-4 { --tone: #8c6f6c; border-radius: 57% 43% 68% 32% / 66% 58% 42% 34%; }
+.stone.st-5 { --tone: #5d5856; border-radius: 70% 30% 52% 48% / 42% 66% 34% 58%; aspect-ratio: 6 / 6.6; }
+.stone.st-6 { --tone: #a39686; border-radius: 35% 65% 58% 42% / 55% 36% 64% 45%; }
+.stone-face { position: absolute; inset: 0; border-radius: inherit; }
+.stones { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1.2rem 1.6rem; max-width: 760px; margin: 0 auto; padding: 2.6rem 0 2.4rem; }
+.stones .stone { width: 104px; transition: transform .35s cubic-bezier(.2,.7,.2,1), opacity .35s, box-shadow .35s; transform: translateY(var(--y, 0)) rotate(var(--r, 0deg)); }
+.stones .st-0 { --r: -8deg; --y: 10px; } .stones .st-1 { --r: 6deg; --y: -6px; width: 112px; } .stones .st-2 { --r: -3deg; --y: 14px; } .stones .st-3 { --r: 12deg; --y: -10px; width: 96px; }
+.stones .st-4 { --r: -10deg; --y: 4px; } .stones .st-5 { --r: 4deg; --y: -4px; width: 116px; } .stones .st-6 { --r: -5deg; --y: 8px; width: 100px; }
+.stones:not(.picked) .stone:hover, .stones:not(.picked) .stone:focus-visible { transform: translateY(calc(var(--y, 0) - 12px)) rotate(var(--r, 0deg)); box-shadow: 0 26px 22px -14px rgba(46, 31, 32, .65), inset 0 -6px 12px rgba(0, 0, 0, .22), inset 0 4px 8px rgba(255, 255, 255, .12); }
+.stones .stone:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+.stones.picked .stone { opacity: .25; cursor: default; }
+.stones.picked .stone.chosen { opacity: 1; transform: translateY(-24px) scale(1.1); }
+.drawn-stone { width: 100%; max-width: 230px; justify-self: center; }
+.drawn-stone .flip { aspect-ratio: 5 / 6; }
+.drawn-stone .face.stone { cursor: default; width: 100%; height: 100%; aspect-ratio: auto; }
+.drawn-card.drawn-stone .front { background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, .3), transparent 52%), radial-gradient(circle at 70% 82%, rgba(0, 0, 0, .32), transparent 62%), var(--leather), var(--tone); box-shadow: 0 22px 26px -14px rgba(46, 31, 32, .65), inset 0 -8px 16px rgba(0, 0, 0, .25); }
+/* the rune, carved and gilded */
+.rune-glyph { position: absolute; inset: 0; display: grid; place-items: center; font: 400 clamp(5rem, 14vw, 7.5rem)/1 "Segoe UI Historic", "Noto Sans Runic", "Junicode", serif; color: #e3c27a;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .45), 0 -1px 0 rgba(255, 240, 200, .35); }
+.rune-glyph.blank::after { content: ""; width: 34%; height: 2px; background: color-mix(in srgb, #e3c27a 50%, transparent); border-radius: 2px; } /* Wyrd: the blank rune */
+@media (max-width: 700px) {
+  .stones { gap: .8rem 1rem; padding: 2rem 0 1.6rem; }
+  .stones .stone { width: 78px; } .stones .st-1 { width: 84px; } .stones .st-3 { width: 72px; } .stones .st-5 { width: 86px; } .stones .st-6 { width: 76px; }
+  .drawn-stone { width: min(200px, 56vw); }
+}
+@media (prefers-reduced-motion: reduce) { .stones .stone { transition: none; } }
+
+/* Today and the Manuscript home: the next sabbat */
+.sabbat-count { margin: .2rem 0 0; font-family: var(--display); font-size: 1.25rem; }
+.sabbat-count > span[aria-hidden] { color: var(--gold); font-size: .9rem; margin-right: .2rem; }
+.sabbat-count a { color: var(--accent-text); }
+.sabbat-count strong { font-weight: 600; }
+.sabbat-date { margin-left: .4rem; font-family: var(--body); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }

@@ -23,7 +23,7 @@ ROW = re.compile(r'<div class="prop-row( rel-row)?"[^>]*><div class="prop-name">
 LINK = re.compile(r'href="(?:\.\./)+manuscript/([a-z-]+)/([^/"#?]+)/"')
 PILL = re.compile(r'<(?:span|a) class="pill"[^>]*>(.*?)</(?:span|a)>', re.S)
 # Kinds of page the tools look for (an entry's Type)
-KINDS = {'Planets', 'Moon Phases', 'Western Zodiac', 'Days of the Week', 'Days of the Year', 'Holidays', 'Seasons', 'Time of Day', 'Color'}
+KINDS = {'Planets', 'Moon Phases', 'Western Zodiac', 'Days of the Week', 'Days of the Year', 'Holidays', 'Seasons', 'Time of Day', 'Color', 'Elder Futhark Runes'}
 MONTHS = 'january|february|march|april|may|june|july|august|september|october|november|december'
 
 
@@ -101,6 +101,7 @@ def main():
         'spell-builder': ('Spell Builder', 'spell'),
         'wheel': ('Correspondence Wheel', 'wheel'),
         'draw-a-card': ('Draw a Card', 'tarot'),
+        'pull-a-rune': ('Pull a Rune', 'rune'),
         'notes': ('Your notes', 'notes'),
     }
     for folder, (title, tool) in shells.items():

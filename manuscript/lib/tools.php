@@ -18,6 +18,7 @@ const TOOL_PAGES = [
     'spell-builder' => ['Spell Builder', 'spell'],
     'wheel' => ['Correspondence Wheel', 'wheel'],
     'draw-a-card' => ['Draw a Card', 'tarot'],
+    'pull-a-rune' => ['Pull a Rune', 'rune'],
 ];
 
 /** A tool's page: members only; tools.js fills in the article. */
@@ -33,14 +34,14 @@ function view_tool_page(string $route): void
 // ------------------------------------------------------------------ the data tools.js works from
 
 /** Kinds of page the tools look for (an entry's Type), plus "Tarot" for a tarot card. */
-const TOOL_KINDS = ['Planets', 'Moon Phases', 'Western Zodiac', 'Days of the Week', 'Days of the Year', 'Holidays', 'Seasons', 'Time of Day', 'Color'];
+const TOOL_KINDS = ['Planets', 'Moon Phases', 'Western Zodiac', 'Days of the Week', 'Days of the Year', 'Holidays', 'Seasons', 'Time of Day', 'Color', 'Elder Futhark Runes'];
 
 /** /tools/data.json: built from the database when the content changes, then served from the cache. */
 function serve_tools_data(): void
 {
     if (!has_access()) { http_response_code(403); exit; }
     // The version changes when the data's shape does, so an older copy is never served.
-    $cache = config('data_dir') . '/tools-data-v3.json';
+    $cache = config('data_dir') . '/tools-data-v4.json';
     $content = config('data_dir') . '/content.sqlite';
     if (!is_file($cache) || filemtime($cache) < (int) @filemtime($content)) {
         file_put_contents($cache . '.tmp', json_encode(tools_data(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));

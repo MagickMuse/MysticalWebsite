@@ -58,7 +58,7 @@ function route(array $parts, string $method): void
             redirect(site_url(implode('/', array_merge(['market'], array_slice($parts, 1)))) . ($q !== '' ? '?' . $q : ''), 301);
         case 'suggest':       search_suggest(trim((string) ($_GET['q'] ?? ''))); return;
         case 'calendar':      view_calendar(); return;
-        case 'today': case 'spell-builder': case 'wheel': case 'draw-a-card': view_tool_page($first); return;
+        case 'today': case 'spell-builder': case 'wheel': case 'draw-a-card': case 'pull-a-rune': view_tool_page($first); return;
         case 'tools':         ($parts[1] ?? '') === 'data.json' ? serve_tools_data() : not_found(); return;
         case 'notes': case 'workings': route_member_store($first, $method); return;
         case 'library':       view_the_library(); return;

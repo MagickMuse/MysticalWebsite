@@ -83,7 +83,7 @@
   }
   function chip(p) { return '<a class="rel" href="' + esc(p.url) + '">' + iconHtml(p.icon, 'rel-icon') + '<span>' + esc(p.title) + '</span></a>'; }
   function crumbs(g, more) {
-    var name = { ritual: 'Ritual Grimoire', astrology: 'Astrology Grimoire', timing: 'Timing Grimoire', card: 'Card Grimoire' }[g] || '';
+    var name = { ritual: 'Ritual Grimoire', astrology: 'Astrology Grimoire', timing: 'Timing Grimoire', card: 'Card Grimoire', rune: 'Rune Grimoire' }[g] || '';
     var h = '<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' + esc(ROOT) + '">Manuscript</a></li>' + (name ? '<li><a href="' + esc(url(g + '/')) + '">' + name + '</a></li>' : '');
     (more || []).forEach(function (m) { h += '<li><a href="' + esc(m[1]) + '">' + esc(m[0]) + '</a></li>'; });
     return h + '</ol></nav>';
@@ -245,7 +245,7 @@
     tool.className = 'pg pg-tool pg-today';
     render(tool, '<header class="pg-head tool-head">' + crumbs('timing') + '<p class="eyebrow labelled">Today in the Manuscript</p>'
       + '<h1>' + DAYS[day.getDay()] + ', <em>' + MONTHS[day.getMonth()] + ' ' + day.getDate() + '</em></h1>'
-      + (R.lede ? '<p class="lede">' + esc(R.lede) + '</p>' : '')
+      + (R.lede ? '<p class="lede">' + esc(R.lede) + '</p>' : '') + sabbatHtml(day, south)
       + '<p class="small day-nav"><a class="link" href="?d=' + iso(prev) + h + '">‹ ' + short(prev) + '</a><span aria-hidden="true">·</span>'
       + '<a class="link" href="?d=' + iso(day) + (south ? '' : '&h=s') + '">' + (south ? 'Use the northern hemisphere' : 'Use the southern hemisphere') + '</a><span aria-hidden="true">·</span>'
       + '<a class="link" href="?d=' + iso(next) + h + '">' + short(next) + ' ›</a></p></header>'
@@ -277,7 +277,7 @@
     box.setAttribute('aria-labelledby', 'glance-h');
     box.innerHTML = '<header class="glance-head"><p class="eyebrow labelled">Today in the Manuscript</p>'
       + '<h2 id="glance-h">' + DAYS[day.getDay()] + ', <em>' + MONTHS[day.getMonth()] + ' ' + day.getDate() + '</em></h2>'
-      + (R.lede ? '<p class="lede">' + esc(R.lede) + '</p>' : '') + '</header>'
+      + (R.lede ? '<p class="lede">' + esc(R.lede) + '</p>' : '') + sabbatHtml(day, false) + '</header>'
       + influenceCards(R)
       + (R.intents.length ? '<div class="glance-favs"><p class="eyebrow">Today favours</p><div class="favs">' + R.intents.slice(0, 6).map(function (x) { return favourLink(x, true); }).join('') + '</div></div>' : '')
       + '<p class="glance-more"><a class="btn ghost" href="' + esc(url('today/')) + '">Open Today</a></p>';
@@ -424,6 +424,69 @@
         drawn.querySelector('[data-again]').addEventListener('click', function () { tarot(tool); window.scrollTo({ top: 0, behavior: quiet ? 'auto' : 'smooth' }); });
       }, quiet ? 0 : 450);
     });
+  }
+
+  // ------------------------------------------------------------------ Pull a Rune
+  // Seven river stones, face down, from the Elder Futhark (24 runes and the blank Wyrd). The one picked turns over to
+  // show its rune, carved, with the rune's correspondences and a way into its page.
+  var RUNE_GLYPHS = { fehu: 'ᚠ', uruz: 'ᚢ', thurisaz: 'ᚦ', ansuz: 'ᚨ', raidho: 'ᚱ', kenaz: 'ᚲ', gebo: 'ᚷ', wunjo: 'ᚹ', hagaiaz: 'ᚺ', nauthiz: 'ᚾ',
+    isaz: 'ᛁ', jera: 'ᛃ', eiwaz: 'ᛇ', pertho: 'ᛈ', algiz: 'ᛉ', sowilo: 'ᛊ', tiwaz: 'ᛏ', berkanan: 'ᛒ', ehwaz: 'ᛖ', mannaz: 'ᛗ', laguz: 'ᛚ',
+    ingwaz: 'ᛜ', othala: 'ᛟ', dagaz: 'ᛞ', wyrd: '' };
+  function runeWords(i) {
+    return D.l[i].filter(function (j) { return D.g[D.p[j][0]] === 'correspondence'; })
+      .sort(function (a, b) { return D.p[a][2].localeCompare(D.p[b][2]); }).map(pg);
+  }
+  function runes(tool) {
+    var bag = []; D.p.forEach(function (p, i) { if (p[4] && p[4].split('|').indexOf('Elder Futhark Runes') !== -1) bag.push(i); });
+    var hand = shuffled(bag).slice(0, 7);
+    tool.className = 'pg pg-tool pg-runes';
+    render(tool, '<header class="pg-head tool-head">' + crumbs('rune') + '<h1>Pull <em>a rune</em></h1></header>'
+      + '<div class="stones" role="group" aria-label="Seven face-down rune stones">' + hand.map(function (i, k) {
+        return '<button class="stone st-' + k + '" type="button" data-pick="' + k + '" aria-label="Stone ' + (k + 1) + ' of 7"><span class="stone-face"></span></button>';
+      }).join('') + '</div><div class="drawn drawn-rune" aria-live="polite"></div>', 'Pull a Rune');
+    var field = tool.querySelector('.stones'), drawn = tool.querySelector('.drawn');
+    field.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-pick]');
+      if (!b || field.classList.contains('picked')) return;
+      var k = +b.getAttribute('data-pick'), rune = pg(hand[k]), words = runeWords(hand[k]), glyph = RUNE_GLYPHS[rune.slug];
+      var quiet = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      field.classList.add('picked'); b.classList.add('chosen');
+      setTimeout(function () {
+        field.hidden = true;
+        drawn.innerHTML = '<div class="drawn-card drawn-stone"><div class="flip"><span class="face stone st-' + k + '"><span class="stone-face"></span></span>'
+          + '<span class="face front stone st-' + k + '"><span class="stone-face"></span><span class="rune-glyph' + (glyph ? '' : ' blank') + '" aria-hidden="true">' + (glyph || '') + '</span></span></div></div>'
+          + '<div class="reading"><p class="eyebrow">Elder Futhark</p><h2>' + esc(rune.title) + '</h2>'
+          + (words.length ? '<div class="rels keywords">' + words.map(chip).join('') + '</div>' : '')
+          + '<div class="actions"><a class="btn" href="' + esc(rune.url) + '">View more</a><button class="btn ghost" type="button" data-again>Pull again</button></div></div>';
+        var flip = drawn.querySelector('.drawn-card');
+        if (quiet) flip.classList.add('turned'); else requestAnimationFrame(function () { requestAnimationFrame(function () { flip.classList.add('turned'); }); });
+        drawn.querySelector('[data-again]').addEventListener('click', function () { runes(tool); window.scrollTo({ top: 0, behavior: quiet ? 'auto' : 'smooth' }); });
+      }, quiet ? 0 : 450);
+    });
+  }
+
+  // ------------------------------------------------------------------ the next sabbat
+  // The Wheel of the Year (northern hemisphere dates; the southern hemisphere keeps each one six months later).
+  var SABBATS = [['Imbolc', 'imbolc', 2, 1], ['Ostara', 'ostara', 3, 20], ['Beltane', 'beltane', 5, 1], ['Litha', 'summer-solstice', 6, 21],
+    ['Lughnasadh', 'lughnasadh', 8, 1], ['Mabon', 'mabon', 9, 22], ['Samhain', 'samhain', 10, 31], ['Yule', 'yule', 12, 21]];
+  /** The next sabbat from a day (today included): {name, page, date, days}. */
+  function nextSabbat(day, south) {
+    var best = null;
+    SABBATS.forEach(function (s) {
+      var d = new Date(day.getFullYear(), (s[2] - 1 + (south ? 6 : 0)) % 12, s[3]);
+      if (d < day) d.setFullYear(d.getFullYear() + 1);
+      var days = Math.round((d - day) / 86400000);
+      if (!best || days < best.days) best = { name: s[0], page: find('timing', s[1]), date: d, days: days };
+    });
+    return best;
+  }
+  function sabbatHtml(day, south) {
+    var s = nextSabbat(day, south);
+    if (!s) return '';
+    var when = s.days === 0 ? 'is today' : s.days === 1 ? 'is tomorrow' : 'in <strong>' + s.days + '</strong> days';
+    var name = s.page ? '<a href="' + esc(s.page.url) + '">' + esc(s.name) + '</a>' : esc(s.name);
+    return '<p class="sabbat-count"><span aria-hidden="true">✦</span> ' + name + ' ' + when
+      + ' <span class="sabbat-date">' + DAYS[s.date.getDay()].slice(0, 3) + ', ' + MONTHS[s.date.getMonth()] + ' ' + s.date.getDate() + '</span></p>';
   }
 
   // ------------------------------------------------------------------ the wheels
@@ -580,7 +643,8 @@
     ritual: [['spell-builder/', 'Spell Builder']],
     astrology: [['wheel/?of=planets', 'Planet Wheel'], ['wheel/?of=signs', 'Zodiac Wheel'], ['wheel/?of=moon', 'Moon Phase Wheel']],
     timing: [['today/', 'Today'], ['calendar/', 'Calendar']],
-    card: [['draw-a-card/', 'Draw a Card']]
+    card: [['draw-a-card/', 'Draw a Card']],
+    rune: [['pull-a-rune/', 'Pull a Rune']]
   };
   function grimoireTools() {
     var art = document.querySelector('article.pg-grimoire'), m = /\/manuscript\/([a-z-]+)\/?$/.exec(location.pathname);
@@ -645,6 +709,7 @@
     if (kind === 'today') today(tool);
     else if (kind === 'spell') spell(tool);
     else if (kind === 'tarot') tarot(tool);
+    else if (kind === 'rune') runes(tool);
     else if (kind === 'wheel') { wheel(tool); window.addEventListener('popstate', function () { wheel(tool); }); }
   }).catch(function () { tool.innerHTML = '<p class="lede">The tools couldn’t load. Refresh the page to try again.</p>'; });
 })();
