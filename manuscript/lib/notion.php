@@ -194,6 +194,7 @@ final class NotionImporter
         }
         $this->intentionIcons();
         $this->pictureIcons();
+        $this->galleryPreviews();
         // Rituals: Open or Closed Practice, to filter by (from the Closed Practice property, which stays on the page).
         foreach (db()->query("SELECT id, tags_json FROM pages WHERE grimoire = 'ritual' AND kind = 'entry'")->fetchAll() as $row) {
             $tags = json_decode((string) $row['tags_json'], true) ?: [];
@@ -273,6 +274,53 @@ final class NotionImporter
             AND EXISTS (SELECT 1 FROM relations r JOIN pages pl ON pl.id = r.to_id
                 WHERE r.from_id = pages.id AND r.prop = 'Plant' AND (pl.icon LIKE 'file:%' OR pl.icon LIKE 'asset:%'))");
         ($this->log)("Picture icons: $made made from covers.");
+    }
+
+    /**
+     * Gallery previews (media/<id>-card.webp, 320px) for the picture grimoires' lists, from each entry's cover or picture icon.
+     * Cut-outs are trimmed and centred, photos cropped square. Cards keep their whole shape: only scaled down.
+     */
+    private function galleryPreviews(): void
+    {
+        if (!function_exists('imagecreatefromstring') || !function_exists('imagewebp')) return;
+        $grims = (array) config('gallery_grimoires', ['plant', 'mineral', 'rune', 'symbol', 'card']);
+        $dir = config('data_dir') . '/media';
+        $place = implode(',', array_fill(0, count($grims), '?'));
+        $st = db()->prepare("SELECT id, grimoire, cover, icon FROM pages WHERE kind = 'entry' AND grimoire IN ($place)");
+        $st->execute($grims);
+        $made = 0;
+        foreach ($st->fetchAll() as $p) {
+            $name = $p['id'] . '-card.webp';
+            if (is_file("$dir/$name")) continue;
+            $c = (string) ($p['cover'] ?: (str_starts_with((string) $p['icon'], 'file:') ? substr((string) $p['icon'], 5) : (str_starts_with((string) $p['icon'], 'asset:') ? $p['icon'] : '')));
+            if ($c === '' || str_starts_with($c, 'http') || str_ends_with($c, '.svg')) continue;
+            $src = str_starts_with($c, 'asset:') ? MM_ROOT . '/assets/' . substr($c, 6) : "$dir/$c";
+            $im = @imagecreatefromstring((string) @file_get_contents($src));
+            if (!$im) continue;
+            imagepalettetotruecolor($im); imagealphablending($im, false); imagesavealpha($im, true);
+            $w = imagesx($im); $h = imagesy($im);
+            if ($p['grimoire'] === 'card') { // whole card, scaled down
+                $k = min(320 / $w, 440 / $h, 1); $ow = max(1, (int) round($w * $k)); $oh = max(1, (int) round($h * $k));
+                $out = imagecreatetruecolor($ow, $oh); imagealphablending($out, false); imagesavealpha($out, true);
+                imagecopyresampled($out, $im, 0, 0, 0, 0, $ow, $oh, $w, $h);
+            } else {
+                $cut = ((imagecolorat($im, 0, 0) >> 24) & 127) > 100 && ((imagecolorat($im, $w - 1, $h - 1) >> 24) & 127) > 100;
+                if ($cut) {
+                    $x0 = $w; $y0 = $h; $x1 = $y1 = -1; $step = max(1, intdiv(max($w, $h), 400));
+                    for ($y = 0; $y < $h; $y += $step) for ($x = 0; $x < $w; $x += $step) {
+                        if (((imagecolorat($im, $x, $y) >> 24) & 127) < 115) { $x0 = min($x0, $x); $y0 = min($y0, $y); $x1 = max($x1, $x); $y1 = max($y1, $y); }
+                    }
+                    if ($x1 < 0) continue;
+                    $cw = $x1 - $x0 + 1; $ch = $y1 - $y0 + 1; $side = (int) round(max($cw, $ch) * 1.08);
+                    $dx = $x0 - intdiv($side - $cw, 2); $dy = $y0 - intdiv($side - $ch, 2);
+                } else { $side = min($w, $h); $dx = intdiv($w - $side, 2); $dy = intdiv($h - $side, 2); }
+                $out = imagecreatetruecolor(320, 320); imagealphablending($out, false); imagesavealpha($out, true);
+                imagefill($out, 0, 0, imagecolorallocatealpha($out, 0, 0, 0, 127));
+                imagecopyresampled($out, $im, 0, 0, $dx, $dy, 320, 320, $side, $side);
+            }
+            if (imagewebp($out, "$dir/$name", 84)) $made++;
+        }
+        ($this->log)("Gallery previews: $made made.");
     }
 
     /** Scientific or Latin names on a Notion page (property name contains "scientific", "latin" or "botanical"). */
