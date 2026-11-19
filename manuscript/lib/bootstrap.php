@@ -214,6 +214,17 @@ function migrate(PDO $pdo): void
     );
     CREATE INDEX IF NOT EXISTS workings_email ON workings(email);
 
+    -- The 30-day beginner path: who is on it, the last day sent, and the token in its stop link.
+    CREATE TABLE IF NOT EXISTS beginner_path (
+        email      TEXT PRIMARY KEY,
+        started_at TEXT NOT NULL,
+        day        INTEGER NOT NULL DEFAULT 0,
+        sent_at    TEXT,
+        stopped_at TEXT,
+        token      TEXT NOT NULL
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS beginner_path_token ON beginner_path(token);
+
     CREATE TABLE IF NOT EXISTS stripe_events (
         id TEXT PRIMARY KEY,
         received_at TEXT NOT NULL

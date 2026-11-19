@@ -14,6 +14,7 @@ require __DIR__ . '/lib/collection.php';
 require __DIR__ . '/lib/glyphs.php';
 require __DIR__ . '/lib/shelf.php';
 require __DIR__ . '/lib/tools.php';
+require __DIR__ . '/lib/path.php';
 
 // Path relative to the wiki's base, e.g. "correspondence/protection".
 $base = parse_url(config('base_url'), PHP_URL_PATH) ?: '';
@@ -26,6 +27,8 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 try {
     // Once a day: clear the notes of members whose access ended more than 90 days ago (lib/tools.php).
     try { clear_lapsed_member_data(); } catch (Throwable $ex) { error_log('[manuscript] cleanup: ' . $ex->getMessage()); }
+    // Once a day: the beginner path's emails (lib/path.php), unless a cron job already sent them.
+    try { maybe_run_beginner_path(); } catch (Throwable $ex) { error_log('[manuscript] beginner path: ' . $ex->getMessage()); }
     route($parts, $method);
 } catch (Throwable $ex) {
     error_log('[manuscript] ' . $ex);
@@ -63,6 +66,7 @@ function route(array $parts, string $method): void
         case 'today': case 'spell-builder': case 'wheel': case 'draw-a-card': case 'pull-a-rune': view_tool_page($first); return;
         case 'tools':         ($parts[1] ?? '') === 'data.json' ? serve_tools_data() : not_found(); return;
         case 'notes': case 'workings': route_member_store($first, $method); return;
+        case 'path':          route_path(array_slice($parts, 1), $method); return;
         case 'library':       view_the_library(); return;
         case 'picture-credits': view_picture_credits(); return;
         case 'sneak-peek':    ($p = sneak_peek_page()) ? view_page($p) : redirect(url()); return;
@@ -103,6 +107,7 @@ function view_home(): void
         $cards = '<p class="lede">Nothing has been moved over yet. Run the importer (see README) to bring grimoires in from Notion.</p>';
     }
     $join = $begin ? '<div class="actions"><a class="btn" href="' . e(page_url($begin)) . '">Begin here</a></div>' : '';
+    if ($member) $join .= path_home_line();
     if (!$member) {
         $join = '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a>'
             . (sneak_peek_page() ? '<a class="btn ghost" href="' . e(url('sneak-peek')) . '">Take a sneak peek</a>' : '') . '</div>'

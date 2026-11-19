@@ -284,7 +284,7 @@ function clear_lapsed_member_data(bool $force = false): int
     foreach ($st->fetchAll(PDO::FETCH_COLUMN) as $email) {
         if (in_array(strtolower($email), $admins, true)) continue;
         $had = 0;
-        foreach (['member_notes', 'workings', 'bookmarks'] as $t) {
+        foreach (['member_notes', 'workings', 'bookmarks', 'beginner_path'] as $t) {
             $del = db()->prepare("DELETE FROM $t WHERE email = ?");
             $del->execute([$email]);
             $had += $del->rowCount();

@@ -29,6 +29,10 @@ hosting, no database server to set up, and nothing to install. Stripe takes the 
   on an ingredient's page, then herbs, stones and oils sharing the same correspondences in that working and carrying no
   warnings of their own), *Why these ingredients* (each one's correspondences that the working shares), and *Before you
   begin* (standard fire safety when the working uses fire, and each ingredient's own warnings, word for word).
+- **Beginner path:** members can start a 30-day email course, one Manuscript page a day (its title, its own opening lines
+  word for word, and a link to read it). The days are listed in `manuscript/beginner-path.php` (edit freely). Emails go
+  out once a day with the first visit, or set a daily cron job: `php …/public_html/manuscript/cli/beginner-path.php`.
+  Members follow along at `/manuscript/path`, and every email has a link to stop them.
 - **Notes:** "✎ Notes" at the top left (beside ★ Saved) opens a pop-up note, named after the page it's written on and
   renamable; `/manuscript/notes` lists every note with its first lines, and each opens in the pop-up.
 - **One copy of the tools:** they all live in `assets/tools.js`, which runs in the browser on this site and on the

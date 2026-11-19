@@ -1401,3 +1401,15 @@ html.nav-fold .mm-mine { order: -2; }
 @media (max-width: 600px) { .mm-prose details.extras-fold > .safety-box { padding: .9rem 1rem .4rem; } }
 .share-btn::before { content: "↗"; margin-right: .5rem; letter-spacing: 0; }
 .share-btn[disabled] { opacity: .5; cursor: progress; }
+
+/* The beginner path (lib/path.php) */
+.path-invite { margin: .4rem 0 0; font-size: .95rem; color: var(--muted); }
+.path-invite > span { color: var(--gold); margin-right: .3rem; }
+.path-list { list-style: none; margin: 1.4rem 0 0; padding: 0; display: grid; }
+.path-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem 1rem; padding: .7rem 0; border-bottom: 1px solid var(--line); }
+.path-list li a { font-family: var(--display); font-size: 1.3rem; }
+.path-list li small { flex-basis: 100%; padding-left: 2.6rem; color: var(--muted); }
+.path-n { flex: none; width: 1.6rem; text-align: right; font-size: .75rem; letter-spacing: .1em; color: var(--muted); }
+.path-list li.done .path-n::after { content: " ✓"; color: var(--gold); }
+.path-list li.next { background: var(--surface); }
+.path-list li.next .path-n { color: var(--accent-text); font-weight: 600; }
