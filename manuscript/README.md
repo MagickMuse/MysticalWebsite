@@ -21,7 +21,8 @@ hosting, no database server to set up, and nothing to install. Stripe takes the 
   new and canceled members, sales by product, refunds, email sign-ups, and CSV downloads.
 - **Members' tools** (members only), each listed under *Enchanted Tools* beside *Guide Pages* in its grimoire's intro:
   the *Spell Builder* in Rituals (`/manuscript/spell-builder`), the *Planet, Zodiac and Moon Phase Wheels* in Astrology
-  (`/manuscript/wheel`), and *Today* and the *Calendar* in Timing (`/manuscript/today`).
+  (`/manuscript/wheel`), *Today* and the *Calendar* in Timing (`/manuscript/today`), and *Draw a Card* in Cards
+  (`/manuscript/draw-a-card`: seven face-down cards, one picked turns over, upright or reversed, with its keywords).
 - **Notes:** "✎ Notes" at the top left (beside ★ Saved) opens a pop-up note, named after the page it's written on and
   renamable; `/manuscript/notes` lists every note with its first lines, and each opens in the pop-up.
 - **One copy of the tools:** they all live in `assets/tools.js`, which runs in the browser on this site and on the

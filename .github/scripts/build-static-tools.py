@@ -4,7 +4,7 @@ The members' tools on the GitHub Pages copy of the Manuscript, which has no serv
 browser, here and on the live site, where lib/tools.php serves the same data from the database):
 
   1. manuscript/tools/data.json: every page (grimoire, address, title, icon, its kinds, date range and how many
-     words it has) and every connection between pages, both ways, plus each calendar day's festivals.
+     words it has), every connection, each calendar day's festivals, and the tarot cards' pictures and keywords and every connection between pages, both ways, plus each calendar day's festivals.
      The same shape lib/tools.php serves on the live site (tools_data()); the tools themselves are only in tools.js.
   2. The tools' own pages: manuscript/today/, spell-builder/, wheel/ and notes/ (shells that tools.js fills in).
 
@@ -32,7 +32,7 @@ def text(s):
 
 
 def main():
-    pages, index, rels = [], {}, []
+    pages, index, rels, covers = [], {}, [], {}
     for g in GRIMOIRES:
         gdir = os.path.join(ROOT, g)
         if not os.path.isdir(gdir):
@@ -68,21 +68,27 @@ def main():
                     vals = [text(v) for v in PILL.findall(r.group(3))] or [text(r.group(3))]
                     rng = ' '.join(vals)
             index[(g, slug)] = len(pages)
-            kinds = sorted(types & KINDS) + (['Tarot'] if ('Suit' in props or 'Upright Correspondences' in props) else [])
+            kinds = sorted(types & KINDS) + (['Tarot'] if 'Upright Correspondences' in props else [])
+            if 'Upright Correspondences' in props:  # a tarot card: its picture, for Draw a Card
+                cv = re.search(r'class="pg-cover[^"]*">.*?<img src="[^"]*/(media|assets)/([^"]+)"', s, re.S)
+                covers[len(pages)] = (('m:' if cv.group(1) == 'media' else 'a:') + cv.group(2)) if cv else ''
             body = re.search(r'<div class="mm-prose">(.*?)</div></article>', s, re.S)
             words = len(text(body.group(1).replace('<', ' <')).split()) if body else 0  # how much the page has to read
             pages.append([GRIMOIRES.index(g), slug, title, icon, '|'.join(kinds), rng, words])
     links = [set() for _ in pages]
     festivals = {}
+    tarot = {i: [i, c, [], []] for i, c in covers.items()}
     for a, prop, g, slug in rels:
         b = index.get((g, slug))
         if b is None or b == a:
             continue
         links[a].add(b)
         links[b].add(a)
+        if a in tarot and prop in ('Upright Correspondences', 'Reversed Correspondences'):
+            tarot[a][2 if prop.startswith('Upright') else 3].append(b)
         if prop == 'Related Timing' and re.match(rf'^({MONTHS})-\d+$', pages[a][1]) and GRIMOIRES[pages[a][0]] == 'timing':
             festivals.setdefault(pages[a][1], []).append(b)
-    out = {'g': GRIMOIRES, 'p': pages, 'l': [sorted(x) for x in links], 'f': festivals}
+    out = {'g': GRIMOIRES, 'p': pages, 'l': [sorted(x) for x in links], 'f': festivals, 't': list(tarot.values())}
     os.makedirs(os.path.join(ROOT, 'tools'), exist_ok=True)
     with open(os.path.join(ROOT, 'tools', 'data.json'), 'w', encoding='utf-8') as fh:
         json.dump(out, fh, ensure_ascii=False, separators=(',', ':'))
@@ -94,6 +100,7 @@ def main():
         'today': ('Today', 'today'),
         'spell-builder': ('Spell Builder', 'spell'),
         'wheel': ('Correspondence Wheel', 'wheel'),
+        'draw-a-card': ('Draw a Card', 'tarot'),
         'notes': ('Your notes', 'notes'),
     }
     for folder, (title, tool) in shells.items():

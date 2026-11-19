@@ -83,7 +83,7 @@
   }
   function chip(p) { return '<a class="rel" href="' + esc(p.url) + '">' + iconHtml(p.icon, 'rel-icon') + '<span>' + esc(p.title) + '</span></a>'; }
   function crumbs(g, more) {
-    var name = { ritual: 'Ritual Grimoire', astrology: 'Astrology Grimoire', timing: 'Timing Grimoire' }[g] || '';
+    var name = { ritual: 'Ritual Grimoire', astrology: 'Astrology Grimoire', timing: 'Timing Grimoire', card: 'Card Grimoire' }[g] || '';
     var h = '<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' + esc(ROOT) + '">Manuscript</a></li>' + (name ? '<li><a href="' + esc(url(g + '/')) + '">' + name + '</a></li>' : '');
     (more || []).forEach(function (m) { h += '<li><a href="' + esc(m[1]) + '">' + esc(m[0]) + '</a></li>'; });
     return h + '</ol></nav>';
@@ -387,6 +387,45 @@
     Store.remove('workings', b.getAttribute('data-del-working')).then(function () { showWorkings(document.querySelector('[data-static-tool]'), false); });
   });
 
+  // ------------------------------------------------------------------ Draw a Card
+  // Seven face-down cards, shuffled from the tarot deck, fanned out. The one picked turns over: upright, or (one time
+  // in three) reversed, with that side's keywords and a way into the card's page.
+  var REVERSED_CHANCE = 1 / 3;
+  function shuffled(list) {
+    var a = list.slice();
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  function tarot(tool) {
+    // The deck: the tarot cards, without the "Suit of Cups"-style overview pages (they have meanings too, but aren't cards).
+    var deck = D.t.filter(function (c) { return !/^suit-of-/.test(D.p[c[0]][1]); }), hand = shuffled(deck).slice(0, 7);
+    tool.className = 'pg pg-tool pg-tarot';
+    render(tool, '<header class="pg-head tool-head">' + crumbs('card') + '<p class="eyebrow labelled">Draw a Card</p><h1>Draw <em>a card</em></h1>'
+      + '<p class="lede">Seven cards from the deck of ' + deck.length + ', face down. Hold your question in mind, and choose the one that calls to you.</p></header>'
+      + '<div class="spread" role="group" aria-label="Seven face-down cards">' + hand.map(function (c, k) {
+        return '<button class="tarot-back fan-' + k + '" type="button" data-pick="' + k + '" aria-label="Card ' + (k + 1) + ' of 7"><span class="back-art" aria-hidden="true"></span></button>';
+      }).join('') + '</div><div class="drawn" aria-live="polite"></div>', 'Draw a Card');
+    var spread = tool.querySelector('.spread'), drawn = tool.querySelector('.drawn');
+    spread.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-pick]');
+      if (!b || spread.classList.contains('picked')) return;
+      var c = hand[+b.getAttribute('data-pick')], card = pg(c[0]), rev = Math.random() < REVERSED_CHANCE;
+      var words = (rev ? c[3] : c[2]).map(pg), quiet = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      spread.classList.add('picked'); b.classList.add('chosen');
+      setTimeout(function () {
+        spread.hidden = true;
+        drawn.innerHTML = '<div class="drawn-card' + (rev ? ' reversed' : '') + '"><div class="flip"><span class="face tarot-back"><span class="back-art"></span></span>'
+          + '<span class="face front">' + (c[1] ? '<img src="' + esc(url((c[1].indexOf('a:') === 0 ? 'assets/' : 'media/') + c[1].slice(2))) + '" alt="' + esc(card.title + (rev ? ', reversed' : '')) + '">' : '<span class="front-name">' + esc(card.title) + '</span>') + '</span></div></div>'
+          + '<div class="reading"><p class="eyebrow">' + (rev ? 'Reversed' : 'Upright') + '</p><h2>' + esc(card.title) + '</h2>'
+          + (words.length ? '<p class="small">' + (rev ? 'Reversed, it speaks of' : 'It speaks of') + '</p><div class="rels keywords">' + words.map(chip).join('') + '</div>' : '')
+          + '<div class="actions"><a class="btn" href="' + esc(card.url) + '">View more</a><button class="btn ghost" type="button" data-again>Draw again</button></div></div>';
+        var flip = drawn.querySelector('.drawn-card');
+        if (quiet) flip.classList.add('turned'); else requestAnimationFrame(function () { requestAnimationFrame(function () { flip.classList.add('turned'); }); });
+        drawn.querySelector('[data-again]').addEventListener('click', function () { tarot(tool); window.scrollTo({ top: 0, behavior: quiet ? 'auto' : 'smooth' }); });
+      }, quiet ? 0 : 450);
+    });
+  }
+
   // ------------------------------------------------------------------ the wheels
   var WHEELS = {
     planets: ['Planet Wheel', 'Planets', 'planet', ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'],
@@ -540,7 +579,8 @@
   var GRIMOIRE_TOOLS = {
     ritual: [['spell-builder/', 'Spell Builder']],
     astrology: [['wheel/?of=planets', 'Planet Wheel'], ['wheel/?of=signs', 'Zodiac Wheel'], ['wheel/?of=moon', 'Moon Phase Wheel']],
-    timing: [['today/', 'Today'], ['calendar/', 'Calendar']]
+    timing: [['today/', 'Today'], ['calendar/', 'Calendar']],
+    card: [['draw-a-card/', 'Draw a Card']]
   };
   function grimoireTools() {
     var art = document.querySelector('article.pg-grimoire'), m = /\/manuscript\/([a-z-]+)\/?$/.exec(location.pathname);
@@ -604,6 +644,7 @@
   data().then(function () {
     if (kind === 'today') today(tool);
     else if (kind === 'spell') spell(tool);
+    else if (kind === 'tarot') tarot(tool);
     else if (kind === 'wheel') { wheel(tool); window.addEventListener('popstate', function () { wheel(tool); }); }
   }).catch(function () { tool.innerHTML = '<p class="lede">The tools couldn’t load. Refresh the page to try again.</p>'; });
 })();

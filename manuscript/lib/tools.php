@@ -17,6 +17,7 @@ const TOOL_PAGES = [
     'today' => ['Today', 'today'],
     'spell-builder' => ['Spell Builder', 'spell'],
     'wheel' => ['Correspondence Wheel', 'wheel'],
+    'draw-a-card' => ['Draw a Card', 'tarot'],
 ];
 
 /** A tool's page: members only; tools.js fills in the article. */
@@ -39,7 +40,7 @@ function serve_tools_data(): void
 {
     if (!has_access()) { http_response_code(403); exit; }
     // The version changes when the data's shape does, so an older copy is never served.
-    $cache = config('data_dir') . '/tools-data-v2.json';
+    $cache = config('data_dir') . '/tools-data-v3.json';
     $content = config('data_dir') . '/content.sqlite';
     if (!is_file($cache) || filemtime($cache) < (int) @filemtime($content)) {
         file_put_contents($cache . '.tmp', json_encode(tools_data(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
@@ -55,7 +56,7 @@ function serve_tools_data(): void
 
 /**
  * Every page as [grimoire, slug, title, icon, kinds, date range, words of text], every connection (both ways, by position in
- * the list), and each calendar day's festivals. The same shape build-static-tools.py writes for the preview.
+ * the list), each calendar day's festivals, and the tarot cards: [page, picture, upright keywords, reversed keywords]. The same shape build-static-tools.py writes for the preview.
  */
 function tools_data(): array
 {
@@ -63,11 +64,12 @@ function tools_data(): array
     $gi = array_flip($grimoires);
     $pages = [];
     $pos = [];
-    foreach (db()->query("SELECT id, grimoire, slug, kind, title, icon, tags_json, plain FROM pages WHERE kind IN ('entry', 'guide') ORDER BY grimoire, slug") as $p) {
+    $pageRow = [];
+    foreach (db()->query("SELECT id, grimoire, slug, kind, title, icon, cover, tags_json, plain FROM pages WHERE kind IN ('entry', 'guide') ORDER BY grimoire, slug") as $p) {
         $tags = json_decode((string) $p['tags_json'], true) ?: [];
         $types = array_map('strval', (array) ($tags['Type'] ?? $tags['Category'] ?? []));
         $kinds = array_values(array_intersect($types, TOOL_KINDS));
-        if (isset($tags['Suit']) || isset($tags['Upright Correspondences'])) $kinds[] = 'Tarot';
+        $pageRow[$p['id']] = $p;
         $icon = (string) shown_icon($p);
         $icon = str_starts_with($icon, 'file:') ? 'm:' . substr($icon, 5) : (str_starts_with($icon, 'asset:') ? 'a:' . substr($icon, 6) : $icon);
         $pos[$p['id']] = count($pages);
@@ -79,15 +81,27 @@ function tools_data(): array
     }
     $links = array_fill(0, count($pages), []);
     $festivals = [];
+    $tarot = []; // tarot cards (they have upright and reversed meanings): page => [picture, upright keywords, reversed keywords]
     foreach (db()->query('SELECT from_id, prop, to_id FROM relations') as $r) {
         $a = $pos[$r['from_id']] ?? null;
         $b = $pos[$r['to_id']] ?? null;
         if ($a === null || $b === null || $a === $b) continue;
         $links[$a][$b] = true;
         $links[$b][$a] = true;
+        if (in_array($r['prop'], ['Upright Correspondences', 'Reversed Correspondences'], true) && $grimoires[$pages[$a][0]] === 'card') {
+            $tarot[$a][$r['prop'] === 'Upright Correspondences' ? 1 : 2][] = $b;
+        }
         if ($r['prop'] === 'Related Timing' && $grimoires[$pages[$a][0]] === 'timing' && preg_match('/^[a-z]+-\d{1,2}$/', $pages[$a][1])) $festivals[$pages[$a][1]][] = $b;
     }
-    return ['g' => $grimoires, 'p' => $pages, 'l' => array_map(fn($l) => array_keys($l), $links), 'f' => (object) $festivals];
+    $cards = [];
+    $ids = array_flip($pos);
+    foreach ($tarot as $i => $t) {
+        $cover = (string) ($pageRow[$ids[$i]]['cover'] ?? '');
+        $cover = str_starts_with($cover, 'asset:') ? 'a:' . substr($cover, 6) : ($cover !== '' && !str_starts_with($cover, 'https://') ? 'm:' . $cover : '');
+        $pages[$i][4] = ltrim($pages[$i][4] . '|Tarot', '|');
+        $cards[] = [$i, $cover, $t[1] ?? [], $t[2] ?? []];
+    }
+    return ['g' => $grimoires, 'p' => $pages, 'l' => array_map(fn($l) => array_keys($l), $links), 'f' => (object) $festivals, 't' => $cards];
 }
 
 // ------------------------------------------------------------------ notes and workings, kept for each member

@@ -487,7 +487,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
   font-size: min(calc(var(--t) * .42), calc(var(--w) * 1.42 * .74 / (var(--n) * 1.12))); }
 
 /* ---------- leather: a fine dark grain and soft light pebbling, laid over each book's colour ---------- */
-.bk, .slab, .b3d { --leather: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0 0 0 -.18'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='turbulence' baseFrequency='.42' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -.35 .1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+.bk, .slab, .b3d, .tarot-back { --leather: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0 0 0 -.18'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='turbulence' baseFrequency='.42' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -.35 .1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
   --worn: inset 0 0 0 1px rgba(0,0,0,.22), inset 0 0 10px rgba(0,0,0,.28); }
 
 /* ---------- the Manuscript home: the grimoire spines on two shelves, in the site's colours ---------- */
@@ -1268,3 +1268,54 @@ html.nav-fold .mm-mine { order: -2; }
   .today-name { font-size: 1.15rem; }
   .today-sub { font-size: .72rem; }
 }
+
+/* ---------- Draw a Card (tools.js): seven card backs in the Muse's colours, fanned; the one picked turns over ---------- */
+.tarot-back { position: relative; display: block; aspect-ratio: 7 / 12; padding: 0; border: 0; border-radius: 9px; cursor: pointer; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 50%, color-mix(in srgb, #c99a92 38%, transparent) 0%, transparent 62%), var(--leather), #7a1f2b;
+  box-shadow: 0 14px 24px -14px rgba(46, 31, 32, .7), inset 0 0 0 1px rgba(0, 0, 0, .25); }
+.tarot-back::before { content: ""; position: absolute; inset: 7px; border: 1.5px solid #c9a356; border-radius: 5px; }
+.tarot-back::after { content: ""; position: absolute; inset: 12px; border: 1px solid color-mix(in srgb, #c9a356 45%, transparent); border-radius: 3px; }
+.back-art { position: absolute; inset: 0; }
+.back-art::before { content: ""; position: absolute; left: 50%; top: 50%; width: 46%; aspect-ratio: 1; transform: translate(-50%, -50%); border: 1px solid color-mix(in srgb, #c9a356 70%, transparent); border-radius: 50%; }
+.back-art::after { content: ""; position: absolute; inset: 0; background: #e3c27a;
+  -webkit-mask: var(--star) 50% 50% / 30% no-repeat, var(--star) 50% 17% / 9% no-repeat, var(--star) 50% 83% / 9% no-repeat, var(--star) 22% 50% / 5% no-repeat, var(--star) 78% 50% / 5% no-repeat;
+  mask: var(--star) 50% 50% / 30% no-repeat, var(--star) 50% 17% / 9% no-repeat, var(--star) 50% 83% / 9% no-repeat, var(--star) 22% 50% / 5% no-repeat, var(--star) 78% 50% / 5% no-repeat; }
+
+.spread { display: flex; justify-content: center; align-items: flex-end; padding: 3.2rem 0 2.4rem; min-height: 300px; }
+.spread .tarot-back { width: 132px; flex: none; margin: 0 -22px; transform-origin: 50% 120%; transition: transform .35s cubic-bezier(.2,.7,.2,1), opacity .35s, box-shadow .35s; }
+.spread .fan-0 { --r: -15deg; --y: 22px; } .spread .fan-1 { --r: -10deg; --y: 9px; } .spread .fan-2 { --r: -5deg; --y: 2px; } .spread .fan-3 { --r: 0deg; --y: 0px; }
+.spread .fan-4 { --r: 5deg; --y: 2px; } .spread .fan-5 { --r: 10deg; --y: 9px; } .spread .fan-6 { --r: 15deg; --y: 22px; }
+.spread .tarot-back { transform: translateY(var(--y)) rotate(var(--r)); }
+.spread:not(.picked) .tarot-back:hover, .spread:not(.picked) .tarot-back:focus-visible { transform: translateY(calc(var(--y) - 22px)) rotate(var(--r)); box-shadow: 0 24px 30px -14px rgba(46, 31, 32, .75); z-index: 2; }
+.spread .tarot-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.spread.picked .tarot-back { opacity: .25; cursor: default; }
+.spread.picked .tarot-back.chosen { opacity: 1; transform: translateY(-44px) rotate(0deg) scale(1.08); z-index: 3; }
+
+.drawn { display: grid; grid-template-columns: minmax(200px, 280px) minmax(0, 1fr); gap: clamp(1.6rem, 5vw, 4rem); align-items: center; max-width: 900px; margin: 1rem auto 0; }
+.drawn:empty { display: none; }
+.drawn-card { perspective: 1400px; }
+.drawn-card .flip { position: relative; aspect-ratio: 7 / 12; transform-style: preserve-3d; transition: transform 1s cubic-bezier(.3,.7,.2,1); }
+.drawn-card.turned .flip { transform: rotateY(180deg); }
+.drawn-card .face { position: absolute; inset: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.drawn-card .face.tarot-back { cursor: default; }
+.drawn-card .front { transform: rotateY(180deg); display: grid; place-items: center; border-radius: 9px; background: var(--surface); box-shadow: 0 22px 34px -16px rgba(46, 31, 32, .65); overflow: hidden; }
+.drawn-card .front img { width: 100%; height: 100%; object-fit: contain; }
+.drawn-card.reversed .front img { transform: rotate(180deg); }
+.front-name { font-family: var(--display); font-size: 1.6rem; padding: 1rem; text-align: center; }
+.reading { display: grid; gap: .7rem; justify-items: start; opacity: 0; transform: translateY(8px); transition: opacity .5s .7s, transform .5s .7s; }
+.drawn-card.turned + .reading { opacity: 1; transform: none; }
+.reading .eyebrow { margin: 0; }
+.reading h2 { font-size: clamp(2.2rem, 5vw, 3.2rem); line-height: 1.05; }
+.drawn-card.reversed + .reading .eyebrow { color: var(--accent-text); }
+.reading .small { margin: .3rem 0 0; color: var(--muted); }
+.reading .actions { margin-top: .8rem; display: flex; flex-wrap: wrap; gap: .7rem; }
+@media (max-width: 700px) {
+  .spread { padding: 2.4rem 0 1.6rem; min-height: 200px; }
+  .spread .tarot-back { --cw: min(78px, calc((100vw - 3rem) / 5)); width: var(--cw); margin: 0 calc(var(--cw) * -.24); }
+  .drawn { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
+  .drawn-card { width: min(220px, 62vw); }
+  .reading { justify-items: center; }
+  .reading .rels, .reading .actions { justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) { .drawn-card .flip, .reading, .spread .tarot-back { transition: none; } }
+:root[data-motion="reduce"] .drawn-card .flip, :root[data-motion="reduce"] .reading { transition: none; }
