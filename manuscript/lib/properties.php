@@ -203,3 +203,55 @@ function drop_sidebar_repeats(string $body, string $panel): string
     }
     return $new;
 }
+
+/**
+ * The blog's hierarchy for a page's text: bold labels ("Element:") get class "lbl" so they stay ink while other bold
+ * phrases show in burgundy, and a Warnings / Safety / Caution section (its heading and what follows, up to the next
+ * heading of the same or a higher level) is boxed as a callout. The GitHub Pages copy was given the same treatment.
+ */
+function prose_hierarchy(string $t): string
+{
+    static $warn = ['warnings', 'warning', 'safety', 'caution', 'cautions', 'precautions', 'safety data', 'notes and cautions', 'safety notes',
+        'safety note', 'safety considerations', 'safety warning', 'a word of caution', 'fire safety', 'safety & when to seek care',
+        'extreme toxicity', 'skin safety', 'contraindications'];
+    static $void = ['img', 'br', 'hr', 'input', 'source', 'wbr', 'meta', 'link'];
+    $t = preg_replace('~<strong>([^<]{1,60}?:)\s*</strong>~u', '<strong class="lbl">$1</strong>', $t);
+    // the index just past the element that starts at $i (null if none starts there)
+    $end = function (string $t, int $i) use ($void): ?int {
+        if (!preg_match('~\G<([a-zA-Z0-9]+)\b[^>]*?(/?)>~', $t, $m, 0, $i)) return null;
+        $name = strtolower($m[1]);
+        if (in_array($name, $void, true) || $m[2] === '/') return $i + strlen($m[0]);
+        preg_match_all('~<(/?)' . preg_quote($m[1], '~') . '\b[^>]*?(/?)>~i', $t, $all, PREG_OFFSET_CAPTURE | PREG_SET_ORDER, $i);
+        $depth = 0;
+        foreach ($all as $x) {
+            if ($x[2][0] === '/') continue;
+            $depth += $x[1][0] === '/' ? -1 : 1;
+            if ($depth === 0) return $x[0][1] + strlen($x[0][0]);
+        }
+        return null;
+    };
+    if (!preg_match_all('~<h([2-5]) id="[^"]*"[^>]*>(.*?)</h\1>~s', $t, $hs, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) return $t;
+    $out = ''; $pos = 0; $len = strlen($t);
+    foreach ($hs as $h) {
+        $start = $h[0][1];
+        if ($start < $pos) continue;
+        $title = mb_strtolower(trim(str_replace('&amp;', '&', strip_tags($h[2][0]))));
+        if (!in_array($title, $warn, true) || substr($t, max(0, $start - 9), min(9, $start)) === '<summary>') continue;
+        $lvl = (int) $h[1][0];
+        $i = $start + strlen($h[0][0]);
+        $headEnd = $i;
+        while (true) {
+            $j = $i;
+            while ($j < $len && ctype_space($t[$j])) $j++;
+            if ($j >= $len || substr($t, $j, 2) === '</' || $t[$j] !== '<') break;
+            if (preg_match('~\G<h([1-6])\b~', $t, $n, 0, $j) && (int) $n[1] <= $lvl) break;
+            $e = $end($t, $j);
+            if ($e === null) break;
+            $i = $e;
+        }
+        if ($i === $headEnd) continue;
+        $out .= substr($t, $pos, $start - $pos) . '<aside class="mm-callout mm-warn" role="note"><div>' . substr($t, $start, $i - $start) . '</div></aside>';
+        $pos = $i;
+    }
+    return $out . substr($t, $pos);
+}

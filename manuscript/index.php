@@ -217,6 +217,8 @@ function view_page(array $p): void
         $bodyHtml = $textParts . resolve_links((string) $p['body_html']);
         // Lines that only repeat the sidebar ("Day: Friday" when Timing shows Friday) are left out of the text.
         if ($panel !== '') $bodyHtml = $textParts . drop_sidebar_repeats(resolve_links((string) $p['body_html']), $panel);
+        // The blog's hierarchy: burgundy highlights, ink labels, warnings boxed.
+        $bodyHtml = prose_hierarchy($bodyHtml);
         // A grimoire's intro box repeats its name as a heading ("The Animal Grimoire"); the page title already says it.
         if ($p['kind'] === 'grimoire') {
             $name = mb_strtolower(preg_replace('/^the\s+/i', '', $p['title']));

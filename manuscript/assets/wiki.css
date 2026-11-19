@@ -913,3 +913,43 @@ details.toggle > summary > h5 { margin: 0; display: inline; }
 html.nav-fold .mm-bar { display: flex; flex-wrap: wrap; gap: .5rem; }
 html.nav-fold .mm-search { flex-basis: 100%; }
 html.nav-fold .mm-acct { order: -1; margin-left: auto; }
+
+/* ---------- Page text: the blog's hierarchy (consistent across the Manuscript) ---------- */
+.mm-prose { font-size: 1.06rem; }
+.mm-prose > * + * { margin-top: 1.3rem; }
+.mm-prose h2 { font-size: clamp(2rem, 4vw, 2.6rem); margin-top: 3.2rem; }
+.mm-prose h3 { font-size: 1.6rem; margin-top: 2.6rem; }
+.mm-prose h4 { font-size: 1.3rem; margin-top: 2rem; }
+.mm-prose > h2:first-child, .mm-prose > h3:first-child, .mm-prose > h4:first-child { margin-top: 0; }
+/* the opening paragraph reads a little larger, like a lede */
+.mm-prose > p:first-child, .mm-prose > .lead-in:first-child { font-size: 1.16rem; line-height: 1.7; color: var(--ink); }
+/* bold: labels ("Element:") stay ink; other bold phrases are the burgundy highlights the blog uses */
+.mm-prose strong { font-weight: 500; color: var(--accent-text); }
+.mm-prose strong.lbl, .mm-prose h2 strong, .mm-prose h3 strong, .mm-prose h4 strong, .mm-prose h5 strong, .mm-prose th strong, .mm-prose summary strong { color: var(--ink); }
+/* bullets are gold stars, as on the blog */
+.mm-prose ul:not(.todo, .entry-grid, .ingredients) { list-style: none; padding-left: 0; }
+.mm-prose ul:not(.todo, .entry-grid, .ingredients) > li { position: relative; padding-left: 1.8rem; }
+.mm-prose ul:not(.todo, .entry-grid, .ingredients) > li::before {
+  content: ""; position: absolute; left: 0; top: .5em; width: .75rem; height: .75rem; background: var(--gold);
+  -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
+.mm-prose ul ul > li::before { width: .55rem; height: .55rem; top: .6em; opacity: .75; }
+.mm-prose li + li { margin-top: .5rem; }
+/* callouts look like the blog's: soft panel, gold rule on top */
+.mm-prose .mm-callout { border: 0; border-top: 1px solid var(--gold); padding: 1.6rem 1.8rem; }
+.mm-prose .mm-callout.c-red_background, .mm-prose .mm-callout.c-pink_background { border-top-color: var(--accent); }
+.mm-prose > .mm-callout { margin-top: 2rem; }
+.mm-prose > .mm-callout + * { margin-top: 2rem; }
+/* Warnings, Safety, Caution: their own soft box with a burgundy edge, the heading as a small label */
+.mm-prose .mm-warn { border-top: 0; border-left: 2px solid var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--bg)); }
+.mm-prose .mm-warn :is(h2, h3, h4, h5):first-child { margin: 0 0 .2rem; font-family: var(--body); font-size: .74rem; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-text); }
+.mm-prose .mm-warn :is(h2, h3, h4, h5):first-child::before { content: "⚠︎ "; letter-spacing: 0; }
+/* every heading level in the serif display face, as on the blog (Notion's smaller headings came out in bold sans) */
+.mm-prose :is(h2, h3, h4, h5) { font-family: var(--display); font-weight: 400; line-height: 1.15; color: var(--ink); }
+.mm-prose h5 { font-size: 1.15rem; font-style: italic; }
+/* heading sizes stepped like the blog's, so sections stand clearly above the bold labels */
+.mm-prose h2 { font-size: clamp(2.1rem, 4vw, 2.6rem); }
+.mm-prose h3 { font-size: clamp(1.8rem, 3.2vw, 2.1rem); margin-top: 2.8rem; }
+.mm-prose h4 { font-size: clamp(1.55rem, 2.6vw, 1.75rem); margin-top: 2.6rem; }
+.mm-prose h5 { font-size: 1.3rem; margin-top: 2rem; }
+.mm-prose :is(h2, h3, h4, h5) + * { margin-top: .9rem; }
+.mm-callout :is(h2, h3, h4, h5) { font-size: 1.3rem; }
