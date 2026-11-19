@@ -44,24 +44,23 @@ function real_book(array $g, int $n, int $i): string
  * The two flat stacks on the shelves: books lying on their side that lead to guide pages and tools, not grimoires.
  * Listed top of the stack first; each book underneath is longer and thicker than the one on it.
  * A book is [title, a page ("grimoire/slug") or "route:<address>", tone] — no title for a plain one.
- * The top shelf's stack ends it on the right; the bottom shelf's starts it on the left, under three candles.
+ * The top shelf ends with three tall candles on their own; the bottom shelf starts with the four guide books in one stack.
  */
 const SHELF_STACKS = [
-    'top' => ['candles' => false, 'books' => [
+    'top' => ['candles' => true, 'books' => []],
+    'bottom' => ['candles' => false, 'books' => [
         ['Calendar', 'route:calendar', 't1'],
         ['Journal Prompts', 'begin-here/journal-prompts', 't3'],
-    ]],
-    'bottom' => ['candles' => true, 'books' => [
         ['The Library', 'route:library', 't4'],
         ['Tarot Spreads', 'card/tarot-spreads', 't2'],
     ]],
 ];
 
 /** A group of three pillar candles of different heights, the tallest in the middle, slightly overlapping. */
-function candles_html(): string
+function candles_html(bool $tall = false): string
 {
     $one = fn(string $c) => '<span class="candle ' . $c . '"><i class="wax"></i><i class="wick"></i><i class="flame"></i></span>';
-    return '<span class="candles" aria-hidden="true"><i class="glow"></i>' . $one('c1') . $one('c2') . $one('c3') . '</span>';
+    return '<span class="candles' . ($tall ? ' tall' : '') . '" aria-hidden="true"><i class="glow"></i>' . $one('c1') . $one('c2') . $one('c3') . '</span>';
 }
 
 /** One book lying in a stack ($k: 0 on top, then bigger): titled and a link once its page is on the site, else plain. */
@@ -77,7 +76,7 @@ function stack_book(?string $title, ?string $ref, string $tone, int $k): string
 
 function stack_html(array $stack, string $side): string
 {
-    $html = '<div class="stack ' . $side . '">' . (!empty($stack['candles']) ? candles_html() : '');
+    $html = '<div class="stack ' . $side . '">' . (!empty($stack['candles']) ? candles_html(!$stack['books']) : '');
     foreach ($stack['books'] as $k => [$title, $ref, $tone]) $html .= stack_book($title, $ref, $tone, $k);
     return $html . '</div>';
 }
