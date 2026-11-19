@@ -1381,3 +1381,10 @@ html.nav-fold .mm-mine { order: -2; }
 .safety-box .extras-list { margin-bottom: .6rem; }
 .warn-for strong { font-weight: 500; }
 @media (max-width: 600px) { .extras-list li { grid-template-columns: minmax(0, 1fr); } }
+/* the three fold away under Quantities; their closed headings say what's inside */
+.mm-prose details.extras-fold { margin: 1.2rem 0 0; }
+.mm-prose details.extras-fold > summary { flex-wrap: wrap; row-gap: .2rem; }
+.mm-prose details.extras-fold > summary > h2 { font-size: clamp(1.5rem, 3vw, 1.9rem); }
+.fold-sub { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.mm-prose [data-extras] { margin-bottom: 2rem; }
+.mm-prose [data-extras] + h2 { margin-top: 1.4rem; }

@@ -553,13 +553,21 @@
     // Fire: in what the working uses or does (its Quantities and Directions; the whole text if it has neither).
     var parts = prose.querySelectorAll('ul.ingredients, ol.steps'), text = parts.length ? [].map.call(parts, function (n) { return n.textContent; }).join(' ') : prose.textContent, fire = FIRE_WORDS.test(text) || ingredients.some(function (j) { return FIRE_WORDS.test(D.p[j][2]); });
 
+    // Each section folds away (closed to start), so the Directions stay right under Quantities; the closed heading says what's inside.
+    var fold = function (id, title, sub, body) {
+      return '<details class="toggle extras-fold"><summary><h2 id="' + id + '">' + title + '</h2><span class="fold-sub">' + sub + '</span></summary>' + body + '</details>';
+    };
+    var plural = function (n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); };
     var html = '';
-    if (subs.length) html += '<h2 id="substitutions">Substitutions</h2><p class="small extras-note">Out of something? These carry the same correspondences in this working. They match in meaning, not in physical effect: check a swap’s own page before it goes on skin or into food.</p><ul class="extras-list subs">' + subs.join('') + '</ul>';
-    if (why.length) html += '<h2 id="why">Why these ingredients</h2><p class="small extras-note">What each one brings to this working, from its correspondences.</p><ul class="extras-list why">' + why.join('') + '</ul>';
+    if (subs.length) html += fold('substitutions', 'Substitutions', 'for ' + plural(subs.length, 'ingredient'),
+      '<p class="small extras-note">Out of something? These carry the same correspondences in this working. They match in meaning, not in physical effect: check a swap’s own page before it goes on skin or into food.</p><ul class="extras-list subs">' + subs.join('') + '</ul>');
+    if (why.length) html += fold('why', 'Why these ingredients', plural(why.length, 'ingredient'),
+      '<p class="small extras-note">What each one brings to this working, from its correspondences.</p><ul class="extras-list why">' + why.join('') + '</ul>');
     if (fire || warn.length) {
-      html += '<h2 id="before-you-begin">Before you begin</h2><aside class="safety-box">'
+      html += fold('before-you-begin', 'Before you begin', [warn.length ? plural(warn.length, 'ingredient') + ' with warnings' : '', fire ? 'fire safety' : ''].filter(Boolean).join(' · '),
+        '<aside class="safety-box">'
         + (fire ? '<p class="label">Fire safety</p><ul class="fire-list">' + FIRE_SAFETY.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '')
-        + (warn.length ? '<p class="label">From the ingredients’ pages</p><ul class="extras-list warn">' + warn.join('') + '</ul>' : '') + '</aside>';
+        + (warn.length ? '<p class="label">From the ingredients’ pages</p><ul class="extras-list warn">' + warn.join('') + '</ul>' : '') + '</aside>');
     }
     if (!html) return;
     var box = document.createElement('div');
