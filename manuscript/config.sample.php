@@ -39,7 +39,7 @@ return [
 
     // Properties never offered in a grimoire list's Sort & filter (entries still show them).
     // 'keep_backgrounds' => ['rune'],   // grimoires whose pictures keep their backgrounds (the Card grimoire always does)
-    // 'hidden_filters' => ['Precautions', 'Notes/Warnings', 'Notes', 'Cleavage', 'Luster', 'Description', 'Directions', 'Quantities'],
+    // 'hidden_filters' => ['Precautions', 'Notes/Warnings', 'Notes', 'Cleavage', 'Luster', 'Description', 'Directions', 'Quantities', 'Date Range'],
 
     // Links left out of the Manuscript because they only work inside Notion (pattern). Default: the widgets.
     // 'skip_links' => '~^https?://magickmuse\\.github\\.io/Widgets/~i',

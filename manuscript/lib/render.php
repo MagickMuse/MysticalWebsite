@@ -180,9 +180,11 @@ function resolve_links(string $html): string
     $html = preg_replace_callback('/<a data-mm-id="([0-9a-f]{32})">(.*?)<\/a>/s', function ($mm) use ($idx) {
         $p = $idx[$mm[1]] ?? null;
         if (!$p && $mm[2] === '…') return '';
-        $text = $mm[2] === '…' ? e($p['title']) : $mm[2];
+        // Notion gives "Untitled" for a mention it can't read the title of: the site knows the page's real title.
+        $text = ($mm[2] === '…' || ($p && trim(strip_tags($mm[2])) === 'Untitled')) ? e($p['title']) : $mm[2];
         // A link to a page that isn't on the site (archived, private, or a how-to-use-Notion guide) reads as plain words.
-        if (!$p) return $text === '' ? '' : '<span class="unmoved">' . $text . '</span>';
+        // A mention of a page deleted in Notion comes through as "Untitled": it shows as nothing.
+        if (!$p) return ($text === '' || trim(strip_tags($text)) === 'Untitled') ? '' : '<span class="unmoved">' . $text . '</span>';
         return '<a href="' . e($p['url']) . '">' . $text . '</a>';
     }, $html);
     $html = str_replace('<p class="page-link"></p>', '', $html);

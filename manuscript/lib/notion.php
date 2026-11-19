@@ -186,6 +186,16 @@ final class NotionImporter
             $set->execute(['asset:' . $file, $g, $slug]);
         }
         $this->intentionIcons();
+        // Tarot spreads: a "Cards" property ("3 cards") from the Number of Cards connection, to filter and group by.
+        $setTags = db()->prepare('UPDATE pages SET tags_json = ? WHERE id = ?');
+        foreach (db()->query("SELECT p.id, p.tags_json, n.title FROM pages p JOIN relations r ON r.from_id = p.id AND r.prop = 'Number of Cards'
+                JOIN pages n ON n.id = r.to_id WHERE p.grimoire = 'card' AND p.kind = 'entry'")->fetchAll() as $row) {
+            if (!preg_match('/^\d+$/', trim($row['title']))) continue;
+            $n = (int) $row['title'];
+            $tags = json_decode((string) $row['tags_json'], true) ?: [];
+            $tags['Cards'] = [$n . ($n === 1 ? ' card' : ' cards')];
+            $setTags->execute([json_encode($tags, JSON_UNESCAPED_UNICODE), $row['id']]);
+        }
         // Covers the site chooses (site-covers.php) replace the Notion cover.
         $covers = is_file(MM_ROOT . '/site-covers.php') ? (array) require MM_ROOT . '/site-covers.php' : [];
         $setCover = db()->prepare('UPDATE pages SET cover = ? WHERE grimoire = ? AND slug = ?');
