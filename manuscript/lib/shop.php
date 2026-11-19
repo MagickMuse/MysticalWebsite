@@ -101,7 +101,7 @@ function view_shop(): void
             . '<h3>' . e(short_name($p)) . '</h3><p>' . e($p['tagline'] ?? '') . '</p><p class="price">' . e(price_label($p)) . '</p></a>';
     }
     // The Manuscript itself leads the shop.
-    $ms = '<a class="card shop-card featured" href="' . e(url('join')) . '"><div class="frame arch shop-art"><img src="' . e(site_url('assets/grimoire-selection-screenshot-700.webp')) . '" alt="" loading="lazy"></div>'
+    $ms = '<a class="card shop-card featured" href="' . e(url('join')) . '"><div class="frame arch shop-art"><i class="spark big" aria-hidden="true"></i></div>'
         . '<h3>The Magick Manuscript</h3><p>15 cross-linked grimoires, 20,000+ pages, growing weekly.</p><p class="price">Membership</p></a>';
     layout('Market', <<<HTML
 <section class="mm-hero">

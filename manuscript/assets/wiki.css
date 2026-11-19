@@ -194,6 +194,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .shop-card:hover { border-color: var(--accent); transform: translateY(-3px); }
 .shop-card.featured { border-color: var(--gold); }
 .shop-art { width: 100%; max-width: 240px; aspect-ratio: 4 / 5; }
+.shop-card .shop-art:not(:has(img)) { max-width: 150px; aspect-ratio: 3 / 4; }
 .shop-art .spark { font-size: 2.4rem; background: var(--bg); }
 .price { font-size: .78rem; letter-spacing: .22em; text-transform: uppercase; font-weight: 500; color: var(--accent-text) !important; }
 .price.big { font-size: 1rem; }
@@ -617,10 +618,10 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 
 /* ---------- every link in the Manuscript is underlined, so it always reads as a link ----------
    Buttons, book spines, pictures, the dashboard's tabs and pill-shaped filters keep their own look. */
-.mm-main a:where(:not(.btn, .bk, .slab, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn)) {
+.mm-main a:where(:not(.btn, .bk, .slab, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn, .card)) {
   text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: .22em;
   text-decoration-color: color-mix(in srgb, currentColor 50%, transparent); }
-.mm-main a:where(:not(.btn, .bk, .slab, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn)):hover { text-decoration-color: currentColor; }
+.mm-main a:where(:not(.btn, .bk, .slab, .zoom, .chip, .fchip, .atag, .rel-more, .car-btn, .card)):hover { text-decoration-color: currentColor; }
 .mm-main .dash-tabs a { text-decoration-line: none; }
 /* links that used to draw their own line underneath: the underline replaces it */
 .rel span, .pg-head .eyebrow a, .pg-head .eyebrow a:hover, .mm-prose .page-link a { border-bottom-color: transparent; }
