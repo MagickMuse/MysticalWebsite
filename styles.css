@@ -459,8 +459,6 @@ a.grimoire:hover .frame, a.grimoire:focus-visible .frame { outline-color: var(--
 .post { display: grid; gap: .9rem; align-content: start; border: 1px solid var(--line); padding-bottom: 1.6rem; }
 .post > :not(.frame) { margin-inline: 1.4rem; }
 .post .frame { aspect-ratio: 4 / 3; }
-.post a.frame img { transition: transform .4s ease; }
-.post a.frame:hover img { transform: scale(1.04); }
 .post h3 { font-size: 1.6rem; }
 .post p { color: var(--ink); }
 .post .link { justify-self: start; }
@@ -724,7 +722,7 @@ footer.site { padding-block: 4rem 2.5rem; border-top: var(--leaded); background:
   .marquee { width: auto; animation: none; }
   .marquee ul { flex: 1; flex-wrap: wrap; justify-content: center; white-space: normal; padding-inline: 24px; row-gap: .6rem; }
   .marquee ul[aria-hidden="true"], .marquee li:last-child { display: none; }
-  .grimoire .frame, .btn, a.card, .buybar, .carousel-nav button, .post a.frame img { transition: none; }
+  .grimoire .frame, .btn, a.card, .buybar, .carousel-nav button { transition: none; }
 }
 
 /* ---------- settings panel (prefs.js) ---------- */
@@ -2263,11 +2261,7 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .gal-card .gal-pic { aspect-ratio: 3 / 4; padding: .35rem; }
 .gal-pic.emoji { font-size: 2.8rem; line-height: 1; font-family: var(--emoji); font-variant-emoji: emoji; }
 .gal-pic.none::before { content: '✦'; color: var(--gold-text); opacity: .4; font-size: 1.5rem; }
-.entry-grid.gallery a:hover .gal-pic img { transform: scale(1.04); }
-.gal-pic img { transition: transform .3s; }
 @media (max-width: 600px) { .entry-grid.gallery { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: .5rem; } }
-@media (prefers-reduced-motion: reduce) { .gal-pic img { transition: none; } }
-:root[data-motion="reduce"] .gal-pic img { transition: none; }
 /* gallery cards: the underline sits under the name only, not under the picture or its ✦ */
 .mm-main .entry-grid.gallery a { text-decoration-line: none; }
 .mm-main .entry-grid.gallery a > span:not(.gal-pic) {
