@@ -3,9 +3,6 @@
 /* ---------- fonts (self-hosted, from Fontsource; SIL Open Font License) ---------- */
 @font-face { font-family: "Cormorant"; font-style: normal; font-weight: 400; font-display: optional; src: url("fonts/cormorant-400.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "Cormorant"; font-style: italic; font-weight: 400; font-display: optional; src: url("fonts/cormorant-400-italic.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Jost"; font-style: normal; font-weight: 300; font-display: optional; src: url("fonts/jost-300.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Jost"; font-style: normal; font-weight: 400; font-display: optional; src: url("fonts/jost-400.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Jost"; font-style: normal; font-weight: 500; font-display: optional; src: url("fonts/jost-500.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "Pinyon Script"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/pinyon-script-400.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 
 @font-face { font-family: "Alegreya"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/alegreya-400.woff2") format("woff2"); }
@@ -33,6 +30,7 @@
   /* paper grain: fractal noise, warm and faint */
   --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .3 0 0 0 0 .22 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
   --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C12.9 8.2 15.8 11.1 24 12 15.8 12.9 12.9 15.8 12 24 11.1 15.8 8.2 12.9 0 12 8.2 11.1 11.1 8.2 12 0Z'/%3E%3C/svg%3E");
+  --star-outline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.6' stroke-linejoin='round' d='M12 1.5C12.8 8.6 15.4 11.2 22.5 12 15.4 12.8 12.8 15.4 12 22.5 11.2 15.4 8.6 12.8 1.5 12 8.6 11.2 11.2 8.6 12 1.5Z'/%3E%3C/svg%3E");
   --leaded: 3px double color-mix(in srgb, var(--gold) 70%, transparent);
   --display: "Cormorant", "Cormorant Garamond", Georgia, serif;
   --body: "Alegreya", Georgia, "Times New Roman", serif;
