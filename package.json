@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint",
     "test": "php tests/run.php",
-    "check": "eslint && php tests/run.php && python3 .github/scripts/build-pages.py --check"
+    "check": "eslint && php tests/run.php"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

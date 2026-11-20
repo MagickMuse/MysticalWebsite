@@ -1,5 +1,5 @@
 # Runs on every push and pull request: the JavaScript checks, PHP syntax, the automated tests,
-# and that every page has the current header, footer and file versions. Nothing is deployed.
+# Nothing is deployed. (Pages are kept up to date by build-pages.yml.)
 name: Checks
 
 on:
@@ -33,5 +33,3 @@ jobs:
       - name: Automated tests
         run: php tests/run.php
 
-      - name: Pages are up to date
-        run: python3 .github/scripts/build-pages.py --check

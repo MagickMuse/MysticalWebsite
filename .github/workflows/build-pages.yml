@@ -1,0 +1,41 @@
+# Puts the shared header and footer (partials/) into every page, and the current file versions on every
+# stylesheet and script link, whenever something they depend on changes. Nobody has to run anything:
+# this commits the updated pages back to the same branch.
+name: Build pages
+
+on:
+  push:
+    paths:
+      - 'partials/**'
+      - '*.html'
+      - 'blog/**'
+      - 'styles.css'
+      - 'site.js'
+      - 'prefs.js'
+      - 'cookie-consent.js'
+      - '.github/scripts/build-pages.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the pages
+        run: python3 .github/scripts/build-pages.py
+
+      - name: Save the updated pages
+        run: |
+          if git diff --quiet; then echo "Pages were already up to date."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898699+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Pages: shared header, footer and file versions (automatic)"
+          git push

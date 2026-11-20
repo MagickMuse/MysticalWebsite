@@ -24,21 +24,18 @@ they live on the server, outside the public website folder.
 
 ## Making changes
 
-```bash
-npm install                                  # once: the checkers (not needed by the site)
-python3 .github/scripts/build-pages.py       # after editing partials/, styles.css or a site script
-npm run check                                # ESLint, the tests, and that every page is up to date
-```
+Edit the header or footer in `partials/`, or any page, stylesheet or script, and push. That's all: GitHub runs
+`.github/scripts/build-pages.py` (the **Build pages** workflow), which writes the shared header and footer into every
+page and stamps each stylesheet and script link with a fingerprint of the file, then saves the result to the same
+branch. The upload to Hostinger runs it too. The Manuscript versions its files on the server from each file's change
+time, so nobody bumps version numbers by hand.
 
-`build-pages.py` writes the shared header and footer into every page and stamps each stylesheet and script
-link with a fingerprint of the file, so browsers fetch the new version exactly when it changes. The Manuscript
-does the same on the server from each file's change time, so nobody bumps version numbers by hand.
+To run the checks on your own computer (optional): `npm install` once, then `npm run check`.
 
 ## Checks
 
 Every push runs `.github/workflows/checks.yml`: ESLint on the scripts, PHP syntax on the app, the automated tests
-(`php tests/run.php`: who gets access, checkout, refunds, chargebacks, with a fake Stripe and an empty database),
-and `build-pages.py --check`.
+(`php tests/run.php`: who gets access, checkout, refunds, chargebacks, with a fake Stripe and an empty database).
 
 ## Deploying
 

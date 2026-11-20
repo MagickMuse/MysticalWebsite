@@ -28,6 +28,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Build the pages (shared header, footer and file versions)
+        run: python3 .github/scripts/build-pages.py
+
       - name: Install the FTP tool
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
 
