@@ -305,6 +305,15 @@ header.site {
 /* a small note under the hero's buttons */
 .aside { font-size: .98rem; color: var(--muted); font-style: italic; max-width: 30rem; }
 
+/* ledger: name on the left, what it is on the right, ruled like an index */
+.ledger { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(2rem, 5vw, 4.5rem); max-width: 1200px; margin: 0 auto; border-top: 1px solid var(--line); }
+.ledger > div { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr); gap: .4rem 1.6rem; padding: 1.4rem 0; border-bottom: 1px solid var(--line); }
+.ledger dt { font-family: var(--display); font-size: 1.55rem; line-height: 1.15; }
+.ledger dd { margin: 0; display: grid; gap: .5rem; justify-items: start; }
+.ledger dd .link { min-height: 0; }
+@media (max-width: 1000px) { .ledger { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .ledger > div { grid-template-columns: minmax(0, 1fr); } }
+
 /* a pull quote is a framed panel */
 .panel {
   margin: 0; padding: 1.6rem 1.8rem; border: 1px solid var(--gold); outline: 1px solid color-mix(in srgb, var(--gold) 45%, transparent); outline-offset: -8px;
@@ -453,6 +462,16 @@ section.tight { padding-block: clamp(2.5rem, 5vw, 4rem); }
 .chapter-break { display: grid; justify-items: center; gap: .6rem; padding-block: 1.6rem; }
 .chapter-break::before, .chapter-break::after { content: ""; width: 1px; height: 2.6rem; background: var(--gold); opacity: .6; }
 .chapter-break .spark { font-size: 1.2rem; }
+/* the story, set as a book: one reading column, each chapter opened by its numeral */
+.chapters.book { max-width: 46rem; }
+.book .chapter, .book .chapter:nth-of-type(even) { grid-template-columns: minmax(0, 1fr); gap: 1.4rem; }
+.book .chapter:nth-of-type(even) .chapter-mark { order: 0; }
+.book .chapter-mark { aspect-ratio: auto; padding: 0; border: 0; border-radius: 0; background: none; gap: .3rem; }
+.book .numeral { font-style: normal; font-size: 1.4rem; color: var(--gold); letter-spacing: .1em; }
+.book .chapter-mark h2 { font-size: clamp(2.2rem, 4vw, 3rem); }
+.book .chapter-text { gap: 1.1rem; }
+.book .chapter-break { padding-block: 2.6rem; }
+.book .chapter-break::before, .book .chapter-break::after { display: none; }
 @media (max-width: 760px) {
   .chapter, .chapter:nth-of-type(even) { grid-template-columns: 1fr; justify-items: center; }
   .chapter:nth-of-type(even) .chapter-mark { order: 0; }
