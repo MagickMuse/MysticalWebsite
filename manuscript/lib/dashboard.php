@@ -68,7 +68,7 @@ function delta(int $now, int $before): string
 {
     if ($before === 0) return $now > 0 ? 'new this period' : 'no change';
     $pct = (int) round(($now - $before) / $before * 100);
-    $arrow = $pct > 0 ? '▲' : ($pct < 0 ? '▼' : '■');
+    $arrow = match (true) { $pct > 0 => '▲', $pct < 0 => '▼', default => '■' };
     return '<span class="delta">' . $arrow . ' ' . abs($pct) . '%</span> vs previous 30 days';
 }
 
@@ -92,7 +92,7 @@ function dash_overview(): void
     $mrr = (int) db()->query("SELECT COALESCE(SUM(amt), 0) FROM (
             SELECT (SELECT amount_cents FROM payments p WHERE p.email = m.email AND p.product = 'membership-monthly' ORDER BY created_at DESC LIMIT 1) AS amt
             FROM members m WHERE m.plan = 'monthly' AND m.status = 'active')")->fetchColumn();
-    $q = fn(string $sql, array $args) => (function () use ($sql, $args) { $st = db()->prepare($sql); $st->execute($args); return (int) $st->fetchColumn(); })();
+    $q = function (string $sql, array $args): int { $st = db()->prepare($sql); $st->execute($args); return (int) $st->fetchColumn(); };
     $new30 = $q('SELECT COUNT(*) FROM members WHERE created_at >= ?', [$d30]);
     $newPrev = $q('SELECT COUNT(*) FROM members WHERE created_at >= ? AND created_at < ?', [$d60, $d30]);
     $cancel30 = $q("SELECT COUNT(*) FROM members WHERE status = 'canceled' AND updated_at >= ?", [$d30]);

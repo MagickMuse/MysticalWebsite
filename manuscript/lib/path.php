@@ -186,15 +186,24 @@ function view_path(?array $row): void
     $list = '';
     foreach ($days as $i => [$p, $try]) {
         $n = $i + 1;
-        $list .= '<li class="' . ($n <= $done ? 'done' : ($n === $done + 1 && $row && !$row['stopped_at'] ? 'next' : '')) . '"><span class="path-n">' . $n . '</span>'
+        $class = '';
+        if ($n <= $done) $class = 'done';
+        elseif ($n === $done + 1 && $row && !$row['stopped_at']) $class = 'next';
+        $list .= '<li class="' . $class . '"><span class="path-n">' . $n . '</span>'
             . '<a href="' . e(page_url($p)) . '">' . e($p['title']) . '</a>'
             . ($try ? '<small>Try it: <a href="' . e(url($try)) . '">' . e(PATH_TOOLS[$try]) . '</a></small>' : '') . '</li>';
     }
-    $status = !$row ? '<p class="lede">One page of the Manuscript a day for ' . $total . ' days, by email at 11:11 each morning, from the basics to working with deities and spirits. Read along here at your own pace, or have each day sent to you.</p>'
-        . '<form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="start"><input type="hidden" name="tz" value="" data-tz><button class="btn" type="submit">Start the Emails</button></form>'
-        : ($row['stopped_at'] ? '<p class="lede">The emails are stopped. You’re on day ' . $done . ' of ' . $total . '.</p><form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="start"><input type="hidden" name="tz" value="" data-tz><button class="btn" type="submit">Start Them Again</button></form>'
-        : ($done >= $total ? '<p class="lede">You’ve finished the path. Every page is still here whenever you want it.</p>'
-        : '<p class="lede">Day ' . $done . ' of ' . $total . '. The next page arrives by email tomorrow at 11:11.</p><form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="stop"><button class="link as-button" type="submit">Stop the Emails</button></form>'));
+    $start = fn(string $label) => '<form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="start"><input type="hidden" name="tz" value="" data-tz><button class="btn" type="submit">' . $label . '</button></form>';
+    if (!$row) {
+        $status = '<p class="lede">One page of the Manuscript a day for ' . $total . ' days, by email at 11:11 each morning, from the basics to working with deities and spirits. Read along here at your own pace, or have each day sent to you.</p>'
+            . $start('Start the Emails');
+    } elseif ($row['stopped_at']) {
+        $status = '<p class="lede">The emails are stopped. You’re on day ' . $done . ' of ' . $total . '.</p>' . $start('Start Them Again');
+    } elseif ($done >= $total) {
+        $status = '<p class="lede">You’ve finished the path. Every page is still here whenever you want it.</p>';
+    } else {
+        $status = '<p class="lede">Day ' . $done . ' of ' . $total . '. The next page arrives by email tomorrow at 11:11.</p><form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="stop"><button class="link as-button" type="submit">Stop the Emails</button></form>';
+    }
     layout('The beginner path', '<section class="saved path-page"><p class="eyebrow">Your Manuscript</p><h1>The Beginner Path</h1>' . $status
         . '<ol class="path-list">' . $list . '</ol></section>', ['private' => true]);
 }

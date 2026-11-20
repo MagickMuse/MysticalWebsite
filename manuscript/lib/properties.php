@@ -54,12 +54,6 @@ function text_as_list(string $text, bool $numbered): string
     return '<' . $tag . '>' . implode('', array_map(fn($i) => '<li>' . implode('<br>', array_map('e', $i)) . '</li>', $items)) . '</' . strtok($tag, ' ') . '>';
 }
 
-/** A property value: plain words in the site's type, separated by small gold stars (no coloured tags). */
-function pill_class(string $value): string
-{
-    return 'pill';
-}
-
 function chip(array $p): string
 {
     return '<a class="rel" href="' . e($p['url']) . '">' . icon_html($p['icon'], 'rel-icon') . '<span>' . e($p['title']) . '</span></a>';
@@ -116,11 +110,15 @@ function properties_panel(array $page, array $tags, array $groups): string
     foreach ($tags as $name => $vals) {
         if (in_array(mb_strtolower((string) $name), $filterOnly, true)) continue;
         $isLink = count($vals) === 1 && preg_match('~^https?://~', (string) $vals[0]);
+        // Long text as it is; other values as plain words (no coloured tags), leading to the list of entries with that value.
+        $pill = function ($v) use ($to, $name): string {
+            if (mb_strlen($v) > 40) return '<span class="prop-text">' . e($v) . '</span>';
+            if (!$to) return '<span class="pill">' . e($v) . '</span>';
+            return '<a class="pill" href="' . e($to((string) $name, (string) $v)) . '" title="All ' . e((string) $name) . ': ' . e((string) $v) . '">' . e($v) . '</a>';
+        };
         $value = $isLink
             ? '<a href="' . e($vals[0]) . '" rel="noopener" target="_blank">' . e(preg_replace('~^https?://(www\.)?~', '', $vals[0])) . '</a>'
-            : implode('', array_map(fn($v) => mb_strlen($v) > 40 ? '<span class="prop-text">' . e($v) . '</span>'
-                : ($to ? '<a class="' . pill_class($v) . '" href="' . e($to((string) $name, (string) $v)) . '" title="All ' . e((string) $name) . ': ' . e((string) $v) . '">' . e($v) . '</a>'
-                    : '<span class="' . pill_class($v) . '">' . e($v) . '</span>'), $vals));
+            : implode('', array_map($pill, $vals));
         $row = '<div class="prop-row"><div class="prop-name">' . prop_glyph((string) $name) . e($name) . '</div><div class="prop-val">' . $value . '</div></div>';
         // Long readings (a dream's Interpretations) come after the connections, so the correspondences are seen first.
         if (in_array(mb_strtolower((string) $name), $lastNames, true)) $last .= $row; else $rows .= $row;

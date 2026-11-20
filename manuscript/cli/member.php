@@ -25,7 +25,8 @@ switch ($cmd) {
     case 'import':
         $fh = fopen($arg, 'r');
         $head = array_map(fn($h) => strtolower(trim($h)), fgetcsv($fh) ?: []);
-        $col = array_search('email', $head) !== false ? array_search('email', $head) : array_search('purchase email', $head);
+        $col = array_search('email', $head);
+        if ($col === false) $col = array_search('purchase email', $head);
         if ($col === false) { fwrite(STDERR, "No 'email' column found.\n"); exit(1); }
         $n = 0;
         while (($row = fgetcsv($fh)) !== false) {

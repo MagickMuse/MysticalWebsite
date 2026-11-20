@@ -108,11 +108,6 @@ function collection_state(array $facets, bool $mine, array $all = []): array
     ];
 }
 
-function is_default_view(array $s): bool
-{
-    return !$s['filters'] && $s['sort'] === 'az' && $s['group'] === ($s['defaultGroup'] ?? '') && $s['letter'] === '' && $s['q'] === '' && !$s['saved'];
-}
-
 function first_letter(string $title): string
 {
     $l = strtoupper(substr(iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', ltrim($title, " \t\"'“‘(")) ?: '#', 0, 1));
@@ -232,7 +227,7 @@ function collection_html(array $v, bool $withHeading): string
         foreach ($counts as $val => $n) {
             $val = (string) $val; // PHP turns numeric keys like "1" into numbers
             $f = $state['filters']; $f[$prop] = $val;
-            $chips .= '<a class="fchip ' . pill_class($val) . ($cur === $val ? ' on' : '') . '" href="' . e($link(['filters' => $f])) . '">' . e($val) . ' <small>' . $n . '</small></a>';
+            $chips .= '<a class="fchip pill' . ($cur === $val ? ' on' : '') . '" href="' . e($link(['filters' => $f])) . '">' . e($val) . ' <small>' . $n . '</small></a>';
         }
         $chips .= '</div></div>';
     }
@@ -246,22 +241,21 @@ function collection_html(array $v, bool $withHeading): string
 
     // What's applied, as small removable tags beside the button.
     $active = '';
-    foreach ($state['filters'] as $prop => $val) $active .= '<a class="atag ' . pill_class($val) . '" href="' . e($link(['filters' => array_diff_key($state['filters'], [$prop => 1])])) . '" title="Remove">' . e($val) . ' <span aria-hidden="true">×</span></a>';
+    foreach ($state['filters'] as $prop => $val) $active .= '<a class="atag pill" href="' . e($link(['filters' => array_diff_key($state['filters'], [$prop => 1])])) . '" title="Remove">' . e($val) . ' <span aria-hidden="true">×</span></a>';
     $labels = ['za' => 'Z–A', 'connected' => 'Most connected', 'popular' => 'Most read', 'updated' => 'Recently updated'];
     if ($state['sort'] !== 'az') $active .= '<a class="atag" href="' . e($link(['sort' => 'az'])) . '">' . $labels[$state['sort']] . ' <span aria-hidden="true">×</span></a>';
     // Grouping is only shown as a removable tag when it isn't the list's usual one.
     $autoFlat = !empty($state['autoFlat']); // filtered to one type: flat on purpose
     if ($state['group'] !== $state['defaultGroup'] && !$autoFlat) {
-        $active .= $state['group'] !== ''
-            ? '<a class="atag" href="' . e($link(['group' => $state['defaultGroup']])) . '">By ' . e($state['group']) . ' <span aria-hidden="true">×</span></a>'
-            : '<a class="atag" href="' . e($link(['group' => $state['defaultGroup']])) . '">Not grouped <span aria-hidden="true">×</span></a>';
+        $active .= '<a class="atag" href="' . e($link(['group' => $state['defaultGroup']])) . '">'
+            . ($state['group'] !== '' ? 'By ' . e($state['group']) : 'Not grouped') . ' <span aria-hidden="true">×</span></a>';
     }
     if ($state['letter'] !== '') $active .= '<a class="atag" href="' . e($link(['letter' => ''])) . '">' . e($state['letter']) . ' <span aria-hidden="true">×</span></a>';
     if ($state['q'] !== '') $active .= '<a class="atag" href="' . e($link(['q' => ''])) . '">“' . e($state['q']) . '” <span aria-hidden="true">×</span></a>';
     if ($state['saved']) $active .= '<a class="atag" href="' . e($link(['saved' => false])) . '">My saved <span aria-hidden="true">×</span></a>';
 
     $count = number_format($total) . ($total === count($all) ? '' : ' of ' . number_format(count($all))) . ' ' . (count($all) === 1 ? 'entry' : 'entries');
-    $bar = '<div class="col-bar"><details class="col-filter"' . (is_default_view($state) ? '' : '') . '><summary><span class="sf-icon" aria-hidden="true">⇅</span> Sort &amp; filter</summary>'
+    $bar = '<div class="col-bar"><details class="col-filter"><summary><span class="sf-icon" aria-hidden="true">⇅</span> Sort &amp; filter</summary>'
         . '<div class="col-views">' . $tools . ($chips ? '<div class="facets">' . $chips . '</div>' : '') . $letters . '</div></details>'
         . ($active ? '<div class="atags">' . $active . '</div>' : '') . '<p class="col-count">' . $count . '</p></div>';
 
@@ -277,13 +271,12 @@ function collection_html(array $v, bool $withHeading): string
             $more = count($items) > GROUP_PREVIEW && !str_starts_with($val, 'No ')
                 ? '<a class="link" href="' . e($link(['filters' => $f, 'group' => ''])) . '">Show all ' . count($items) . '</a>' : '';
             // The group's name leads to just that group, as one list (not for the "No …" group).
-            $name = str_starts_with($val, 'No ') ? '<span class="' . pill_class($val) . '">' . e($val) . '</span>'
-                : '<a class="' . pill_class($val) . '" href="' . e($link(['filters' => $f, 'group' => ''])) . '" title="Only ' . e($val) . '">' . e($val) . '</a>';
+            $name = str_starts_with($val, 'No ') ? '<span class="pill">' . e($val) . '</span>'
+                : '<a class="pill" href="' . e($link(['filters' => $f, 'group' => ''])) . '" title="Only ' . e($val) . '">' . e($val) . '</a>';
             $list .= '<section class="col-group"><h3>' . $name . ' <small>' . count($items) . '</small></h3>'
                 . '<ul class="entry-grid' . gallery_class($v['c']) . '">' . collection_items(array_slice($items, 0, GROUP_PREVIEW), $state['sort'], $metric) . '</ul>' . $more . '</section>';
         }
     } else {
-        $offset = 0;
         $list = '<ul class="entry-grid' . gallery_class($v['c']) . '" data-col-list>' . collection_items(array_slice($rows, 0, COLLECTION_PAGE * $state['page']), $state['sort'], $metric) . '</ul>';
         if (COLLECTION_PAGE * $state['page'] < $total) {
             $next = view_link($v, ['page' => $state['page'] + 1]);

@@ -128,12 +128,6 @@ final class NotionImporter
     }
 
     /**
-     * Rules the site applies to what came from Notion, after every import (also to pages not re-downloaded):
-     *  - grimoires without pictures (config "no_pictures", default the Entity Grimoire): no cover, no picture icon,
-     *    no pictures in the text or in picture properties
-     *  - icons set by the site (manuscript/site-icons.php), e.g. the astrological symbols for planets and signs
-     */
-    /**
      * The Library (config "library_db"): the books the Manuscript draws on, saved to data_dir/library.json for /library.
      * Only title, author and topics are kept: the reading-progress columns (status, pages read) stay in Notion.
      */
@@ -162,6 +156,12 @@ final class NotionImporter
         ($this->log)('  ◦ The Library: ' . count($books) . ' books');
     }
 
+    /**
+     * Rules the site applies to what came from Notion, after every import (also to pages not re-downloaded):
+     *  - grimoires without pictures (config "no_pictures", default the Entity Grimoire): no cover, no picture icon,
+     *    no pictures in the text or in picture properties
+     *  - icons set by the site (manuscript/site-icons.php), e.g. the astrological symbols for planets and signs
+     */
     public function applySiteRules(): void
     {
         $none = (array) config('no_pictures', ['entity']);
@@ -249,14 +249,9 @@ final class NotionImporter
                 if (!$im) continue;
                 imagepalettetotruecolor($im); imagealphablending($im, false); imagesavealpha($im, true);
                 $w = imagesx($im); $h = imagesy($im);
-                $cut = ((imagecolorat($im, 0, 0) >> 24) & 127) > 100 && ((imagecolorat($im, $w - 1, $h - 1) >> 24) & 127) > 100;
-                if ($cut) { // trim to the subject, then centre it on a clear square
-                    $x0 = $w; $y0 = $h; $x1 = $y1 = -1; $step = max(1, intdiv(max($w, $h), 400));
-                    for ($y = 0; $y < $h; $y += $step) for ($x = 0; $x < $w; $x += $step) {
-                        if (((imagecolorat($im, $x, $y) >> 24) & 127) < 115) { $x0 = min($x0, $x); $y0 = min($y0, $y); $x1 = max($x1, $x); $y1 = max($y1, $y); }
-                    }
-                    if ($x1 < 0) continue;
-                    $cw = $x1 - $x0 + 1; $ch = $y1 - $y0 + 1; $side = max($cw, $ch);
+                if (self::isCutout($im)) { // trim to the subject, then centre it on a clear square
+                    if (!($box = self::subjectBox($im))) continue;
+                    [$x0, $y0, $cw, $ch] = $box; $side = max($cw, $ch);
                     $dx = $x0 - intdiv($side - $cw, 2); $dy = $y0 - intdiv($side - $ch, 2);
                 } elseif ($p['grimoire'] === 'mineral') { // the whole specimen, fitted
                     $side = 0; $dx = $dy = 0;
@@ -297,7 +292,13 @@ final class NotionImporter
         foreach ($st->fetchAll() as $p) {
             $name = $p['id'] . '-card.webp';
             if (is_file("$dir/$name")) continue;
-            $c = (string) ($p['cover'] ?: (str_starts_with((string) $p['icon'], 'file:') ? substr((string) $p['icon'], 5) : (str_starts_with((string) $p['icon'], 'asset:') ? $p['icon'] : '')));
+            $icon = (string) $p['icon'];
+            $c = match (true) { // its cover, else its picture icon
+                (bool) $p['cover'] => (string) $p['cover'],
+                str_starts_with($icon, 'file:') => substr($icon, 5),
+                str_starts_with($icon, 'asset:') => $icon,
+                default => '',
+            };
             if ($c === '' || str_starts_with($c, 'http') || str_ends_with($c, '.svg')) continue;
             $src = str_starts_with($c, 'asset:') ? MM_ROOT . '/assets/' . substr($c, 6) : "$dir/$c";
             $im = @imagecreatefromstring((string) @file_get_contents($src));
@@ -309,14 +310,9 @@ final class NotionImporter
                 $out = imagecreatetruecolor($ow, $oh); imagealphablending($out, false); imagesavealpha($out, true);
                 imagecopyresampled($out, $im, 0, 0, 0, 0, $ow, $oh, $w, $h);
             } else {
-                $cut = ((imagecolorat($im, 0, 0) >> 24) & 127) > 100 && ((imagecolorat($im, $w - 1, $h - 1) >> 24) & 127) > 100;
-                if ($cut) {
-                    $x0 = $w; $y0 = $h; $x1 = $y1 = -1; $step = max(1, intdiv(max($w, $h), 400));
-                    for ($y = 0; $y < $h; $y += $step) for ($x = 0; $x < $w; $x += $step) {
-                        if (((imagecolorat($im, $x, $y) >> 24) & 127) < 115) { $x0 = min($x0, $x); $y0 = min($y0, $y); $x1 = max($x1, $x); $y1 = max($y1, $y); }
-                    }
-                    if ($x1 < 0) continue;
-                    $cw = $x1 - $x0 + 1; $ch = $y1 - $y0 + 1; $side = (int) round(max($cw, $ch) * 1.08);
+                if (self::isCutout($im)) {
+                    if (!($box = self::subjectBox($im))) continue;
+                    [$x0, $y0, $cw, $ch] = $box; $side = (int) round(max($cw, $ch) * 1.08);
                     $dx = $x0 - intdiv($side - $cw, 2); $dy = $y0 - intdiv($side - $ch, 2);
                 } elseif ($p['grimoire'] === 'mineral') { // a mineral photo: the whole specimen, fitted inside the square
                     $k = 320 / max($w, $h); $ow = (int) round($w * $k); $oh = (int) round($h * $k);
@@ -335,7 +331,6 @@ final class NotionImporter
         ($this->log)("Gallery previews: $made made.");
     }
 
-    /** Scientific or Latin names on a Notion page (property name contains "scientific", "latin" or "botanical"). */
     /**
      * Rituals and recipes without an icon get the icon of their intention, from the correspondences:
      * one they link to that their title names ("Protection Oil"), else the one their category names (Divination),
@@ -393,13 +388,35 @@ final class NotionImporter
         if ($n) ($this->log)("Site rules: $n ritual/recipe page(s) given their intention's icon.");
     }
 
+    /** A cut-out: clear at its top-left and bottom-right corners. */
+    private static function isCutout(\GdImage $im): bool
+    {
+        return ((imagecolorat($im, 0, 0) >> 24) & 127) > 100 && ((imagecolorat($im, imagesx($im) - 1, imagesy($im) - 1) >> 24) & 127) > 100;
+    }
+
+    /** Where a cut-out's subject is (its pixels that aren't clear): [x, y, width, height], or null if it is all clear. */
+    private static function subjectBox(\GdImage $im): ?array
+    {
+        $w = imagesx($im); $h = imagesy($im);
+        $x0 = $w; $y0 = $h; $x1 = $y1 = -1; $step = max(1, intdiv(max($w, $h), 400));
+        for ($y = 0; $y < $h; $y += $step) for ($x = 0; $x < $w; $x += $step) {
+            if (((imagecolorat($im, $x, $y) >> 24) & 127) < 115) { $x0 = min($x0, $x); $y0 = min($y0, $y); $x1 = max($x1, $x); $y1 = max($y1, $y); }
+        }
+        return $x1 < 0 ? null : [$x0, $y0, $x1 - $x0 + 1, $y1 - $y0 + 1];
+    }
+
+    /** Scientific or Latin names on a Notion page (property name contains "scientific", "latin" or "botanical"). */
     private function scientificNames(array $page): array
     {
         $out = [];
         foreach ($page['properties'] ?? [] as $name => $prop) {
             if (!preg_match('/scientific|latin|botanical/i', $name)) continue;
             $v = $prop[$prop['type']] ?? null;
-            $text = is_array($v) && isset($v[0]['plain_text']) ? $this->plainText($v) : (is_array($v) ? implode(',', array_column($v, 'name')) : (string) ($v['name'] ?? $v ?? ''));
+            $text = match (true) {
+                is_array($v) && isset($v[0]['plain_text']) => $this->plainText($v),
+                is_array($v) => implode(',', array_column($v, 'name')),
+                default => (string) ($v['name'] ?? $v ?? ''),
+            };
             foreach (preg_split('/[,;]/', $text) as $t) if (trim($t) !== '') $out[] = trim($t);
         }
         return $out;
@@ -491,7 +508,7 @@ final class NotionImporter
                 $res = $this->call('POST', $path, $body + ($cursor ? ['start_cursor' => $cursor] : []) + ['page_size' => 100]);
             }
             foreach ($res['results'] ?? [] as $r) yield $r;
-            $cursor = $res['has_more'] ?? false ? $res['next_cursor'] : null;
+            $cursor = ($res['has_more'] ?? false) ? $res['next_cursor'] : null;
         } while ($cursor);
     }
 
@@ -511,14 +528,8 @@ final class NotionImporter
         $extra = is_file(MM_ROOT . '/extra-pages.php') ? (array) ((require MM_ROOT . '/extra-pages.php')[$slug] ?? []) : [];
         $n = 1000;
         foreach ($extra as $extraSlug => $extraId) {
-            try {
-                $this->importPage($this->call('GET', '/pages/' . normalize_id((string) $extraId)), 'guide', $pageId, $n++, (string) $extraSlug);
-            } catch (ImportPaused $ex) {
-                throw $ex;
-            } catch (Throwable $ex) {
-                $this->stats['errors']++;
-                ($this->log)('  ! ' . $extraSlug . ': ' . $ex->getMessage());
-            }
+            $sort = $n++;
+            $this->importChild(fn() => $this->importPage($this->call('GET', '/pages/' . normalize_id((string) $extraId)), 'guide', $pageId, $sort, (string) $extraSlug), $extraSlug . ': ');
         }
 
         // A page or database that failed to load was never marked as seen: pruning now would delete it
@@ -587,18 +598,22 @@ final class NotionImporter
 
         foreach ($ctx['children'] as $i => [$childKind, $childId]) {
             if ($childKind === 'database' && $this->guidesOnly) continue;
-            try {
-                if ($childKind === 'page') {
-                    $this->importPage($this->call('GET', "/pages/$childId"), 'guide', $id, $i);
-                } else {
-                    $this->importDatabase($childId, $id, $i);
-                }
-            } catch (ImportPaused $ex) {
-                throw $ex;
-            } catch (Throwable $ex) {
-                $this->stats['errors']++;
-                ($this->log)('  ! ' . $ex->getMessage());
-            }
+            $this->importChild(fn() => $childKind === 'page'
+                ? $this->importPage($this->call('GET', "/pages/$childId"), 'guide', $id, $i)
+                : $this->importDatabase($childId, $id, $i));
+        }
+    }
+
+    /** One page or database inside another: a failure is counted and logged and the walk goes on; a pause stops it all. */
+    private function importChild(callable $import, string $label = ''): void
+    {
+        try {
+            $import();
+        } catch (ImportPaused $ex) {
+            throw $ex;
+        } catch (Throwable $ex) {
+            $this->stats['errors']++;
+            ($this->log)('  ! ' . $label . $ex->getMessage());
         }
     }
 
@@ -608,18 +623,9 @@ final class NotionImporter
         $st->execute([$id]);
         foreach ($st->fetchAll() as $child) {
             if ($child['kind'] === 'collection' && $this->guidesOnly) continue;
-            try {
-                if ($child['kind'] === 'guide') {
-                    $this->importPage($this->call('GET', '/pages/' . $child['id']), 'guide', $id, (int) $child['sort']);
-                } else {
-                    $this->importDatabase($child['id'], $id, (int) $child['sort']);
-                }
-            } catch (ImportPaused $ex) {
-                throw $ex;
-            } catch (Throwable $ex) {
-                $this->stats['errors']++;
-                ($this->log)('  ! ' . $ex->getMessage());
-            }
+            $this->importChild(fn() => $child['kind'] === 'guide'
+                ? $this->importPage($this->call('GET', '/pages/' . $child['id']), 'guide', $id, (int) $child['sort'])
+                : $this->importDatabase($child['id'], $id, (int) $child['sort']));
         }
     }
 
@@ -652,14 +658,8 @@ final class NotionImporter
         ]);
         $n = 0;
         foreach ($this->paginate('POST', "/databases/$dbId/query", ['sorts' => [['timestamp' => 'created_time', 'direction' => 'ascending']]]) as $row) {
-            try {
-                $this->importPage($row, 'entry', $dbId, $n++);
-            } catch (ImportPaused $ex) {
-                throw $ex;
-            } catch (Throwable $ex) {
-                $this->stats['errors']++;
-                ($this->log)('  ! ' . $ex->getMessage());
-            }
+            $sort = $n++;
+            $this->importChild(fn() => $this->importPage($row, 'entry', $dbId, $sort));
             if ($n % 50 === 0) ($this->log)("    … $n entries");
         }
         ($this->log)("    $n entries");

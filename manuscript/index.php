@@ -212,43 +212,38 @@ function view_page(array $p): void
         $img = '<img src="' . e(media_url($p['cover'])) . '" alt="' . ($whole ? e($p['title']) : '') . '">';
         $cover = '<div class="pg-cover' . ($whole ? ' cutout' : '') . '">'
             . ($whole ? '<a class="zoom" href="' . e(media_url($p['cover'])) . '" data-zoom>' . $img . '</a>' : $img) . '</div>';
-    } elseif (!$photo) {
-        $cover = '';
     }
 
-    {
-        $gallery = '';
-        if ($images) {
-            // Each picture opens full size when clicked (assets/wiki.js); without JavaScript the link opens the picture itself.
-            $gallery = '<div class="gallery">' . implode('', array_map(fn($f) => '<figure><a class="zoom" href="' . e(media_url($f)) . '" data-zoom>'
-                . '<img src="' . e(media_url($f)) . '" alt="' . e($p['title']) . '" loading="lazy"></a></figure>', $images)) . '</div>';
-        }
-        // A spread's layout picture goes right above its Card Details, where the positions are explained.
-        $details = '<div class="prop-row"><div class="prop-name">' . prop_glyph('Card Details') . 'Card Details</div>';
-        if ($gallery && str_contains($panel, $details)) {
-            $panel = str_replace($details, str_replace('class="gallery"', 'class="gallery in-panel"', $gallery) . $details, $panel);
-            $gallery = '';
-        }
-        // Landing pages: intro text is public, the guide pages it links to are for members.
-        $bodyHtml = $textParts . resolve_links((string) $p['body_html']);
-        // Lines that only repeat the sidebar ("Day: Friday" when Timing shows Friday) are left out of the text.
-        if ($panel !== '') $bodyHtml = $textParts . drop_sidebar_repeats(resolve_links((string) $p['body_html']), $panel);
-        // The blog's hierarchy: burgundy highlights, ink labels, warnings boxed.
-        $bodyHtml = prose_hierarchy($bodyHtml);
-        // A grimoire's intro box repeats its name as a heading ("The Animal Grimoire"); the page title already says it.
-        if ($p['kind'] === 'grimoire') {
-            $name = mb_strtolower(preg_replace('/^the\s+/i', '', $p['title']));
-            $bodyHtml = preg_replace_callback('~<h([2-4])\b[^>]*>(.*?)</h\1>~s', function ($m) use ($name) {
-                return mb_strtolower(preg_replace('/^the\s+/i', '', trim(html_entity_decode(strip_tags($m[2]))))) === $name ? '' : $m[0];
-            }, $bodyHtml, 1);
-        }
-        // In intro boxes, "Label:" written in bold becomes a label line, with any text after it as its own paragraph.
-        $bodyHtml = preg_replace_callback('~<aside class="mm-callout[^"]*">.*?</aside>~s', fn($box) => preg_replace_callback(
-            '~<p><strong>([^<]{2,80}:)</strong>\s*(.*?)</p>~s',
-            fn($m) => '<p class="label">' . $m[1] . '</p>' . (trim(strip_tags($m[2])) !== '' ? '<p>' . $m[2] . '</p>' : ''),
-            $box[0]), $bodyHtml);
-        $body = $panel . $gallery . '<div class="mm-prose">' . $bodyHtml . '</div>';
+    $gallery = '';
+    if ($images) {
+        // Each picture opens full size when clicked (assets/wiki.js); without JavaScript the link opens the picture itself.
+        $gallery = '<div class="gallery">' . implode('', array_map(fn($f) => '<figure><a class="zoom" href="' . e(media_url($f)) . '" data-zoom>'
+            . '<img src="' . e(media_url($f)) . '" alt="' . e($p['title']) . '" loading="lazy"></a></figure>', $images)) . '</div>';
     }
+    // A spread's layout picture goes right above its Card Details, where the positions are explained.
+    $details = '<div class="prop-row"><div class="prop-name">' . prop_glyph('Card Details') . 'Card Details</div>';
+    if ($gallery && str_contains($panel, $details)) {
+        $panel = str_replace($details, str_replace('class="gallery"', 'class="gallery in-panel"', $gallery) . $details, $panel);
+        $gallery = '';
+    }
+    $prose = resolve_links((string) $p['body_html']);
+    // Lines that only repeat the sidebar ("Day: Friday" when Timing shows Friday) are left out of the text.
+    if ($panel !== '') $prose = drop_sidebar_repeats($prose, $panel);
+    // The blog's hierarchy: burgundy highlights, ink labels, warnings boxed.
+    $bodyHtml = prose_hierarchy($textParts . $prose);
+    // A grimoire's intro box repeats its name as a heading ("The Animal Grimoire"); the page title already says it.
+    if ($p['kind'] === 'grimoire') {
+        $name = mb_strtolower(preg_replace('/^the\s+/i', '', $p['title']));
+        $bodyHtml = preg_replace_callback('~<h([2-4])\b[^>]*>(.*?)</h\1>~s', function ($m) use ($name) {
+            return mb_strtolower(preg_replace('/^the\s+/i', '', trim(html_entity_decode(strip_tags($m[2]))))) === $name ? '' : $m[0];
+        }, $bodyHtml, 1);
+    }
+    // In intro boxes, "Label:" written in bold becomes a label line, with any text after it as its own paragraph.
+    $bodyHtml = preg_replace_callback('~<aside class="mm-callout[^"]*">.*?</aside>~s', fn($box) => preg_replace_callback(
+        '~<p><strong>([^<]{2,80}:)</strong>\s*(.*?)</p>~s',
+        fn($m) => '<p class="label">' . $m[1] . '</p>' . (trim(strip_tags($m[2])) !== '' ? '<p>' . $m[2] . '</p>' : ''),
+        $box[0]), $bodyHtml);
+    $body = $panel . $gallery . '<div class="mm-prose">' . $bodyHtml . '</div>';
     // With written content, the properties become a sidebar beside it (and wiki.js adds a table of contents).
     // A page that is only properties keeps them across the page: sidebars beside nothing would only show the gap.
     $aside = $panel !== '' && trim(html_entity_decode(strip_tags($bodyHtml))) !== '';
@@ -462,6 +457,7 @@ function view_search(string $q): void
     }
     $match = fts_query($q);
     $rows = [];
+    $counts = [];
     if ($match !== '') {
         $sql = "SELECT p.id, p.slug, p.grimoire, p.kind, p.title, p.icon, p.aka, p.parent_id,
                 snippet(search, 3, '<mark>', '</mark>', '…', 24) AS snip
@@ -471,10 +467,7 @@ function view_search(string $q): void
         $st = db()->prepare($sql);
         $st->execute($g !== '' ? ["{title aka plain} : $match", $g] : ["{title aka plain} : $match"]);
         $rows = $st->fetchAll();
-    }
-    // How many hits in each grimoire, for the filter.
-    $counts = [];
-    if ($match !== '') {
+        // How many hits in each grimoire, for the filter.
         $st = db()->prepare("SELECT p.grimoire, COUNT(*) n FROM search JOIN pages p ON p.id = search.id WHERE search MATCH ? GROUP BY p.grimoire");
         $st->execute(["{title aka plain} : $match"]);
         $counts = $st->fetchAll(PDO::FETCH_KEY_PAIR);
@@ -503,7 +496,7 @@ function view_search(string $q): void
     }
     $count = count($rows);
     $shown = $count >= 100 ? '100+' : (string) $count;
-    $body = '<section class="mm-results"><p class="eyebrow">Search</p><h1>' . ($count ? $shown . ($count === 1 ? ' result' : ' results') . ' for ' . e($q) . '' : 'Nothing found for ' . e($q) . '') . '</h1>'
+    $body = '<section class="mm-results"><p class="eyebrow">Search</p><h1>' . ($count ? $shown . ($count === 1 ? ' result' : ' results') . ' for ' . e($q) : 'Nothing found for ' . e($q)) . '</h1>'
         . $note . $chips
         . ($count ? '<ol class="results">' . $list . '</ol>' : '<p class="lede">Try another spelling, a shorter word, or a related term.</p>')
         . '</section>';

@@ -88,7 +88,11 @@ function tools_data(): array
             if ($f) $safety[count($pages)] = $f;
         }
         $icon = (string) shown_icon($p);
-        $icon = str_starts_with($icon, 'file:') ? 'm:' . substr($icon, 5) : (str_starts_with($icon, 'asset:') ? 'a:' . substr($icon, 6) : $icon);
+        $icon = match (true) { // pictures as m:<media file> or a:<asset>, emoji as they are
+            str_starts_with($icon, 'file:') => 'm:' . substr($icon, 5),
+            str_starts_with($icon, 'asset:') => 'a:' . substr($icon, 6),
+            default => $icon,
+        };
         $pos[$p['id']] = count($pages);
         // How much the page has to read: its text, and a recipe's or ritual's Description, Quantities and Directions.
         $text = (string) $p['plain'];
@@ -120,7 +124,11 @@ function tools_data(): array
     $ids = array_flip($pos);
     foreach ($tarot as $i => $t) {
         $cover = (string) ($pageRow[$ids[$i]]['cover'] ?? '');
-        $cover = str_starts_with($cover, 'asset:') ? 'a:' . substr($cover, 6) : ($cover !== '' && !str_starts_with($cover, 'https://') ? 'm:' . $cover : '');
+        $cover = match (true) {
+            str_starts_with($cover, 'asset:') => 'a:' . substr($cover, 6),
+            $cover !== '' && !str_starts_with($cover, 'https://') => 'm:' . $cover,
+            default => '',
+        };
         $pages[$i][4] = ltrim($pages[$i][4] . '|Tarot', '|');
         $cards[] = [$i, $cover, $t[1] ?? [], $t[2] ?? []];
     }
