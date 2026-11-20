@@ -110,7 +110,7 @@ function view_page(array $p): void
     // On a grimoire, "The Magick Manuscript" above the title leads back to the Manuscript's home.
     $eyebrowHtml = $p['kind'] === 'grimoire' ? '<a href="' . e(url()) . '">' . e($eyebrow) . '</a>' : e($eyebrow);
     $head = '<header class="pg-head">' . $crumbs . '<p class="eyebrow">' . $eyebrowHtml . '</p>'
-        . '<div class="pg-title"><h1>' . icon_html($p['icon'], 'pg-icon big') . e($p['title']) . '</h1>' . save_button($p) . '</div></header>';
+        . '<div class="pg-title"><h1>' . entry_icon($p, 'pg-icon big') . e($p['title']) . '</h1>' . save_button($p) . '</div></header>';
     $panel = in_array($p['kind'], ['entry', 'guide'], true) ? properties_panel($p, $tags, connections($p)) : '';
     // Visitors reading the sneak peek get a note above it; every link inside opens the join pop-up.
     $peek = !has_access() && ($sp = sneak_peek_page()) && $sp['id'] === $p['id'];
@@ -370,4 +370,17 @@ function sign_picture(array $p): ?string
     $dir = ['rune' => 'runes', 'astrology' => 'signs'][$p['grimoire'] ?? ''] ?? null;
     if (!$dir || !is_file(MM_ROOT . "/assets/$dir/" . $p['slug'] . '.png')) return null;
     return url("assets/$dir/" . $p['slug'] . '.png');
+}
+
+/**
+ * The small icon beside an entry's name (in lists and its page title): its own picture icon if it has one, else the
+ * site's gold drawing (sign_picture()), else its emoji.
+ */
+function entry_icon(array $e, string $class = 'pg-icon'): string
+{
+    $icon = (string) ($e['icon'] ?? '');
+    if (!preg_match('/^(asset|file):./', $icon) && ($pic = sign_picture($e))) {
+        return '<img class="' . $class . '" src="' . e($pic) . '" alt="" width="24" height="24" loading="lazy">';
+    }
+    return icon_html($icon, $class);
 }

@@ -310,7 +310,7 @@ function collection_items(array $rows, string $sort, array $metric): string
             'popular' => isset($metric[$e['id']]) ? '<small class="metric">' . $metric[$e['id']] . ' views</small>' : '',
             default => '',
         };
-        $out .= '<li><a href="' . e(page_url($e)) . '">' . (is_gallery($e['grimoire']) ? gallery_pic($e) : icon_html($e['icon'])) . '<span>' . e($e['title']) . '</span>' . $badge . '</a></li>';
+        $out .= '<li><a href="' . e(page_url($e)) . '">' . (is_gallery($e['grimoire']) ? gallery_pic($e) : entry_icon($e)) . '<span>' . e($e['title']) . '</span>' . $badge . '</a></li>';
     }
     return $out;
 }
