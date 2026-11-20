@@ -231,7 +231,7 @@ header.site {
 }
 
 /* ---------- the opening (home): the book falls open ---------- */
-/* Left page: the arch-framed photograph. A gold gutter. Right page: a line from the Manuscript, then the title and the way in. */
+/* Left page: the arch-framed photograph. A gold gutter. Right page: the title and the way in. */
 .opening {
   display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: center;
   max-width: 1320px; margin-inline: auto; padding-block: clamp(2.5rem, 6vw, 5rem) clamp(4rem, 8vw, 6.5rem);
@@ -240,12 +240,6 @@ header.site {
 .opening-art .frame { aspect-ratio: 4 / 5; width: 100%; }
 .gutter { align-self: stretch; background: color-mix(in srgb, var(--gold) 65%, transparent); }
 .opening-page { display: grid; gap: 1.5rem; justify-items: start; max-width: 34rem; }
-.excerpt { margin: 0; }
-.excerpt p { max-width: none; font-family: var(--display); font-size: clamp(1.45rem, 2.1vw, 1.8rem); line-height: 1.34; }
-.excerpt cite { display: block; margin-top: .9rem; font-size: 1rem; color: var(--muted); }
-.excerpt cite a { color: inherit; text-decoration-color: var(--gold); text-underline-offset: .25em; }
-.excerpt cite a:hover { color: var(--accent-text); }
-.opening .rule { width: 3.5rem; height: 1px; margin: .3rem 0 .1rem; background: color-mix(in srgb, var(--gold) 80%, transparent); }
 .opening h1 { font-size: clamp(3rem, 6.2vw, 5.4rem); }
 @media (max-width: 860px) {
   .opening { grid-template-columns: minmax(0, 1fr); padding-top: 1.5rem; }
@@ -258,10 +252,8 @@ header.site {
   :root:not([data-motion="reduce"]) .opening-art .frame { animation: arch-open 1.2s cubic-bezier(.65, 0, .35, 1) both; }
   :root:not([data-motion="reduce"]) .opening-page > * { animation: ink-in .9s ease both; }
   :root:not([data-motion="reduce"]) .opening-page > :nth-child(1) { animation-delay: .55s; }
-  :root:not([data-motion="reduce"]) .opening-page > :nth-child(2) { animation-delay: .8s; }
+  :root:not([data-motion="reduce"]) .opening-page > :nth-child(2) { animation-delay: .75s; }
   :root:not([data-motion="reduce"]) .opening-page > :nth-child(3) { animation-delay: .95s; }
-  :root:not([data-motion="reduce"]) .opening-page > :nth-child(4) { animation-delay: 1.1s; }
-  :root:not([data-motion="reduce"]) .opening-page > :nth-child(5) { animation-delay: 1.25s; }
 }
 @keyframes arch-open { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes ink-in { from { opacity: 0; } to { opacity: 1; } }
