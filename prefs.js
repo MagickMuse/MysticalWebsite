@@ -91,7 +91,10 @@
   var ARCH = '<svg viewBox="0 0 28 36" aria-hidden="true" focusable="false">'
     + '<path class="tt-glass" d="M5 34V17c0-5 4-6.6 7-9.4C13.3 6.3 13.8 4 14 1.5c.2 2.5.7 4.8 2 6.1 3 2.8 7 4.4 7 9.4v17z"/>'
     + '<path class="tt-arch" d="M3 34.5V16.6c0-6 4.6-7.9 7.7-10.7C12.6 4.2 13.6 2.3 14 .5c.4 1.8 1.4 3.7 3.3 5.4 3.1 2.8 7.7 4.7 7.7 10.7v17.9zM1.5 34.5h25"/>'
-    + '<path class="tt-star" d="M14 13.5c.5 4.3 2.2 6 6.5 6.5-4.3.5-6 2.2-6.5 6.5-.5-4.3-2.2-6-6.5-6.5 4.3-.5 6-2.2 6.5-6.5z"/></svg>';
+    // by day: a little sun in the window
+    + '<g class="tt-sun"><circle cx="14" cy="21" r="2.6"/><path d="M14 15.4v1.5M14 25.1v1.5M8.4 21h1.5M18.1 21h1.5M10 17l1.1 1.1M16.9 23.9l1.1 1.1M10 25l1.1-1.1M16.9 18.1l1.1-1.1"/></g>'
+    // by candlelight: a crescent moon
+    + '<path class="tt-moon" d="M15.6 15.7a5.2 5.2 0 1 0 3.6 8.4 4.3 4.3 0 0 1-3.6-8.4z"/></svg>';
   function syncToggle(btn) {
     var dark = isDark();
     btn.setAttribute('aria-pressed', dark ? 'true' : 'false');

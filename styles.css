@@ -212,8 +212,7 @@ header.site {
   border: 1px solid var(--line); background: none; color: var(--ink); cursor: pointer;
   font-family: var(--body); font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; font-weight: 500;
 }
-/* Theme toggle: a pointed arch from the logo with the four-point star in its window.
-   By day the window is open (star outlined); by candlelight the star is lit gold. */
+/* Theme toggle: a pointed arch from the logo with a little sun in its window by day and a crescent moon by candlelight. */
 .theme-toggle {
   grid-column: 3; grid-row: 1; display: grid; place-items: center; width: 44px; height: 48px; padding: 0;
   border: 0; background: none; color: var(--accent-text); cursor: pointer;
@@ -221,9 +220,14 @@ header.site {
 .theme-toggle svg { width: 26px; height: 34px; overflow: visible; }
 .theme-toggle .tt-arch { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; }
 .theme-toggle .tt-glass { fill: var(--gold); opacity: 0; transition: opacity .4s; }
-.theme-toggle .tt-star { fill: none; stroke: var(--gold); stroke-width: 1.3; stroke-linejoin: round; transform-origin: 14px 20px; transition: fill .4s, transform .5s cubic-bezier(.2, .7, .2, 1); }
+.theme-toggle .tt-sun, .theme-toggle .tt-moon { transform-origin: 14px 21px; transition: opacity .35s, transform .5s cubic-bezier(.2, .7, .2, 1); }
+.theme-toggle .tt-sun circle { fill: var(--gold-text); }
+.theme-toggle .tt-sun path { fill: none; stroke: var(--gold-text); stroke-width: 1.3; stroke-linecap: round; }
+.theme-toggle .tt-moon { fill: var(--gold-text); opacity: 0; transform: rotate(-40deg) scale(.6); }
+/* by candlelight the sun sets and the moon rises */
 .theme-toggle[aria-pressed="true"] .tt-glass { opacity: .18; }
-.theme-toggle[aria-pressed="true"] .tt-star { fill: var(--gold); transform: rotate(90deg); }
+.theme-toggle[aria-pressed="true"] .tt-sun { opacity: 0; transform: rotate(60deg) scale(.6); }
+.theme-toggle[aria-pressed="true"] .tt-moon { opacity: 1; transform: none; }
 .theme-toggle:hover .tt-arch { stroke: var(--gold); }
 @media (max-width: 980px) {
   .menu { display: block; }
