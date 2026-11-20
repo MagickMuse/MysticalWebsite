@@ -180,7 +180,7 @@
     teaser.innerHTML = '<p class="teaser-date">' + date + '</p>'
       + '<p class="teaser-sky"><span><img src="' + pic(moon[1]) + '" alt="" width="40" height="40">' + moon[2] + '</span>'
       + '<span><img src="' + pic(sign) + '" alt="" width="40" height="40">The Sun in ' + signName + '</span></p>'
-      + '<a class="link" href="manuscript/today/">See Today in the Manuscript</a>';
+      + '<a class="link" href="manuscript/today/">See Today’s Correspondences</a>';
     teaser.hidden = false;
   }
 

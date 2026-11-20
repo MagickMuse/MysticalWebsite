@@ -14,7 +14,7 @@ declare(strict_types=1);
  */
 
 const TOOL_PAGES = [
-    'today' => ['Today', 'today'],
+    'today' => ['Today’s Correspondences', 'today'],
     'spell-builder' => ['Spell Builder', 'spell'],
     'wheel' => ['Correspondence Wheel', 'wheel'],
     'draw-a-card' => ['Draw a Card', 'tarot'],
@@ -25,6 +25,10 @@ const TOOL_PAGES = [
     'enchanted-tools' => ['Enchanted Tools', 'tools'],
 ];
 
+/** What Today is, for search engines and before the page fills in. */
+const TODAY_DESCRIPTION = 'Today’s magickal correspondences: the moon phase, the planet that rules the day, the Sun’s sign and the season, '
+    . 'with the herbs, crystals, colors, oils and spells that suit them. Updated every day.';
+
 /** Tools anyone can open (they read /tools/today.json, which holds no page's content). */
 const PUBLIC_TOOLS = ['today'];
 
@@ -34,6 +38,14 @@ function view_tool_page(string $route): void
     if (!has_access() && !in_array($route, PUBLIC_TOOLS, true)) { view_gate(['locked' => true]); return; }
     [$title, $tool] = TOOL_PAGES[$route];
     record_view('route:/manuscript/' . $route);
+    if ($route === 'today') { // public, and meant to be found: its own title, description and opening words
+        layout('Today’s Correspondences: Moon Phase, Planetary Day & Sun Sign', '<article class="pg pg-tool" data-static-tool="today">'
+            . '<header class="pg-head tool-head"><p class="eyebrow">Today’s Correspondences</p><h1>Today’s Moon, Planet, Sign and Season</h1>'
+            . '<p class="lede">' . e(TODAY_DESCRIPTION) . '</p></header>'
+            . '<noscript><p class="notice">Today’s correspondences need JavaScript turned on.</p></noscript></article>',
+            ['index' => true, 'protect' => true, 'description' => TODAY_DESCRIPTION]);
+        return;
+    }
     layout($title, '<article class="pg pg-tool" data-static-tool="' . e($tool) . '"><p class="lede">Opening the ' . e($title) . '…</p>'
         . '<noscript><p class="notice">The ' . e($title) . ' needs JavaScript turned on.</p></noscript></article>', ['private' => true, 'protect' => true]);
 }

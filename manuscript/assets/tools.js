@@ -261,7 +261,7 @@
     }
     var h = south ? '&h=s' : '', prev = addDays(day, -1), next = addDays(day, 1);
     tool.className = 'pg pg-tool pg-today';
-    render(tool, '<header class="pg-head tool-head">' + crumbs('timing') + '<p class="eyebrow">Today in the Manuscript</p>'
+    render(tool, '<header class="pg-head tool-head">' + crumbs('timing') + '<p class="eyebrow">Today’s Correspondences</p>'
       + '<h1>' + longDate(day) + '</h1>'
       + (R.lede ? '<p class="lede">' + esc(R.lede) + '</p>' : '') + sabbatHtml(day, south)
       + '<p class="small day-nav"><a class="link" href="?d=' + iso(prev) + h + '">‹ ' + short(prev) + '</a><span aria-hidden="true">·</span>'
@@ -271,7 +271,7 @@
       + (favours ? '<section class="tool-section"><h2>Today Favors</h2><p class="small">Intentions tied to more than one of today’s influences. Choose one to build a spell for it.</p><div class="favs">' + favours + '</div></section>' : '')
       + (work ? '<section class="tool-section"><h2>Work with Today</h2><p class="small">Tied to the most of today’s moon, day, sign and season.</p><div class="work-parts">' + work + '</div></section>' : '')
       + '<section class="tool-section two-col">' + (onDay ? '<div><h2>On This Day</h2>' + onDay + '</div>' : '')
-      + (soon.length ? '<div><h2>Coming Up</h2><ul class="soon">' + soon.join('') + '</ul><p class="small"><a class="link" href="' + esc(url('calendar/')) + '">The Full Calendar</a></p></div>' : '') + '</section>', 'Today');
+      + (soon.length ? '<div><h2>Coming Up</h2><ul class="soon">' + soon.join('') + '</ul><p class="small"><a class="link" href="' + esc(url('calendar/')) + '">The Full Calendar</a></p></div>' : '') + '</section>', 'Today’s Correspondences');
   }
 
   /**
@@ -293,12 +293,12 @@
     var box = document.createElement('section');
     box.className = 'today-glance';
     box.setAttribute('aria-labelledby', 'glance-h');
-    box.innerHTML = '<header class="glance-head"><p class="eyebrow">Today in the Manuscript</p>'
+    box.innerHTML = '<header class="glance-head"><p class="eyebrow">Today’s Correspondences</p>'
       + '<h2 id="glance-h">' + longDate(day) + '</h2>'
       + (R.lede ? '<p class="lede">' + esc(R.lede) + '</p>' : '') + sabbatHtml(day, false) + '</header>'
       + influenceCards(R)
       + (R.intents.length ? '<div class="glance-favs"><p class="eyebrow">Today Favors</p><div class="favs">' + R.intents.slice(0, 6).map(function (x) { return favourLink(x, true); }).join('') + '</div></div>' : '')
-      + '<p class="glance-more"><a class="btn ghost" href="' + esc(url('today/')) + '">Open Today</a></p>';
+      + '<p class="glance-more"><a class="btn ghost" href="' + esc(url('today/')) + '">See Today’s Correspondences</a></p>';
     after.after(box);
   }
 
@@ -1357,7 +1357,7 @@
   var GRIMOIRE_TOOLS = {
     ritual: [['spell-builder/', 'Spell Builder']],
     astrology: [['wheel/?of=planets', 'Planet Wheel'], ['wheel/?of=signs', 'Zodiac Wheel'], ['wheel/?of=moon', 'Moon Phase Wheel']],
-    timing: [['today/', 'Today'], ['calendar/', 'Calendar'], ['planetary-hours/', 'Planetary Hours']],
+    timing: [['today/', 'Today’s Correspondences'], ['calendar/', 'Calendar'], ['planetary-hours/', 'Planetary Hours']],
     dream: [['dream-decoder/', 'Dream Decoder']],
     card: [['draw-a-card/', 'Draw a Card']],
     rune: [['pull-a-rune/', 'Pull a Rune']]

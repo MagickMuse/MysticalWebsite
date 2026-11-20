@@ -134,7 +134,7 @@ def write_today(d):
     # The tools' pages: the Saved page's frame (header, footer, styles) around a shell tools.js fills in.
     frame = open(os.path.join(ROOT, 'saved', 'index.html'), encoding='utf-8').read()
     shells = {
-        'today': ('Today', 'today'),
+        'today': ('Today’s Correspondences: Moon Phase, Planetary Day & Sun Sign', 'today'),
         'spell-builder': ('Spell Builder', 'spell'),
         'wheel': ('Correspondence Wheel', 'wheel'),
         'draw-a-card': ('Draw a Card', 'tarot'),
