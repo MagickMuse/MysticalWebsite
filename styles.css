@@ -40,8 +40,9 @@
   --emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Segoe UI Symbol", sans-serif;
   color-scheme: light;
 }
-/* Candlelight: oxblood with blush text. Follows the device unless the arch toggle or Settings picks a mode
-   (prefs.js sets data-theme on <html>). Contrast on --bg: ink 12.4:1, muted 7.6:1, accent 7.3:1, gold 7.6:1. */
+/* Candlelight: oxblood with blush text, and the default. prefs.js (in every page's <head>) sets data-theme="dark"
+   unless the arch toggle or Settings picked Light or "Match my device"; the media query below serves "Match my device"
+   and visitors without JavaScript. Contrast on --bg: ink 12.4:1, muted 7.6:1, accent 7.3:1, gold 7.6:1. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #530011; --surface: #661322; --deep: #3d000c;

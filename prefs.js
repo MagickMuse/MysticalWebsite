@@ -1,7 +1,7 @@
 /*
  * Display & accessibility settings, kept in this browser (localStorage "mm-prefs").
  * Loaded in <head> before the styles paint, so the chosen theme, font and size show from the first frame:
- *   theme   system | light | dark      (system follows the device; dark is oxblood by candlelight)
+ *   theme   dark | light | system      (dark, oxblood by candlelight, is the default; system follows the device)
  *   font    default | dyslexic | legible   (OpenDyslexic, Atkinson Hyperlegible)
  *   size    normal | large | larger
  *   spacing normal | wide              (more space between lines, letters and words)
@@ -11,19 +11,30 @@
  */
 (function () {
   var KEY = 'mm-prefs', root = document.documentElement;
-  var DEFAULTS = { theme: 'system', font: 'default', size: 'normal', spacing: 'normal', motion: 'system' };
+  var DEFAULTS = { theme: 'dark', font: 'default', size: 'normal', spacing: 'normal', motion: 'system' };
   function load() {
     var p = {};
     try { p = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) {}
+    // Before v2 the default theme was "system", and saving any setting stored it. Those visitors never picked it,
+    // so they move to the new default (dark) once. A "system" chosen from v2 on is kept.
+    if (!p.v) { if (p.theme === 'system') delete p.theme; p.v = 2; }
     for (var k in DEFAULTS) if (!(k in p)) p[k] = DEFAULTS[k];
     return p;
   }
   function apply(p) {
     if (p.theme === 'light' || p.theme === 'dark') root.setAttribute('data-theme', p.theme); else root.removeAttribute('data-theme');
+    themeColor();
     for (var k in DEFAULTS) {
       if (k === 'theme') continue;
       if (p[k] && p[k] !== DEFAULTS[k]) root.setAttribute('data-' + k, p[k]); else root.removeAttribute('data-' + k);
     }
+  }
+  // The browser's own bar (phones) matches the header: oxblood, or parchment by day.
+  function themeColor() {
+    var dark = root.getAttribute('data-theme') ? root.getAttribute('data-theme') === 'dark'
+      : !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var metas = document.querySelectorAll('meta[name="theme-color"]');
+    for (var i = 0; i < metas.length; i++) { metas[i].removeAttribute('media'); metas[i].setAttribute('content', dark ? '#3d000c' : '#ede0d6'); }
   }
   apply(load());
 
@@ -99,10 +110,10 @@
       if (r) r.checked = true;
     });
     bar.appendChild(btn);
-    if (darkQuery && darkQuery.addEventListener) darkQuery.addEventListener('change', function () { syncToggle(btn); });
+    if (darkQuery && darkQuery.addEventListener) darkQuery.addEventListener('change', function () { syncToggle(btn); themeColor(); });
     document.addEventListener('change', function (e) { if (e.target && e.target.name === 'theme') syncToggle(btn); });
   }
-  function ready() { addToggle(); wire(); fitNav(); }
+  function ready() { themeColor(); addToggle(); wire(); fitNav(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready); else ready();
   window.addEventListener('resize', fitNav);
   window.addEventListener('load', fitNav);
