@@ -9,7 +9,7 @@ members-only digital grimoire with a shop, built as a small PHP app. It runs on 
 | Path | What it is |
 | --- | --- |
 | `*.html`, `blog/` | The website's pages, written by hand. Their header and footer come from `partials/`. |
-| `partials/` | The site header and footer. Edit here, then run the page build (below). |
+| `partials/` | The site header and footer, and the top of `llms.txt` (what the site is, for AI assistants). Edit here; the page build (below) does the rest. |
 | `styles.css` | The one stylesheet for the website and the Manuscript. A contents guide is at the top. |
 | `site.js`, `prefs.js`, `cookie-consent.js` | The website's scripts: menu and blog search, display settings, cookie consent. |
 | `manuscript/` | The Manuscript app. `index.php` routes every request; the code is in `manuscript/lib/`. See `manuscript/README.md`. |

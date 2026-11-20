@@ -110,7 +110,8 @@ function view_shop(): void
   <p class="lede">Courses, grimoire templates and the Manuscript. Everything you buy stays in your library, ready whenever you are.</p>
 </section>
 <section class="cards shop-grid">$ms$cards</section>
-HTML, ['index' => true, 'section' => 'market', 'description' => 'Witchcraft courses, grimoire templates and The Magick Manuscript from The Magick Muse.']);
+HTML, ['index' => true, 'section' => 'market', 'description' => 'Witchcraft courses, grimoire templates and The Magick Manuscript from The Magick Muse.',
+        'ld' => [shop_list_ld()]]);
 }
 
 function view_product(array $p): void
@@ -150,7 +151,31 @@ function view_product(array $p): void
         . '<h1>' . e(short_name($p)) . '</h1>' . $full . '<p class="price big">' . e(price_label($p)) . '</p>'
         . $includes . $action . $refund
         . '<div class="mm-prose product-desc">' . $desc . '</div>' . community_links() . '</div></article>',
-        ['index' => true, 'section' => 'market', 'description' => $p['tagline'] ?? '']);
+        ['index' => true, 'section' => 'market', 'description' => $p['tagline'] ?? '', 'ld' => [product_ld($p)]]);
+}
+
+/**
+ * A product as Google reads it (schema.org Product), so search results can show its price. A pay-what-you-want
+ * product shows its minimum.
+ */
+function product_ld(array $p): array
+{
+    $page = site_url('market/' . $p['slug']);
+    $ld = ['@type' => 'Product', 'name' => short_name($p), 'description' => $p['tagline'] ?? '', 'url' => $page,
+        'category' => $p['kind'] ?? '', 'brand' => ['@type' => 'Brand', 'name' => 'The Magick Muse'],
+        'offers' => ['@type' => 'Offer', 'price' => number_format(empty($p['free']) ? (int) $p['price_cents'] / 100 : 0, 2, '.', ''),
+            'priceCurrency' => strtoupper((string) config('currency', 'usd')), 'availability' => 'https://schema.org/InStock', 'url' => $page]];
+    if (!empty($p['image'])) $ld['image'] = preg_match('~^https?://~', $p['image']) ? $p['image'] : site_url($p['image']);
+    return $ld;
+}
+
+/** The Market's list of products, for search engines (schema.org ItemList). */
+function shop_list_ld(): array
+{
+    $items = [url('join')];
+    foreach (products() as $slug => $p) if (empty($p['hidden'])) $items[] = site_url('market/' . $slug);
+    return ['@type' => 'ItemList', 'name' => 'The Market', 'itemListElement' => array_map(
+        fn($u, $i) => ['@type' => 'ListItem', 'position' => $i + 1, 'url' => $u], $items, array_keys($items))];
 }
 
 function do_buy(): void

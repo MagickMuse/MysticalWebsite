@@ -1,0 +1,20 @@
+<!-- The top of /llms.txt. Edit freely; build-pages.py adds the blog list below it, so new posts appear by themselves. -->
+# The Magick Muse
+
+> The Magick Muse (magickmuse.com) is a witchcraft education site built around The Magick Manuscript: a members' online grimoire of 20,000+ cross-linked pages across 15 grimoires (plants, crystals, oils, animals, entities and deities, astrology, timing, runes, symbols, tarot, rituals, recipes, materials, dreams and correspondences), researched from published books with sources cited.
+
+The site is for practising witches of any path, beginners included. It is not tied to Wicca or any one tradition, and it favours sourced information over guesswork.
+
+## The Magick Manuscript
+
+- [The Magick Manuscript](https://magickmuse.com/grimoires): what is inside the 15 grimoires and how they link together
+- [Join the Manuscript](https://magickmuse.com/manuscript/join): membership, monthly or lifetime
+- [Today's Correspondences](https://magickmuse.com/manuscript/today): free daily page with the moon phase, the planet ruling the day, the Sun's sign and the season, and what suits them
+- [Calendar feed](https://magickmuse.com/manuscript/calendar.ics): festivals and moon phases for Google, Apple or Outlook calendars
+
+## Learning and shop
+
+- [Magick Mastery](https://magickmuse.com/mastery): guides, self-paced beginner courses and the blog
+- [The Market](https://magickmuse.com/market): courses (Witchcraft 101 and 111), Notion grimoire templates, and a free Crystal Grimoire template
+- [The Magick Muses](https://magickmuse.com/muses): a free Discord community of 950+ practitioners
+- [Our story](https://magickmuse.com/mythos): how the Manuscript began

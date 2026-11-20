@@ -325,6 +325,8 @@ function layout(string $title, string $body, array $opt = []): void
     $q = e($_GET['q'] ?? '');
     $section = $opt['section'] ?? 'manuscript'; // which main-menu item is marked as the current page
     $robots = !empty($opt['index']) ? 'index, follow' : 'noindex, nofollow';
+    // This page's address without its query string (?code=…) or a closing slash, as in sitemap.xml, so shared and searched links all count as one page.
+    $canonical = site_url(trim((string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH), '/'));
     ?>
 <!doctype html>
 <html lang="en">
@@ -334,6 +336,19 @@ function layout(string $title, string $body, array $opt = []): void
   <title><?= e($title) ?> | The Magick Manuscript</title>
   <meta name="robots" content="<?= $robots ?>">
   <?php if (!empty($opt['description'])): ?><meta name="description" content="<?= e($opt['description']) ?>"><?php endif ?>
+<?php if (!empty($opt['index'])): // pages search engines list: their one address, and how they look when shared ?>
+  <link rel="canonical" href="<?= e($canonical) ?>">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="The Magick Muse">
+  <meta property="og:title" content="<?= e($title) ?>">
+  <?php if (!empty($opt['description'])): ?><meta property="og:description" content="<?= e($opt['description']) ?>"><?php endif ?>
+  <meta property="og:url" content="<?= e($canonical) ?>">
+  <meta property="og:image" content="<?= e($opt['image'] ?? site_url('assets/og-manuscript.jpg')) ?>">
+  <meta name="twitter:card" content="summary_large_image">
+<?php endif ?>
+<?php foreach ($opt['ld'] ?? [] as $ld): // structured data for search results (prices, lists); JSON_HEX_TAG keeps "</script>" out of it ?>
+  <script type="application/ld+json"><?= json_encode(['@context' => 'https://schema.org'] + $ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?></script>
+<?php endforeach ?>
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <?php // The fonts load "optional": fetched first thing, they're ready in time; otherwise a reload could fall back to the browser's own, bigger serif. ?>
