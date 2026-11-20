@@ -93,8 +93,9 @@
         waiting.get(watch).push(el);
       });
     };
-    mark('.about .frame.arch, .course .frame.arch, .library .frame.arch, .feature-art', 'arch');
-    mark('main .intro, .cards > *, .posts > .post, .library > li, .course, .chapter, .stats > li, .faq, .carousel, .about-text, .feature-text, .cta-inner, .link-list > li', 'rise');
+    // Scroll reveals are retired: the page has one orchestrated moment (the opening on the home page, in CSS),
+    // and sections simply sit on the page like printed ones. mark() stays for any page that opts back in.
+    void mark;
 
     // Re-stagger library grimoire items by column so each row fades in one at a time
     (function () {
