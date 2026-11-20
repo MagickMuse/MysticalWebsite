@@ -77,6 +77,7 @@
     if (!action || !/search\/$/.test(action)) return null;
     var root = new URL(action + '../', location.href), loaded = null;
     var fold = function (t) { return (t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); };
+    var termsOf = function (q) { return fold(q).split(/[^\p{L}\p{N}]+/u).filter(Boolean).slice(0, 8); };
     function load() {
       return loaded || (loaded = fetch(new URL('search/index.json', root)).then(function (r) { return r.json(); }).then(function (d) {
         d.vocab = {};
@@ -88,16 +89,24 @@
         return d;
       }));
     }
+    // How well a page's title (or other names) matches the whole query: 0 is best.
+    function rank(r, whole) {
+      if (r.t === whole) return 0;
+      var at = r.t.indexOf(whole);
+      if (at === 0) return 1;
+      if (at > 0) return 2;
+      if (r.a.indexOf(whole) >= 0) return 3;
+      return 4;
+    }
     // Every word typed must start a word of the title or other names ("rose qua" finds Rose Quartz). Best matches first.
     function find(q, grimoire) {
-      var terms = fold(q).split(/[^\p{L}\p{N}]+/u).filter(Boolean).slice(0, 8), whole = fold(q).trim();
+      var terms = termsOf(q), whole = fold(q).trim();
       return load().then(function (d) {
         var hits = [];
         if (terms.length) d.p.forEach(function (r) {
           if (grimoire && r[3] !== grimoire) return;
           for (var i = 0; i < terms.length; i++) if (!r.w.some(function (w) { return w.indexOf(terms[i]) === 0; })) return;
-          var score = r.t === whole ? 0 : r.t.indexOf(whole) === 0 ? 1 : r.t.indexOf(whole) >= 0 ? 2 : r.a.indexOf(whole) >= 0 ? 3 : 4;
-          hits.push({ score: score, len: r[0].length, title: r[0], aka: r[1], url: new URL(r[2], root).href, grimoire: r[3],
+          hits.push({ score: rank(r, whole), len: r[0].length, title: r[0], aka: r[1], url: new URL(r[2], root).href, grimoire: r[3],
             where: r[4] || d.g[r[3]] || '', icon: r[5] });
         });
         hits.sort(function (a, b) { return a.score - b.score || a.len - b.len || a.title.localeCompare(b.title); });
@@ -108,7 +117,7 @@
     // (a typo or two away; common words win ties). Null when nothing needs changing.
     function correct(q) {
       return load().then(function (d) {
-        var terms = fold(q).split(/[^\p{L}\p{N}]+/u).filter(Boolean).slice(0, 8), changed = false;
+        var terms = termsOf(q), changed = false;
         var out = terms.map(function (t) {
           if (t.length < 3 || d.words.some(function (w) { return w.indexOf(t) === 0; })) return t;
           var best = null, bestD = maxEdits(t) + 1, bestN = 0;
@@ -193,7 +202,9 @@
             var aa = document.createElement('a');
             aa.href = form.getAttribute('action') + '?q=' + encodeURIComponent(didMean || q);
             if (didMean) q = didMean;
-            aa.textContent = rows.length ? 'Search all pages for “' + q + '”' : staticSearch ? 'No titles match “' + q + '”' : 'No titles match. Search all text for “' + q + '”';
+            if (rows.length) aa.textContent = 'Search all pages for “' + q + '”';
+            else if (staticSearch) aa.textContent = 'No titles match “' + q + '”';
+            else aa.textContent = 'No titles match. Search all text for “' + q + '”';
             all.appendChild(aa);
             list.appendChild(all);
             list.hidden = false;
@@ -241,7 +252,7 @@
       var note = results.querySelector('.did-you-mean');
       if (offer || used) {
         note = put(results, 'p', 'did-you-mean'); head.after(note);
-        var go = function (word, label) { var a = put(note, 'a', '', ''); a.href = staticSearch.action + '?q=' + encodeURIComponent(word); put(a, 'em', '', word); return a; };
+        var go = function (word) { var a = put(note, 'a', '', ''); a.href = staticSearch.action + '?q=' + encodeURIComponent(word); put(a, 'em', '', word); };
         if (offer) { note.append('Did you mean '); go(offer); note.append('?'); }
         else { note.append('No pages match “' + q + '”. Showing results for '); put(note, 'em', '', used); note.append('.'); }
       }
@@ -298,13 +309,14 @@
     set(); window.addEventListener('resize', set);
   })();
 
+  var reduceMotion = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.getAttribute('data-motion') === 'reduce';
+
   // Table of contents for a page with written content: it shows while the reader scrolls, fades out
   // a moment after scrolling stops, and a click on a title goes to that section (and closes it).
   (function () {
     var prose = document.querySelector('.pg.with-aside > .mm-prose'); if (!prose) return;
     var heads = Array.prototype.filter.call(prose.querySelectorAll('h2[id], h3[id], h4[id]'), function (h) { return h.textContent.trim(); });
     if (heads.length < 2) return;
-    var still = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.getAttribute('data-motion') === 'reduce';
     var nav = document.createElement('nav'); nav.className = 'toc'; nav.setAttribute('aria-label', 'On this page');
     var t = document.createElement('p'); t.className = 'toc-title'; t.textContent = 'On this page'; nav.appendChild(t);
     var ol = document.createElement('ol'); nav.appendChild(ol);
@@ -343,7 +355,7 @@
       var h = document.getElementById(a.getAttribute('href').slice(1));
       for (var d = h.closest('details'); d; d = d.parentElement && d.parentElement.closest('details')) d.open = true; // sections folded in a toggle
       jumping = true; over = false; nav.classList.remove('show'); a.blur();
-      h.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+      h.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
       history.replaceState(null, '', '#' + h.id);
     });
     mark();
@@ -625,8 +637,6 @@
     if (wide.addEventListener) wide.addEventListener('change', apply);
   })();
 
-  var reduceMotion = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.getAttribute('data-motion') === 'reduce';
-
   // Visitors: anything inside the Manuscript (a book, a connection, a link) opens the join pop-up,
   // except the pages anyone can read. Runs first (capture), so the book animation never starts for them.
   (function () {
@@ -740,7 +750,7 @@
     var r = book.getBoundingClientRect();
     var W = Math.min(300, window.innerWidth * 0.44, v.h * 0.6), H = W * 1.42, T = Math.max(26, Math.round(W * 0.15));
     var label = book.getAttribute('data-label') || '';
-    var color = getComputedStyle(book).getPropertyValue('--bc'), inkOn = getComputedStyle(book).getPropertyValue('--ink-on');
+    var bookStyle = getComputedStyle(book), color = bookStyle.getPropertyValue('--bc'), inkOn = bookStyle.getPropertyValue('--ink-on');
 
     var veil = el('div', 'book-veil'), stage = el('div', 'book-stage'), wrap = el('div', 'b3d-wrap'), box = el('div', 'b3d');
     box.style.width = W + 'px'; box.style.height = H + 'px'; box.style.setProperty('--bc', color); box.style.setProperty('--ink-on', inkOn);
@@ -806,49 +816,10 @@
   }
   window.addEventListener('pageshow', restoreShelf);
   window.addEventListener('hashchange', restoreShelf);
-  // ---------- members' tools (lib/tools.php) ----------
-
-  // Today's page: show the reader's own date, not the server's (a reader in Sydney is already on tomorrow).
-  (function () {
-    var page = document.querySelector('[data-today]');
-    if (!page || /[?&]d=/.test(location.search)) return;
-    var n = new Date();
-    var local = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
-    if (local === page.getAttribute('data-today')) return;
-    var q = new URLSearchParams(location.search); q.set('d', local);
-    location.replace(location.pathname + '?' + q.toString());
-  })();
 
   // "Delete" buttons that ask first
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-confirm]');
     if (b && !window.confirm(b.getAttribute('data-confirm'))) e.preventDefault();
   });
-
-  // Correspondence wheel: choosing a point swaps in its connections without reloading the page.
-  (function () {
-    var holder = document.querySelector('[data-wheel]');
-    if (!holder || !window.fetch) return;
-    function load(href, push) {
-      var detail = holder.querySelector('.wheel-detail');
-      if (detail) detail.setAttribute('aria-busy', 'true');
-      var u = new URL(href, location.href); u.searchParams.set('part', '1');
-      fetch(u.toString(), { credentials: 'same-origin' })
-        .then(function (r) { if (!r.ok) throw new Error(); return r.text(); })
-        .then(function (html) {
-          holder.innerHTML = html;
-          if (push) history.pushState({ wheel: true }, '', href);
-          var name = holder.querySelector('.wheel-head h2');
-          if (name && push && window.matchMedia('(max-width: 860px)').matches) name.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        })
-        .catch(function () { location.href = href; });
-    }
-    holder.addEventListener('click', function (e) {
-      var seg = e.target.closest('a.seg');
-      if (!seg || e.metaKey || e.ctrlKey || e.shiftKey) return;
-      e.preventDefault();
-      load(seg.getAttribute('href'), true);
-    });
-    window.addEventListener('popstate', function () { load(location.href, false); });
-  })();
 })();
