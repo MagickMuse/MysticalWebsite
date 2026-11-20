@@ -642,12 +642,13 @@ function view_welcome(): void
             $s = stripe('GET', 'checkout/sessions/' . $sid);
             $buyer = $s['customer_details']['email'] ?? null;
             if (($s['status'] ?? '') === 'complete' && $buyer) {
-                // The webhook normally records the membership; doing it here too means no waiting.
-                if (!member_row($buyer)) {
+                // The webhook normally records the membership; doing it here too means no waiting. This also covers a
+                // returning member whose old membership ended (their row exists but gives no access).
+                if (!member_has_access(member_row($buyer))) {
                     handle_stripe_event(['id' => 'welcome_' . $sid, 'type' => 'checkout.session.completed', 'data' => ['object' => $s]]);
                 }
                 // Only say "you're in" when access really was granted (a bank transfer may still be pending).
-                if (checkout_link_fresh($s) && member_row($buyer)) {
+                if (checkout_link_fresh($s) && member_has_access(member_row($buyer))) {
                     sign_in($buyer);
                     $email = $buyer;
                 }

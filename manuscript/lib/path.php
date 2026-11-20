@@ -112,9 +112,7 @@ function run_beginner_path(int $limit = 500): int
     foreach ($st->fetchAll() as $row) {
         if ($sent >= $limit) break;
         if (!path_due($row)) continue;
-        $m = member_row($row['email']);
-        $active = $m && ($m['status'] === 'active' || ($m['paid_through'] && $m['paid_through'] >= now()));
-        if (!$active && !is_admin($row['email'])) continue; // no access, no emails (they resume if access comes back)
+        if (!member_has_access(member_row($row['email'])) && !is_admin($row['email'])) continue; // no access, no emails (they resume if access comes back)
         $n = (int) $row['day'] + 1;
         if (send_path_day($row, $n)) {
             db()->prepare('UPDATE beginner_path SET day = ?, sent_at = ? WHERE email = ?')->execute([$n, now(), $row['email']]);

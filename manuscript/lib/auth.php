@@ -47,9 +47,15 @@ function has_access(): bool
     $email = current_email();
     if (!$email) return false;
     if (is_admin($email)) return true;
-    $m = member_row($email);
+    return member_has_access(member_row($email));
+}
+
+/** Whether a members row grants access (admins aside). */
+function member_has_access(?array $m): bool
+{
     if (!$m) return false;
     if ($m['status'] === 'active') return true;
+    if ($m['status'] === 'disputed') return false; // paused while the bank looks at a chargeback, whatever the plan
     // Grace: a canceled or past-due subscription keeps access until the paid period ends.
     return $m['paid_through'] !== null && $m['paid_through'] >= now();
 }

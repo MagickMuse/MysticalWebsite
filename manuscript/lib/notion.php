@@ -414,6 +414,7 @@ final class NotionImporter
             $v = $prop[$prop['type']] ?? null;
             $text = match (true) {
                 is_array($v) && isset($v[0]['plain_text']) => $this->plainText($v),
+                is_array($v) && isset($v['name']) => (string) $v['name'], // a select: one option, not a list
                 is_array($v) => implode(',', array_column($v, 'name')),
                 default => (string) ($v['name'] ?? $v ?? ''),
             };

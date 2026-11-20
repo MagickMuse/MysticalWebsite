@@ -233,7 +233,9 @@ function apply_stripe_event(array $event): void
         case 'invoice.paid':
             if (empty($obj['subscription']) && empty($obj['parent']['subscription_details']['subscription'])) return;
             if ((int) ($obj['amount_paid'] ?? 0) <= 0) return;
-            record_payment(['id' => $obj['id'], 'email' => $obj['customer_email'] ?? '', 'product' => 'membership-monthly',
+            $email = $obj['customer_email'] ?? '';
+            if ($email === '' && !empty($obj['customer'])) $email = (string) member_email_by_customer($obj['customer']);
+            record_payment(['id' => $obj['id'], 'email' => $email, 'product' => 'membership-monthly',
                 'amount_cents' => (int) $obj['amount_paid'], 'currency' => $obj['currency'] ?? 'usd',
                 'intent' => is_string($obj['payment_intent'] ?? null) ? $obj['payment_intent'] : null,
                 'created_at' => gmdate('Y-m-d H:i:s', (int) ($obj['status_transitions']['paid_at'] ?? $obj['created'] ?? time()))]);
@@ -279,6 +281,8 @@ function apply_stripe_event(array $event): void
                 default => 'canceled',
             };
             if ($event['type'] === 'customer.subscription.deleted') $status = 'canceled';
+            // A renewal during an open chargeback doesn't lift the pause; the dispute's outcome decides.
+            if ($status === 'active' && (member_row($email)['status'] ?? '') === 'disputed') $status = 'disputed';
             upsert_member($email, [
                 'plan' => 'monthly',
                 'status' => $status,
@@ -292,29 +296,49 @@ function apply_stripe_event(array $event): void
 
 function apply_dispute(array $dispute, bool $opened): void
 {
-    $intent = $dispute['payment_intent'] ?? null;
-    if (!is_string($intent) || $intent === '') return;
-    $st = db()->prepare('SELECT email, product, amount_cents FROM payments WHERE intent = ?');
-    $st->execute([$intent]);
-    $pay = $st->fetch();
-    if (!$pay) return; // not a sale we recorded (e.g. a subscription invoice)
-
     // Stripe closes a dispute as won, lost, or warning_closed (an inquiry that never became a chargeback).
     $outcome = $opened ? 'open' : (($dispute['status'] ?? '') === 'lost' ? 'lost' : 'won');
-    db()->prepare('UPDATE payments SET dispute = ? WHERE intent = ?')->execute([$outcome, $intent]);
-    // Money taken back by the bank no longer counts as revenue.
-    if ($outcome === 'lost') db()->prepare('UPDATE payments SET refunded_cents = amount_cents WHERE intent = ?')->execute([$intent]);
+    $intent = $dispute['payment_intent'] ?? null;
+    $pay = null;
+    if (is_string($intent) && $intent !== '') {
+        $st = db()->prepare('SELECT email, product, amount_cents FROM payments WHERE intent = ?');
+        $st->execute([$intent]);
+        $pay = $st->fetch() ?: null;
+    }
+    if ($pay) {
+        db()->prepare('UPDATE payments SET dispute = ? WHERE intent = ?')->execute([$outcome, $intent]);
+        // Money taken back by the bank no longer counts as revenue.
+        if ($outcome === 'lost') db()->prepare('UPDATE payments SET refunded_cents = amount_cents WHERE intent = ?')->execute([$intent]);
+    }
 
-    if ($pay['product'] === 'membership-lifetime') {
-        $m = member_row($pay['email']);
-        if (!$m || $m['plan'] !== 'lifetime') return; // given access another way since: leave it alone
-        if ($outcome === 'open' && $m['status'] === 'active') upsert_member($pay['email'], ['status' => 'disputed']);
-        if ($outcome === 'won' && $m['status'] === 'disputed') upsert_member($pay['email'], ['status' => 'active']);
-        if ($outcome === 'lost') upsert_member($pay['email'], ['status' => 'canceled', 'paid_through' => null]);
-    } elseif (!str_starts_with($pay['product'], 'membership-')) {
+    if ($pay && !str_starts_with($pay['product'], 'membership-')) {
         if ($outcome === 'won') grant($pay['email'], $pay['product'], 'stripe');
         else db()->prepare("DELETE FROM purchases WHERE email = ? AND product = ? AND source = 'stripe'")->execute([$pay['email'], $pay['product']]);
+        return;
     }
+
+    if ($pay) {
+        $email = $pay['email'];
+    } else {
+        // A monthly payment can be recorded without its payment intent (newer Stripe invoices don't carry one),
+        // so find the member through the disputed charge's customer.
+        $charge = is_string($dispute['charge'] ?? null) ? stripe('GET', 'charges/' . $dispute['charge']) : [];
+        $email = is_string($charge['customer'] ?? null) ? member_email_by_customer($charge['customer']) : null;
+    }
+    $m = member_row($email);
+    $plan = $pay ? substr($pay['product'], strlen('membership-')) : 'monthly';
+    if (!$m || $m['plan'] !== $plan) return; // given access another way since: leave it alone
+    if ($outcome === 'open' && $m['status'] === 'active') upsert_member($email, ['status' => 'disputed']);
+    if ($outcome === 'won' && $m['status'] === 'disputed') upsert_member($email, ['status' => 'active']);
+    if ($outcome === 'lost') upsert_member($email, ['status' => 'canceled', 'paid_through' => null]);
+}
+
+/** The member a Stripe customer belongs to, if any. */
+function member_email_by_customer(string $customer): ?string
+{
+    $st = db()->prepare('SELECT email FROM members WHERE stripe_customer = ?');
+    $st->execute([$customer]);
+    return $st->fetchColumn() ?: null;
 }
 
 /** Newer Stripe API versions moved current_period_end onto the subscription items. */
