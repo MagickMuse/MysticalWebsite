@@ -1092,10 +1092,23 @@
     list = [item].concat(list.filter(function (x) { return x.u !== item.u; })).slice(0, 8);
     writeStored(RECENT, list);
   }
+  /** The Manuscript home's "your reading" area under the shelf (made here when the page doesn't have one). */
+  function yourReading() {
+    var box = document.querySelector('.mm-yours');
+    var shelves = document.querySelector('.book-pile') || document.querySelector('.shelves');
+    if (!box && shelves && document.querySelector('.mm-hero')) {
+      shelves.insertAdjacentHTML('afterend', '<section class="mm-yours" aria-label="Your reading"></section>');
+      box = document.querySelector('.mm-yours');
+    }
+    return box;
+  }
+
   function continueReading() {
-    var hero = document.querySelector('.mm-hero'), list = readStored(RECENT) || [];
-    if (!hero || !document.querySelector('.shelves, .book-pile') || !list.length || document.querySelector('.continue-reading')) return;
-    hero.insertAdjacentHTML('beforeend', '<div class="continue-reading"><p class="eyebrow">Continue Reading</p><div class="rels">' + list.slice(0, 5).map(function (x) {
+    var list = readStored(RECENT) || [];
+    if (!list.length || document.querySelector('.continue-reading')) return;
+    var box = yourReading();
+    if (!box) return;
+    box.insertAdjacentHTML('afterbegin', '<div class="continue-reading"><h2>Continue reading</h2><div class="rels">' + list.slice(0, 5).map(function (x) {
       var icon = '';
       if (x.i) icon = '<img class="rel-icon" src="' + esc(x.i) + '" alt="" width="24" height="24" loading="lazy">';
       else if (x.e) icon = '<span class="rel-icon" aria-hidden="true">' + esc(x.e) + '</span>';
@@ -1373,10 +1386,10 @@
       Store.remove('notes', del.getAttribute('data-del-note')).then(function () { notesPage(document.querySelector('[data-static-tool="notes"]')); });
     }
   });
-  // The Manuscript home: "Surprise me" beside "Begin here" opens a random well-filled page from a random grimoire.
-  var begin = document.querySelector('.mm-hero .actions a.btn[href*="begin-here"]');
-  if (begin && !document.querySelector('[data-surprise]')) {
-    begin.insertAdjacentHTML('afterend', '<button class="btn ghost" type="button" data-surprise>Surprise Me</button>');
+  // The Manuscript home: under the shelf, a link that opens a random well-filled page from a random grimoire.
+  var yours = document.querySelector('.mm-hero .actions a.btn[href*="begin-here"]') ? yourReading() : null;
+  if (yours && !document.querySelector('[data-surprise]')) {
+    yours.insertAdjacentHTML('beforeend', '<p class="surprise"><button class="link as-button" type="button" data-surprise>Open a random page</button></p>');
     document.querySelector('[data-surprise]').addEventListener('click', function () {
       var btn = this; btn.disabled = true;
       data().then(function () { location.href = surprise().url; }).catch(function () { btn.disabled = false; });

@@ -738,7 +738,6 @@ html.nav-fold .nav ul a { align-content: center; min-height: 52px; }
 .mm-hero h1 em { font-style: italic; }
 .mm-hero .actions { justify-content: center; }
 .mm-hero.narrow { max-width: 720px; margin-inline: auto; }
-.count-line { display: block; margin-top: .4rem; font-family: var(--display); font-style: italic; font-size: 1.2rem; color: var(--ink); }
 
 
 /* ---------- article ---------- */
@@ -2151,8 +2150,12 @@ table.hours td.planet span { color: var(--gold-text); margin-right: .2rem; }
 .cal-moon-list li { display: flex; gap: 1rem; align-items: baseline; padding: .4rem 0; border-bottom: 1px solid var(--line); }
 .cal-moon-list time { flex: none; width: 8.5rem; font-size: .76rem; letter-spacing: .06em; color: var(--muted); }
 
-.continue-reading { display: grid; gap: .4rem; justify-items: center; margin-top: .4rem; }
-.continue-reading .eyebrow { margin: 0; }
+/* Under the shelf on the Manuscript home: the member's own reading, quieter than the shelf above it */
+.mm-yours { display: grid; gap: 1.6rem; justify-items: center; text-align: center; margin: clamp(2.5rem, 5vw, 3.5rem) auto 0; max-width: 60rem; }
+.mm-yours:empty { display: none; }
+.mm-yours > * { margin: 0; }
+.continue-reading { display: grid; gap: .8rem; justify-items: center; }
+.continue-reading h2 { font-size: 1.6rem; }
 .continue-reading .rels { justify-content: center; }
 .save-note-btn + .link { align-self: center; }
 

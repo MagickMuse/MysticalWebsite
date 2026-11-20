@@ -107,7 +107,9 @@ function view_home(): void
         $cards = '<p class="lede">Nothing has been moved over yet. Run the importer (see README) to bring grimoires in from Notion.</p>';
     }
     $join = $begin ? '<div class="actions"><a class="btn" href="' . e(page_url($begin)) . '">Begin Here</a></div>' : '';
-    if ($member) $join .= path_home_line();
+    // A member's own reading (beginner path, continue reading, a random page) sits under the shelf, not above it:
+    // above the shelf there is only the title, one sentence and the way in.
+    $yours = $member ? '<section class="mm-yours" aria-label="Your reading">' . path_home_line() . '</section>' : '';
     if (!$member) {
         $join = '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a Member</a>'
             . (sneak_peek_page() ? '<a class="btn ghost" href="' . e(url('sneak-peek')) . '">Take a Sneak Peek</a>' : '') . '</div>'
@@ -117,10 +119,11 @@ function view_home(): void
     layout('The Magick Manuscript', <<<HTML
 <section class="mm-hero">
   <h1>The Magick Manuscript</h1>
-  <p class="lede">{$count} cross-linked grimoires. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three. <span class="count-line">{$total} pages inscribed so far.</span></p>
+  <p class="lede">{$count} cross-linked grimoires and {$total} pages. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>
   $join
 </section>
 $cards
+$yours
 HTML, $member ? ['private' => true, 'protect' => true]
     : ['index' => true, 'protect' => true, 'description' => 'The Magick Manuscript: a members-only, cross-linked digital grimoire by The Magick Muse.']);
 }

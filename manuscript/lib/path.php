@@ -213,10 +213,10 @@ function path_home_line(): string
     if (!$email || !has_access()) return '';
     $row = path_row($email);
     $total = count(path_days());
-    if (!$row) return '<p class="path-invite"><span aria-hidden="true">✦</span> New to the Manuscript? <a href="' . e(url('path')) . '">Take the ' . $total . '-day beginner path</a>, one page a day.</p>';
+    if (!$row) return '<p class="path-invite">New to the Manuscript? <a href="' . e(url('path')) . '">Take the ' . $total . '-day beginner path</a>, one page a day.</p>';
     $done = (int) $row['day'];
     if ($done >= $total) return '';
     $next = path_days()[max(0, $done - 1)][0] ?? null;
-    return '<p class="path-invite"><span aria-hidden="true">✦</span> Beginner path: day ' . $done . ' of ' . $total
+    return '<p class="path-invite">Beginner path: day ' . $done . ' of ' . $total
         . ($next ? ' · <a href="' . e(page_url($next)) . '">' . e($next['title']) . '</a>' : '') . ' · <a href="' . e(url('path')) . '">See the path</a></p>';
 }
