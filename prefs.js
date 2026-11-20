@@ -26,6 +26,10 @@
     }
   }
   apply(load());
+  // The homepage shows the Manuscript's shelf in a frame (manuscript/?peek): only the shelf, on a clear background.
+  if (/[?&]peek\b/.test(location.search)) root.classList.add('peek');
+  // A change made in another window or frame (the homepage's settings, with the shelf in its frame) shows here at once.
+  window.addEventListener('storage', function (e) { if (e.key === KEY) apply(load()); });
 
   // The settings panel: radio groups named theme, font, size, spacing and motion. Changes apply at once.
   function wire() {
