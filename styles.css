@@ -116,12 +116,6 @@ main > section + section, main > div + section { border-top: var(--leaded); }
 .eyebrow { font-family: var(--display); font-style: italic; font-size: 1.15rem; line-height: 1.3; color: var(--muted); margin: 0; }
 .script { font-family: var(--script); color: var(--accent-text); font-weight: 400; }
 .lede { font-size: 1.15rem; color: var(--ink); }
-/* drop cap: the first letter set in the display face inside a small gold arch */
-.dropcap::first-letter, .prose > p:first-child::first-letter {
-  float: left; font-family: var(--display); font-weight: 400; font-size: 3.5em; line-height: .82;
-  padding: .2em .14em .04em; margin: .05em .14em 0 0; color: var(--accent-text);
-  border: 1px solid var(--gold); border-radius: 1em 1em 0 0;
-}
 
 /* ---------- gold four-point stars ---------- */
 /* The star has jobs: the centre of a divider, a list bullet, a checkbox, the theme toggle. It never floats. */
@@ -131,12 +125,10 @@ main > section + section, main > div + section { border-top: var(--leaded); }
   -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat;
 }
 .stars-float, .badge { display: none; }
-/* botanical divider (assets/ornaments/vine.svg): a whiplash vine with the star at its heart */
-.star-rule, .vine {
-  display: block; width: min(520px, 100%); aspect-ratio: 10 / 1; margin-inline: auto; background: var(--gold);
-  -webkit-mask: url("assets/ornaments/vine.svg") center / contain no-repeat; mask: url("assets/ornaments/vine.svg") center / contain no-repeat;
-}
-.star-rule > * { display: none; }
+/* divider: a thin gold line with one small star at its centre */
+.star-rule { display: flex; align-items: center; gap: 1rem; width: min(320px, 100%); margin-inline: auto; }
+.star-rule::before, .star-rule::after { content: ""; flex: 1; height: 1px; background: color-mix(in srgb, var(--gold) 70%, transparent); }
+.star-rule .spark { font-size: .8rem; }
 /* leaded glass: the double gold line between sections */
 .leaded { border-top: var(--leaded); }
 
@@ -250,11 +242,10 @@ header.site {
 .opening-page { display: grid; gap: 1.5rem; justify-items: start; max-width: 34rem; }
 .excerpt { margin: 0; }
 .excerpt p { max-width: none; font-family: var(--display); font-size: clamp(1.45rem, 2.1vw, 1.8rem); line-height: 1.34; }
-.excerpt p.dropcap::first-letter { font-size: 2.75em; }
 .excerpt cite { display: block; margin-top: .9rem; font-size: 1rem; color: var(--muted); }
 .excerpt cite a { color: inherit; text-decoration-color: var(--gold); text-underline-offset: .25em; }
 .excerpt cite a:hover { color: var(--accent-text); }
-.opening .vine { width: min(300px, 80%); margin: .2rem 0 0; }
+.opening .rule { width: 3.5rem; height: 1px; margin: .3rem 0 .1rem; background: color-mix(in srgb, var(--gold) 80%, transparent); }
 .opening h1 { font-size: clamp(3rem, 6.2vw, 5.4rem); }
 @media (max-width: 860px) {
   .opening { grid-template-columns: minmax(0, 1fr); padding-top: 1.5rem; }
