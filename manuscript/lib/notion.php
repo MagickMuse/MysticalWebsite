@@ -1053,12 +1053,16 @@ final class NotionImporter
         if (!$im) return $file;
         imagepalettetotruecolor($im);
         $w = imagesx($im); $h = imagesy($im);
-        // ink only: no pixel that shows is noticeably coloured
-        for ($y = 0; $y < $h; $y += max(1, intdiv($h, 48))) for ($x = 0; $x < $w; $x += max(1, intdiv($w, 48))) {
+        // ink only: hardly any solid pixel is clearly coloured (a soft edge may carry a faint tint)
+        $solid = 0; $coloured = 0;
+        for ($y = 0; $y < $h; $y += max(1, intdiv($h, 64))) for ($x = 0; $x < $w; $x += max(1, intdiv($w, 64))) {
             $c = imagecolorat($im, $x, $y);
-            $r = ($c >> 16) & 255; $g = ($c >> 8) & 255; $b = $c & 255; $a = ($c >> 24) & 127;
-            if ($a < 100 && max($r, $g, $b) - min($r, $g, $b) > 40) return $file;
+            if ((($c >> 24) & 127) > 20) continue;
+            $r = ($c >> 16) & 255; $g = ($c >> 8) & 255; $b = $c & 255;
+            $solid++;
+            if (max($r, $g, $b) - min($r, $g, $b) > 60) $coloured++;
         }
+        if ($solid && $coloured / $solid > 0.03) return $file;
         $out = imagecreatetruecolor($w, $h); imagealphablending($out, false); imagesavealpha($out, true);
         for ($y = 0; $y < $h; $y++) for ($x = 0; $x < $w; $x++) {
             $c = imagecolorat($im, $x, $y);
