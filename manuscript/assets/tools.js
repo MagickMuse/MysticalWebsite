@@ -1055,6 +1055,25 @@
   // ------------------------------------------------------------------ the Calendar: the moon's sign and phases each day
   // Each day shows the sign the moon is in at noon (the Moon in Aries… pages), with its moves into a new sign and the
   // month's new, quarter and full moons listed under the calendar, at your local times. From Astronomy Engine.
+  // Add to your calendar: the festivals and moon phases feed (/calendar.ics, lib/ical.php). Subscribing keeps it
+  // current by itself; the download is a one-off copy.
+  function calendarExport() {
+    var head = document.querySelector('[data-calendar] .pg-head');
+    if (!head) return;
+    var feed = new URL(url('calendar.ics'), location.href), webcal = 'webcal://' + feed.host + feed.pathname;
+    var links = [
+      ['Google Calendar', 'https://calendar.google.com/calendar/r?cid=' + encodeURIComponent(webcal)],
+      ['Apple Calendar', webcal],
+      ['Outlook', 'https://outlook.live.com/calendar/0/addfromweb?url=' + encodeURIComponent(feed.href) + '&name=' + encodeURIComponent('The Magick Manuscript')]
+    ];
+    var box = document.createElement('details');
+    box.className = 'cal-export';
+    box.innerHTML = '<summary class="link as-button">Add to Your Calendar</summary><div><p class="small">The year’s festivals and every new, quarter and full moon, at your local time. It updates by itself.</p><p class="cal-export-links">'
+      + links.map(function (l) { return '<a class="btn ghost" href="' + esc(l[1]) + '"' + (/^https/.test(l[1]) ? ' target="_blank" rel="noopener"' : '') + '>' + esc(l[0]) + '</a>'; }).join('')
+      + '<a class="btn ghost" href="' + esc(feed.pathname + '?download=1') + '" download="magick-manuscript.ics">Download</a></p></div>';
+    head.appendChild(box);
+  }
+
   function calendarMoon() {
     var cal = document.querySelector('[data-calendar]'), title = cal && cal.querySelector('.cal-title');
     if (!cal || !title) return;
@@ -1399,6 +1418,7 @@
   rememberPage();
   continueReading();
   calendarMoon();
+  calendarExport();
   if (document.querySelector('.pg-head .crumbs') && /Tarot Spreads/.test(document.querySelector('.pg-head .crumbs').textContent)) data().then(spreadTool).catch(function () {});
   if (/\/manuscript\/(ritual|recipe)\/[^/]+\/?$/.test(location.pathname)) data().then(workingExtras).catch(function () {});
   document.addEventListener('click', function (e) {

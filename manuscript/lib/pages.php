@@ -198,6 +198,17 @@ function view_calendar(): void
 {
     if (!has_access()) { view_gate(['locked' => true]); return; }
     record_view('route:/manuscript/calendar');
+    [$days, $events] = calendar_days();
+    echo_calendar_page(calendar_html($days, fn(array $p) => page_url($p), fn(array $p) => array_map(
+        fn($t) => [festival_icon($t), $t['title']], $events[$p['id']] ?? [])));
+}
+
+/**
+ * The Timing Grimoire's day pages ($days[month][day] = page) and each day's festivals ($events[day page id] = pages):
+ * its "Related Timing" connections (Samhain on October 31, Yule on December 21…).
+ */
+function calendar_days(): array
+{
     $st = db()->prepare("SELECT id, slug, grimoire, kind, title FROM pages WHERE grimoire = 'timing' AND kind = 'entry'");
     $st->execute();
     $days = [];
@@ -205,7 +216,6 @@ function view_calendar(): void
     foreach ($st->fetchAll() as $p) {
         if (preg_match('/^(' . implode('|', $months) . ')-(\d{1,2})$/', $p['slug'], $m)) $days[array_search($m[1], $months, true) + 1][(int) $m[2]] = $p;
     }
-    // The festivals on each day: its "Related Timing" connections (Samhain on October 31, Yule on December 21…).
     $ids = array_merge(...array_map(fn($m) => array_column($m, 'id'), $days ?: [[]]));
     $events = [];
     foreach (array_chunk($ids, 500) as $chunk) {
@@ -215,8 +225,33 @@ function view_calendar(): void
         $idx = page_index(array_column($rows, 'to_id'));
         foreach ($rows as $r) if (isset($idx[$r['to_id']])) $events[$r['from_id']][] = $idx[$r['to_id']];
     }
-    echo_calendar_page(calendar_html($days, fn(array $p) => page_url($p), fn(array $p) => array_map(
-        fn($t) => [$t['icon'] && !preg_match('/^(file|asset):/', (string) $t['icon']) ? $t['icon'] : '', $t['title']], $events[$p['id']] ?? [])));
+    return [$days, $events];
+}
+
+/** A festival's emoji, if its icon is one (not a picture). */
+function festival_icon(array $p): string
+{
+    return $p['icon'] && !preg_match('/^(file|asset):/', (string) $p['icon']) ? (string) $p['icon'] : '';
+}
+
+/**
+ * /calendar.ics: the festivals and moon phases as a calendar feed (lib/ical.php), open to everyone so calendar apps can
+ * fetch it without signing in. Like Today for visitors, it gives names only: each event links to its page, which
+ * visitors find locked.
+ */
+function view_calendar_feed(): void
+{
+    [$days, $events] = calendar_days();
+    $festivals = [];
+    foreach ($days as $m => $list) foreach ($list as $d => $p) foreach ($events[$p['id']] ?? [] as $t) {
+        $festivals[] = ['month' => $m, 'day' => $d, 'title' => $t['title'], 'icon' => festival_icon($t), 'url' => page_url($t)];
+    }
+    $moons = array_map(fn($slug) => ($p = find_page('astrology', $slug)) ? page_url($p) : '',
+        ['new-moon', 'first-quarter-moon', 'full-moon', 'third-quarter-moon']);
+    header('Content-Type: text/calendar; charset=utf-8');
+    header('Content-Disposition: ' . (isset($_GET['download']) ? 'attachment' : 'inline') . '; filename="magick-manuscript.ics"');
+    header('Cache-Control: public, max-age=3600');
+    echo calendar_ics($festivals, $moons, time());
 }
 
 /** The twelve months as lists of days ($days[month][day] = page); $href gives a day's address, $events its festivals ([emoji, name]…). */

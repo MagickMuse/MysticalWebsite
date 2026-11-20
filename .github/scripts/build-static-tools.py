@@ -14,6 +14,7 @@ import html
 import json
 import os
 import re
+import subprocess
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'manuscript')
 GRIMOIRES = ['animal', 'astrology', 'begin-here', 'card', 'correspondence', 'dream', 'entity', 'material', 'mineral',
@@ -115,6 +116,28 @@ def main():
         json.dump(out, fh, ensure_ascii=False, separators=(',', ':'))
     print(f'tools/data.json: {len(pages)} pages, {sum(len(x) for x in links) // 2} connections')
     write_today(out)
+    write_calendar_feed(out)
+
+
+def write_calendar_feed(d):
+    """calendar.ics: the festivals and moon phases, made by lib/ical.php (the same feed the live site serves at /calendar.ics)."""
+    live = 'https://magickmuse.com/manuscript/'
+    months = MONTHS.split('|')
+    page = lambda i: live + d['g'][d['p'][i][0]] + '/' + d['p'][i][1]
+    festivals = []
+    for day, lst in d['f'].items():
+        mon, num = day.rsplit('-', 1)
+        for i in lst:
+            icon = d['p'][i][3]
+            festivals.append({'month': months.index(mon) + 1, 'day': int(num), 'title': d['p'][i][2],
+                              'icon': '' if re.match(r'^[ma]:', icon) else icon, 'url': page(i)})
+    find = {(d['g'][p[0]], p[1]): n for n, p in enumerate(d['p'])}
+    moons = [page(find[('astrology', s)]) if ('astrology', s) in find else '' for s in ('new-moon', 'first-quarter-moon', 'full-moon', 'third-quarter-moon')]
+    ics = subprocess.run(['php', os.path.join(ROOT, 'lib', 'ical.php')], input=json.dumps({'festivals': festivals, 'moons': moons}),
+                         capture_output=True, text=True, check=True).stdout
+    with open(os.path.join(ROOT, 'calendar.ics'), 'w', encoding='utf-8', newline='') as fh:
+        fh.write(ics)
+    print(f'calendar.ics: {len(festivals)} festivals and the moon phases')
 
 
 def write_today(d):

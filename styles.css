@@ -1842,6 +1842,10 @@ html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone
 }
 .cal-btn:hover { border-color: var(--accent); }
 .cal-today { margin-left: auto; }
+.cal-export { margin-top: var(--gap-text); }
+.cal-export > summary { display: inline-block; list-style: none; padding: 0; }
+.cal-export > summary::-webkit-details-marker { display: none; }
+.cal-export-links { display: flex; flex-wrap: wrap; gap: .6rem; margin: .6rem 0 0; }
 .cal-m-name { font-size: 1.6rem; margin: var(--gap-h3-before) 0 var(--gap-h3); }
 .calendar.js .cal-m-name { display: none; } /* the month's name is in the bar above */
 .cal-week, .cal-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }

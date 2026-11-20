@@ -14,6 +14,7 @@ require __DIR__ . '/lib/collection.php';
 require __DIR__ . '/lib/glyphs.php';
 require __DIR__ . '/lib/shelf.php';
 require __DIR__ . '/lib/tools.php';
+require __DIR__ . '/lib/ical.php';
 require __DIR__ . '/lib/path.php';
 require __DIR__ . '/lib/pages.php';
 require __DIR__ . '/lib/search.php';
@@ -66,6 +67,7 @@ function route(array $parts, string $method): void
             redirect(site_url(implode('/', array_merge(['market'], array_slice($parts, 1)))) . ($q !== '' ? '?' . $q : ''), 301);
         case 'suggest':       search_suggest(trim((string) ($_GET['q'] ?? ''))); return;
         case 'calendar':      view_calendar(); return;
+        case 'calendar.ics':  view_calendar_feed(); return;
         case 'today': case 'spell-builder': case 'wheel': case 'draw-a-card': case 'pull-a-rune': case 'dream-decoder': case 'planetary-hours': case 'guide-pages': case 'enchanted-tools': view_tool_page($first); return;
         case 'tools':
             match ($parts[1] ?? '') { 'data.json' => serve_tools_data(), 'today.json' => serve_today_data(), default => not_found() };

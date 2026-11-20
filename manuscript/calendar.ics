@@ -1,0 +1,2142 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//The Magick Muse//The Magick Manuscript//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:The Magick Manuscript
+X-WR-CALDESC:Festivals and moon phases from The Magick Manuscript.
+REFRESH-INTERVAL;VALUE=DURATION:P1D
+X-PUBLISHED-TTL:P1D
+BEGIN:VEVENT
+UID:festival-0401-daa4ec014d@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240401
+DTEND;VALUE=DATE:20240402
+RRULE:FREQ=YEARLY
+SUMMARY:Dark Mother Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/dark-mother-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/dark-mother-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0401-4268b2eab3@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240401
+DTEND;VALUE=DATE:20240402
+RRULE:FREQ=YEARLY
+SUMMARY:💕 Festival of Venus
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/festival-of-venus
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/festival-of-venus
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0401-53472bb8d5@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240401
+DTEND;VALUE=DATE:20240402
+RRULE:FREQ=YEARLY
+SUMMARY:💕 Fortuna Virilis
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/fortuna-virilis
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/fortuna-virilis
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0423-34c87d55ad@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240423
+DTEND;VALUE=DATE:20240424
+RRULE:FREQ=YEARLY
+SUMMARY:🐉 Feast of Saint George
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/feast-of-saint-george
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/feast-of-saint-george
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0423-87487ba267@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240423
+DTEND;VALUE=DATE:20240424
+RRULE:FREQ=YEARLY
+SUMMARY:Festival of the Greenman
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/festival-of-the-greenman
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/festival-of-the-greenman
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0425-668282b1cc@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240425
+DTEND;VALUE=DATE:20240426
+RRULE:FREQ=YEARLY
+SUMMARY:Spring Festival
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/spring-festival
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/spring-festival
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0428-442ba6ef52@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240428
+DTEND;VALUE=DATE:20240429
+RRULE:FREQ=YEARLY
+SUMMARY:🌺 The Floralia
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/the-floralia
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/the-floralia
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0430-ee0013d109@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240430
+DTEND;VALUE=DATE:20240501
+RRULE:FREQ=YEARLY
+SUMMARY:Beltane
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/beltane
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/beltane
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0407-8874473148@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240407
+DTEND;VALUE=DATE:20240408
+RRULE:FREQ=YEARLY
+SUMMARY:Feast of Blajini
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/feast-of-blajini
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/feast-of-blajini
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0408-db93515abc@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240408
+DTEND;VALUE=DATE:20240409
+RRULE:FREQ=YEARLY
+SUMMARY:Day of Mooncakes
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/day-of-mooncakes
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/day-of-mooncakes
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0801-785b83be0b@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240801
+DTEND;VALUE=DATE:20240802
+RRULE:FREQ=YEARLY
+SUMMARY:✨ Cross Quarter Days
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/cross-quarter-days
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/cross-quarter-days
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0801-34fab43792@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240801
+DTEND;VALUE=DATE:20240802
+RRULE:FREQ=YEARLY
+SUMMARY:Lughnasadh
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/lughnasadh
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/lughnasadh
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0820-aab10aa6b6@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240820
+DTEND;VALUE=DATE:20240821
+RRULE:FREQ=YEARLY
+SUMMARY:Marriage of the God and Goddess
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/marriage-of-the-god-and-goddess
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/marriage-of-the-god-and-goddes
+ s
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1213-130366a5ac@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241213
+DTEND;VALUE=DATE:20241214
+RRULE:FREQ=YEARLY
+SUMMARY:🕯️ Feast of Saint Lucy
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/feast-of-saint-lucy
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/feast-of-saint-lucy
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1217-1b551e9b65@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241217
+DTEND;VALUE=DATE:20241218
+RRULE:FREQ=YEARLY
+SUMMARY:🍴 Feast Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/feast-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/feast-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1221-e1d3b33fae@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241221
+DTEND;VALUE=DATE:20241222
+RRULE:FREQ=YEARLY
+SUMMARY:Yule
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/yule
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/yule
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1222-e1d3b33fae@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241222
+DTEND;VALUE=DATE:20241223
+RRULE:FREQ=YEARLY
+SUMMARY:Yule
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/yule
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/yule
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1224-164161ad43@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241224
+DTEND;VALUE=DATE:20241225
+RRULE:FREQ=YEARLY
+SUMMARY:🎄 Christmas Eve
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/christmas-eve
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/christmas-eve
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1224-0baa4c28eb@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241224
+DTEND;VALUE=DATE:20241225
+RRULE:FREQ=YEARLY
+SUMMARY:Holly Eve
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/holly-eve
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/holly-eve
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1225-81b616fbff@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241225
+DTEND;VALUE=DATE:20241226
+RRULE:FREQ=YEARLY
+SUMMARY:🎄 Christmas
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/christmas
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/christmas
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1225-a9e1422b72@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241225
+DTEND;VALUE=DATE:20241226
+RRULE:FREQ=YEARLY
+SUMMARY:Oak Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/oak-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/oak-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1226-0c657dab51@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241226
+DTEND;VALUE=DATE:20241227
+RRULE:FREQ=YEARLY
+SUMMARY:🐦 Hunting of the Wren
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/hunting-of-the-wren
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/hunting-of-the-wren
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1231-94e19b40ac@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241231
+DTEND;VALUE=DATE:20250101
+RRULE:FREQ=YEARLY
+SUMMARY:Hogmanay
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/hogmanay
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/hogmanay
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0201-8899a15ab6@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240201
+DTEND;VALUE=DATE:20240202
+RRULE:FREQ=YEARLY
+SUMMARY:🕯️ Candlemas
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/candlemas
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/candlemas
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0201-785b83be0b@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240201
+DTEND;VALUE=DATE:20240202
+RRULE:FREQ=YEARLY
+SUMMARY:✨ Cross Quarter Days
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/cross-quarter-days
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/cross-quarter-days
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0201-38dab1d4d3@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240201
+DTEND;VALUE=DATE:20240202
+RRULE:FREQ=YEARLY
+SUMMARY:Imbolc
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/imbolc
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/imbolc
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0214-4678d5958b@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240214
+DTEND;VALUE=DATE:20240215
+RRULE:FREQ=YEARLY
+SUMMARY:💝 Valentine's Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/valentine-s-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/valentine-s-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0215-7212808643@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240215
+DTEND;VALUE=DATE:20240216
+RRULE:FREQ=YEARLY
+SUMMARY:Pan's Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/pan-s-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/pan-s-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0228-651a2f41d5@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240228
+DTEND;VALUE=DATE:20240229
+RRULE:FREQ=YEARLY
+SUMMARY:Cake Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/cake-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/cake-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0101-d8662cfc74@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240101
+DTEND;VALUE=DATE:20240102
+RRULE:FREQ=YEARLY
+SUMMARY:Hag's Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/hag-s-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/hag-s-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0115-4c584524f9@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240115
+DTEND;VALUE=DATE:20240116
+RRULE:FREQ=YEARLY
+SUMMARY:🕯️ Feast of Saint Bonnet
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/feast-of-saint-bonnet
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/feast-of-saint-bonnet
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0118-cee74f50ab@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240118
+DTEND;VALUE=DATE:20240119
+RRULE:FREQ=YEARLY
+SUMMARY:Day of Danu
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/day-of-danu
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/day-of-danu
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0105-816da8ae94@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240105
+DTEND;VALUE=DATE:20240106
+RRULE:FREQ=YEARLY
+SUMMARY:⭐ Epiphany Eve
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/epiphany-eve
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/epiphany-eve
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0105-ef34dba21e@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240105
+DTEND;VALUE=DATE:20240106
+RRULE:FREQ=YEARLY
+SUMMARY:🎄 Twelfth Night
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/twelfth-night
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/twelfth-night
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0106-c6324e1502@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240106
+DTEND;VALUE=DATE:20240107
+RRULE:FREQ=YEARLY
+SUMMARY:👹 Berchtentag
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/berchtentag
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/berchtentag
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0106-72721d28c3@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240106
+DTEND;VALUE=DATE:20240107
+RRULE:FREQ=YEARLY
+SUMMARY:Triple Goddess Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/triple-goddess-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/triple-goddess-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0701-ceb493bebb@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240701
+DTEND;VALUE=DATE:20240702
+RRULE:FREQ=YEARLY
+SUMMARY:Crone Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/crone-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/crone-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0721-be27a3d784@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240721
+DTEND;VALUE=DATE:20240722
+RRULE:FREQ=YEARLY
+SUMMARY:Witch's Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/witch-s-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/witch-s-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0613-e45cd288fa@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240613
+DTEND;VALUE=DATE:20240614
+RRULE:FREQ=YEARLY
+SUMMARY:Epona Feast Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/epona-feast-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/epona-feast-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0613-e50b6a73f2@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240613
+DTEND;VALUE=DATE:20240614
+RRULE:FREQ=YEARLY
+SUMMARY:🐷 Feast of Saint Anthony
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/feast-of-saint-anthony
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/feast-of-saint-anthony
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0620-184f63d607@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240620
+DTEND;VALUE=DATE:20240621
+RRULE:FREQ=YEARLY
+SUMMARY:☀️ Midsummer
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/midsummer
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/midsummer
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0621-184f63d607@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240621
+DTEND;VALUE=DATE:20240622
+RRULE:FREQ=YEARLY
+SUMMARY:☀️ Midsummer
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/midsummer
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/midsummer
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0621-f30ece8f07@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240621
+DTEND;VALUE=DATE:20240622
+RRULE:FREQ=YEARLY
+SUMMARY:📅 Summer Solstice
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/summer-solstice
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/summer-solstice
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0621-74fc8acc94@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240621
+DTEND;VALUE=DATE:20240622
+RRULE:FREQ=YEARLY
+SUMMARY:🍀 The Fortunalia
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/the-fortunalia
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/the-fortunalia
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0622-184f63d607@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240622
+DTEND;VALUE=DATE:20240623
+RRULE:FREQ=YEARLY
+SUMMARY:☀️ Midsummer
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/midsummer
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/midsummer
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0623-1c16d55623@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240623
+DTEND;VALUE=DATE:20240624
+RRULE:FREQ=YEARLY
+SUMMARY:Day of the Lady and Lord of the Sidhe
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/day-of-the-lady-and-lord-of-the
+ -sidhe
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/day-of-the-lady-and-lord-of-th
+ e-sidhe
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0627-7bdaa13d23@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240627
+DTEND;VALUE=DATE:20240628
+RRULE:FREQ=YEARLY
+SUMMARY:Day of the Household Deities
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/day-of-the-household-deities
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/day-of-the-household-deities
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0603-22ab1edd67@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240603
+DTEND;VALUE=DATE:20240604
+RRULE:FREQ=YEARLY
+SUMMARY:⚔️ Feast of Bellona
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/feast-of-bellona
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/feast-of-bellona
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0605-2fffb394f9@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240605
+DTEND;VALUE=DATE:20240606
+RRULE:FREQ=YEARLY
+SUMMARY:Earth Mother Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/earth-mother-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/earth-mother-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0317-00e2e64728@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240317
+DTEND;VALUE=DATE:20240318
+RRULE:FREQ=YEARLY
+SUMMARY:🍷 Liberalia
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/liberalia
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/liberalia
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0317-587dc288d8@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240317
+DTEND;VALUE=DATE:20240318
+RRULE:FREQ=YEARLY
+SUMMARY:Maenad Festival
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/maenad-festival
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/maenad-festival
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0319-49e09c4c77@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240319
+DTEND;VALUE=DATE:20240320
+RRULE:FREQ=YEARLY
+SUMMARY:🐰 Ostara
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/ostara
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/ostara
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0320-49e09c4c77@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240320
+DTEND;VALUE=DATE:20240321
+RRULE:FREQ=YEARLY
+SUMMARY:🐰 Ostara
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/ostara
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/ostara
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0321-49e09c4c77@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240321
+DTEND;VALUE=DATE:20240322
+RRULE:FREQ=YEARLY
+SUMMARY:🐰 Ostara
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/ostara
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/ostara
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0325-ca314c9bcc@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240325
+DTEND;VALUE=DATE:20240326
+RRULE:FREQ=YEARLY
+SUMMARY:Lady Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/lady-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/lady-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0309-b3a0b9d4ed@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240309
+DTEND;VALUE=DATE:20240310
+RRULE:FREQ=YEARLY
+SUMMARY:Mother Goddess Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/mother-goddess-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/mother-goddess-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0501-ee0013d109@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240501
+DTEND;VALUE=DATE:20240502
+RRULE:FREQ=YEARLY
+SUMMARY:Beltane
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/beltane
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/beltane
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0501-785b83be0b@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240501
+DTEND;VALUE=DATE:20240502
+RRULE:FREQ=YEARLY
+SUMMARY:✨ Cross Quarter Days
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/cross-quarter-days
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/cross-quarter-days
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0511-f37c9d3a7e@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240511
+DTEND;VALUE=DATE:20240512
+RRULE:FREQ=YEARLY
+SUMMARY:👻 The Lemuria
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/the-lemuria
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/the-lemuria
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0513-f37c9d3a7e@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240513
+DTEND;VALUE=DATE:20240514
+RRULE:FREQ=YEARLY
+SUMMARY:👻 The Lemuria
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/the-lemuria
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/the-lemuria
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0517-142df4e5d1@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240517
+DTEND;VALUE=DATE:20240518
+RRULE:FREQ=YEARLY
+SUMMARY:🌙 Bendidea Festival
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/bendidea-festival
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/bendidea-festival
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0521-806a906858@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240521
+DTEND;VALUE=DATE:20240522
+RRULE:FREQ=YEARLY
+SUMMARY:Dark/Bright Mother Goddess Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/dark-bright-mother-goddess-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/dark-bright-mother-goddess-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0509-f37c9d3a7e@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240509
+DTEND;VALUE=DATE:20240510
+RRULE:FREQ=YEARLY
+SUMMARY:👻 The Lemuria
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/the-lemuria
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/the-lemuria
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1101-fceae45138@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241101
+DTEND;VALUE=DATE:20241102
+RRULE:FREQ=YEARLY
+SUMMARY:Cailleach's Reign
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/cailleach-s-reign
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/cailleach-s-reign
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1101-785b83be0b@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241101
+DTEND;VALUE=DATE:20241102
+RRULE:FREQ=YEARLY
+SUMMARY:✨ Cross Quarter Days
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/cross-quarter-days
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/cross-quarter-days
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1101-b23c98fe8e@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241101
+DTEND;VALUE=DATE:20241102
+RRULE:FREQ=YEARLY
+SUMMARY:💀 Dias de los Muertos
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/dias-de-los-muertos
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/dias-de-los-muertos
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1101-a49291206e@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241101
+DTEND;VALUE=DATE:20241102
+RRULE:FREQ=YEARLY
+SUMMARY:Samhain
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/samhain
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/samhain
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1115-42c0985ebb@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241115
+DTEND;VALUE=DATE:20241116
+RRULE:FREQ=YEARLY
+SUMMARY:🌿 Feast of Ferronia
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/feast-of-ferronia
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/feast-of-ferronia
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1116-4cd7c0ce9b@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241116
+DTEND;VALUE=DATE:20241117
+RRULE:FREQ=YEARLY
+SUMMARY:🌑 Night of Hekate
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/night-of-hekate
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/night-of-hekate
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1102-5391f44493@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241102
+DTEND;VALUE=DATE:20241103
+RRULE:FREQ=YEARLY
+SUMMARY:💀 Day of the Dead
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/day-of-the-dead
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/day-of-the-dead
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1102-8ee190b988@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241102
+DTEND;VALUE=DATE:20241103
+RRULE:FREQ=YEARLY
+SUMMARY:💀 Fête Ghede
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/fete-ghede
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/fete-ghede
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1122-ff974ef79f@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241122
+DTEND;VALUE=DATE:20241123
+RRULE:FREQ=YEARLY
+SUMMARY:Night of Shiva
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/night-of-shiva
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/night-of-shiva
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1127-53917a4bb9@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241127
+DTEND;VALUE=DATE:20241128
+RRULE:FREQ=YEARLY
+SUMMARY:Uma Day
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/uma-day
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/uma-day
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1129-973ed306b1@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241129
+DTEND;VALUE=DATE:20241130
+RRULE:FREQ=YEARLY
+SUMMARY:Feast of Hathor
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/feast-of-hathor
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/feast-of-hathor
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1018-c987fe04cf@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241018
+DTEND;VALUE=DATE:20241019
+RRULE:FREQ=YEARLY
+SUMMARY:Great Horn Festival
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/great-horn-festival
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/great-horn-festival
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1002-6fc6b9b962@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241002
+DTEND;VALUE=DATE:20241003
+RRULE:FREQ=YEARLY
+SUMMARY:Feast of the Guardian Spirits
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/feast-of-the-guardian-spirits
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/feast-of-the-guardian-spirits
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1031-b23c98fe8e@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241031
+DTEND;VALUE=DATE:20241101
+RRULE:FREQ=YEARLY
+SUMMARY:💀 Dias de los Muertos
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/dias-de-los-muertos
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/dias-de-los-muertos
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-1031-e1114432a2@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20241031
+DTEND;VALUE=DATE:20241101
+RRULE:FREQ=YEARLY
+SUMMARY:🎃 Halloween
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/halloween
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/halloween
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0913-14ce006161@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240913
+DTEND;VALUE=DATE:20240914
+RRULE:FREQ=YEARLY
+SUMMARY:Fire Lighting Ceremony
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/fire-lighting-ceremony
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/fire-lighting-ceremony
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0921-e8c8a6cc5c@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240921
+DTEND;VALUE=DATE:20240922
+RRULE:FREQ=YEARLY
+SUMMARY:Mabon
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/mabon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/mabon
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0922-e8c8a6cc5c@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240922
+DTEND;VALUE=DATE:20240923
+RRULE:FREQ=YEARLY
+SUMMARY:Mabon
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/mabon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/mabon
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0923-e8c8a6cc5c@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240923
+DTEND;VALUE=DATE:20240924
+RRULE:FREQ=YEARLY
+SUMMARY:Mabon
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/mabon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/mabon
+END:VEVENT
+BEGIN:VEVENT
+UID:festival-0924-e8c8a6cc5c@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART;VALUE=DATE:20240924
+DTEND;VALUE=DATE:20240925
+RRULE:FREQ=YEARLY
+SUMMARY:Mabon
+DESCRIPTION:Its correspondences and rituals are in The Magick Manuscript.\n
+ \nhttps://magickmuse.com/manuscript/timing/mabon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/timing/mabon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202610260411@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20261026T041149Z
+DTEND:20261026T051149Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202611012028@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20261101T202829Z
+DTEND:20261101T212829Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202611090702@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20261109T070203Z
+DTEND:20261109T080203Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202611171147@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20261117T114751Z
+DTEND:20261117T124751Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202611241453@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20261124T145333Z
+DTEND:20261124T155333Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202612010608@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20261201T060843Z
+DTEND:20261201T070843Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202612090051@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20261209T005152Z
+DTEND:20261209T015152Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202612170542@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20261217T054242Z
+DTEND:20261217T064242Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202612240128@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20261224T012815Z
+DTEND:20261224T022815Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202612301859@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20261230T185935Z
+DTEND:20261230T195935Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202701072024@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270107T202430Z
+DTEND:20270107T212430Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202701152034@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270115T203432Z
+DTEND:20270115T213432Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202701221217@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270122T121722Z
+DTEND:20270122T131722Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202701291055@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270129T105534Z
+DTEND:20270129T115534Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202702061556@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270206T155610Z
+DTEND:20270206T165610Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202702140758@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270214T075831Z
+DTEND:20270214T085831Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202702202323@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270220T232335Z
+DTEND:20270221T002335Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202702280516@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270228T051632Z
+DTEND:20270228T061632Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202703080929@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270308T092934Z
+DTEND:20270308T102934Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202703151625@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270315T162513Z
+DTEND:20270315T172513Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202703221043@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270322T104346Z
+DTEND:20270322T114346Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202703300053@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270330T005355Z
+DTEND:20270330T015355Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202704062351@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270406T235114Z
+DTEND:20270407T005114Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202704132256@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270413T225641Z
+DTEND:20270413T235641Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202704202227@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270420T222708Z
+DTEND:20270420T232708Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202704282017@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270428T201748Z
+DTEND:20270428T211748Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202705061058@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270506T105835Z
+DTEND:20270506T115835Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202705130443@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270513T044355Z
+DTEND:20270513T054355Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202705201059@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270520T105900Z
+DTEND:20270520T115900Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202705281357@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270528T135752Z
+DTEND:20270528T145752Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202706041940@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270604T194019Z
+DTEND:20270604T204019Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202706111056@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270611T105606Z
+DTEND:20270611T115606Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202706190044@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270619T004424Z
+DTEND:20270619T014424Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202706270454@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270627T045422Z
+DTEND:20270627T055422Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202707040302@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270704T030203Z
+DTEND:20270704T040203Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202707101838@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270710T183858Z
+DTEND:20270710T193858Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202707181544@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270718T154458Z
+DTEND:20270718T164458Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202707261655@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270726T165500Z
+DTEND:20270726T175500Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202708021005@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270802T100507Z
+DTEND:20270802T110507Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202708090454@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270809T045409Z
+DTEND:20270809T055409Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202708170728@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270817T072842Z
+DTEND:20270817T082842Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202708250227@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270825T022725Z
+DTEND:20270825T032725Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202708311741@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270831T174107Z
+DTEND:20270831T184107Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202709071831@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270907T183115Z
+DTEND:20270907T193115Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202709152303@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270915T230337Z
+DTEND:20270916T000337Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202709231020@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270923T102031Z
+DTEND:20270923T112031Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202709300236@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20270930T023608Z
+DTEND:20270930T033608Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202710071147@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20271007T114724Z
+DTEND:20271007T124724Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202710151347@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20271015T134705Z
+DTEND:20271015T144705Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202710221729@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20271022T172912Z
+DTEND:20271022T182912Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202710291336@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20271029T133633Z
+DTEND:20271029T143633Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202711060800@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20271106T080005Z
+DTEND:20271106T090005Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202711140325@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20271114T032554Z
+DTEND:20271114T042554Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202711210048@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20271121T004811Z
+DTEND:20271121T014811Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202711280324@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20271128T032423Z
+DTEND:20271128T042423Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202712060522@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20271206T052211Z
+DTEND:20271206T062211Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202712131608@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20271213T160849Z
+DTEND:20271213T170849Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202712200910@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20271220T091055Z
+DTEND:20271220T101055Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202712272012@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20271227T201224Z
+DTEND:20271227T211224Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202801050140@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280105T014032Z
+DTEND:20280105T024032Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202801120403@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280112T040305Z
+DTEND:20280112T050305Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202801181926@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280118T192607Z
+DTEND:20280118T202607Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202801261512@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280126T151234Z
+DTEND:20280126T161234Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202802031910@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280203T191035Z
+DTEND:20280203T201035Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202802101503@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280210T150343Z
+DTEND:20280210T160343Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202802170808@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280217T080807Z
+DTEND:20280217T090807Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202802251037@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280225T103730Z
+DTEND:20280225T113730Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202803040902@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280304T090226Z
+DTEND:20280304T100226Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202803110106@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280311T010607Z
+DTEND:20280311T020607Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202803172322@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280317T232255Z
+DTEND:20280318T002255Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202803260431@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280326T043131Z
+DTEND:20280326T053131Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202804021915@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280402T191530Z
+DTEND:20280402T201530Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202804091026@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280409T102640Z
+DTEND:20280409T112640Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202804161636@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280416T163658Z
+DTEND:20280416T173658Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202804241947@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280424T194700Z
+DTEND:20280424T204700Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202805020225@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280502T022547Z
+DTEND:20280502T032547Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202805081948@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280508T194852Z
+DTEND:20280508T204852Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202805161043@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280516T104308Z
+DTEND:20280516T114308Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202805240816@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280524T081620Z
+DTEND:20280524T091620Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202805310736@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280531T073640Z
+DTEND:20280531T083640Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202806070608@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280607T060849Z
+DTEND:20280607T070849Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202806150427@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280615T042725Z
+DTEND:20280615T052725Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202806221827@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280622T182737Z
+DTEND:20280622T192737Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202806291210@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280629T121037Z
+DTEND:20280629T131037Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202807061810@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280706T181053Z
+DTEND:20280706T191053Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202807142056@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280714T205638Z
+DTEND:20280714T215638Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202807220301@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280722T030138Z
+DTEND:20280722T040138Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202807281740@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280728T174009Z
+DTEND:20280728T184009Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202808050809@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280805T080951Z
+DTEND:20280805T090951Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202808131145@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280813T114525Z
+DTEND:20280813T124525Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202808201043@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280820T104342Z
+DTEND:20280820T114342Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202808270135@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280827T013553Z
+DTEND:20280827T023553Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202809032347@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280903T234741Z
+DTEND:20280904T004741Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202809120045@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280912T004550Z
+DTEND:20280912T014550Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202809181823@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280918T182342Z
+DTEND:20280918T192342Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202809251309@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20280925T130957Z
+DTEND:20280925T140957Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202810031625@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20281003T162506Z
+DTEND:20281003T172506Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202810111156@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20281011T115654Z
+DTEND:20281011T125654Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202810180256@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20281018T025648Z
+DTEND:20281018T035648Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202810250453@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20281025T045306Z
+DTEND:20281025T055306Z
+SUMMARY:🌓 First Quarter Moon
+DESCRIPTION:The exact moment of the first quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/first-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/first-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202811020917@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20281102T091722Z
+DTEND:20281102T101722Z
+SUMMARY:🌕 Full Moon
+DESCRIPTION:The exact moment of the full moon\, in your own time zone.\n\nh
+ ttps://magickmuse.com/manuscript/astrology/full-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/full-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202811092125@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20281109T212556Z
+DTEND:20281109T222556Z
+SUMMARY:🌗 Third Quarter Moon
+DESCRIPTION:The exact moment of the third quarter moon\, in your own time z
+ one.\n\nhttps://magickmuse.com/manuscript/astrology/third-quarter-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/third-quarter-moon
+END:VEVENT
+BEGIN:VEVENT
+UID:moon-202811161318@magickmuse.com
+DTSTAMP:20261120T224324Z
+DTSTART:20281116T131800Z
+DTEND:20281116T141800Z
+SUMMARY:🌑 New Moon
+DESCRIPTION:The exact moment of the new moon\, in your own time zone.\n\nht
+ tps://magickmuse.com/manuscript/astrology/new-moon
+TRANSP:TRANSPARENT
+URL:https://magickmuse.com/manuscript/astrology/new-moon
+END:VEVENT
+END:VCALENDAR

@@ -49,7 +49,7 @@ jobs:
           lftp_run "
           mkdir -p -f \"$FTP_DATA_DIR\"
           mirror --reverse --parallel=4 --no-perms --verbose=1 \
-            -x '^\.git/' -x '^\.github/' -x '^partials/' -x '^tests/' -x '^node_modules/' -x '^package(-lock)?\.json$' -x '^eslint\.config\.mjs$' -x '^\.editorconfig$' -x '(^|/)\.gitignore$' -x '\.md$' -x '^preview/' -x '^manuscript/index\.html$' -x '^market/' -x '^manuscript/(join|login|sneak-peek|account|saved|search|today|spell-builder|wheel|notes|tools)/' -x '^manuscript/media/' -x '^manuscript/(animal|astrology|begin-here|card|correspondence|dream|entity|material|mineral|oil|plant|recipe|ritual|rune|symbol|timing)/' \
+            -x '^\.git/' -x '^\.github/' -x '^partials/' -x '^tests/' -x '^node_modules/' -x '^package(-lock)?\.json$' -x '^eslint\.config\.mjs$' -x '^\.editorconfig$' -x '(^|/)\.gitignore$' -x '\.md$' -x '^preview/' -x '^manuscript/(index\.html|calendar\.ics)$' -x '^market/' -x '^manuscript/(join|login|sneak-peek|account|saved|search|today|spell-builder|wheel|notes|tools)/' -x '^manuscript/media/' -x '^manuscript/(animal|astrology|begin-here|card|correspondence|dream|entity|material|mineral|oil|plant|recipe|ritual|rune|symbol|timing)/' \
             ./ \"$FTP_DIR\"
           "
           echo "Uploaded to the live site: https://magickmuse.com"
