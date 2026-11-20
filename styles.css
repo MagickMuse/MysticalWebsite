@@ -243,19 +243,17 @@ header.site {
 }
 
 /* ---------- the opening (home): the book falls open ---------- */
-/* Left page: the arch-framed photograph. A gold gutter. Right page: the title and the way in. */
+/* Left: the arch-framed photograph. Right: the title and the way in. */
 .opening {
-  display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: center;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2.5rem, 6vw, 5.5rem); align-items: center;
   max-width: 1320px; margin-inline: auto; padding-block: clamp(2.5rem, 6vw, 5rem) clamp(4rem, 8vw, 6.5rem);
 }
 .opening-art { justify-self: end; width: min(100%, 480px); }
 .opening-art .frame { aspect-ratio: 4 / 5; width: 100%; }
-.gutter { align-self: stretch; background: color-mix(in srgb, var(--gold) 65%, transparent); }
 .opening-page { display: grid; gap: 1.5rem; justify-items: start; max-width: 34rem; }
 .opening h1 { font-size: clamp(3rem, 6.2vw, 5.4rem); }
 @media (max-width: 860px) {
   .opening { grid-template-columns: minmax(0, 1fr); padding-top: 1.5rem; }
-  .gutter { display: none; }
   .opening-art { justify-self: center; width: min(72%, 320px); }
   .opening-page { justify-self: center; }
 }
@@ -366,7 +364,7 @@ header.site {
   font-size: 1rem; color: var(--muted);
 }
 .intro .meta { justify-content: center; padding-block: 1rem; margin-top: .6rem; border-block: 1px solid var(--line); }
-.quote { margin: 0; font-family: var(--display); font-size: 1.5rem; font-style: italic; border-left: 1px solid var(--accent); padding-left: 1.4rem; line-height: 1.35; }
+.quote { margin: 0; font-family: var(--display); font-size: 1.5rem; font-style: italic; line-height: 1.35; }
 .quote p { max-width: none; }
 .quote cite { display: block; font-family: var(--body); font-style: italic; font-size: 1rem; color: var(--muted); margin-top: var(--gap-h3); }
 .alt .quote cite { color: var(--ink); }
@@ -771,7 +769,7 @@ html.nav-fold .nav ul a { align-content: center; min-height: 52px; }
 .mm-prose ul, .mm-prose ol { padding-left: 1.4rem; }
 .mm-prose ul.todo { list-style: none; padding-left: 0; }
 .mm-prose a { color: var(--accent-text); text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.mm-prose blockquote { margin: 0; font-family: var(--display); font-style: italic; font-size: 1.35rem; border-left: 1px solid var(--accent); padding-left: 1.4rem; line-height: 1.4; }
+.mm-prose blockquote { margin: 0; font-family: var(--display); font-style: italic; font-size: 1.35rem; line-height: 1.4; }
 .mm-prose figure { margin: 2rem 0; }
 .mm-prose figure img { margin-inline: auto; max-height: 520px; width: auto; }
 .mm-prose figcaption { text-align: center; font-size: .85rem; color: var(--muted); margin-top: .6rem; }
@@ -827,7 +825,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 .mm-callout.c-red_background, .mm-callout.c-pink_background, .mm-callout.c-brown_background, .mm-callout.c-orange_background,
 .mm-callout.c-yellow_background, .mm-callout.c-gray_background, .mm-callout.c-purple_background,
 .mm-callout.c-blue_background, .mm-callout.c-green_background { background: var(--surface); }
-.mm-callout.c-red_background, .mm-callout.c-pink_background { border-left: 2px solid var(--accent); }
+.mm-callout.c-red_background, .mm-callout.c-pink_background { border-color: var(--accent); }
 
 /* ---------- collections + entry grids ---------- */
 .collection { margin-top: var(--gap-h3-before); }
@@ -1647,7 +1645,7 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .mm-prose .mm-callout.c-red_background, .mm-prose .mm-callout.c-pink_background { border-top-color: var(--accent); }
 .mm-prose > .mm-callout, .mm-prose > .mm-callout + * { margin-top: var(--gap-h3-before); }
 /* Warnings, Safety, Caution: their own soft box with a burgundy edge, the heading as a small label */
-.mm-prose .mm-warn { border-top: 0; border-left: 2px solid var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--bg)); }
+.mm-prose .mm-warn { border: 1px solid var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--bg)); }
 .mm-prose .mm-warn :is(h2, h3, h4, h5):first-child { margin: 0 0 .2rem; font-family: var(--display); font-style: italic; font-size: 1.05rem; text-transform: none; color: var(--accent-text); }
 .mm-prose .mm-warn :is(h2, h3, h4, h5):first-child::before { content: "⚠︎ "; letter-spacing: 0; }
 /* every heading level in the serif display face, as on the blog (Notion's smaller headings came out in bold sans) */
@@ -1893,17 +1891,10 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .gal-mineral .gal-pic:not(.none) { background: none; }
 
 /* ---------- Saved and Notes at the top left; the note pop-up; the notes page ---------- */
-.mm-mine { grid-column: 1; grid-row: 1; justify-self: start; display: flex; gap: .5rem; align-items: center; margin: 0; font-size: .9rem; letter-spacing: .04em; text-transform: lowercase; white-space: nowrap; }
-.mm-mine a { text-decoration: none; }
-.mm-mine a:hover { color: var(--accent-text); }
-.mm-mine .dot { color: var(--gold-text); }
-.mm-mine span[aria-hidden] { color: var(--gold-text); letter-spacing: 0; }
 .mm-search { grid-row: 1; }
 .mm-acct { grid-row: 1; }
-@media (max-width: 860px) { .mm-mine { order: -2; } }
-html.nav-fold .mm-mine { order: -2; }
 
-.note-pop { width: min(640px, calc(100vw - 2rem)); padding: 0; border: 1px solid color-mix(in srgb, var(--gold) 70%, transparent); border-left: 3px solid var(--gold); border-radius: 0;
+.note-pop { width: min(640px, calc(100vw - 2rem)); padding: 0; border: 1px solid color-mix(in srgb, var(--gold) 70%, transparent); border-radius: 0;
   background: var(--surface); color: var(--ink); }
 .note-pop::backdrop { background: rgba(46, 31, 32, .55); }
 .note-pop[open] { animation: pop-in .28s cubic-bezier(.2,.7,.2,1); }
@@ -1924,7 +1915,7 @@ html.nav-fold .mm-mine { order: -2; }
 
 .notes-page h1 em { font-style: italic; }
 .note-cards { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
-.note-card { position: relative; display: grid; align-content: start; gap: .4rem; padding: 1.1rem 1.2rem 1rem; border: 1px solid var(--line); border-left: 3px solid var(--gold); border-radius: 0; background: var(--surface); transition: border-color .2s, transform .2s; }
+.note-card { position: relative; display: grid; align-content: start; gap: .4rem; padding: 1.1rem 1.2rem 1rem; border: 1px solid var(--line); border-radius: 0; background: var(--surface); transition: border-color .2s, transform .2s; }
 .note-card:hover { border-color: var(--gold); transform: translateY(-2px); }
 .note-open { display: grid; gap: .35rem; text-decoration: none; color: var(--ink); }
 .note-open::after { content: ""; position: absolute; inset: 0; } /* the whole card opens the note */
@@ -2075,7 +2066,7 @@ html.nav-fold .mm-mine { order: -2; }
 .sub-label a { color: inherit; }
 .extras-list > li:last-child { border-bottom: 0; }
 .extras-fold .safety-box { margin-bottom: var(--gap-h3); }
-.safety-box { margin: 0 0 1.8rem; padding: 1.1rem 1.3rem .6rem; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-left: 3px solid var(--accent); border-radius: 0; background: var(--surface); }
+.safety-box { margin: 0 0 1.8rem; padding: 1.1rem 1.3rem .6rem; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 0; background: var(--surface); }
 .safety-box .label { margin: 0 0 .5rem; }
 .fire-list { margin: 0 0 1.1rem; padding-left: 1.2rem; }
 .fire-list li { margin: .2rem 0; }
@@ -2149,7 +2140,7 @@ html.nav-fold .mm-mine { order: -2; }
 .place-row label { display: grid; gap: .3rem; font-size: .95rem; text-transform: none; }
 .place-row input { width: 9rem; }
 .place-error { color: var(--accent-text); }
-.hour-now { display: grid; justify-items: start; gap: .2rem; margin: 0 0 1.2rem; padding: 1rem 1.3rem; border-left: 3px solid var(--gold); background: var(--surface); border-radius: 0; }
+.hour-now { display: grid; justify-items: start; gap: .2rem; margin: 0 0 1.2rem; padding: 1rem 1.3rem; border: 1px solid var(--line); background: var(--surface); border-radius: 0; }
 .hour-now .eyebrow { margin: 0; }
 .hour-planet { margin: 0; font-family: var(--display); font-size: 2rem; }
 .hour-now .small { margin: 0; color: var(--muted); }

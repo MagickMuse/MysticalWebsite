@@ -747,6 +747,8 @@ function view_account(): void
     $email = e($email);
     $admin = is_admin(current_email()) ? '<a class="link" href="' . e(url('dashboard')) . '">Dashboard</a>' : '';
     $library = '<a class="link" href="' . e(site_url('market/library')) . '">Your Library</a>';
+    // A member's saved pages and notes live here rather than in the header.
+    $mine = has_access() ? '<a class="link" href="' . e(url('saved')) . '">Saved Pages</a><a class="link" href="' . e(url('notes')) . '">Your Notes</a>' : '';
     // Display & accessibility: kept in the browser by prefs.js, the same panel as the website's /settings page.
     $prefs = (string) @file_get_contents(__DIR__ . '/lib/prefs-panel.html');
     layout('Account', <<<HTML
@@ -754,7 +756,7 @@ function view_account(): void
   <p class="eyebrow">Account</p>
   <h1>{$email}</h1>
   <p class="lede">$status</p>
-  <div class="actions">$join $billing $library $admin
+  <div class="actions">$join $billing $mine $library $admin
     <form method="post" action="$logout"><input type="hidden" name="csrf" value="$csrf"><button class="link as-button" type="submit">Sign Out</button></form>
   </div>
 </section>

@@ -303,12 +303,6 @@ function layout(string $title, string $body, array $opt = []): void
         ? '<a href="' . e(url('account')) . '">Account</a>'
         : '<a href="' . e(url('login')) . '">Sign In</a>';
     $q = e($_GET['q'] ?? '');
-    // Members: their saved pages, their notes and Today, at the top left. "Notes" opens the note pop-up (tools.js); without JavaScript it's the list.
-    $mine = $email && has_access()
-        ? '<p class="mm-mine"><a href="' . e(url('saved')) . '"><span aria-hidden="true">★</span> Saved</a><span class="dot" aria-hidden="true">·</span>'
-          . '<a href="' . e(url('notes')) . '" data-note-open aria-haspopup="dialog"><span aria-hidden="true">✎</span> Notes</a>'
-          . '<span class="dot" aria-hidden="true">·</span><a href="' . e(url('today')) . '"><span aria-hidden="true">☾</span> Today</a></p>'
-        : '';
     $robots = !empty($opt['index']) ? 'index, follow' : 'noindex, nofollow';
     ?>
 <!doctype html>
@@ -353,7 +347,6 @@ function layout(string $title, string $body, array $opt = []): void
     </nav>
   </div>
   <div class="wrap mm-bar">
-    <?= $mine ?>
     <?php if (has_access()): ?>
     <form class="mm-search" action="<?= e(url('search')) ?>" method="get" role="search">
       <label class="sr-only" for="mm-q">Search the Manuscript</label>
@@ -370,7 +363,6 @@ function layout(string $title, string $body, array $opt = []): void
 <?= $visitor ? join_popup(!empty($opt['peek'])) : '' ?>
 <footer class="site">
   <div class="wrap foot">
-    <div class="star-rule" aria-hidden="true"><i class="spark big"></i></div>
     <a class="logo" href="<?= e(site_url('')) ?>">Magick Muse</a>
     <p class="legal"><a href="<?= e(site_url('settings')) ?>">Accessibility &amp; display</a><span aria-hidden="true">✦</span><a href="<?= e(site_url('privacy-policy')) ?>">Privacy Policy</a></p>
     <small>&copy; <?= date('Y') ?> The Magick Muse. All rights reserved. The Manuscript is for members only: please do not copy or share its pages.</small>
