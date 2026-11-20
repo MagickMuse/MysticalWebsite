@@ -132,7 +132,13 @@ function view_page(array $p): void
     $cover = $photo ? '<div class="pg-cover arch-banner"><img src="' . e($photo) . '" alt="" width="1600" height="640"></div>' : '';
     // Cut-out pictures (transparent PNGs, like the Animal Grimoire's) are shown whole, standing on the page, not cropped into the arch.
     // Tall pictures (a tarot or Lenormand card) are shown whole too, and open full size when clicked: a wide banner would crop them to a strip.
-    if (!$photo && $p['cover']) {
+    // Runes: the site's own gold drawing of the rune (assets/runes/), the same on every rune page, in place of a cover.
+    $runePic = $p['grimoire'] === 'rune' && is_file(MM_ROOT . '/assets/runes/' . $p['slug'] . '.png');
+    if ($runePic) {
+        $cover = '<div class="pg-cover cutout rune-pic"><img src="' . e(url('assets/runes/' . $p['slug'] . '.png')) . '" alt="The '
+            . e($p['title']) . ' rune" width="512" height="512"></div>';
+    }
+    if (!$photo && !$runePic && $p['cover']) {
         // pictures kept with the site (the mineral photos from Wikimedia Commons) are specimen shots: shown whole
         $whole = str_starts_with((string) $p['cover'], 'asset:') || is_cutout($p['cover']) || is_portrait($p['cover']);
         $img = '<img src="' . e(media_url($p['cover'])) . '" alt="' . ($whole ? e($p['title']) : '') . '">';

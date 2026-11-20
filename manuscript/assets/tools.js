@@ -425,7 +425,7 @@
     if (line) lines.push(line);
     return lines;
   }
-  /** The picture: o = {eyebrow, title, state ('Upright', 'Reversed' or ''), words: [...], card: Image | null, reversed, glyph, tone}. */
+  /** The picture: o = {eyebrow, title, state ('Upright', 'Reversed' or ''), words: [...], card: Image | null, reversed, glyphImg, tone}. */
   function shareCanvas(o) {
     var W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H;
     var x = c.getContext('2d');
@@ -461,10 +461,10 @@
       x.fillStyle = hl; x.fillRect(0, 0, W, H);
       var sh = x.createRadialGradient(sx + 140, sy + 260, 20, sx + 140, sy + 260, 480); sh.addColorStop(0, 'rgba(0,0,0,.32)'); sh.addColorStop(1, 'rgba(0,0,0,0)');
       x.fillStyle = sh; x.fillRect(0, 0, W, H); x.restore();
-      if (o.glyph) {
-        x.font = '440px "Segoe UI Historic", "Noto Sans Runic", "Junicode", serif'; x.textBaseline = 'middle';
-        x.fillStyle = 'rgba(0,0,0,.45)'; x.fillText(o.glyph, sx, sy + 6);
-        x.fillStyle = '#e3c27a'; x.fillText(o.glyph, sx, sy); x.textBaseline = 'alphabetic';
+      if (o.glyphImg) {
+        var gs = 400;
+        x.drawImage(tinted(o.glyphImg, 'rgba(0,0,0,.45)', gs), sx - gs / 2, sy - gs / 2 + 6);
+        x.drawImage(tinted(o.glyphImg, '#e3c27a', gs), sx - gs / 2, sy - gs / 2);
       }
     }
     var y = top + artH + 150;
@@ -475,10 +475,19 @@
     return c;
   }
   /** Makes the picture now; returns what the Share button does with it. */
+  /** A copy of a picture in one colour (its shape kept), size × size. */
+  function tinted(img, colour, size) {
+    var c = document.createElement('canvas'); c.width = c.height = size;
+    var x = c.getContext('2d'); x.drawImage(img, 0, 0, size, size);
+    x.globalCompositeOperation = 'source-in'; x.fillStyle = colour; x.fillRect(0, 0, size, size);
+    return c;
+  }
   function prepareShare(o, name) {
     var fonts = document.fonts ? Promise.all(['400 112px Cormorant', 'italic 400 56px Cormorant', '300 40px Jost', '500 34px Jost'].map(function (f) { return document.fonts.load(f); })) : Promise.resolve();
     var logo = loadImage(SITE_ROOT + 'assets/logo.svg').catch(function () { return null; });
-    return Promise.all([fonts, logo]).then(function (r) {
+    var glyph = o.glyphSrc ? loadImage(o.glyphSrc).catch(function () { return null; }) : Promise.resolve(null);
+    return Promise.all([fonts, logo, glyph]).then(function (r) {
+      o.glyphImg = r[2];
       var c = shareCanvas(o), lg = r[1];
       if (lg) { var x = c.getContext('2d'), w = 230, h = w * 879 / 1585; x.globalAlpha = .92; x.drawImage(lg, 1080 - 100 - w, 1920 - 100 - h, w, h); x.globalAlpha = 1; }
       return new Promise(function (ok) { c.toBlob(function (b) { ok(new File([b], name + '.png', { type: 'image/png' })); }, 'image/png'); });
@@ -555,7 +564,7 @@
       setTimeout(function () {
         spread.hidden = true;
         drawn.innerHTML = '<div class="drawn-card' + (rev ? ' reversed' : '') + '"><div class="flip"><span class="face tarot-back"><span class="back-art"></span></span>'
-          + '<span class="face front">' + (c[1] ? '<img src="' + esc(artUrl(c[1])) + '" alt="' + esc(card.title + (rev ? ', reversed' : '')) + '">' : '<span class="front-name">' + esc(card.title) + '</span>') + '</span></div></div>'
+          + '<span class="face front">' + (c[1] ? '<img class="card-art" src="' + esc(artUrl(c[1])) + '" alt="' + esc(card.title + (rev ? ', reversed' : '')) + '">' : '<span class="front-name">' + esc(card.title) + '</span>') + '</span></div></div>'
           + '<div class="reading"><p class="eyebrow">' + (rev ? 'Reversed' : 'Upright') + '</p><h2>' + esc(card.title) + '</h2>'
           + (words.length ? '<p class="small">' + (rev ? 'Reversed, it speaks of' : 'It speaks of') + '</p><div class="rels keywords">' + words.map(chip).join('') + '</div>' : '')
           + '<div class="actions"><a class="btn" href="' + esc(card.url) + '">View More</a><button class="btn ghost" type="button" data-again>Draw Again</button></div></div>';
@@ -579,6 +588,8 @@
   var RUNE_GLYPHS = { fehu: 'ᚠ', uruz: 'ᚢ', thurisaz: 'ᚦ', ansuz: 'ᚨ', raidho: 'ᚱ', kenaz: 'ᚲ', gebo: 'ᚷ', wunjo: 'ᚹ', hagaiaz: 'ᚺ', nauthiz: 'ᚾ',
     isaz: 'ᛁ', jera: 'ᛃ', eiwaz: 'ᛇ', pertho: 'ᛈ', algiz: 'ᛉ', sowilo: 'ᛊ', tiwaz: 'ᛏ', berkanan: 'ᛒ', ehwaz: 'ᛖ', mannaz: 'ᛗ', laguz: 'ᛚ',
     ingwaz: 'ᛜ', othala: 'ᛟ', dagaz: 'ᛞ', wyrd: '' };
+  /** A rune's picture: a gold drawing in assets/runes/, named by the rune's page. */
+  function runeImage(slug) { return url('assets/runes/' + slug + '.png'); }
   function runeWords(i) {
     return D.l[i].filter(function (j) { return D.g[D.p[j][0]] === 'correspondence'; })
       .sort(function (a, b) { return D.p[a][2].localeCompare(D.p[b][2]); }).map(pg);
@@ -601,14 +612,16 @@
       setTimeout(function () {
         field.hidden = true;
         drawn.innerHTML = '<div class="drawn-card drawn-stone"><div class="flip"><span class="face stone st-' + k + '"><span class="stone-face"></span></span>'
-          + '<span class="face front stone st-' + k + '"><span class="stone-face"></span><span class="rune-glyph' + (glyph ? '' : ' blank') + '" aria-hidden="true">' + (glyph || '') + '</span></span></div></div>'
+          + '<span class="face front stone st-' + k + '"><span class="stone-face"></span>' + (glyph
+            ? '<img class="rune-glyph" src="' + esc(runeImage(rune.slug)) + '" alt="" width="512" height="512">'
+            : '<span class="rune-glyph blank" aria-hidden="true"></span>') + '</span></div></div>'
           + '<div class="reading"><p class="eyebrow">Elder Futhark</p><h2>' + esc(rune.title) + '</h2>'
           + (words.length ? '<div class="rels keywords">' + words.map(chip).join('') + '</div>' : '')
           + '<div class="actions"><a class="btn" href="' + esc(rune.url) + '">View More</a><button class="btn ghost" type="button" data-again>Pull Again</button></div></div>';
         turnOver(drawn.querySelector('.drawn-card'), quiet);
         drawn.querySelector('[data-again]').addEventListener('click', function () { runes(tool); window.scrollTo({ top: 0, behavior: quiet ? 'auto' : 'smooth' }); });
         var tone = getComputedStyle(drawn.querySelector('.front.stone')).getPropertyValue('--tone').trim();
-        shareButton(drawn.querySelector('.reading .actions'), prepareShare({ eyebrow: 'My rune', title: rune.title, state: 'Elder Futhark', card: null, glyph: glyph, tone: tone,
+        shareButton(drawn.querySelector('.reading .actions'), prepareShare({ eyebrow: 'My rune', title: rune.title, state: 'Elder Futhark', card: null, glyphSrc: glyph ? runeImage(rune.slug) : null, tone: tone,
           words: titles(words) }, 'my-rune-' + rune.slug), 'I pulled ' + rune.title + ' ✦');
         saveToNotes(drawn.querySelector('.reading .actions'), function () {
           return { title: 'Rune: ' + rune.title + ' · ' + noteDate(), body: 'Pulled on ' + noteDate() + ', ' + moonNow() + '.\n'
