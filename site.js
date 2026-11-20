@@ -160,6 +160,30 @@
     });
   });
 
+  // Home: today's moon and Sun sign, worked out here as the Manuscript's Today page does (its new-moon epoch and phase
+  // boundaries, and the sign dates on its sign pages), leading to the full Today page.
+  var teaser = document.getElementById('today-teaser');
+  if (teaser) {
+    var now = new Date(), SYNODIC = 29.530588853;
+    var age = ((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 12) / 1000 - 947182440) / 86400) % SYNODIC;
+    if (age < 0) age += SYNODIC;
+    var phases = [[1.84566, 'new-moon', 'New Moon'], [5.53699, 'waxing-crescent-moon', 'Waxing Crescent Moon'], [9.22831, 'first-quarter-moon', 'First Quarter Moon'],
+      [12.91963, 'waxing-gibbous-moon', 'Waxing Gibbous Moon'], [16.61096, 'full-moon', 'Full Moon'], [20.30228, 'waning-gibbous-moon', 'Waning Gibbous Moon'],
+      [23.99361, 'third-quarter-moon', 'Third Quarter Moon'], [27.68493, 'waning-crescent-moon', 'Waning Crescent Moon'], [99, 'new-moon', 'New Moon']];
+    var moon = phases.filter(function (ph) { return age < ph[0]; })[0];
+    // [last day of the sign, as month * 100 + day, its page]; Capricorn wraps the new year
+    var signs = [[119, 'capricorn'], [218, 'aquarius'], [320, 'pisces'], [419, 'aries'], [520, 'taurus'], [620, 'gemini'], [722, 'cancer'],
+      [822, 'leo'], [922, 'virgo'], [1022, 'libra'], [1121, 'scorpio'], [1221, 'sagittarius'], [1231, 'capricorn']];
+    var md = (now.getMonth() + 1) * 100 + now.getDate(), sign = signs.filter(function (x) { return md <= x[0]; })[0][1];
+    var signName = sign.charAt(0).toUpperCase() + sign.slice(1), pic = function (slug) { return 'manuscript/assets/signs/' + slug + '.png'; };
+    var date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    teaser.innerHTML = '<p class="teaser-date">' + date + '</p>'
+      + '<p class="teaser-sky"><span><img src="' + pic(moon[1]) + '" alt="" width="40" height="40">' + moon[2] + '</span>'
+      + '<span><img src="' + pic(sign) + '" alt="" width="40" height="40">The Sun in ' + signName + '</span></p>'
+      + '<a class="link" href="manuscript/today/">See Today in the Manuscript</a>';
+    teaser.hidden = false;
+  }
+
   // Blog search: filters the posts as you type (title, summary, topics and keywords)
   var search = document.getElementById('post-search');
   if (search) {

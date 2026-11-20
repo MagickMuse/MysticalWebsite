@@ -611,6 +611,16 @@ main > section.back { border-top: 0; padding-top: 0; }
 /* ---------- 404 ---------- */
 .code { font-family: var(--script); font-size: clamp(5rem, 18vw, 9rem); line-height: 1; color: var(--accent-text); }
 
+/* ---------- home: today's sky, leading to the Manuscript's Today page ---------- */
+.today-teaser { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .8rem 2.4rem; padding: 1.4rem 1.5rem;
+  border-top: 1px solid var(--line); text-align: center; }
+.today-teaser[hidden] { display: none; }
+.today-teaser p { margin: 0; }
+.teaser-date { font-family: var(--display); font-style: italic; font-size: 1.25rem; color: var(--muted); }
+.teaser-sky { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem 1.8rem; font-family: var(--display); font-size: 1.35rem; }
+.teaser-sky span { display: inline-flex; align-items: center; gap: .6rem; }
+.teaser-sky img { width: 34px; height: 34px; }
+
 /* ---------- footer ---------- */
 footer.site { padding-block: 4rem 2.5rem; border-top: var(--leaded); background: var(--texture), var(--deep); }
 .foot { display: grid; gap: 2rem; justify-items: center; text-align: center; }
