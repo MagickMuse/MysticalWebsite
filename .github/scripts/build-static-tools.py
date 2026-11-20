@@ -45,8 +45,9 @@ def main():
                 continue
             s = open(f, encoding='utf-8').read()
             h1 = re.search(r'<h1>(.*?)</h1>', s, re.S)
-            if not h1 or 'props-panel' not in s:
+            if not h1 or re.search(r'class="pg pg-(grimoire|collection)', s):  # grimoires and their lists aren't pages
                 continue
+            guide = 'props-panel' not in s  # a guide page: written text, no properties
             icon = ''
             m = re.search(r'<span class="pg-icon big" aria-hidden="true">([^<]*)</span>', h1.group(1))
             if m:
@@ -74,7 +75,7 @@ def main():
             if fields:
                 safety[len(pages)] = fields
             index[(g, slug)] = len(pages)
-            kinds = sorted(types & KINDS) + (['Tarot'] if 'Upright Correspondences' in props else [])
+            kinds = sorted(types & KINDS) + (['Tarot'] if 'Upright Correspondences' in props else []) + (['Guide'] if guide else [])
             if 'Upright Correspondences' in props:  # a tarot card: its picture, for Draw a Card
                 cv = re.search(r'class="pg-cover[^"]*">.*?<img src="[^"]*/(media|assets)/([^"]+)"', s, re.S)
                 covers[len(pages)] = (('m:' if cv.group(1) == 'media' else 'a:') + cv.group(2)) if cv else ''
@@ -94,7 +95,21 @@ def main():
             tarot[a][2 if prop.startswith('Upright') else 3].append(b)
         if prop == 'Related Timing' and re.match(rf'^({MONTHS})-\d+$', pages[a][1]) and GRIMOIRES[pages[a][0]] == 'timing':
             festivals.setdefault(pages[a][1], []).append(b)
-    out = {'g': GRIMOIRES, 'p': pages, 'l': [sorted(x) for x in links], 'f': festivals, 't': list(tarot.values()), 'w': safety}
+    # Each grimoire's name and its guide pages, in the order of its "Guide Pages" list.
+    gtitles, guides = {}, {}
+    for g in GRIMOIRES:
+        f = os.path.join(ROOT, g, 'index.html')
+        if not os.path.isfile(f):
+            continue
+        gs = open(f, encoding='utf-8').read()
+        h = re.search(r'<h1>(.*?)</h1>', gs, re.S)
+        if h:
+            gtitles[g] = text(re.sub(r'<span class="pg-icon[^"]*"[^>]*>[^<]*</span>', '', h.group(1)))
+        box = re.search(r'<summary>Guide Pages</summary>(.*?)</details>', gs, re.S)
+        if box:
+            ids = [index.get((lg, ls)) for lg, ls in LINK.findall(box.group(1))]
+            guides[g] = [i for n, i in enumerate(ids) if i is not None and i not in ids[:n]]
+    out = {'g': GRIMOIRES, 'p': pages, 'l': [sorted(x) for x in links], 'f': festivals, 't': list(tarot.values()), 'w': safety, 'gp': guides, 'gt': gtitles}
     os.makedirs(os.path.join(ROOT, 'tools'), exist_ok=True)
     with open(os.path.join(ROOT, 'tools', 'data.json'), 'w', encoding='utf-8') as fh:
         json.dump(out, fh, ensure_ascii=False, separators=(',', ':'))
@@ -110,6 +125,8 @@ def main():
         'pull-a-rune': ('Pull a Rune', 'rune'),
         'dream-decoder': ('Dream Decoder', 'dream'),
         'planetary-hours': ('Planetary Hours', 'hours'),
+        'guide-pages': ('Guide Pages', 'guides'),
+        'enchanted-tools': ('Enchanted Tools', 'tools'),
         'notes': ('Your notes', 'notes'),
     }
     for folder, (title, tool) in shells.items():

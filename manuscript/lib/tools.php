@@ -21,6 +21,8 @@ const TOOL_PAGES = [
     'pull-a-rune' => ['Pull a Rune', 'rune'],
     'dream-decoder' => ['Dream Decoder', 'dream'],
     'planetary-hours' => ['Planetary Hours', 'hours'],
+    'guide-pages' => ['Guide Pages', 'guides'],
+    'enchanted-tools' => ['Enchanted Tools', 'tools'],
 ];
 
 /** A tool's page: members only; tools.js fills in the article. */
@@ -47,7 +49,7 @@ function serve_tools_data(): void
 {
     if (!has_access()) { http_response_code(403); exit; }
     // The version changes when the data's shape does, so an older copy is never served.
-    $cache = config('data_dir') . '/tools-data-v5.json';
+    $cache = config('data_dir') . '/tools-data-v6.json';
     $content = config('data_dir') . '/content.sqlite';
     if (!is_file($cache) || filemtime($cache) < (int) @filemtime($content)) {
         file_put_contents($cache . '.tmp', json_encode(tools_data(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
@@ -77,6 +79,7 @@ function tools_data(): array
         $tags = json_decode((string) $p['tags_json'], true) ?: [];
         $types = array_map('strval', (array) ($tags['Type'] ?? $tags['Category'] ?? []));
         $kinds = array_values(array_intersect($types, TOOL_KINDS));
+        if ($p['kind'] === 'guide') $kinds[] = 'Guide';
         $pageRow[$p['id']] = $p;
         // Safety fields, exactly as written, for the safety notes on rituals and recipes (tools.js decides what to show).
         if (in_array($p['grimoire'], SAFETY_GRIMOIRES, true)) {
@@ -107,6 +110,12 @@ function tools_data(): array
         }
         if ($r['prop'] === 'Related Timing' && $grimoires[$pages[$a][0]] === 'timing' && preg_match('/^[a-z]+-\d{1,2}$/', $pages[$a][1])) $festivals[$pages[$a][1]][] = $b;
     }
+    // Each grimoire's name and its guide pages (for the Guide Pages and Enchanted Tools books on the shelf).
+    $gtitles = db()->query("SELECT grimoire, title FROM pages WHERE kind = 'grimoire'")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $guides = [];
+    foreach (db()->query("SELECT id, grimoire FROM pages WHERE kind = 'guide' ORDER BY grimoire, sort, title") as $g) {
+        if (isset($pos[$g['id']])) $guides[$g['grimoire']][] = $pos[$g['id']];
+    }
     $cards = [];
     $ids = array_flip($pos);
     foreach ($tarot as $i => $t) {
@@ -115,7 +124,7 @@ function tools_data(): array
         $pages[$i][4] = ltrim($pages[$i][4] . '|Tarot', '|');
         $cards[] = [$i, $cover, $t[1] ?? [], $t[2] ?? []];
     }
-    return ['g' => $grimoires, 'p' => $pages, 'l' => array_map(fn($l) => array_keys($l), $links), 'f' => (object) $festivals, 't' => $cards, 'w' => (object) $safety];
+    return ['g' => $grimoires, 'p' => $pages, 'l' => array_map(fn($l) => array_keys($l), $links), 'f' => (object) $festivals, 't' => $cards, 'w' => (object) $safety, 'gp' => (object) $guides, 'gt' => (object) $gtitles];
 }
 
 // ------------------------------------------------------------------ notes and workings, kept for each member

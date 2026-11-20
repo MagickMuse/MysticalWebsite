@@ -60,10 +60,10 @@ function real_book(array $g, int $n, int $i): string
 const SHELF_STACKS = [
     'top' => ['candles' => true, 'books' => []],
     'bottom' => ['candles' => false, 'books' => [
-        ['Calendar', 'route:calendar', 't1'],
-        ['Journal Prompts', 'begin-here/journal-prompts', 't3'],
-        ['The Library', 'route:library', 't4'],
-        ['Tarot Spreads', 'card/tarot-spreads', 't2'],
+        ['Guide Pages', 'route:guide-pages', 't1'],
+        ['Enchanted Tools', 'route:enchanted-tools', 't3'],
+        ['Calendar', 'route:calendar', 't4'],
+        ['The Library', 'route:library', 't2'],
     ]],
 ];
 

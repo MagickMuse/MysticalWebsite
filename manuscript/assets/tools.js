@@ -94,6 +94,7 @@
   function isTarotCard(slug, kinds) { return kinds.indexOf('Tarot') !== -1 && !/^suit-of-/.test(slug); }
   function partOf(g, kinds, slug) {
     var has = function (k) { return kinds.indexOf(k) !== -1; };
+    if (has('Guide')) return ''; // guide pages are reading, not ingredients
     if (g === 'astrology') return has('Planets') || has('Moon Phases') ? 'when' : '';
     if (g === 'timing') return has('Days of the Week') || has('Holidays') || has('Seasons') || has('Time of Day') ? 'when' : '';
     if (g === 'symbol') return has('Color') ? 'colours' : '';
@@ -798,37 +799,86 @@
     'how', 'into', 'just', 'like', 'made', 'many', 'more', 'most', 'much', 'never', 'new', 'nothing', 'now', 'off', 'old', 'once', 'one', 'only', 'other', 'out', 'over',
     'own', 'really', 'same', 'saw', 'see', 'seeing', 'some', 'something', 'still', 'such', 'than', 'that', 'the', 'then', 'there', 'they', 'thing', 'things', 'this',
     'through', 'too', 'under', 'very', 'was', 'were', 'what', 'when', 'where', 'which', 'while', 'who', 'why', 'with', 'would', 'you', 'your'];
-  var dreamIndex = null;
+  // Words are compared by their root, so tenses, plurals and word forms meet: falling, falls, fell, fall → "fall";
+  // flying, flies, flew → "fly"; houses → "hous"; baking, baked, bake → "bak". Irregular forms are listed.
+  var IRREGULAR = { fell: 'fall', fallen: 'fall', flew: 'fly', flown: 'fly', ran: 'run', swam: 'swim', swum: 'swim', drove: 'drive', driven: 'drive',
+    ate: 'eat', eaten: 'eat', drank: 'drink', drunk: 'drink', fought: 'fight', bit: 'bite', bitten: 'bite', broke: 'break', broken: 'break', caught: 'catch',
+    chose: 'choose', chosen: 'choose', came: 'come', drew: 'draw', drawn: 'draw', fled: 'flee', froze: 'freeze', frozen: 'freeze', gave: 'give', given: 'give',
+    grew: 'grow', grown: 'grow', hid: 'hide', hidden: 'hide', held: 'hold', hung: 'hang', kept: 'keep', knelt: 'kneel', knew: 'know', known: 'know', lost: 'lose',
+    met: 'meet', paid: 'pay', rode: 'ride', ridden: 'ride', rang: 'ring', rung: 'ring', rose: 'rise', risen: 'rise', sang: 'sing', sung: 'sing', sank: 'sink',
+    sunk: 'sink', sat: 'sit', shook: 'shake', shaken: 'shake', shot: 'shoot', slept: 'sleep', slid: 'slide', spoke: 'speak', spoken: 'speak', spun: 'spin',
+    stole: 'steal', stolen: 'steal', stung: 'sting', struck: 'strike', swore: 'swear', sworn: 'swear', swept: 'sweep', took: 'take', taken: 'take', taught: 'teach',
+    tore: 'tear', torn: 'tear', threw: 'throw', thrown: 'throw', woke: 'wake', woken: 'wake', wore: 'wear', worn: 'wear', wept: 'weep', won: 'win', wrote: 'write',
+    written: 'write', bought: 'buy', brought: 'bring', built: 'build', burnt: 'burn', dug: 'dig', dreamt: 'dream', felt: 'feel', found: 'find', heard: 'hear',
+    made: 'make', sold: 'sell', sent: 'send', sought: 'seek', stood: 'stand', told: 'tell', thought: 'think', died: 'die', dying: 'die', lying: 'lie', tying: 'tie',
+    teeth: 'tooth', mice: 'mouse', geese: 'goose', children: 'child', men: 'man', women: 'woman', feet: 'foot', knives: 'knife', wives: 'wife',
+    wolves: 'wolf', leaves: 'leaf', loaves: 'loaf', halves: 'half', lives: 'life', thieves: 'thief', shelves: 'shelf', calves: 'calf', elves: 'elf', people: 'person' };
+  function root(w) {
+    w = IRREGULAR[w] || w;
+    var verb = false;
+    if (w.length > 4 && /ies$/.test(w)) w = w.slice(0, -3) + 'y';
+    else if (w.length > 5 && /ing$/.test(w)) { w = w.slice(0, -3); verb = true; }
+    else if (w.length > 4 && /ied$/.test(w)) w = w.slice(0, -3) + 'y';
+    else if (w.length > 4 && /ed$/.test(w)) { w = w.slice(0, -2); verb = true; }
+    else if (w.length > 4 && /(s|x|z|ch|sh)es$/.test(w)) w = w.slice(0, -2);
+    else if (w.length > 3 && /s$/.test(w) && !/(ss|us|is)$/.test(w)) w = w.slice(0, -1);
+    if (verb && /([bdfgklmnprtvz])\1$/.test(w) && !/(ll|ss|zz|ff)$/.test(w)) w = w.slice(0, -1); // running → runn → run
+    if (w.length > 3 && /e$/.test(w)) w = w.slice(0, -1); // bake → bak, to meet baking → bak
+    return w;
+  }
+  var dreamIndex = null, dreamSingles = null, dreamExact = null;
+  /** Did the dreamer use a verb form? (-ing, -ed, or an irregular past like flew, fell, ran) */
+  function verbal(w) { return /(ing|ed)$/.test(w) || (w in IRREGULAR && !/^(teeth|mice|geese|children|men|women|feet|people)$/.test(w) && !/(ves)$/.test(w)); }
   function buildDreamIndex() {
     if (dreamIndex) return dreamIndex;
-    dreamIndex = {};
+    dreamIndex = {}; dreamSingles = []; dreamExact = {};
     D.p.forEach(function (p, i) {
       if (D.g[p[0]] !== 'dream') return;
       var m = /^Dreaming of (?:an? |the )?(.+)$/i.exec(p[2]); if (!m) return;
-      var k = m[1].toLowerCase().replace(/[^a-z' -]/g, '').trim();
-      if (!k || DREAM_SKIP.indexOf(k) !== -1 || k.length < 3) return;
-      var forms = [k, k + 's', k + 'es'];
-      if (/y$/.test(k)) forms.push(k.slice(0, -1) + 'ies');
-      if (/ies$/.test(k)) forms.push(k.slice(0, -3) + 'y');
-      if (/es$/.test(k)) forms.push(k.slice(0, -2));
-      if (/s$/.test(k) && !/ss$/.test(k)) forms.push(k.slice(0, -1));
-      forms.forEach(function (f) { if (f.length >= 3 && !(f in dreamIndex)) dreamIndex[f] = i; });
+      // "Bar/Bartending" and "Belching and Burping" are each two symbols.
+      m[1].split(/\s*\/\s*|\s+and\s+|\s*&\s*/i).forEach(function (part) {
+        var words = part.toLowerCase().replace(/[^a-z' -]/g, ' ').split(/[\s-]+/).filter(Boolean).map(function (w) { return w.replace(/'s$/, ''); });
+        if (!words.length || words.length > 3) return;
+        if (words.length === 1 && (DREAM_SKIP.indexOf(words[0]) !== -1 || words[0].length < 3)) return;
+        var key = words.map(root).join(' '), exact = words.join(' ');
+        if (!(exact in dreamExact)) dreamExact[exact] = i;
+        if (!(key in dreamIndex)) { dreamIndex[key] = []; if (words.length === 1 && key.length >= 5) dreamSingles.push(key); }
+        dreamIndex[key].push({ i: i, ing: /ing$/.test(words[words.length - 1]) });
+      });
     });
     return dreamIndex;
   }
-  /** The symbols in a dream: [{start, end, i}] in order, longest phrases first (three words, then two, then one). */
+  /** Within one letter (a typo): one added, missing or wrong letter, or two letters swapped. */
+  function oneOff(a, b) {
+    if (a === b || Math.abs(a.length - b.length) > 1) return a === b;
+    var i = 0; while (i < a.length && i < b.length && a[i] === b[i]) i++;
+    if (a.length === b.length) return a.slice(i + 1) === b.slice(i + 1) || (a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2));
+    return a.length > b.length ? a.slice(i + 1) === b.slice(i) : a.slice(i) === b.slice(i + 1);
+  }
+  /** The symbols in a dream: [{start, end, i, first, near}] in order; longest phrases first (three words, then two, then one), then typos. */
   function findSymbols(text) {
     var idx = buildDreamIndex(), words = [], re = /[A-Za-z']+/g, m, out = [], used = {};
-    while ((m = re.exec(text))) words.push({ w: m[0].toLowerCase().replace(/'s$/, ''), s: m.index, e: m.index + m[0].length });
+    while ((m = re.exec(text))) { var w = m[0].toLowerCase().replace(/'s$/, ''); words.push({ w: w, r: root(w), s: m.index, e: m.index + m[0].length }); }
     for (var k = 0; k < words.length; k++) {
-      for (var len = 3; len >= 1; len--) {
+      var hit = null;
+      for (var len = 3; len >= 1 && !hit; len--) {
         if (k + len > words.length) continue;
-        var phrase = words.slice(k, k + len).map(function (x) { return x.w; }).join(' ');
-        if (phrase in idx) {
-          out.push({ start: words[k].s, end: words[k + len - 1].e, i: idx[phrase], first: !used[idx[phrase]] });
-          used[idx[phrase]] = true; k += len - 1; break;
+        if (len === 1 && (DREAM_SKIP.indexOf(words[k].w) !== -1 || words[k].w.length < 3)) continue;
+        var part = words.slice(k, k + len), exact = part.map(function (x) { return x.w; }).join(' '), phrase = part.map(function (x) { return x.r; }).join(' ');
+        var pick = null;
+        if (exact in dreamExact) pick = dreamExact[exact]; // the very word ("flying" → Flying)
+        else if (phrase in idx) { // the same root: a verb form prefers the -ing symbol (flew → Flying), anything else the rest (fly → Flies)
+          var c = idx[phrase], v = verbal(part[len - 1].w), best = c.filter(function (x) { return x.ing === v; })[0] || c[0];
+          pick = best.i;
         }
+        if (pick != null) { hit = { start: part[0].s, end: part[len - 1].e, i: pick }; k += len - 1; }
       }
+      // A typo in a longer word: the one symbol within one letter of it (none if two are equally close).
+      if (!hit && words[k].w.length >= 6 && DREAM_SKIP.indexOf(words[k].w) === -1) {
+        var near = dreamSingles.filter(function (key) { return oneOff(words[k].r, key); });
+        if (near.length === 1) hit = { start: words[k].s, end: words[k].e, i: idx[near[0]][0].i, near: true };
+      }
+      if (hit) { hit.first = !used[hit.i]; used[hit.i] = true; out.push(hit); }
     }
     return out;
   }
@@ -858,7 +908,7 @@
       e.preventDefault();
       var text = box.value.trim(); if (!text) return;
       var found = findSymbols(text), marked = '', last = 0;
-      found.forEach(function (f) { marked += esc(text.slice(last, f.start)) + '<mark>' + esc(text.slice(f.start, f.end)) + '</mark>'; last = f.end; });
+      found.forEach(function (f) { marked += esc(text.slice(last, f.start)) + '<mark' + (f.near ? ' title="Read as ' + esc(D.p[f.i][2].replace(/^Dreaming of /i, '')) + '"' : '') + '>' + esc(text.slice(f.start, f.end)) + '</mark>'; last = f.end; });
       marked += esc(text.slice(last));
       var symbols = found.filter(function (f) { return f.first; }).map(function (f) { return pg(f.i); });
       out.innerHTML = '<section class="tool-section"><h2>Your <em>dream</em></h2><p class="dream-marked">' + marked.replace(/\n/g, '<br>') + '</p></section>'
@@ -1025,6 +1075,39 @@
     hero.insertAdjacentHTML('beforeend', '<div class="continue-reading"><p class="eyebrow">Continue reading</p><div class="rels">' + list.slice(0, 5).map(function (x) {
       return '<a class="rel" href="' + esc(x.u) + '">' + (x.i ? '<img class="rel-icon" src="' + esc(x.i) + '" alt="" width="24" height="24" loading="lazy">' : x.e ? '<span class="rel-icon" aria-hidden="true">' + esc(x.e) + '</span>' : '') + '<span>' + esc(x.t) + '</span></a>';
     }).join('') + '</div></div>');
+  }
+
+  // ------------------------------------------------------------------ the shelf's Guide Pages and Enchanted Tools books
+  // Every guide page and every tool on one page each, grouped by grimoire (they're in each grimoire's intro too).
+  function grimoireOrder(keys) {
+    return keys.sort(function (a, b) { return a === 'begin-here' ? -1 : b === 'begin-here' ? 1 : (D.gt[a] || a).localeCompare(D.gt[b] || b); });
+  }
+  function guideIndex(tool) {
+    var by = {};
+    Object.keys(D.gp || {}).forEach(function (g) { if (D.gp[g].length) by[g] = D.gp[g]; });
+    D.p.forEach(function (p, i) { // a grimoire without a Guide Pages list (Begin Here): its guide pages as they are
+      var g = D.g[p[0]];
+      if (!(g in (D.gp || {})) && p[4] && p[4].split('|').indexOf('Guide') !== -1) (by[g] = by[g] || []).push(i);
+    });
+    var total = 0;
+    var html = grimoireOrder(Object.keys(by)).map(function (g) {
+      total += by[g].length;
+      return '<section class="index-group"><h2><a href="' + esc(url(g + '/')) + '">' + esc(D.gt[g] || g) + '</a> <small>' + by[g].length + '</small></h2><ul class="index-list">'
+        + by[g].map(function (i) { var p = pg(i); return '<li><a href="' + esc(p.url) + '">' + esc(p.title) + '</a></li>'; }).join('') + '</ul></section>';
+    }).join('');
+    tool.className = 'pg pg-tool pg-index';
+    render(tool, '<header class="pg-head tool-head"><nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' + esc(ROOT) + '">Manuscript</a></li></ol></nav><h1>Guide <em>pages</em></h1>'
+      + '<p class="lede">All ' + total + ' guide pages, by grimoire. Each is also in its grimoire’s introduction.</p></header><div class="index-groups">' + html + '</div>', 'Guide Pages');
+  }
+  function toolIndex(tool) {
+    var html = grimoireOrder(Object.keys(GRIMOIRE_TOOLS)).map(function (g) {
+      return '<section class="index-group"><h2><a href="' + esc(url(g + '/')) + '">' + esc(D.gt[g] || g) + '</a></h2><ul class="index-list">'
+        + GRIMOIRE_TOOLS[g].map(function (t) { return '<li><a href="' + esc(url(t[0])) + '">' + esc(t[1]) + '</a></li>'; }).join('') + '</ul></section>';
+    }).join('');
+    tool.className = 'pg pg-tool pg-index';
+    render(tool, '<header class="pg-head tool-head"><nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' + esc(ROOT) + '">Manuscript</a></li></ol></nav><h1>Enchanted <em>tools</em></h1>'
+      + '<p class="lede">Every tool in the Manuscript, by grimoire. Each is also in its grimoire’s introduction.</p></header><div class="index-groups">' + html
+      + '<section class="index-group"><h2>Everywhere</h2><ul class="index-list"><li><a href="' + esc(url('notes/')) + '">Your notes</a></li><li><a href="' + esc(url('')) + '">Surprise me (on the Manuscript home)</a></li></ul></section></div>', 'Enchanted Tools');
   }
 
   // ------------------------------------------------------------------ the next sabbat
@@ -1282,6 +1365,8 @@
     else if (kind === 'rune') runes(tool);
     else if (kind === 'dream') dreamDecoder(tool);
     else if (kind === 'hours') planetaryHours(tool);
+    else if (kind === 'guides') guideIndex(tool);
+    else if (kind === 'tools') toolIndex(tool);
     else if (kind === 'wheel') { wheel(tool); window.addEventListener('popstate', function () { wheel(tool); }); }
   }).catch(function () { tool.innerHTML = '<p class="lede">The tools couldn’t load. Refresh the page to try again.</p>'; });
 })();

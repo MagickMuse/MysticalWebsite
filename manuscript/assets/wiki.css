@@ -1471,3 +1471,13 @@ table.hours td.planet span { color: var(--gold); margin-right: .2rem; }
 .continue-reading .eyebrow { margin: 0; }
 .continue-reading .rels { justify-content: center; }
 .save-note-btn + .link { align-self: center; }
+
+/* The shelf's Guide Pages and Enchanted Tools: everything on one page, by grimoire */
+.index-groups { columns: 3 260px; column-gap: 2.6rem; margin-top: 1rem; }
+.index-group { break-inside: avoid; margin: 0 0 2rem; }
+.index-group h2 { font-size: 1.5rem; padding-bottom: .4rem; margin-bottom: .5rem; border-bottom: 1px solid var(--line); }
+.index-group h2 a { color: var(--ink); text-decoration: none; }
+.index-group h2 a:hover { color: var(--accent-text); }
+.index-group h2 small { font-family: var(--body); font-size: .75rem; color: var(--muted); }
+.index-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
+.index-list li a { display: inline-block; padding: .2rem 0; line-height: 1.4; }
