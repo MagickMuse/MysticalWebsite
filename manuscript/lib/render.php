@@ -301,9 +301,14 @@ function layout(string $title, string $body, array $opt = []): void
     header('Content-Type: text/html; charset=utf-8');
     // The checkout page alone may load Stripe's payment form (Stripe's published CSP list for Stripe.js and embedded Checkout).
     $stripe = !empty($opt['stripe']);
+    // Visitors' pages carry Google Analytics (only once they accept cookies, as on the website); members' pages don't.
+    $ga = !has_access();
     header("Content-Security-Policy: default-src 'self'; script-src 'self'" . ($stripe ? ' https://js.stripe.com https://*.js.stripe.com' : '')
+        . ($ga ? ' https://www.googletagmanager.com' : '')
         . "; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.pexels.com https://images.unsplash.com" . ($stripe ? ' https://*.stripe.com' : '')
+        . ($ga ? ' https://www.googletagmanager.com https://*.google-analytics.com' : '')
         . "; connect-src 'self'" . ($stripe ? ' https://api.stripe.com https://checkout.stripe.com https://merchant-ui-api.stripe.com' : '')
+        . ($ga ? ' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com' : '')
         . ($stripe ? '; frame-src https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://checkout.stripe.com' : '')
         . "; form-action 'self'; frame-ancestors " . (isset($_GET['peek']) ? "'self'" : "'none'") . "; base-uri 'self'; object-src 'none'");
     header('X-Content-Type-Options: nosniff');
@@ -337,6 +342,10 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="stylesheet" href="<?= e(asset_url(site_url('styles.css'), 'styles.css')) ?>">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#3d000c" media="(prefers-color-scheme: dark)">
+<?php if ($ga): ?>
+  <script src="<?= e(asset_url(site_url('ga.js'), 'ga.js')) ?>"></script>
+  <script src="<?= e(asset_url(site_url('cookie-consent.js'), 'cookie-consent.js')) ?>" defer></script>
+<?php endif ?>
   <script src="<?= e(asset_url(url('assets/wiki.js'), 'manuscript/assets/wiki.js')) ?>" data-tools="<?= e(asset_url(url('assets/tools.js'), 'manuscript/assets/tools.js')) ?>" defer></script>
 <?php if ($stripe): ?>
   <script src="https://js.stripe.com/dahlia/stripe.js" defer></script>

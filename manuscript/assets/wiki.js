@@ -671,7 +671,16 @@
         text.textContent = text.getAttribute(name ? 'data-named' : 'data-general');
       }
       if (!pop.open) pop.showModal();
+      // Analytics (only once the visitor has accepted cookies): which pages make people want in
+      track('join_popup_shown', name);
     };
+    var shownFor = '';
+    function track(event, name) {
+      if (event === 'join_popup_shown') shownFor = name || '(general)';
+      if (typeof window.gtag === 'function') window.gtag('event', event, { page_name: name || shownFor || '(general)', page_path: location.pathname });
+    }
+    var inside = pop.querySelector('.actions a.btn');
+    if (inside) inside.addEventListener('click', function () { track('join_popup_click', shownFor); });
     document.addEventListener('click', function (e) {
       var a = e.target.closest && e.target.closest('a[href]');
       if (!a || !locked(a)) return;
