@@ -49,11 +49,10 @@
   <link rel="manifest" href="site.webmanifest">
   <link rel="alternate" type="application/rss+xml" title="Magick Mastery" href="feed.xml">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <link rel="preload" href="fonts/jost-300.woff2" as="font" type="font/woff2" crossorigin>
+  <meta name="theme-color" content="#3d000c" media="(prefers-color-scheme: dark)">
+  <link rel="preload" href="fonts/alegreya-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/cormorant-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="fonts/cormorant-400-italic.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="fonts/jost-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/alegreya-500.woff2" as="font" type="font/woff2" crossorigin>
   <script src="prefs.js"></script>
   <link rel="stylesheet" href="styles.css">
   <script>
@@ -87,32 +86,24 @@
   </div>
 </header>
 <main id="main">
-  <section class="wrap">
-    <div class="hero">
-      <div class="hero-text">
-        <p class="eyebrow">A Living Digital Grimoire</p>
-        <h1>The Magick <em>Manuscript</em> <i class="spark twinkle" aria-hidden="true"></i></h1>
-        <p class="lede">Every correspondence, cross-linked in one online grimoire. 15 grimoires, 20,000 pages, every future update included.</p>
-        <div class="actions">
-          <a class="btn" href="manuscript/join/">Get the Manuscript</a>
-          <a class="link" href="#peek">Peek Inside</a>
-        </div>
-      </div>
-      <div class="hero-art">
-        <div class="frame arch"><img src="assets/photos/px-7979100-840x1050.webp" srcset="assets/photos/px-7979100-480x600.webp 480w, assets/photos/px-7979100-840x1050.webp 840w, assets/photos/px-7979100-1200x1500.webp 1200w" sizes="(max-width: 860px) 420px, 600px" alt="A leather-bound book propped up, with a wand lying beside it" width="840" height="1050" fetchpriority="high"></div>
-        <div class="stars-float" aria-hidden="true">
-          <i class="spark twinkle s1"></i>
-          <i class="spark twinkle d2 s2"></i>
-          <i class="spark twinkle d3 s3"></i>
-        </div>
+  <section class="wrap opening" aria-labelledby="ms-title">
+    <div class="opening-art">
+      <div class="frame arch gilt"><img src="assets/photos/px-7979100-840x1050.webp" srcset="assets/photos/px-7979100-480x600.webp 480w, assets/photos/px-7979100-840x1050.webp 840w, assets/photos/px-7979100-1200x1500.webp 1200w" sizes="(max-width: 860px) 320px, 480px" alt="A leather-bound book propped up, with a wand lying beside it" width="840" height="1050" fetchpriority="high"></div>
+    </div>
+    <div class="gutter" aria-hidden="true"></div>
+    <div class="opening-page">
+      <h1 id="ms-title">The Magick Manuscript</h1>
+      <p class="lede">Every correspondence, cross-linked in one online grimoire. 15 grimoires, 20,000 pages, every future update included.</p>
+      <div class="actions">
+        <a class="btn" href="manuscript/join/">Get the Manuscript</a>
+        <a class="link" href="#peek">Read a Page First</a>
       </div>
     </div>
   </section>
 
   <section class="alt" aria-labelledby="ms-what">
     <div class="wrap intro">
-      <div class="star-rule" aria-hidden="true"><i class="spark twinkle big"></i></div>
-      <h2 id="ms-what">A living database. <em>Built to grow with you.</em></h2>
+      <h2 id="ms-what">A Living Database, Built to Grow with You</h2>
       <p>The Magick Manuscript is an online grimoire built for serious practitioners. Every grimoire is cross-linked so that a crystal connects to its planetary ruler, which connects to its deity correspondences, which connects to ritual timing. Everything talks to everything else.</p>
       <div class="actions">
         <a class="btn" href="manuscript/join/">Get the Manuscript</a>
@@ -122,11 +113,11 @@
 
   <section class="wrap" id="peek" aria-labelledby="ms-peek">
     <div class="intro">
-      <p class="eyebrow labelled">Peek Inside</p>
-      <h2 id="ms-peek">A real look <em>at the Manuscript</em></h2>
-      <p>No guesswork. Open a real page of the Manuscript, Protection from the Correspondence Grimoire, exactly as members see it, with every connection in place.</p>
+      
+      <h2 id="ms-peek">A Real Look at the Manuscript</h2>
+      <p>Open a real page of the Manuscript, Protection from the Correspondence Grimoire, exactly as members see it, with every connection in place.</p>
       <div class="actions">
-        <a class="btn" href="manuscript/sneak-peek/">Read a full page free</a>
+        <a class="btn" href="manuscript/sneak-peek/">Read a Page Free</a>
       </div>
     </div>
   </section>
@@ -134,8 +125,8 @@
   <section class="alt" id="grimoires" aria-labelledby="ms-library">
     <div class="wrap">
       <div class="intro">
-        <p class="eyebrow labelled">Inside the Manuscript</p>
-        <h2 id="ms-library">15 Grimoires. <em>One searchable system.</em></h2>
+        
+        <h2 id="ms-library">Fifteen Grimoires, Searched as One</h2>
       </div>
       <ul class="library">
         <li class="grimoire"><div class="frame arch"><img src="assets/photos/px-11236317-400x400.webp" alt="" width="400" height="400" loading="lazy"><svg class="glyph" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" focusable="false"><path d="M238,80A62,62,0,0,0,132.18,36.14L62.1,105.41a13.94,13.94,0,0,0-4.1,9.9v74.21L27.76,219.76a6,6,0,1,0,8.48,8.48L66.48,198h74.21a13.94,13.94,0,0,0,9.9-4.1l0,0,68.83-69.63h0l.39-.4A61.6,61.6,0,0,0,238,80ZM140.64,44.64a50,50,0,0,1,72,69.36H150.48l37.76-37.76a6,6,0,0,0-8.48-8.48l-48,48h0L118,129.52V67ZM70,115.31a2,2,0,0,1,.56-1.39l35.44-35v62.63l-36,36Zm72.09,70.11a2,2,0,0,1-1.4.58H78.48l37.76-37.75h0L138.48,126h62.35Z"/></svg></div><small>261 pages</small><h3>Animals</h3><p>animal symbolism, spirit guides &amp; omens</p></li>
@@ -160,30 +151,21 @@
 
   <section class="wrap" aria-labelledby="ms-for">
     <div class="intro">
-      <h2 id="ms-for" class="eyebrow labelled">The Manuscript is for you if:</h2>
+      <h2 id="ms-for">The Manuscript Is for You If</h2>
     </div>
-    <div class="cards">
-      <div class="card">
-        <i class="spark" aria-hidden="true"></i>
-        <p>You are tired of scattered notes, lost bookmarks, and contradictory sources. You want one reliable system for everything.</p>
-      </div>
-      <div class="card">
-        <i class="spark" aria-hidden="true"></i>
-        <p>You want to go deeper. Not surface-level content, but the kind of research that connects astrology to plants to deities to ritual timing.</p>
-      </div>
-      <div class="card">
-        <i class="spark" aria-hidden="true"></i>
-        <p>You practice seriously: whether you are a seasoned witch or a thoughtful beginner who refuses to settle for a Google search.</p>
-      </div>
-    </div>
+    <ul class="stars for-you">
+      <li>You are tired of scattered notes, lost bookmarks, and contradictory sources. You want one reliable system for everything.</li>
+      <li>You want to go deeper: research that connects astrology to plants to deities to ritual timing.</li>
+      <li>You practice seriously, whether you are a seasoned witch or a thoughtful beginner who refuses to settle for a Google search.</li>
+    </ul>
   </section>
 
   <section class="alt" aria-labelledby="ms-praise">
     <div class="wrap">
       <div class="intro">
-        <h2 id="ms-praise">What practitioners <span class="script">say</span></h2>
+        <h2 id="ms-praise">From the Coven</h2>
       </div>
-      <div class="cards">
+      <div class="praise">
         <blockquote class="quote">
           <p>"Oh boy, I just opened the notion template a couple of hours ago!! WOW!! It must have taken forever to build, it's way more detailed than I was expecting. Very quickly fell down the rabbit hole. I even found info on things I didn't know I wanted to know. Definitely my #1 source for research and info from now on. Well worth the money. Thank you!!!"</p>
           <cite>GamingGranLiza</cite>
@@ -197,24 +179,15 @@
           <cite>Blue Moth</cite>
         </blockquote>
       </div>
+      <p class="tally">15 grimoires, 20,000+ pages, 170+ guide pages, 8+ built-in tools, 86+ journal prompts, and 950+ members on Discord.</p>
     </div>
   </section>
 
-  <section class="alt" aria-label="The Manuscript in numbers">
-    <ul class="wrap stats">
-      <li><strong>15</strong><span>Grimoires</span></li>
-      <li><strong>20,000+</strong><span>Pages</span></li>
-      <li><strong>170+</strong><span>Guide Pages</span></li>
-      <li><strong>8+</strong><span>Built-in Widgets</span></li>
-      <li><strong>86+</strong><span>Journal Prompts</span></li>
-      <li><strong>950+</strong><span>Discord Members</span></li>
-    </ul>
-  </section>
 
   <section class="wrap" aria-labelledby="ms-faq">
     <div class="intro">
-      <p class="eyebrow labelled">Before You Decide</p>
-      <h2 id="ms-faq">Questions, <em>answered</em></h2>
+      
+      <h2 id="ms-faq">Questions, Answered</h2>
     </div>
     <div class="faq">
       <details>
@@ -251,20 +224,20 @@
   <section class="alt" id="build-your-own" aria-labelledby="ms-diy">
     <div class="wrap">
       <div class="intro">
-        <p class="eyebrow labelled">Not ready for the whole grimoire?</p>
-        <h2 id="ms-diy">Want to build it <em>yourself?</em></h2>
-        <p>Start with the Manuscript's structure as a blank Notion template and fill it in with your own research.</p>
+        
+        <h2 id="ms-diy">Want to Build It Yourself?</h2>
+        <p>Not ready for the whole grimoire? Start with the Manuscript's structure as a blank Notion template and fill it in with your own research.</p>
       </div>
       <div class="cards pairs">
         <div class="card">
           <h3>The Blank Grimoire <small>$10+, pay what you can</small></h3>
           <p>Blank versions of 14 of the Manuscript's grimoires, ready for your own entries.</p>
-          <a class="btn" href="market/blank-grimoire/">Get the blank grimoire</a>
+          <a class="btn" href="market/blank-grimoire/">Get the Blank Grimoire</a>
         </div>
         <div class="card">
           <h3>Blank Crystal Grimoire <small>free</small></h3>
           <p>Try the structure before you commit: a blank Crystal grimoire to start filling in today.</p>
-          <a class="btn ghost" href="market/crystal-grimoire/">Get it free</a>
+          <a class="btn ghost" href="market/crystal-grimoire/">Get It Free</a>
         </div>
       </div>
       <blockquote class="quote diy-quote">
@@ -276,15 +249,15 @@
 
   <section class="cta" aria-labelledby="ms-cta">
     <div class="wrap cta-inner">
-      <div class="star-rule" aria-hidden="true"><i class="spark twinkle big"></i></div>
-      <p class="eyebrow">20,000 pages. 1 price.</p>
-      <h2 id="ms-cta">Your practice has been waiting for a resource this <em>reliable.</em></h2>
+      <div class="star-rule" aria-hidden="true"><i class="spark"></i></div>
+      <p class="eyebrow">One price: $333</p>
+      <h2 id="ms-cta">Bring Your Practice Home to the Manuscript</h2>
       <a class="btn" href="manuscript/join/">Get the Magick Manuscript</a>
     </div>
   </section>
 </main>
 <div class="buybar" id="buybar">
-  <a class="btn" href="manuscript/join/">Get the Manuscript · $333</a>
+  <a class="btn" href="manuscript/join/">Get the Manuscript for $333</a>
 </div>
 <footer class="site">
   <div class="wrap foot">
@@ -305,17 +278,17 @@
       <li><a href="https://discord.com/invite/PBr2BtCpxk" target="_blank" rel="noopener" aria-label="Discord"><span class="icon discord" aria-hidden="true"></span></a></li>
     </ul>
     <p class="email"><a href="mailto:TheMagickMuse.co@gmail.com">TheMagickMuse.co@gmail.com</a></p>
-    <p class="legal"><a href="settings">Accessibility &amp; display</a><span aria-hidden="true">✦</span><a href="privacy-policy">Privacy Policy</a></p>
+    <p class="legal"><a href="settings">Accessibility &amp; Display</a><a href="privacy-policy">Privacy Policy</a></p>
     <small>&copy; 2026 The Magick Muse. All rights reserved.</small>
   </div>
 </footer>
 <dialog class="offer" id="offer" aria-labelledby="offer-title">
   <button class="close" type="button" data-close aria-label="Close">&times;</button>
-  <p class="eyebrow labelled">Before you go</p>
-  <h2 id="offer-title">A gift <em>for the seeker.</em></h2>
+  <p class="eyebrow">Before you go</p>
+  <h2 id="offer-title">A Gift for the Seeker</h2>
   <p>Take 10% off The Magick Manuscript: 15 cross-linked grimoires and 20,000+ pages of research, all sourced from published books.</p>
   <p class="promo">SEEKER10</p>
-  <a class="btn" href="manuscript/join/?code=SEEKER10" data-close>Get 10% off</a>
+  <a class="btn" href="manuscript/join/?code=SEEKER10" data-close>Get 10% Off</a>
   <small>The code is applied automatically at checkout.</small>
 </dialog>
 </body>

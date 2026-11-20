@@ -283,6 +283,17 @@ header.site {
 .contents a:hover .c-name { color: var(--accent-text); }
 .contents a:hover .c-dots { border-bottom-style: solid; }
 
+/* "for you if": a short list with gold stars for bullets */
+.for-you { display: grid; gap: 1.4rem; max-width: 760px; margin: 0 auto; font-family: var(--display); font-size: clamp(1.3rem, 2.2vw, 1.6rem); line-height: 1.4; }
+.for-you li { padding-left: 2.2rem; }
+.for-you li::before { top: .4em; width: .95rem; height: .95rem; }
+.prose .stars li + li, .for-you li + li { margin-top: 0; }
+/* the numbers, said as a sentence */
+.tally { margin: clamp(2.4rem, 5vw, 3.5rem) auto 0; max-width: 46rem; text-align: center; font-family: var(--display); font-style: italic; font-size: 1.3rem; color: var(--muted); }
+/* paired offers sit in framed panels */
+.cards.pairs .card { border: 1px solid var(--gold); outline: 1px solid color-mix(in srgb, var(--gold) 45%, transparent); outline-offset: -9px; padding: 2.4rem 2.2rem; background: var(--texture), var(--bg); }
+.cards.pairs .card h3 small { font-family: var(--display); font-size: 1.15rem; }
+
 /* a pull quote is a framed panel */
 .panel {
   margin: 0; padding: 1.6rem 1.8rem; border: 1px solid var(--gold); outline: 1px solid color-mix(in srgb, var(--gold) 45%, transparent); outline-offset: -8px;

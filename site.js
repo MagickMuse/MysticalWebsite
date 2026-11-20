@@ -58,7 +58,7 @@
 
   // Mobile buy bar: appears once the hero has scrolled out of view
   var buybar = document.getElementById('buybar');
-  var hero = document.querySelector('.hero');
+  var hero = document.querySelector('.hero, .opening');
   if (buybar && hero && 'IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
       buybar.classList.toggle('shown', !entries[0].isIntersecting);
