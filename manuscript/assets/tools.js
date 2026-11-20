@@ -1270,8 +1270,8 @@
     return Store.list('notes').then(function (list) {
       notesCache = list.sort(function (a, b) { return String(b.updated || '').localeCompare(String(a.updated || '')); });
       tool.className = 'saved notes-page';
-      render(tool, '<p class="eyebrow">Your Manuscript</p><h1>Your Notes</h1>'
-        + '<p class="small">Only you can see these. Each one opens to read, rename or change it.' + (PREVIEW ? ' On this preview they’re kept in this browser.' : '') + '</p>'
+      render(tool, '<header class="pg-head tool-head"><p class="eyebrow">Your Manuscript</p><h1>Your Notes</h1>'
+        + '<p class="small">Only you can see these. Each one opens to read, rename or change it.' + (PREVIEW ? ' On this preview they’re kept in this browser.' : '') + '</p></header>'
         + (list.length ? '<ul class="note-cards">' + list.map(function (n) {
           var snip = (n.body || '').replace(/\s+/g, ' ').trim(), when = new Date(String(n.updated || n.created).replace(' ', 'T'));
           return '<li class="note-card"><a class="note-open" href="#note-' + n.id + '" data-note-id="' + n.id + '"><span class="note-card-title">' + esc(n.title) + '</span>'

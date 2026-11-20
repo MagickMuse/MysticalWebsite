@@ -99,7 +99,7 @@
 
     // Re-stagger library grimoire items by column so each row fades in one at a time
     (function () {
-      var items = document.querySelectorAll('.library > li[data-reveal]');
+      var items = document.querySelectorAll('.grimoire-grid > li[data-reveal]');
       if (!items.length) return;
       var colCount = window.matchMedia('(max-width: 640px)').matches ? 2
                    : window.matchMedia('(max-width: 1000px)').matches ? 3 : 5;
