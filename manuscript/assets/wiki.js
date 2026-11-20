@@ -8,6 +8,17 @@
     document.head.appendChild(tools);
   }
 
+  // The burgundy duotone for book-cover photos: an SVG colour matrix (grayscale, then the site's burgundy wash).
+  // A blend mode did the same, but browsers stop painting a blended image while its book is animating.
+  (function () {
+    var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'fx-defs'); svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('focusable', 'false');
+    svg.innerHTML = '<filter id="mm-duotone" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="'
+      + '0.1985 0.6677 0.0674 0 -0.0180  0.1555 0.5232 0.0528 0 -0.0141  0.1606 0.5404 0.0546 0 -0.0145  0 0 0 1 0"/></filter>';
+    document.body.appendChild(svg);
+    document.documentElement.classList.add('duo');
+  })();
+
   // Mobile menu (same behaviour as the main site)
   var btn = document.querySelector('.menu');
   var menu = document.getElementById('site-menu');

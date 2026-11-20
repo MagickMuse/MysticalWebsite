@@ -1267,10 +1267,12 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 /* the front cover, shown on hover */
 .bk .cover { position: absolute; inset: 0; width: 220px; opacity: 0; transition: opacity .35s .05s; background: var(--leather), var(--bc); }
 .bk .cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-/* Cover photos in the site's burgundy duotone: grayscale, multiplied onto a burgundy-washed leather
-   (#c2989d is #7a1f2b at 46% over white, the same wash as the website's photos). */
-.bk .cover img, .b3d-front .face img { filter: grayscale(1) contrast(1.04) brightness(1.18); mix-blend-mode: multiply; }
-.bk .cover, .b3d-front .face { background: var(--leather), #c2989d; }
+/* Cover photos in the site's burgundy duotone. wiki.js adds an SVG colour matrix (#mm-duotone: grayscale, then
+   the same burgundy wash as the website's photos) and marks <html> with .duo; until then they are plain grayscale.
+   No blend mode: browsers stop painting a blended image while the book is animating. */
+.bk .cover img, .b3d-front .face img { filter: grayscale(1) contrast(1.04) brightness(1.18); }
+html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone); }
+.fx-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 .bk .cover::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in srgb, var(--bc) 92%, transparent) 0%, color-mix(in srgb, var(--bc) 55%, transparent) 26%, rgba(0,0,0,0) 48%, rgba(0,0,0,0) 70%, rgba(28,20,21,.55) 100%); z-index: 1; }
 .bk .cover::after { content: ""; position: absolute; inset: 9px; border: 1px solid color-mix(in srgb, var(--gold) 85%, transparent); border-radius: 2px; z-index: 2; pointer-events: none; }
 .cover-title { position: absolute; top: 22px; left: 16px; right: 16px; z-index: 3; text-align: center; font-family: var(--display); font-size: 25px; line-height: 1.1; color: var(--ink-on); }
