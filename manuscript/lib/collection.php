@@ -361,10 +361,8 @@ function gallery_class(array $c): string
 /** The entry's gallery picture: its preview (made on import from the cover), else its picture icon or emoji, else a ✦. */
 function gallery_pic(array $e): string
 {
-    // Runes with the site's own gold drawing (assets/runes/) use it, the same picture as on their page.
-    if (($e['grimoire'] ?? '') === 'rune' && is_file(MM_ROOT . '/assets/runes/' . $e['slug'] . '.png')) {
-        return '<span class="gal-pic rune-pic"><img src="' . e(url('assets/runes/' . $e['slug'] . '.png')) . '" alt="" loading="lazy"></span>';
-    }
+    // Runes and signs with the site's own gold drawing use it, the same picture as on their page.
+    if ($pic = sign_picture($e)) return '<span class="gal-pic rune-pic"><img src="' . e($pic) . '" alt="" loading="lazy"></span>';
     $card = $e['id'] . '-card.webp';
     if (is_file(config('data_dir') . '/media/' . $card)) return '<span class="gal-pic"><img src="' . e(media_url($card)) . '" alt="" loading="lazy"></span>';
     $icon = (string) ($e['icon'] ?? '');

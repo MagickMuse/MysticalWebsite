@@ -132,13 +132,12 @@ function view_page(array $p): void
     $cover = $photo ? '<div class="pg-cover arch-banner"><img src="' . e($photo) . '" alt="" width="1600" height="640"></div>' : '';
     // Cut-out pictures (transparent PNGs, like the Animal Grimoire's) are shown whole, standing on the page, not cropped into the arch.
     // Tall pictures (a tarot or Lenormand card) are shown whole too, and open full size when clicked: a wide banner would crop them to a strip.
-    // Runes: the site's own gold drawing of the rune (assets/runes/), the same on every rune page, in place of a cover.
-    $runePic = $p['grimoire'] === 'rune' && is_file(MM_ROOT . '/assets/runes/' . $p['slug'] . '.png');
-    if ($runePic) {
-        $cover = '<div class="pg-cover cutout rune-pic"><img src="' . e(url('assets/runes/' . $p['slug'] . '.png')) . '" alt="The '
-            . e($p['title']) . ' rune" width="512" height="512"></div>';
+    // Runes and astrological signs: the site's own gold drawing (sign_picture()), in place of a cover.
+    $signPic = sign_picture($p);
+    if ($signPic) {
+        $cover = '<div class="pg-cover cutout rune-pic"><img src="' . e($signPic) . '" alt="' . e($p['title']) . '" width="512" height="512"></div>';
     }
-    if (!$photo && !$runePic && $p['cover']) {
+    if (!$photo && !$signPic && $p['cover']) {
         // pictures kept with the site (the mineral photos from Wikimedia Commons) are specimen shots: shown whole
         $whole = str_starts_with((string) $p['cover'], 'asset:') || is_cutout($p['cover']) || is_portrait($p['cover']);
         $img = '<img src="' . e(media_url($p['cover'])) . '" alt="' . ($whole ? e($p['title']) : '') . '">';
@@ -360,4 +359,15 @@ final class NotionImporterLinks
         $s = strtolower(str_replace('-', '', $s));
         return preg_match('/([0-9a-f]{32})$/', $s, $m) ? $m[1] : null;
     }
+}
+
+/**
+ * The site's own gold drawing for a rune or an astrological sign, if it has one: assets/runes/<slug>.png in the
+ * Rune Grimoire, assets/signs/<slug>.png in Astrology. Shown at the top of the page and on its card in lists.
+ */
+function sign_picture(array $p): ?string
+{
+    $dir = ['rune' => 'runes', 'astrology' => 'signs'][$p['grimoire'] ?? ''] ?? null;
+    if (!$dir || !is_file(MM_ROOT . "/assets/$dir/" . $p['slug'] . '.png')) return null;
+    return url("assets/$dir/" . $p['slug'] . '.png');
 }
