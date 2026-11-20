@@ -202,14 +202,14 @@ header.site {
 .nav nav { grid-column: 2; grid-row: 1; display: flex; justify-content: flex-end; align-items: center; gap: clamp(1.2rem, 2.4vw, 2.4rem); }
 .nav ul { display: flex; align-items: center; gap: clamp(1.2rem, 2.4vw, 2.4rem); list-style: none; margin: 0; padding: 0; }
 .nav li { display: flex; align-items: center; }
-/* The one place spaced capitals live: the main navigation */
-.nav ul a { display: grid; justify-items: center; text-decoration: none; font-family: var(--body); font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; font-weight: 500; white-space: nowrap; line-height: 1.5; padding-inline: .2rem; }
+/* Header labels are set in lowercase, lightly tracked (wide tracking is for capitals) */
+.nav ul a { display: grid; justify-items: center; text-decoration: none; font-family: var(--body); font-size: .95rem; letter-spacing: .04em; text-transform: lowercase; font-weight: 500; white-space: nowrap; line-height: 1.5; padding-inline: .2rem; }
 .nav ul a small, .foot ul a small { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 1rem; letter-spacing: 0; text-transform: none; color: var(--muted); line-height: 1.1; }
 .nav ul a:hover, .nav ul a[aria-current="page"] { color: var(--accent-text); }
 .menu {
   display: none; grid-column: 2; grid-row: 1; justify-self: end; min-width: 44px; min-height: 44px; padding: .5rem .9rem;
   border: 1px solid var(--line); background: none; color: var(--ink); cursor: pointer;
-  font-family: var(--body); font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; font-weight: 500;
+  font-family: var(--body); font-size: .95rem; letter-spacing: .04em; text-transform: lowercase; font-weight: 500;
 }
 /* Theme toggle: a pointed arch from the logo with a little sun in its window by day and a crescent moon by candlelight. */
 .theme-toggle {
@@ -723,7 +723,7 @@ html.nav-fold .nav ul a { align-content: center; min-height: 52px; }
   border: 1px solid var(--line); border-right: 0; padding: .7rem 1rem;
 }
 .mm-search .btn { padding: .7rem 1.2rem; }
-.mm-acct { grid-column: 3; justify-self: end; margin: 0; font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
+.mm-acct { grid-column: 3; justify-self: end; margin: 0; font-size: .9rem; letter-spacing: .04em; text-transform: lowercase; white-space: nowrap; }
 .mm-acct a { text-decoration: none; }
 .mm-acct a:hover { color: var(--accent-text); }
 @media (max-width: 640px) {
@@ -1442,7 +1442,6 @@ html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone
   .stack.at-end { margin-right: 12px; } .stack.at-start { margin-left: 12px; }
   .stack .bk.lying, .stack .bk.lying.open, .stack .bk.lying:focus-visible { height: 50px; }
   .stack .slab.s1 { width: calc(var(--w) + 26px); height: 52px; } .stack .slab.s2 { width: calc(var(--w) + 52px); height: 58px; }
-  .stack.at-start .candles { margin-left: calc(52px + 18px); }
 }
 
 /* ---------- wide screens: a grimoire list's Sort & filter in a sidebar on the left (wiki.js adds .tools-aside) ---------- */
@@ -1540,7 +1539,7 @@ html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone
 .stack { --w: 270px; }
 .stack .slab.s0 { width: var(--w); height: 56px; margin: 0; }
 .stack.at-start .candles { margin-left: calc(74px + 26px); } /* on the left part of the right-aligned book */
-@media (max-width: 640px) { .stack { --w: 200px; } .stack .slab.s0 { height: 50px; } }
+@media (max-width: 640px) { .stack { --w: 200px; } .stack .slab.s0 { height: 50px; } .stack.at-start .candles { margin-left: calc(52px + 18px); } }
 /* phones: the titled books (Calendar, Journal Prompts) are the big books at the base of the pile */
 .book-pile .slab { flex: none; width: min(306px, 90vw); height: 50px; }
 
@@ -1781,7 +1780,6 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .day-nav span { color: var(--gold-text); }
 
 /* Today: four cards for the moon, the day, the sun and the season */
-  border: 1px solid var(--line); border-radius: 160px 160px 0 0; background: var(--surface); }
 .moon-pic { display: block; }
 .moon-dark { fill: color-mix(in srgb, var(--ink) 82%, var(--bg)); stroke: color-mix(in srgb, var(--gold) 70%, transparent); stroke-width: 1.5; }
 .moon-lit { fill: #f3e6c4; }
@@ -1890,7 +1888,7 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .gal-mineral .gal-pic:not(.none) { background: none; }
 
 /* ---------- Saved and Notes at the top left; the note pop-up; the notes page ---------- */
-.mm-mine { grid-column: 1; grid-row: 1; justify-self: start; display: flex; gap: .5rem; align-items: center; margin: 0; font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
+.mm-mine { grid-column: 1; grid-row: 1; justify-self: start; display: flex; gap: .5rem; align-items: center; margin: 0; font-size: .9rem; letter-spacing: .04em; text-transform: lowercase; white-space: nowrap; }
 .mm-mine a { text-decoration: none; }
 .mm-mine a:hover { color: var(--accent-text); }
 .mm-mine .dot { color: var(--gold-text); }
