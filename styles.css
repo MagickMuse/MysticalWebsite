@@ -138,7 +138,6 @@ main:not(.mm-main) > section + section { border-top: var(--leaded); }
   background: var(--gold);
   -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat;
 }
-.stars-float, .badge { display: none; }
 /* divider: a thin gold line with one small star at its centre */
 .star-rule { display: flex; align-items: center; gap: 1rem; width: min(320px, 100%); margin-inline: auto; }
 .star-rule::before, .star-rule::after { content: ""; flex: 1; height: 1px; background: color-mix(in srgb, var(--gold) 70%, transparent); }
@@ -236,27 +235,6 @@ header.site {
   .nav ul { flex-direction: column; align-items: stretch; gap: 0; }
   .nav li { display: block; }
   .nav ul a { align-content: center; min-height: 52px; }
-}
-
-/* ---------- hero ---------- */
-.hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(2rem, 6vw, 5rem); align-items: center; }
-.hero-text { display: grid; gap: 1.6rem; min-width: 0; }
-.hero h1 { font-size: clamp(3.2rem, 8vw, 6.4rem); }
-.hero h1 em { font-style: italic; }
-.hero h1 .spark { font-size: .45em; }
-.hero-art { position: relative; width: 100%; max-width: 600px; justify-self: center; }
-.hero-art .frame { aspect-ratio: 4 / 5; width: 100%; }
-.badge {
-  position: absolute; left: -2rem; bottom: 2.5rem; background: var(--btn); color: var(--on-btn);
-  padding: 1rem 1.4rem; border: 1px solid var(--gold); text-align: center;
-  box-shadow: 0 20px 40px -20px rgba(28, 20, 21, .5);
-}
-.badge .spark { font-size: .9rem; }
-.badge .script { font-size: 1.9rem; display: block; line-height: 1.2; color: var(--on-btn); }
-@media (max-width: 860px) {
-  .hero { grid-template-columns: 1fr; }
-  .hero-art { max-width: 420px; }
-  .badge { left: 1rem; }
 }
 
 /* ---------- the opening (home): the book falls open ---------- */
@@ -377,8 +355,6 @@ header.site {
 /* ---------- featured ---------- */
 .feature-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: clamp(2rem, 6vw, 5rem); align-items: center; }
 .feature-art { position: relative; min-width: 0; }
-.feature-art .stars-float .s1 { font-size: 2rem; top: -1rem; left: -1rem; right: auto; }
-.feature-art .stars-float .s2 { font-size: 1.4rem; top: auto; bottom: 1.5rem; right: -.8rem; }
 .feature-text { display: grid; gap: 1.4rem; min-width: 0; }
 .meta {
   display: flex; flex-wrap: wrap; gap: .5rem 2rem; list-style: none; margin: 0; padding: 0;
@@ -768,7 +744,7 @@ html.nav-fold .nav ul a { align-content: center; min-height: 52px; }
 
 /* ---------- article ---------- */
 .pg { max-width: 920px; margin-inline: auto; }
-.pg-grimoire, .pg-collection { max-width: 1200px; }
+.pg-grimoire { max-width: 1200px; }
 .pg-head { display: grid; margin-bottom: var(--gap-intro); }
 .pg-head h1 { font-size: clamp(2.4rem, 6vw, 4rem); display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
 .pg-icon { display: inline-grid; place-items: center; width: 1.3em; height: 1.3em; object-fit: contain; font-size: .95em; line-height: 1; flex: none; font-family: var(--emoji); font-style: normal; font-variant-emoji: emoji; }
@@ -781,18 +757,13 @@ html.nav-fold .nav ul a { align-content: center; min-height: 52px; }
 .tag { font-size: .8rem; padding: .15rem .7rem; border: 1px solid var(--line); background: var(--surface); border-radius: 1.1em 1.1em 0 0; }
 
 /* body text converted from Notion */
-.mm-prose { font-size: 1.05rem; }
 .mm-prose > * + * { margin-top: var(--gap-text); }
 .mm-prose h2 { margin-top: var(--gap-h2-before); }
 .mm-prose h3, .mm-prose h4 { margin-top: var(--gap-h3-before); }
 .mm-prose > h2 + * { margin-top: var(--gap-head); }
 .mm-prose > :is(h3, h4) + * { margin-top: var(--gap-h3); }
-.mm-prose h2 { font-size: clamp(1.9rem, 4vw, 2.5rem); }
-.mm-prose h3 { font-size: 1.6rem; }
-.mm-prose h4 { font-size: 1.3rem; }
 .mm-prose p, .mm-prose li { max-width: 72ch; }
 .mm-prose ul, .mm-prose ol { padding-left: 1.4rem; }
-.mm-prose li + li { margin-top: .35rem; }
 .mm-prose ul.todo { list-style: none; padding-left: 0; }
 .mm-prose a { color: var(--accent-text); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .mm-prose blockquote { margin: 0; font-family: var(--display); font-style: italic; font-size: 1.35rem; border-left: 1px solid var(--accent); padding-left: 1.4rem; line-height: 1.4; }
@@ -855,7 +826,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 
 /* ---------- collections + entry grids ---------- */
 .collection { margin-top: var(--gap-h3-before); }
-.collection-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--line); padding-bottom: .8rem; margin-bottom: 1.4rem; }
+.collection-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--line); padding-bottom: .8rem; }
 .collection-head h2 { font-size: 2rem; display: flex; gap: .5rem; align-items: center; }
 .count { font-family: var(--display); font-style: italic; font-size: 1.05rem; text-transform: none; color: var(--muted); }
 .entry-grid { list-style: none; margin: 0 0 1.4rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: .5rem; }
@@ -1162,14 +1133,13 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 /* ---------- condensed list bar: one "Sort & filter" button, controls folded inside ---------- */
 .collection { scroll-margin-top: 9rem; }
 .collection-head { margin-bottom: var(--gap-h3); }
-.col-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; margin-bottom: var(--gap-text); }
+.col-bar { display: flex; align-items: center; gap: .6rem 1rem; margin-bottom: var(--gap-text); }
 .col-filter { flex: 0 0 auto; }
-.col-filter[open] { flex: 1 1 100%; order: 3; }
 .col-filter > summary { list-style: none; display: inline-flex; align-items: center; gap: .5rem; padding: .5rem 1rem; min-height: 40px; border: 1px solid var(--line); border-radius: 0; background: var(--bg); cursor: pointer; font-size: .95rem; text-transform: none; color: var(--ink); user-select: none; }
 .col-filter > summary::-webkit-details-marker { display: none; }
 .col-filter > summary:hover, .col-filter[open] > summary { border-color: var(--accent); color: var(--accent-text); }
 .sf-icon { color: var(--gold-text); font-size: .95rem; letter-spacing: 0; }
-.col-filter .col-views { margin: .8rem 0 0; padding: 1.1rem 1.2rem; border: 1px solid var(--gold); border-radius: 0; background: color-mix(in srgb, var(--surface) 55%, var(--bg)); }
+.col-filter .col-views { padding: 1.1rem 1.2rem; border: 1px solid var(--gold); border-radius: 0; }
 .atags { display: flex; flex-wrap: wrap; gap: .35rem; }
 .atag { display: inline-flex; align-items: center; gap: .45rem; padding: .2rem .8rem; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 1.1em 1.1em 0 0; font-size: .95rem; text-transform: none; text-decoration: none; color: var(--accent-text); line-height: 1.6; background: var(--bg); }
 .atag:hover { border-color: var(--accent); }
@@ -1409,7 +1379,7 @@ html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone
 }
 
 /* ---------- table of contents: shows while scrolling, fades once scrolling stops ---------- */
-.toc { position: fixed; right: clamp(.6rem, 2vw, 2rem); top: 50%; z-index: 40; width: min(250px, 72vw); max-height: 72dvh; overflow-y: auto; padding: .9rem 1rem 1rem;
+.toc { position: fixed; right: clamp(.6rem, 2vw, 2rem); top: calc(50% + var(--site-head, 160px) / 2); z-index: 40; width: min(250px, 72vw); max-height: calc(100dvh - var(--site-head, 160px) - 3rem); overflow-y: auto; padding: .9rem 1rem 1rem;
   background: color-mix(in srgb, var(--bg) 95%, transparent); border: 1px solid var(--gold); border-radius: 0;
   opacity: 0; visibility: hidden; transform: translate(14px, -50%); transition: opacity .35s, transform .35s, visibility 0s .35s; }
 .toc.show { opacity: 1; visibility: visible; transform: translate(0, -50%); transition: opacity .2s, transform .2s, visibility 0s; }
@@ -1425,12 +1395,10 @@ html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone
 
 /* the site header stays pinned while scrolling: sections jumped to land just below it (wiki.js measures it as --site-head) */
 .mm-prose :is(h2, h3, h4) { scroll-margin-top: calc(var(--site-head, 160px) + 1.2rem); }
-.toc { top: calc(50% + var(--site-head, 160px) / 2); max-height: calc(100dvh - var(--site-head, 160px) - 3rem); }
 
 /* ---------- the flat stacks: pressed against the standing books, each book underneath bigger than the one on it ---------- */
 /* Correspondences (ending the top shelf) lines up on the left, against the books before it;
    Rituals (starting the bottom shelf) lines up on the right, against the books after it. */
-.stack { --w: 300px; }
 .stack.at-end { align-items: flex-start; margin: 0 20px 0 0; }
 .stack.at-start { align-items: flex-end; margin: 0 0 0 20px; }
 .stack .bk.lying, .stack .bk.lying.open, .car-track:not([data-ready]) .stack .bk.lying:hover, .stack .bk.lying:focus-visible { width: var(--w); height: 56px; }
@@ -1441,7 +1409,7 @@ html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone
 
 /* ---------- three pillar candles on the flat book: different heights, the tallest in the middle, overlapping a little ---------- */
 .candles { position: relative; display: flex; align-items: flex-end; height: 92px; margin: 0 0 0 0; transition: transform .35s; }
-.stack.at-start .candles { align-self: flex-start; margin-left: calc(74px + 30px); } /* on the left part of the right-aligned book */
+.stack.at-start .candles { align-self: flex-start; }
 .stack.at-end .candles { align-self: flex-start; margin-left: 40px; }
 .candle { position: relative; display: block; width: 24px; flex: none; }
 .candle.c1 { --h: 36px; width: 24px; z-index: 2; }
@@ -1471,7 +1439,6 @@ html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone
 /* lifting the book lifts the candles with it */
 .stack:has(.bk.lying.open, .bk.lying:focus-visible) .candles, .car-track:not([data-ready]) .stack:has(.bk.lying:hover) .candles { transform: translateY(-8px); }
 @media (max-width: 640px) {
-  .stack { --w: 224px; }
   .stack.at-end { margin-right: 12px; } .stack.at-start { margin-left: 12px; }
   .stack .bk.lying, .stack .bk.lying.open, .stack .bk.lying:focus-visible { height: 50px; }
   .stack .slab.s1 { width: calc(var(--w) + 26px); height: 52px; } .stack .slab.s2 { width: calc(var(--w) + 52px); height: 58px; }
@@ -1572,11 +1539,10 @@ html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone
 /* the flat stacks now hold only books lying on their side (guides and tools): the top one is the smallest */
 .stack { --w: 270px; }
 .stack .slab.s0 { width: var(--w); height: 56px; margin: 0; }
-.stack.at-start .candles { margin-left: calc(74px + 26px); }
+.stack.at-start .candles { margin-left: calc(74px + 26px); } /* on the left part of the right-aligned book */
 @media (max-width: 640px) { .stack { --w: 200px; } .stack .slab.s0 { height: 50px; } }
 /* phones: the titled books (Calendar, Journal Prompts) are the big books at the base of the pile */
 .book-pile .slab { flex: none; width: min(306px, 90vw); height: 50px; }
-.book-pile .slab.s2 { width: min(322px, 94vw); height: 54px; }
 
 /* ---------- recipes and rituals: Description, Quantities and Directions as the page's text ---------- */
 .mm-prose .lead-in { font-size: 1.12rem; line-height: 1.7; color: var(--ink); }
@@ -1598,7 +1564,6 @@ button.rel-more { cursor: pointer; font: inherit; background: none; }
   .toc a { font-size: .78rem; padding: .22rem .35rem; }
   .toc .lvl-3 a { padding-left: .8rem; font-size: .75rem; } .toc .lvl-4 a { padding-left: 1.2rem; font-size: .72rem; }
 }
-.mm-prose h5 { font-size: 1.12rem; }
 details.toggle > summary > h5 { margin: 0; display: inline; }
 /* The Library: the books behind the Manuscript, A to Z, with topic buttons */
 .pg-library { max-width: 1000px; }
@@ -1683,12 +1648,11 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .mm-prose .mm-warn :is(h2, h3, h4, h5):first-child::before { content: "⚠︎ "; letter-spacing: 0; }
 /* every heading level in the serif display face, as on the blog (Notion's smaller headings came out in bold sans) */
 .mm-prose :is(h2, h3, h4, h5) { font-family: var(--display); font-weight: 400; line-height: 1.15; color: var(--ink); }
-.mm-prose h5 { font-size: 1.15rem; font-style: italic; }
 /* heading sizes stepped like the blog's, so sections stand clearly above the bold labels */
 .mm-prose h2 { font-size: clamp(2.1rem, 4vw, 2.6rem); }
 .mm-prose h3 { font-size: clamp(1.8rem, 3.2vw, 2.1rem); }
 .mm-prose h4 { font-size: clamp(1.55rem, 2.6vw, 1.75rem); }
-.mm-prose h5 { font-size: 1.3rem; margin-top: var(--gap-h3-before); }
+.mm-prose h5 { font-size: 1.3rem; font-style: italic; margin-top: var(--gap-h3-before); }
 .mm-prose > h5 + * { margin-top: var(--gap-h3); }
 .mm-callout :is(h2, h3, h4, h5) { font-size: 1.3rem; }
 /* Search: "Did you mean …?" */
@@ -1964,11 +1928,6 @@ html.nav-fold .mm-mine { order: -2; }
 .note-card-title { font-family: var(--display); font-size: 1.45rem; line-height: 1.15; }
 .note-card-snip { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-family: var(--display); font-style: italic; font-size: 1.05rem; line-height: 1.45; color: var(--muted); }
 .note-card-meta { position: relative; z-index: 1; margin: .2rem 0 0; font-family: var(--display); font-style: italic; font-size: 1.05rem; text-transform: none; color: var(--muted); }
-.one-note .note-form { padding: 0; }
-.one-note .note-form.on-page .btn { justify-self: start; }
-
-/* the tools fold-out beside Guide Pages on a grimoire */
-.mm-callout.tools-only { margin-bottom: var(--gap-h3-before); }
 /* Links to the tools under an entry's title ("Build a spell for Protection", "See Venus on the wheel"), added by tools.js */
 .tool-links { display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; margin: -.2rem 0 0; }
 

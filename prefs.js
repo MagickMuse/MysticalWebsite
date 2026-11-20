@@ -29,10 +29,15 @@
       if (p[k] && p[k] !== DEFAULTS[k]) root.setAttribute('data-' + k, p[k]); else root.removeAttribute('data-' + k);
     }
   }
+  // Whether candlelight is showing: the chosen theme, or the device's setting until one is picked.
+  var darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function isDark() {
+    var t = root.getAttribute('data-theme');
+    return t ? t === 'dark' : !!(darkQuery && darkQuery.matches);
+  }
   // The browser's own bar (phones) matches the header: oxblood, or parchment by day.
   function themeColor() {
-    var dark = root.getAttribute('data-theme') ? root.getAttribute('data-theme') === 'dark'
-      : !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var dark = isDark();
     var metas = document.querySelectorAll('meta[name="theme-color"]');
     for (var i = 0; i < metas.length; i++) { metas[i].removeAttribute('media'); metas[i].setAttribute('content', dark ? '#3d000c' : '#ede0d6'); }
   }
@@ -43,15 +48,18 @@
   window.addEventListener('storage', function (e) { if (e.key === KEY) apply(load()); });
 
   // The settings panel: radio groups named theme, font, size, spacing and motion. Changes apply at once.
+  function tick(f, p) {
+    for (var k in DEFAULTS) {
+      var r = f.querySelector('input[name="' + k + '"][value="' + p[k] + '"]');
+      if (r) r.checked = true;
+    }
+  }
   function wire() {
     var forms = document.querySelectorAll('form[data-prefs]');
     if (!forms.length) return;
     var p = load();
     Array.prototype.forEach.call(forms, function (f) {
-      for (var k in DEFAULTS) {
-        var r = f.querySelector('input[name="' + k + '"][value="' + p[k] + '"]');
-        if (r) r.checked = true;
-      }
+      tick(f, p);
       f.addEventListener('change', function (e) {
         if (!e.target.name || !(e.target.name in DEFAULTS)) return;
         p[e.target.name] = e.target.value;
@@ -66,7 +74,7 @@
         p = {}; for (var k in DEFAULTS) p[k] = DEFAULTS[k];
         try { localStorage.removeItem(KEY); } catch (err) {}
         apply(p); fitNav();
-        for (var k2 in DEFAULTS) { var r = f.querySelector('input[name="' + k2 + '"][value="' + p[k2] + '"]'); if (r) r.checked = true; }
+        tick(f, p);
       });
       f.hidden = false;
     });
@@ -80,14 +88,9 @@
     var bar = nav.closest('.nav') || nav.parentNode, r = nav.getBoundingClientRect();
     if (nav.scrollWidth > nav.clientWidth + 1 || bar.scrollWidth > bar.clientWidth + 1 || r.right > document.documentElement.clientWidth) root.classList.add('nav-fold');
   }
-  // The theme toggle in the header: a pointed arch from the logo with the four-point star in its window.
+  // The theme toggle in the header: a pointed arch from the logo with a little sun in its window by day and a crescent moon by candlelight.
   // It starts from whatever is showing (the device's setting, until a mode is picked) and flips between day and candlelight.
   // Settings keeps the third choice, "match my device".
-  var darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
-  function isDark() {
-    var t = root.getAttribute('data-theme');
-    return t ? t === 'dark' : !!(darkQuery && darkQuery.matches);
-  }
   var ARCH = '<svg viewBox="0 0 28 36" aria-hidden="true" focusable="false">'
     + '<path class="tt-glass" d="M5 34V17c0-5 4-6.6 7-9.4C13.3 6.3 13.8 4 14 1.5c.2 2.5.7 4.8 2 6.1 3 2.8 7 4.4 7 9.4v17z"/>'
     + '<path class="tt-arch" d="M3 34.5V16.6c0-6 4.6-7.9 7.7-10.7C12.6 4.2 13.6 2.3 14 .5c.4 1.8 1.4 3.7 3.3 5.4 3.1 2.8 7.7 4.7 7.7 10.7v17.9zM1.5 34.5h25"/>'
