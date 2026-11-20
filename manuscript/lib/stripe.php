@@ -1,9 +1,21 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * A stand-in for Stripe's API, for the automated tests (tests/run.php). Never set on the site.
+ * stripe_fake(fn($method, $path, $params) => [...]) sets it; stripe_fake() returns it.
+ */
+function stripe_fake(?callable $set = null): ?callable
+{
+    static $fake = null;
+    if ($set !== null) $fake = $set;
+    return $fake;
+}
+
 /** Minimal Stripe API client: no SDK needed, works on any PHP host with curl. */
 function stripe(string $method, string $path, array $params = [], string $version = '2024-06-20'): array
 {
+    if ($fake = stripe_fake()) return $fake($method, $path, $params);
     // One key for every try, so a POST retried after a network hiccup can't create a second checkout or portal session.
     $headers = ['Stripe-Version: ' . $version];
     if ($method === 'POST') $headers[] = 'Idempotency-Key: ' . bin2hex(random_bytes(16));

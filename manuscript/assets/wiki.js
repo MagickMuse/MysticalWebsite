@@ -431,7 +431,7 @@
       // Every entry of this list once, in A–Z order, then only the ones with the value.
       var seen = {}, items = [];
       section.querySelectorAll('.entry-grid li').forEach(function (li) {
-        var a = li.querySelector('a'), m = a && a.getAttribute('href').match(/\/([^\/]+)\/$/);
+        var a = li.querySelector('a'), m = a && a.getAttribute('href').match(/\/([^/]+)\/$/);
         if (!m || seen[m[1]]) return;
         seen[m[1]] = true;
         if ((!keep || keep.has(m[1])) && (!letter || firstLetter(nameOf(li)) === letter)) { var c = li.cloneNode(true); c.hidden = false; items.push(c); }

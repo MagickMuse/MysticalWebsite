@@ -666,13 +666,6 @@ function view_welcome(): void
     layout('Welcome', '<section class="mm-hero narrow"><p class="eyebrow">Welcome, Seeker</p><h1>The Manuscript Is Open to You</h1>' . $msg . '</section>', ['private' => true]);
 }
 
-/** Only same-site paths may be used as a post-login destination. */
-function safe_next(?string $next): string
-{
-    $next = (string) $next;
-    return preg_match('~^/(?![/\\\\])[^\s]*$~', $next) ? $next : (parse_url(config('base_url'), PHP_URL_PATH) ?: '/');
-}
-
 function view_login(string $notice = '', ?string $next = null): void
 {
     $next = safe_next($next ?? ($_GET['next'] ?? $_POST['next'] ?? null));

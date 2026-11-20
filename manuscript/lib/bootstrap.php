@@ -31,7 +31,9 @@ function config(?string $key = null, $default = null)
         // A relative data_dir is relative to the manuscript/ folder, e.g. '../../../manuscript-data-test'.
         if ($cfg['data_dir'] !== '' && $cfg['data_dir'][0] !== '/') $cfg['data_dir'] = MM_ROOT . '/' . $cfg['data_dir'];
         // Safety: the database and paid images must never sit inside the public website folder.
-        $web = realpath((string) ($_SERVER['DOCUMENT_ROOT'] ?? '')) ?: '';
+        // (realpath('') is the current folder, so an empty DOCUMENT_ROOT, as on the command line, means "no web folder".)
+        $docRoot = (string) ($_SERVER['DOCUMENT_ROOT'] ?? '');
+        $web = $docRoot !== '' ? (realpath($docRoot) ?: '') : '';
         $dataParent = realpath(dirname($cfg['data_dir'])) ?: dirname($cfg['data_dir']);
         $dataPath = rtrim($dataParent, '/') . '/' . basename($cfg['data_dir']);
         $inWeb = ($web !== '' && $web !== '/' && str_starts_with($dataPath . '/', rtrim($web, '/') . '/'))

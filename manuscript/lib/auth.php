@@ -181,3 +181,10 @@ function throttle(string $key, int $max, int $seconds): bool
     $_SESSION['throttle'][$key] = array_values($hits);
     return true;
 }
+
+/** Only same-site paths may be used as a post-login destination. */
+function safe_next(?string $next): string
+{
+    $next = (string) $next;
+    return preg_match('~^/(?![/\\\\])[^\s]*$~', $next) ? $next : (parse_url(config('base_url'), PHP_URL_PATH) ?: '/');
+}

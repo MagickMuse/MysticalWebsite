@@ -6,3 +6,6 @@ manuscript/deploy.local.php
 manuscript-config.php
 *.sqlite
 *.sqlite-*
+
+# Tools for the checks (npm install), never part of the site
+node_modules/

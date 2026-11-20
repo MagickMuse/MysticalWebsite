@@ -1,0 +1,37 @@
+# Runs on every push and pull request: the JavaScript checks, PHP syntax, the automated tests,
+# and that every page has the current header, footer and file versions. Nothing is deployed.
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install the checkers
+        run: npm ci
+
+      - name: JavaScript (ESLint)
+        run: npx eslint
+
+      - name: PHP syntax
+        run: find manuscript -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      - name: Automated tests
+        run: php tests/run.php
+
+      - name: Pages are up to date
+        run: python3 .github/scripts/build-pages.py --check
