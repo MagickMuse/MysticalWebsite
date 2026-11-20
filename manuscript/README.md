@@ -25,6 +25,11 @@ hosting, no database server to set up, and nothing to install. Stripe takes the 
   (`/manuscript/draw-a-card`: seven face-down cards, one picked turns over, upright or reversed, with its keywords), and
   *Pull a Rune* in Runes (`/manuscript/pull-a-rune`: seven river stones; the one picked turns over to its Elder Futhark rune).
   Today and the Manuscript home also count down to the next sabbat.
+  Also: *Do this spread* on every tarot spread page (deals the spread's Number of Cards into its Card Details positions,
+  with its layout picture as the guide), the *Dream Decoder* in Dreams (finds the Dream Grimoire's symbols in a typed
+  dream and shows each one's Interpretations), *Planetary Hours* in Timing, the moon's sign and phases on the Calendar
+  (linking the Moon in … pages), *Continue reading* on the Manuscript home, and *Save to notes* on pulls, spreads and dreams.
+  Sky positions and sunrise times come from Astronomy Engine (`assets/astronomy.min.js`, MIT licence).
 - **On every ritual and recipe** (after Quantities, from the Manuscript's own pages only): *Substitutions* (those written
   on an ingredient's page, then herbs, stones and oils sharing the same correspondences in that working and carrying no
   warnings of their own), *Why these ingredients* (each one's correspondences that the working shares), and *Before you

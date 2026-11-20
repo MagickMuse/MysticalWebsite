@@ -108,6 +108,8 @@ def main():
         'wheel': ('Correspondence Wheel', 'wheel'),
         'draw-a-card': ('Draw a Card', 'tarot'),
         'pull-a-rune': ('Pull a Rune', 'rune'),
+        'dream-decoder': ('Dream Decoder', 'dream'),
+        'planetary-hours': ('Planetary Hours', 'hours'),
         'notes': ('Your notes', 'notes'),
     }
     for folder, (title, tool) in shells.items():

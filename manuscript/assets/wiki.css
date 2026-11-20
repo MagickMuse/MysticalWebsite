@@ -1413,3 +1413,61 @@ html.nav-fold .mm-mine { order: -2; }
 .path-list li.done .path-n::after { content: " ✓"; color: var(--gold); }
 .path-list li.next { background: var(--surface); }
 .path-list li.next .path-n { color: var(--accent-text); font-weight: 600; }
+
+/* ---------- Do this spread, Dream Decoder, Planetary Hours, the moon on the Calendar, Continue reading ---------- */
+.do-spread { margin-top: .2rem; }
+.spread-reading { margin: 0 0 2.6rem; padding: 1.6rem 1.4rem 1.4rem; border: 1px solid var(--line); border-top: 3px solid var(--gold); border-radius: 4px 4px 6px 6px; background: var(--surface); }
+.spread-head h2 { font-size: clamp(1.8rem, 3.6vw, 2.4rem); } .spread-head h2 em { font-style: italic; }
+.spread-head .small { margin: .3rem 0 1rem; color: var(--muted); }
+.spread-layout { margin: 0 auto 1.4rem; max-width: 420px; }
+.spread-layout img { width: 100%; height: auto; border-radius: 6px; }
+.spread-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1.2rem 1rem; }
+.spread-slot { display: grid; gap: .4rem; align-content: start; justify-items: center; text-align: center; }
+.spread-card { position: relative; width: 112px; aspect-ratio: 7 / 12; padding: 0; border: 0; background: none; cursor: pointer; perspective: 800px; }
+.spread-card .tarot-back { position: absolute; inset: 0; cursor: pointer; }
+.slot-n { position: absolute; z-index: 2; top: -.6rem; left: -.6rem; width: 1.7rem; height: 1.7rem; display: grid; place-items: center; border-radius: 999px; background: var(--accent); color: #f6efe8; font-size: .8rem; font-weight: 500; }
+.slot-front { position: absolute; inset: 0; border-radius: 8px; overflow: hidden; background: var(--bg); box-shadow: 0 10px 18px -12px rgba(46, 31, 32, .6); animation: slot-in .5s ease; }
+.slot-front img { width: 100%; height: 100%; object-fit: contain; }
+.slot-front.reversed img { transform: rotate(180deg); }
+@keyframes slot-in { from { transform: rotateY(90deg); } to { transform: none; } }
+.slot-pos { font-size: .82rem; line-height: 1.4; color: var(--muted); max-width: 22ch; }
+.slot-read { display: grid; gap: .15rem; }
+.slot-name { font-family: var(--display); font-size: 1.2rem; }
+.slot-state { font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text); }
+.slot-words { font-size: .82rem; line-height: 1.4; }
+.spread-actions { margin-top: 1.4rem; display: flex; flex-wrap: wrap; gap: .7rem; align-items: center; }
+@media (prefers-reduced-motion: reduce) { .slot-front { animation: none; } }
+
+.dream-form textarea { width: 100%; min-height: 9rem; padding: .9rem 1rem; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 400 1.05rem/1.6 var(--body); resize: vertical; }
+.dream-form .actions { margin-top: .7rem; }
+.dream-marked { font-family: var(--display); font-size: 1.3rem; line-height: 1.7; }
+.dream-marked mark { background: color-mix(in srgb, var(--gold) 30%, transparent); padding: 0 .15em; border-radius: 2px; }
+.dream-symbols { list-style: none; margin: 0; padding: 0; display: grid; gap: .2rem; }
+.dream-symbols .sym-name { font-family: var(--display); font-size: 1.35rem; }
+.sym-read p { margin: .4rem 0; }
+.dream-actions { display: flex; flex-wrap: wrap; gap: .7rem; align-items: center; }
+.tool-section h2 small { font-family: var(--body); font-size: .8rem; color: var(--muted); }
+
+.place-row { display: flex; flex-wrap: wrap; gap: .8rem; align-items: end; margin-top: .6rem; }
+.place-row label { display: grid; gap: .3rem; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; }
+.place-row input { width: 9rem; }
+.place-error { color: var(--accent-text); }
+.hour-now { display: grid; justify-items: start; gap: .2rem; margin: 0 0 1.2rem; padding: 1rem 1.3rem; border-left: 3px solid var(--gold); background: var(--surface); border-radius: 2px 6px 6px 2px; }
+.hour-now .eyebrow { margin: 0; }
+.hour-planet { margin: 0; font-family: var(--display); font-size: 2rem; }
+.hour-now .small { margin: 0; color: var(--muted); }
+table.hours td.when { white-space: nowrap; color: var(--muted); }
+table.hours tr.now td { background: color-mix(in srgb, var(--gold) 16%, var(--bg)); }
+table.hours td.planet span { color: var(--gold); margin-right: .2rem; }
+
+.cal-moon { display: block; margin-top: .15rem; font-size: .68rem; letter-spacing: .02em; color: var(--muted); white-space: nowrap; }
+.cal-moon-list { margin-top: 2rem; }
+.cal-moon-list h2 { font-size: clamp(1.6rem, 3vw, 2rem); margin-bottom: .6rem; } .cal-moon-list h2 em { font-style: italic; }
+.cal-moon-list ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.cal-moon-list li { display: flex; gap: 1rem; align-items: baseline; padding: .4rem 0; border-bottom: 1px solid var(--line); }
+.cal-moon-list time { flex: none; width: 8.5rem; font-size: .76rem; letter-spacing: .06em; color: var(--muted); }
+
+.continue-reading { display: grid; gap: .4rem; justify-items: center; margin-top: .4rem; }
+.continue-reading .eyebrow { margin: 0; }
+.continue-reading .rels { justify-content: center; }
+.save-note-btn + .link { align-self: center; }

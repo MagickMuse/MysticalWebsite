@@ -19,6 +19,8 @@ const TOOL_PAGES = [
     'wheel' => ['Correspondence Wheel', 'wheel'],
     'draw-a-card' => ['Draw a Card', 'tarot'],
     'pull-a-rune' => ['Pull a Rune', 'rune'],
+    'dream-decoder' => ['Dream Decoder', 'dream'],
+    'planetary-hours' => ['Planetary Hours', 'hours'],
 ];
 
 /** A tool's page: members only; tools.js fills in the article. */

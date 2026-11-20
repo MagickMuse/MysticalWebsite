@@ -3,7 +3,7 @@
 Things only you can do (accounts, Notion, decisions). Claude keeps this list up to date: say “add it to my to-do list”
 in any session. Tick a box by changing `[ ]` to `[x]`, or ask Claude to.
 
-_Last updated: November 19, 2026_
+_Last updated: November 20, 2026_
 
 ## Before launch
 - [ ] **Stripe:** the four things blocking live checkout: dispute events on the webhook, Stripe's account review, tax
@@ -15,6 +15,8 @@ _Last updated: November 19, 2026_
 - [ ] **Beginner path at 11:11:** hPanel → Advanced → Cron Jobs → Custom: minute `11,26,41,56`, everything else `*`, command
       `php /home/YOUR-USERNAME/domains/magickmuse.com/public_html/manuscript/cli/beginner-path.php`
 - [ ] **Try Share on your phone:** Draw a Card or Pull a Rune → Share should open your phone's share menu with the picture.
+- [ ] **Try the new tools on the preview:** Do this spread (any tarot spread page), the Dream Decoder (Dreams), Planetary
+      Hours (Timing; it asks for your location once), the moon on the Calendar, and Save to notes after a pull.
 - [ ] **Review the beginner path's 30 days:** `manuscript/beginner-path.php`, one line per day; reorder or swap freely.
 
 ## After launch
