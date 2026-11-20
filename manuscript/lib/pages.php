@@ -362,12 +362,13 @@ final class NotionImporterLinks
 }
 
 /**
- * The site's own gold drawing for a rune or an astrological sign, if it has one: assets/runes/<slug>.png in the
- * Rune Grimoire, assets/signs/<slug>.png in Astrology. Shown at the top of the page and on its card in lists.
+ * The site's own drawing for a rune, an astrological sign or a symbol, if it has one: assets/runes/<slug>.png in the
+ * Rune Grimoire, assets/signs/ in Astrology, assets/symbols/ in Symbols (colours, numbers). Shown at the top of the
+ * page and on its card in lists.
  */
 function sign_picture(array $p): ?string
 {
-    $dir = ['rune' => 'runes', 'astrology' => 'signs'][$p['grimoire'] ?? ''] ?? null;
+    $dir = ['rune' => 'runes', 'astrology' => 'signs', 'symbol' => 'symbols'][$p['grimoire'] ?? ''] ?? null;
     if (!$dir || !is_file(MM_ROOT . "/assets/$dir/" . $p['slug'] . '.png')) return null;
     return url("assets/$dir/" . $p['slug'] . '.png');
 }
