@@ -114,6 +114,22 @@ def main():
     with open(os.path.join(ROOT, 'tools', 'data.json'), 'w', encoding='utf-8') as fh:
         json.dump(out, fh, ensure_ascii=False, separators=(',', ':'))
     print(f'tools/data.json: {len(pages)} pages, {sum(len(x) for x in links) // 2} connections')
+    write_today(out)
+
+
+def write_today(d):
+    """tools/today.json: data.json cut down to what Today needs, for visitors (the same as today_data() in lib/tools.php)."""
+    kinds = {'Moon Phases', 'Planets', 'Western Zodiac', 'Days of the Week', 'Days of the Year', 'Seasons', 'Holidays'}
+    src = {i for i, p in enumerate(d['p']) if kinds & set(str(p[4]).split('|'))}
+    src |= {i for lst in d['f'].values() for i in lst}
+    keep = sorted(src | {j for i in src for j in d['l'][i]})
+    new = {old: n for n, old in enumerate(keep)}
+    today = {'g': d['g'], 'p': [d['p'][i] for i in keep], 'l': [[new[j] for j in d['l'][i] if i in src or j in src] for i in keep],
+             'n': [len(d['l'][i]) for i in keep],
+             'f': {day: [new[i] for i in lst] for day, lst in d['f'].items()}, 't': [], 'w': {}, 'gp': {}, 'gt': d['gt']}
+    with open(os.path.join(ROOT, 'tools', 'today.json'), 'w', encoding='utf-8') as fh:
+        json.dump(today, fh, ensure_ascii=False, separators=(',', ':'))
+    print(f'tools/today.json: {len(keep)} pages (of {len(d["p"])})')
 
     # The tools' pages: the Saved page's frame (header, footer, styles) around a shell tools.js fills in.
     frame = open(os.path.join(ROOT, 'saved', 'index.html'), encoding='utf-8').read()

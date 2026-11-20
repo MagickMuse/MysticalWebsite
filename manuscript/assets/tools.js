@@ -65,7 +65,9 @@
   // ------------------------------------------------------------------ the data
   var dataP = null, D = null, bySlug = {};
   function data() {
-    if (!dataP) dataP = fetch(url('tools/data.json')).then(okJson).then(function (d) {
+    // Visitors get today.json (Today's pages and their names only); members get everything.
+    var file = document.body.hasAttribute('data-visitor') ? 'tools/today.json' : 'tools/data.json';
+    if (!dataP) dataP = fetch(url(file)).then(okJson).then(function (d) {
       D = d;
       d.part = d.p.map(function (p) { return partOf(d.g[p[0]], kindsOf(p), p[1]); });
       d.p.forEach(function (p, i) { bySlug[d.g[p[0]] + '/' + p[1]] = i; });
@@ -127,7 +129,7 @@
     counts.forEach(function (n, i) {
       var part = D.part[i];
       if (!part || (only && only.indexOf(part) === -1)) return;
-      (parts[part] = parts[part] || []).push([i, n, D.l[i].length]);
+      (parts[part] = parts[part] || []).push([i, n, D.n ? D.n[i] : D.l[i].length]); // D.n: today.json's connection counts
     });
     var out = [];
     PARTS.forEach(function (pt) {
@@ -1375,7 +1377,14 @@
     if (links.length) head.insertAdjacentHTML('afterend', '<p class="tool-links small">' + links.join('') + '</p>');
   }
 
-  if (!MEMBER) return; // visitors: nothing here is theirs to use
+  // Visitors: only Today is theirs, on its own page and at a glance on the Manuscript home. It reads today.json
+  // (names only), and every page it names opens the join pop-up instead (wiki.js).
+  if (!MEMBER) {
+    var vTool = document.querySelector('[data-static-tool="today"]'), vShelves = document.querySelector('.book-pile') || document.querySelector('.shelves');
+    if (vTool) data().then(function () { today(vTool); }).catch(function () {});
+    else if (vShelves) data().then(function () { homeToday(vShelves); }).catch(function () {});
+    return;
+  }
   // The beginner path: the member's time zone goes with "Start", so its emails come at 11:11 their time (lib/path.php).
   document.querySelectorAll('input[data-tz]').forEach(function (i) { try { i.value = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {} });
   grimoireTools();

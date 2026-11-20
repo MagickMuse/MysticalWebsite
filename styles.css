@@ -2,7 +2,7 @@
 
    One stylesheet for the website and the Manuscript, in this order (search for "---------- name"):
      1. Foundations: fonts, tokens (colours, spacing), accessibility settings, base, type, stars, buttons, frames
-     2. The website: header, the opening, praise, contents, sections, cards, posts, courses, chapters, FAQ,
+     2. The website: header, the opening, praise, sections, cards, posts, courses, chapters, FAQ,
         call-to-action band, articles, links page, 404, footer, offer pop-up, cookie consent, buy bar, motion
      3. Settings panel and the Manuscript's search bar
      4. The Manuscript: pages, collections, connections, paywall and forms, search, shop, dashboard, saved pages,
@@ -316,18 +316,6 @@ header.site {
 }
 .alt .praise .quote { background: var(--texture), var(--bg); }
 @media (max-width: 900px) { .praise { grid-template-columns: minmax(0, 1fr); max-width: 560px; } }
-
-/* ---------- contents: the three ways in, set like a book's table of contents ---------- */
-.contents { list-style: none; margin: 0 auto; padding: 0; max-width: 860px; border-top: 1px solid var(--line); }
-.contents li { border-bottom: 1px solid var(--line); }
-.contents a { display: grid; gap: .4rem; padding: 1.6rem .2rem; text-decoration: none; }
-.contents .c-line { display: flex; align-items: baseline; gap: 1rem; }
-.contents .c-name { font-family: var(--display); font-size: clamp(1.8rem, 3.4vw, 2.4rem); line-height: 1.1; }
-.contents .c-dots { flex: 1; min-width: 2rem; border-bottom: 1px dotted color-mix(in srgb, var(--gold) 80%, transparent); transform: translateY(-.35em); }
-.contents .c-sub { font-family: var(--display); font-style: italic; font-size: 1.2rem; color: var(--muted); white-space: nowrap; }
-.contents p { color: var(--ink); }
-.contents a:hover .c-name { color: var(--accent-text); }
-.contents a:hover .c-dots { border-bottom-style: solid; }
 
 /* "for you if": a short list with gold stars for bullets */
 .for-you {
@@ -2645,7 +2633,7 @@ html.peek .car-track { overflow: hidden; }
    The containers below stack their children with margins from the spacing scale instead of their own gaps,
    so a label sits the same distance above its heading, and text the same distance above its buttons, everywhere. */
 :is(.opening-page, .intro, .feature-text, .card, .post, .about-text, .course-text, .chapter-text, .chapter-mark,
-    .article-head, .callout, .cta-inner, .offer[open], .contents a, .ledger dd, .panel, .split > div, .author > div,
+    .article-head, .callout, .cta-inner, .offer[open], .ledger dd, .panel, .split > div, .author > div,
     .mm-hero,
     .pg-head,
     .product-text,
@@ -2664,7 +2652,7 @@ html.peek .car-track { overflow: hidden; }
       gap: 0;
     }
 :is(.opening-page, .intro, .feature-text, .card, .post, .about-text, .course-text, .chapter-text, .chapter-mark,
-    .article-head, .callout, .cta-inner, .offer[open], .contents a, .ledger dd, .panel, .split > div, .author > div,
+    .article-head, .callout, .cta-inner, .offer[open], .ledger dd, .panel, .split > div, .author > div,
     .mm-hero,
     .pg-head,
     .product-text,
@@ -2683,7 +2671,7 @@ html.peek .car-track { overflow: hidden; }
       margin-top: var(--gap-text);
     }
 :is(.opening-page, .intro, .feature-text, .card, .post, .about-text, .course-text, .chapter-text, .chapter-mark,
-    .article-head, .callout, .cta-inner, .offer[open], .contents a, .ledger dd, .panel, .split > div, .author > div,
+    .article-head, .callout, .cta-inner, .offer[open], .ledger dd, .panel, .split > div, .author > div,
     .mm-hero,
     .pg-head,
     .product-text,
@@ -2705,7 +2693,7 @@ html.peek .car-track { overflow: hidden; }
       margin-top: var(--gap-media);
     }
 :is(.opening-page, .intro, .feature-text, .card, .post, .about-text, .course-text, .chapter-text, .chapter-mark,
-    .article-head, .callout, .cta-inner, .offer[open], .contents a, .ledger dd, .panel, .split > div, .author > div,
+    .article-head, .callout, .cta-inner, .offer[open], .ledger dd, .panel, .split > div, .author > div,
     .mm-hero,
     .pg-head,
     .product-text,
@@ -2726,7 +2714,7 @@ html.peek .car-track { overflow: hidden; }
       margin-top: var(--gap-head);
     }
 :is(.opening-page, .intro, .feature-text, .card, .post, .about-text, .course-text, .chapter-text, .chapter-mark,
-    .article-head, .callout, .cta-inner, .offer[open], .contents a, .ledger dd, .panel, .split > div, .author > div,
+    .article-head, .callout, .cta-inner, .offer[open], .ledger dd, .panel, .split > div, .author > div,
     .mm-hero,
     .pg-head,
     .product-text,
@@ -2745,7 +2733,7 @@ html.peek .car-track { overflow: hidden; }
       margin-top: var(--gap-h3);
     }
 :is(.opening-page, .intro, .feature-text, .card, .post, .about-text, .course-text, .chapter-text, .chapter-mark,
-    .article-head, .callout, .cta-inner, .offer[open], .contents a, .ledger dd, .panel, .split > div, .author > div,
+    .article-head, .callout, .cta-inner, .offer[open], .ledger dd, .panel, .split > div, .author > div,
     .mm-hero,
     .pg-head,
     .product-text,
@@ -2765,7 +2753,7 @@ html.peek .car-track { overflow: hidden; }
       margin-top: var(--gap-label);
     }
 :is(.opening-page, .intro, .feature-text, .card, .post, .about-text, .course-text, .chapter-text, .chapter-mark,
-    .article-head, .callout, .cta-inner, .offer[open], .contents a, .ledger dd, .panel, .split > div, .author > div,
+    .article-head, .callout, .cta-inner, .offer[open], .ledger dd, .panel, .split > div, .author > div,
     .mm-hero,
     .pg-head,
     .product-text,
@@ -2788,7 +2776,7 @@ html.peek .car-track { overflow: hidden; }
       margin-top: var(--gap-actions);
     }
 :is(.opening-page, .intro, .feature-text, .card, .post, .about-text, .course-text, .chapter-text, .chapter-mark,
-    .article-head, .callout, .cta-inner, .offer[open], .contents a, .ledger dd, .panel, .split > div, .author > div,
+    .article-head, .callout, .cta-inner, .offer[open], .ledger dd, .panel, .split > div, .author > div,
     .mm-hero,
     .pg-head,
     .product-text,

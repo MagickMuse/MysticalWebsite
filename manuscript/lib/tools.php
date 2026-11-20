@@ -25,10 +25,13 @@ const TOOL_PAGES = [
     'enchanted-tools' => ['Enchanted Tools', 'tools'],
 ];
 
-/** A tool's page: members only; tools.js fills in the article. */
+/** Tools anyone can open (they read /tools/today.json, which holds no page's content). */
+const PUBLIC_TOOLS = ['today'];
+
+/** A tool's page: members only, except the public ones; tools.js fills in the article. */
 function view_tool_page(string $route): void
 {
-    if (!has_access()) { view_gate(['locked' => true]); return; }
+    if (!has_access() && !in_array($route, PUBLIC_TOOLS, true)) { view_gate(['locked' => true]); return; }
     [$title, $tool] = TOOL_PAGES[$route];
     record_view('route:/manuscript/' . $route);
     layout($title, '<article class="pg pg-tool" data-static-tool="' . e($tool) . '"><p class="lede">Opening the ' . e($title) . '…</p>'
@@ -61,6 +64,49 @@ function serve_tools_data(): void
     header('ETag: ' . $etag);
     if (($_SERVER['HTTP_IF_NONE_MATCH'] ?? '') === $etag) { http_response_code(304); return; }
     readfile($cache);
+}
+
+/**
+ * /tools/today.json, for everyone: just what Today needs, in the same shape as data.json. The day's possible
+ * influences (moon phases, planets, signs, weekdays, calendar days, seasons, festivals) with their connections, and
+ * the names of the pages they connect to. No page's content, and not the rest of the Manuscript.
+ */
+function serve_today_data(): void
+{
+    $cache = config('data_dir') . '/tools-today-v1.json';
+    $content = config('data_dir') . '/content.sqlite';
+    if (!is_file($cache) || filemtime($cache) < (int) @filemtime($content)) {
+        file_put_contents($cache . '.tmp', json_encode(today_data(tools_data()), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        rename($cache . '.tmp', $cache);
+    }
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: public, max-age=3600');
+    readfile($cache);
+}
+
+/** data.json cut down to Today's pages (see serve_today_data()); build-static-tools.py does the same for the preview. */
+function today_data(array $d): array
+{
+    $kinds = ['Moon Phases', 'Planets', 'Western Zodiac', 'Days of the Week', 'Days of the Year', 'Seasons', 'Holidays'];
+    $src = [];
+    foreach ($d['p'] as $i => $p) {
+        if (array_intersect(explode('|', (string) $p[4]), $kinds)) $src[$i] = true;
+    }
+    foreach ($d['f'] as $list) foreach ($list as $i) $src[$i] = true;
+    $keep = $src;
+    foreach (array_keys($src) as $i) foreach ($d['l'][$i] as $j) $keep[$j] = true;
+    ksort($keep);
+    $new = array_flip(array_keys($keep)); // old position => new position
+    $p = []; $l = []; $count = [];
+    foreach ($new as $i => $n) {
+        $p[] = $d['p'][$i];
+        $count[] = count($d['l'][$i]); // how connected each page is overall (Today breaks ties with it), a number only
+        // a named page keeps only its links back to Today's pages (they rank "Work with Today")
+        $l[] = array_values(array_map(fn($j) => $new[$j], isset($src[$i]) ? $d['l'][$i] : array_filter($d['l'][$i], fn($j) => isset($src[$j]))));
+    }
+    $f = [];
+    foreach ($d['f'] as $day => $list) $f[$day] = array_map(fn($i) => $new[$i], $list);
+    return ['g' => $d['g'], 'p' => $p, 'l' => $l, 'n' => $count, 'f' => $f, 't' => [], 'w' => (object) [], 'gp' => (object) [], 'gt' => $d['gt']];
 }
 
 /**
