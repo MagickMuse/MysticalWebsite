@@ -20,20 +20,28 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function url(path) { return ROOT + path; }
   function params() { return new URLSearchParams(location.search); }
+  function okJson(r) { if (!r.ok) throw new Error(); return r.json(); }
+  function readStored(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } }
+  function writeStored(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
+  function kindsOf(p) { return p[4] ? p[4].split('|') : []; } // a page's kinds (its tags), from data.json
 
   // Notes and workings: the member's account on the live site (lib/tools.php), this browser on the preview.
   var Store = {
-    local: function (kind) { try { return JSON.parse(localStorage.getItem('mm-' + kind + '-v1')) || []; } catch (e) { return []; } },
-    keepLocal: function (kind, list) { try { localStorage.setItem('mm-' + kind + '-v1', JSON.stringify(list)); } catch (e) {} },
+    local: function (kind) { return readStored('mm-' + kind + '-v1') || []; },
+    keepLocal: function (kind, list) { writeStored('mm-' + kind + '-v1', list); },
     list: function (kind) {
       if (PREVIEW) return Promise.resolve(Store.local(kind));
-      return fetch(url(kind + '?json=1'), { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error(); return r.json(); });
+      return fetch(url(kind + '?json=1'), { credentials: 'same-origin' }).then(okJson);
     },
     post: function (kind, fields) {
       var body = new FormData(); body.append('csrf', CSRF);
-      Object.keys(fields).forEach(function (k) { body.append(k, typeof fields[k] === 'object' ? JSON.stringify(fields[k]) : fields[k] == null ? '' : fields[k]); });
-      return fetch(url(kind), { method: 'POST', body: body, credentials: 'same-origin', headers: { 'X-Requested-With': 'fetch' } })
-        .then(function (r) { if (!r.ok) throw new Error(); return r.json(); });
+      Object.keys(fields).forEach(function (k) {
+        var v = fields[k];
+        if (typeof v === 'object') v = JSON.stringify(v); // lists (a working's intents and items) go as JSON; null as "null"
+        else if (v === undefined) v = '';
+        body.append(k, v);
+      });
+      return fetch(url(kind), { method: 'POST', body: body, credentials: 'same-origin', headers: { 'X-Requested-With': 'fetch' } }).then(okJson);
     },
     /** Saves one (new when it has no id); resolves to its id (0: an empty new note, not kept). */
     save: function (kind, item) {
@@ -57,9 +65,9 @@
   // ------------------------------------------------------------------ the data
   var dataP = null, D = null, bySlug = {};
   function data() {
-    if (!dataP) dataP = fetch(url('tools/data.json')).then(function (r) { if (!r.ok) throw new Error(); return r.json(); }).then(function (d) {
+    if (!dataP) dataP = fetch(url('tools/data.json')).then(okJson).then(function (d) {
       D = d;
-      d.part = d.p.map(function (p) { return partOf(d.g[p[0]], p[4] ? p[4].split('|') : [], p[1]); });
+      d.part = d.p.map(function (p) { return partOf(d.g[p[0]], kindsOf(p), p[1]); });
       d.p.forEach(function (p, i) { bySlug[d.g[p[0]] + '/' + p[1]] = i; });
       return d;
     });
@@ -67,31 +75,32 @@
   }
   function pg(i) {
     var p = D.p[i];
-    return { i: i, g: D.g[p[0]], slug: p[1], title: p[2], icon: p[3], part: D.part[i], kinds: p[4] ? p[4].split('|') : [], range: p[5], url: url(D.g[p[0]] + '/' + p[1] + '/') };
+    return { i: i, g: D.g[p[0]], slug: p[1], title: p[2], icon: p[3], part: D.part[i], kinds: kindsOf(p), range: p[5], url: url(D.g[p[0]] + '/' + p[1] + '/') };
   }
   function find(g, slug) { var i = bySlug[g + '/' + slug]; return i == null ? null : pg(i); }
   function ofKind(g, kind) {
     var out = {};
-    D.p.forEach(function (p, i) { if (D.g[p[0]] === g && p[4] && p[4].split('|').indexOf(kind) !== -1) out[p[1]] = pg(i); });
+    D.p.forEach(function (p, i) { if (D.g[p[0]] === g && kindsOf(p).indexOf(kind) !== -1) out[p[1]] = pg(i); });
     return out;
   }
+  /** A picture as data.json names it: "a:…" is in assets/, "m:…" in media/. */
+  function artUrl(ref) { return url((ref.indexOf('a:') === 0 ? 'assets/' : 'media/') + ref.slice(2)); }
   function iconHtml(icon, cls) {
     if (!icon) return '';
-    if (icon.indexOf('a:') === 0) return '<img class="' + cls + '" src="' + esc(url('assets/' + icon.slice(2))) + '" alt="" width="24" height="24" loading="lazy">';
-    if (icon.indexOf('m:') === 0) return '<img class="' + cls + '" src="' + esc(url('media/' + icon.slice(2))) + '" alt="" width="24" height="24" loading="lazy">';
+    if (icon.indexOf('a:') === 0 || icon.indexOf('m:') === 0) return '<img class="' + cls + '" src="' + esc(artUrl(icon)) + '" alt="" width="24" height="24" loading="lazy">';
     return '<span class="' + cls + '" aria-hidden="true">' + esc(icon) + '</span>';
   }
   function chip(p) { return '<a class="rel" href="' + esc(p.url) + '">' + iconHtml(p.icon, 'rel-icon') + '<span>' + esc(p.title) + '</span></a>'; }
-  function crumbs(g, more) {
+  /** The breadcrumb: the Manuscript, then the grimoire g (none if g is '' or not one of these). */
+  function crumbs(g) {
     var name = { ritual: 'Ritual Grimoire', astrology: 'Astrology Grimoire', timing: 'Timing Grimoire', card: 'Card Grimoire', rune: 'Rune Grimoire', dream: 'Dream Grimoire' }[g] || '';
     var h = '<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' + esc(ROOT) + '">Manuscript</a></li>' + (name ? '<li><a href="' + esc(url(g + '/')) + '">' + name + '</a></li>' : '');
-    (more || []).forEach(function (m) { h += '<li><a href="' + esc(m[1]) + '">' + esc(m[0]) + '</a></li>'; });
     return h + '</ol></nav>';
   }
 
-  /** Which part of a working a page can be: timing, a colour, a herb… (none: it isn't one). */
   /** One of the 78 tarot cards (the "Suit of Cups"-style overview pages have meanings too, but aren't cards). */
   function isTarotCard(slug, kinds) { return kinds.indexOf('Tarot') !== -1 && !/^suit-of-/.test(slug); }
+  /** Which part of a working a page can be: timing, a colour, a herb… (none: it isn't one). */
   function partOf(g, kinds, slug) {
     var has = function (k) { return kinds.indexOf(k) !== -1; };
     if (has('Guide')) return ''; // guide pages are reading, not ingredients
@@ -173,6 +182,12 @@
   function iso(day) { return day.getFullYear() + '-' + String(day.getMonth() + 1).padStart(2, '0') + '-' + String(day.getDate()).padStart(2, '0'); }
   function short(day) { return MONTHS[day.getMonth()].slice(0, 3) + ' ' + day.getDate(); }
   function addDays(day, n) { var d = new Date(day); d.setDate(d.getDate() + n); return d; }
+  function longDate(day) { return DAYS[day.getDay()] + ', ' + MONTHS[day.getMonth()] + ' ' + day.getDate(); } // Friday, November 20
+  /** The day asked for in the address (?d=2026-11-20), at midnight; null when none is. */
+  function askedDay(q) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(q.get('d') || '');
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+  }
 
   // ------------------------------------------------------------------ Today
   /** What a day holds: its moon, weekday and ruling planet, the Sun's sign, the season, and the intentions they favor. */
@@ -214,10 +229,10 @@
   }
 
   function today(tool) {
-    var q = params(), m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(q.get('d') || ''), south = q.get('h') === 's';
-    var day = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date();
+    var q = params(), south = q.get('h') === 's';
+    var day = askedDay(q) || new Date();
     day.setHours(0, 0, 0, 0);
-    var R = dayReading(day, south), ph = R.ph, moon = R.moon, ruler = R.ruler, sign = R.sign, seas = R.seas, dayPage = R.dayPage, src = R.src;
+    var R = dayReading(day, south), dayPage = R.dayPage, src = R.src;
 
     var cards = influenceCards(R);
 
@@ -245,7 +260,7 @@
     var h = south ? '&h=s' : '', prev = addDays(day, -1), next = addDays(day, 1);
     tool.className = 'pg pg-tool pg-today';
     render(tool, '<header class="pg-head tool-head">' + crumbs('timing') + '<p class="eyebrow">Today in the Manuscript</p>'
-      + '<h1>' + DAYS[day.getDay()] + ', ' + MONTHS[day.getMonth()] + ' ' + day.getDate() + '</h1>'
+      + '<h1>' + longDate(day) + '</h1>'
       + (R.lede ? '<p class="lede">' + esc(R.lede) + '</p>' : '') + sabbatHtml(day, south)
       + '<p class="small day-nav"><a class="link" href="?d=' + iso(prev) + h + '">‹ ' + short(prev) + '</a><span aria-hidden="true">·</span>'
       + '<a class="link" href="?d=' + iso(day) + (south ? '' : '&h=s') + '">' + (south ? 'Use the northern hemisphere' : 'Use the southern hemisphere') + '</a><span aria-hidden="true">·</span>'
@@ -277,7 +292,7 @@
     box.className = 'today-glance';
     box.setAttribute('aria-labelledby', 'glance-h');
     box.innerHTML = '<header class="glance-head"><p class="eyebrow">Today in the Manuscript</p>'
-      + '<h2 id="glance-h">' + DAYS[day.getDay()] + ', ' + MONTHS[day.getMonth()] + ' ' + day.getDate() + '</h2>'
+      + '<h2 id="glance-h">' + longDate(day) + '</h2>'
       + (R.lede ? '<p class="lede">' + esc(R.lede) + '</p>' : '') + sabbatHtml(day, false) + '</header>'
       + influenceCards(R)
       + (R.intents.length ? '<div class="glance-favs"><p class="eyebrow">Today Favors</p><div class="favs">' + R.intents.slice(0, 6).map(function (x) { return favourLink(x, true); }).join('') + '</div></div>' : '')
@@ -358,7 +373,7 @@
     });
     showWorkings(tool, false);
   }
-  /** "Your workings" under the Spell Builder ($open: open the newest and scroll to it, just after saving). */
+  /** "Your workings" under the Spell Builder (open: open the newest and scroll to it, just after saving). */
   function showWorkings(tool, open) {
     return Store.list('workings').then(function (list) {
       var old = tool.querySelector('.workings'); if (old) old.remove();
@@ -502,7 +517,7 @@
       Store.save('notes', item).then(function (id) {
         item.id = id; b.textContent = 'Saved ✓';
         var open = document.createElement('a'); open.href = url('notes/'); open.className = 'link'; open.textContent = 'Open in notes';
-        open.addEventListener('click', function (e) { e.preventDefault(); (pop = pop || noteDialog()).openNote(item); });
+        open.addEventListener('click', function (e) { e.preventDefault(); notePop().openNote(item); });
         b.after(open);
       }).catch(function () { b.disabled = false; b.textContent = 'Not saved. Try again'; });
     });
@@ -512,13 +527,19 @@
   // Seven face-down cards, shuffled from the tarot deck, fanned out. The one picked turns over: upright, or (one time
   // in three) reversed, with that side's keywords and a way into the card's page.
   var REVERSED_CHANCE = 1 / 3;
+  function titles(pages) { return pages.map(function (p) { return p.title; }); }
+  /** Turns a drawn card or stone face up: straight away for reduced motion, else on the second frame, so it animates. */
+  function turnOver(flip, quiet) {
+    if (quiet) flip.classList.add('turned'); else requestAnimationFrame(function () { requestAnimationFrame(function () { flip.classList.add('turned'); }); });
+  }
+  function tarotDeck() { return D.t.filter(function (c) { return isTarotCard(D.p[c[0]][1], D.p[c[0]][4].split('|')); }); }
   function shuffled(list) {
     var a = list.slice();
     for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; }
     return a;
   }
   function tarot(tool) {
-    var deck = D.t.filter(function (c) { return isTarotCard(D.p[c[0]][1], D.p[c[0]][4].split('|')); }), hand = shuffled(deck).slice(0, 7);
+    var hand = shuffled(tarotDeck()).slice(0, 7);
     tool.className = 'pg pg-tool pg-tarot';
     render(tool, '<header class="pg-head tool-head">' + crumbs('card') + '<h1>Draw a Card</h1></header>'
       + '<div class="spread" role="group" aria-label="Seven face-down cards">' + hand.map(function (c, k) {
@@ -534,20 +555,19 @@
       setTimeout(function () {
         spread.hidden = true;
         drawn.innerHTML = '<div class="drawn-card' + (rev ? ' reversed' : '') + '"><div class="flip"><span class="face tarot-back"><span class="back-art"></span></span>'
-          + '<span class="face front">' + (c[1] ? '<img src="' + esc(url((c[1].indexOf('a:') === 0 ? 'assets/' : 'media/') + c[1].slice(2))) + '" alt="' + esc(card.title + (rev ? ', reversed' : '')) + '">' : '<span class="front-name">' + esc(card.title) + '</span>') + '</span></div></div>'
+          + '<span class="face front">' + (c[1] ? '<img src="' + esc(artUrl(c[1])) + '" alt="' + esc(card.title + (rev ? ', reversed' : '')) + '">' : '<span class="front-name">' + esc(card.title) + '</span>') + '</span></div></div>'
           + '<div class="reading"><p class="eyebrow">' + (rev ? 'Reversed' : 'Upright') + '</p><h2>' + esc(card.title) + '</h2>'
           + (words.length ? '<p class="small">' + (rev ? 'Reversed, it speaks of' : 'It speaks of') + '</p><div class="rels keywords">' + words.map(chip).join('') + '</div>' : '')
           + '<div class="actions"><a class="btn" href="' + esc(card.url) + '">View More</a><button class="btn ghost" type="button" data-again>Draw Again</button></div></div>';
-        var flip = drawn.querySelector('.drawn-card');
-        if (quiet) flip.classList.add('turned'); else requestAnimationFrame(function () { requestAnimationFrame(function () { flip.classList.add('turned'); }); });
+        turnOver(drawn.querySelector('.drawn-card'), quiet);
         drawn.querySelector('[data-again]').addEventListener('click', function () { tarot(tool); window.scrollTo({ top: 0, behavior: quiet ? 'auto' : 'smooth' }); });
         var front = drawn.querySelector('.front img');
         shareButton(drawn.querySelector('.reading .actions'), (front ? loadImage(front.src) : Promise.resolve(null)).then(function (im) {
-          return prepareShare({ eyebrow: 'My card', title: card.title, state: rev ? 'Reversed' : 'Upright', reversed: rev, card: im, words: words.map(function (p) { return p.title; }) }, 'my-card-' + card.slug);
+          return prepareShare({ eyebrow: 'My card', title: card.title, state: rev ? 'Reversed' : 'Upright', reversed: rev, card: im, words: titles(words) }, 'my-card-' + card.slug);
         }), 'I drew ' + card.title + (rev ? ', reversed' : '') + ' ✦');
         saveToNotes(drawn.querySelector('.reading .actions'), function () {
           return { title: card.title + (rev ? ' (reversed)' : '') + ' · ' + noteDate(), body: 'Drawn on ' + noteDate() + ', ' + moonNow() + '.\n'
-            + (rev ? 'Reversed' : 'Upright') + (words.length ? ': ' + words.map(function (p) { return p.title; }).join(', ') : '') + '\n\n' };
+            + (rev ? 'Reversed' : 'Upright') + (words.length ? ': ' + titles(words).join(', ') : '') + '\n\n' };
         });
       }, quiet ? 0 : 450);
     });
@@ -564,7 +584,7 @@
       .sort(function (a, b) { return D.p[a][2].localeCompare(D.p[b][2]); }).map(pg);
   }
   function runes(tool) {
-    var bag = []; D.p.forEach(function (p, i) { if (p[4] && p[4].split('|').indexOf('Elder Futhark Runes') !== -1) bag.push(i); });
+    var bag = []; D.p.forEach(function (p, i) { if (kindsOf(p).indexOf('Elder Futhark Runes') !== -1) bag.push(i); });
     var hand = shuffled(bag).slice(0, 7);
     tool.className = 'pg pg-tool pg-runes';
     render(tool, '<header class="pg-head tool-head">' + crumbs('rune') + '<h1>Pull a Rune</h1></header>'
@@ -585,15 +605,14 @@
           + '<div class="reading"><p class="eyebrow">Elder Futhark</p><h2>' + esc(rune.title) + '</h2>'
           + (words.length ? '<div class="rels keywords">' + words.map(chip).join('') + '</div>' : '')
           + '<div class="actions"><a class="btn" href="' + esc(rune.url) + '">View More</a><button class="btn ghost" type="button" data-again>Pull Again</button></div></div>';
-        var flip = drawn.querySelector('.drawn-card');
-        if (quiet) flip.classList.add('turned'); else requestAnimationFrame(function () { requestAnimationFrame(function () { flip.classList.add('turned'); }); });
+        turnOver(drawn.querySelector('.drawn-card'), quiet);
         drawn.querySelector('[data-again]').addEventListener('click', function () { runes(tool); window.scrollTo({ top: 0, behavior: quiet ? 'auto' : 'smooth' }); });
         var tone = getComputedStyle(drawn.querySelector('.front.stone')).getPropertyValue('--tone').trim();
         shareButton(drawn.querySelector('.reading .actions'), prepareShare({ eyebrow: 'My rune', title: rune.title, state: 'Elder Futhark', card: null, glyph: glyph, tone: tone,
-          words: words.map(function (p) { return p.title; }) }, 'my-rune-' + rune.slug), 'I pulled ' + rune.title + ' ✦');
+          words: titles(words) }, 'my-rune-' + rune.slug), 'I pulled ' + rune.title + ' ✦');
         saveToNotes(drawn.querySelector('.reading .actions'), function () {
           return { title: 'Rune: ' + rune.title + ' · ' + noteDate(), body: 'Pulled on ' + noteDate() + ', ' + moonNow() + '.\n'
-            + (words.length ? words.map(function (p) { return p.title; }).join(', ') : '') + '\n\n' };
+            + titles(words).join(', ') + '\n\n' };
         });
       }, quiet ? 0 : 450);
     });
@@ -751,8 +770,7 @@
     var spreadName = document.querySelector('.pg-head h1').textContent.trim();
     document.querySelector('[data-do-spread]').addEventListener('click', function () {
       var old = document.querySelector('.spread-reading'); if (old) old.remove();
-      var deck = D.t.filter(function (c) { return isTarotCard(D.p[c[0]][1], D.p[c[0]][4].split('|')); });
-      var hand = shuffled(deck).slice(0, n).map(function (c) { return { c: c, rev: Math.random() < REVERSED_CHANCE }; });
+      var hand = shuffled(tarotDeck()).slice(0, n).map(function (c) { return { c: c, rev: Math.random() < REVERSED_CHANCE }; });
       var box = document.createElement('section');
       box.className = 'spread-reading';
       box.innerHTML = '<header class="spread-head"><h2>Your Reading</h2><p class="small">Turn the cards over one at a time, in order.'
@@ -768,7 +786,7 @@
         if (btn.classList.contains('turned')) return;
         var h = hand[k], card = pg(h.c[0]), words = (h.rev ? h.c[3] : h.c[2]).map(pg).slice(0, 6);
         btn.classList.add('turned'); btn.setAttribute('aria-label', 'Card ' + (k + 1) + ': ' + card.title + (h.rev ? ', reversed' : ''));
-        btn.querySelector('.tarot-back').outerHTML = '<span class="slot-front' + (h.rev ? ' reversed' : '') + '">' + (h.c[1] ? '<img src="' + esc(url((h.c[1].indexOf('a:') === 0 ? 'assets/' : 'media/') + h.c[1].slice(2))) + '" alt="">' : '<span>' + esc(card.title) + '</span>') + '</span>';
+        btn.querySelector('.tarot-back').outerHTML = '<span class="slot-front' + (h.rev ? ' reversed' : '') + '">' + (h.c[1] ? '<img src="' + esc(artUrl(h.c[1])) + '" alt="">' : '<span>' + esc(card.title) + '</span>') + '</span>';
         var read = slot.querySelector('.slot-read');
         read.hidden = false;
         read.innerHTML = '<a class="slot-name" href="' + esc(card.url) + '">' + esc(card.title) + '</a><span class="slot-state">' + (h.rev ? 'Reversed' : 'Upright') + '</span>'
@@ -776,7 +794,7 @@
         if (box.querySelectorAll('.spread-card.turned').length === n && !box.querySelector('.save-note-btn')) {
           saveToNotes(box.querySelector('.spread-actions'), function () {
             return { title: spreadName + ' · ' + noteDate(), body: 'Laid out on ' + noteDate() + ', ' + moonNow() + '.\n\n' + hand.map(function (x, j) {
-              var c = pg(x.c[0]), w = (x.rev ? x.c[3] : x.c[2]).map(pg).slice(0, 6).map(function (p) { return p.title; });
+              var c = pg(x.c[0]), w = titles((x.rev ? x.c[3] : x.c[2]).map(pg).slice(0, 6));
               return (j + 1) + '. ' + (details[j + 1] || 'Card ' + (j + 1)) + '\n   ' + c.title + (x.rev ? ' (reversed)' : '') + (w.length ? ': ' + w.join(', ') : '');
             }).join('\n') + '\n\n' };
           });
@@ -897,6 +915,7 @@
       return out;
     });
   }
+  function symbolName(title) { return title.replace(/^Dreaming of /i, ''); } // "Dreaming of Water" → "Water"
   function dreamDecoder(tool) {
     tool.className = 'pg pg-tool pg-dream';
     render(tool, '<header class="pg-head tool-head">' + crumbs('dream') + '<h1>Dream Decoder</h1>'
@@ -908,16 +927,16 @@
       e.preventDefault();
       var text = box.value.trim(); if (!text) return;
       var found = findSymbols(text), marked = '', last = 0;
-      found.forEach(function (f) { marked += esc(text.slice(last, f.start)) + '<mark' + (f.near ? ' title="Read as ' + esc(D.p[f.i][2].replace(/^Dreaming of /i, '')) + '"' : '') + '>' + esc(text.slice(f.start, f.end)) + '</mark>'; last = f.end; });
+      found.forEach(function (f) { marked += esc(text.slice(last, f.start)) + '<mark' + (f.near ? ' title="Read as ' + esc(symbolName(D.p[f.i][2])) + '"' : '') + '>' + esc(text.slice(f.start, f.end)) + '</mark>'; last = f.end; });
       marked += esc(text.slice(last));
       var symbols = found.filter(function (f) { return f.first; }).map(function (f) { return pg(f.i); });
       out.innerHTML = '<section class="tool-section"><h2>Your Dream</h2><p class="dream-marked">' + marked.replace(/\n/g, '<br>') + '</p></section>'
         + (symbols.length ? '<section class="tool-section"><h2>The Symbols <small>' + symbols.length + '</small></h2><ul class="dream-symbols">'
-          + symbols.map(function (p, k) { return '<li><details class="toggle" data-sym="' + k + '"><summary><span class="sym-name">' + esc(p.title.replace(/^Dreaming of /i, '')) + '</span></summary><div class="sym-read"><p class="small">Opening…</p></div></details></li>'; }).join('')
+          + symbols.map(function (p, k) { return '<li><details class="toggle" data-sym="' + k + '"><summary><span class="sym-name">' + esc(symbolName(p.title)) + '</span></summary><div class="sym-read"><p class="small">Opening…</p></div></details></li>'; }).join('')
           + '</ul></section>' : '<p class="lede">None of the Dream Grimoire’s symbols came up. Try naming the things, places, animals and people in it.</p>')
         + '<div class="actions dream-actions"></div>';
       if (symbols.length) saveToNotes(out.querySelector('.dream-actions'), function () {
-        return { title: 'Dream · ' + noteDate(), body: text + '\n\nSymbols: ' + symbols.map(function (p) { return p.title.replace(/^Dreaming of /i, ''); }).join(', ') + '\n\n' };
+        return { title: 'Dream · ' + noteDate(), body: text + '\n\nSymbols: ' + titles(symbols).map(symbolName).join(', ') + '\n\n' };
       });
       out.querySelectorAll('details[data-sym]').forEach(function (d) {
         d.addEventListener('toggle', function () {
@@ -957,8 +976,8 @@
   var ORDINAL = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'];
   function planetaryHours(tool) {
     tool.className = 'pg pg-tool pg-hours';
-    var saved = store0('mm-place'), q = params(), m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(q.get('d') || '');
-    var day = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(); day.setHours(0, 0, 0, 0);
+    var saved = readStored('mm-place'), asked = askedDay(params());
+    var day = asked || new Date(); day.setHours(0, 0, 0, 0);
     var head = '<header class="pg-head tool-head">' + crumbs('timing') + '<h1>Planetary Hours</h1></header>';
     var placeForm = '<form class="mm-form inline place-form"><p class="lede">Planetary hours follow your sunrise and sunset, so they need to know roughly where you are. It stays in this browser.</p>'
       + '<div class="actions"><button class="btn" type="button" data-locate>Use My Location</button></div>'
@@ -969,7 +988,7 @@
       var form = tool.querySelector('.place-form'), err = tool.querySelector('.place-error');
       var use = function (lat, lon) {
         if (!(Math.abs(lat) <= 90 && Math.abs(lon) <= 180)) { err.hidden = false; err.textContent = 'Those don’t look like a latitude and longitude.'; return; }
-        try { localStorage.setItem('mm-place', JSON.stringify({ lat: Math.round(lat * 100) / 100, lon: Math.round(lon * 100) / 100 })); } catch (e) {}
+        writeStored('mm-place', { lat: Math.round(lat * 100) / 100, lon: Math.round(lon * 100) / 100 });
         planetaryHours(tool);
       };
       tool.querySelector('[data-locate]').addEventListener('click', function () {
@@ -988,7 +1007,7 @@
       if (!rise || !set || !next) { render(tool, head + '<p class="lede">The sun doesn’t rise and set here today, so there are no planetary hours to count.</p>', 'Planetary Hours'); return; }
       var r = rise.date, s = set.date, n2 = next.date, dayLen = (s - r) / 12, nightLen = (n2 - s) / 12;
       // Before today's sunrise it's still last night's hours: show yesterday's planetary day.
-      if (!m && new Date() < r) { var y = new Date(day); y.setDate(day.getDate() - 1); history.replaceState(null, '', '?d=' + iso(y)); planetaryHours(tool); return; }
+      if (!asked && new Date() < r) { history.replaceState(null, '', '?d=' + iso(addDays(day, -1))); planetaryHours(tool); return; }
       var start = CHALDEAN.indexOf(DAY_RULER[day.getDay()]), rows = '', now = new Date(), current = null;
       for (var h = 0; h < 24; h++) {
         var night = h >= 12, a = new Date(night ? s.getTime() + (h - 12) * nightLen : r.getTime() + h * dayLen), b = new Date(a.getTime() + (night ? nightLen : dayLen));
@@ -998,11 +1017,11 @@
           + '<td class="when">' + clock(a) + ' – ' + clock(b) + '</td><td class="planet"><span aria-hidden="true">' + PLANET_GLYPH[planet] + '\uFE0E</span> '
           + (pp ? '<a href="' + esc(pp.url) + '">' + esc(pp.title) + '</a>' : planet) + '</td></tr>';
       }
-      var ruler = find('astrology', DAY_RULER[day.getDay()]), prev = new Date(day), nxt = new Date(day); prev.setDate(day.getDate() - 1); nxt.setDate(day.getDate() + 1);
+      var ruler = find('astrology', DAY_RULER[day.getDay()]), prev = addDays(day, -1), nxt = addDays(day, 1);
       render(tool, head
         + (current ? '<div class="hour-now"><p class="eyebrow">Right Now</p><p class="hour-planet"><span aria-hidden="true">' + PLANET_GLYPH[current.planet] + '\uFE0E</span> '
           + (current.pp ? '<a href="' + esc(current.pp.url) + '">' + esc(current.pp.title) + '</a>' : current.planet) + '</p><p class="small">until ' + clock(current.b) + '</p></div>' : '')
-        + '<p class="lede">' + DAYS[day.getDay()] + ', ' + MONTHS[day.getMonth()] + ' ' + day.getDate() + (ruler ? ': a <a href="' + esc(ruler.url) + '">' + esc(ruler.title) + '</a> day' : '')
+        + '<p class="lede">' + longDate(day) + (ruler ? ': a <a href="' + esc(ruler.url) + '">' + esc(ruler.title) + '</a> day' : '')
         + '. Sunrise ' + clock(r) + ', sunset ' + clock(s) + '.</p>'
         + '<p class="small day-nav"><a class="link" href="?d=' + iso(prev) + '">‹ ' + short(prev) + '</a><span aria-hidden="true">·</span><a class="link" href="?d=' + iso(nxt) + '">' + short(nxt) + ' ›</a>'
         + '<span aria-hidden="true">·</span><button class="link as-button" type="button" data-forget>Change Location</button></p>'
@@ -1010,7 +1029,6 @@
       tool.querySelector('[data-forget]').addEventListener('click', function () { try { localStorage.removeItem('mm-place'); } catch (e) {} planetaryHours(tool); });
     }).catch(function () { render(tool, head + '<p class="lede">The hours couldn’t be worked out. Refresh the page to try again.</p>', 'Planetary Hours'); });
   }
-  function store0(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } }
 
   // ------------------------------------------------------------------ the Calendar: the moon's sign and phases each day
   // Each day shows the sign the moon is in at noon (the Moon in Aries… pages), with its moves into a new sign and the
@@ -1046,7 +1064,7 @@
       events.sort(function (x, y) { return x[0] - y[0]; });
       var list = cal.querySelector('.cal-moon-list'); if (!list) { list = document.createElement('section'); list.className = 'cal-moon-list'; cal.appendChild(list); }
       list.innerHTML = '<h2>The Moon in ' + MONTHS[month] + '</h2><ul>' + events.map(function (e) {
-        return '<li><time datetime="' + e[0].toISOString() + '">' + MONTHS[e[0].getMonth()].slice(0, 3) + ' ' + e[0].getDate() + ', ' + clock(e[0]) + '</time>'
+        return '<li><time datetime="' + e[0].toISOString() + '">' + short(e[0]) + ', ' + clock(e[0]) + '</time>'
           + (e[2] ? '<a href="' + esc(e[2].url) + '">' + esc(e[1]) + '</a>' : '<span>' + esc(e[1]) + '</span>') + '</li>';
       }).join('') + '</ul><p class="small">Times are your local time. The sign shown on each day is the moon’s sign at noon.</p>';
     };
@@ -1060,34 +1078,46 @@
   // ------------------------------------------------------------------ Continue reading (Manuscript home)
   // The last pages a member opened, kept in this browser, shown under the Manuscript's welcome.
   var RECENT = 'mm-recent-v1';
+  /** A page heading's words, without its icon. */
+  function headingText(h1) {
+    var c = h1.cloneNode(true);
+    c.querySelectorAll('.pg-icon').forEach(function (x) { x.remove(); });
+    return c.textContent.trim();
+  }
   function rememberPage() {
     var art = document.querySelector('article.pg-entry, article.pg-guide'), h1 = art && art.querySelector('.pg-head h1');
     if (!h1) return;
-    var c = h1.cloneNode(true), icon = c.querySelector('.pg-icon'), iconSrc = icon && icon.tagName === 'IMG' ? icon.getAttribute('src') : '', iconText = icon && icon.tagName !== 'IMG' ? icon.textContent : '';
-    c.querySelectorAll('.pg-icon').forEach(function (x) { x.remove(); });
-    var list = store0(RECENT) || [], item = { u: location.pathname, t: c.textContent.trim(), i: iconSrc ? new URL(iconSrc, location.href).pathname : '', e: iconText };
+    var icon = h1.querySelector('.pg-icon'), iconSrc = icon && icon.tagName === 'IMG' ? icon.getAttribute('src') : '', iconText = icon && icon.tagName !== 'IMG' ? icon.textContent : '';
+    var list = readStored(RECENT) || [], item = { u: location.pathname, t: headingText(h1), i: iconSrc ? new URL(iconSrc, location.href).pathname : '', e: iconText };
     list = [item].concat(list.filter(function (x) { return x.u !== item.u; })).slice(0, 8);
-    try { localStorage.setItem(RECENT, JSON.stringify(list)); } catch (e) {}
+    writeStored(RECENT, list);
   }
   function continueReading() {
-    var hero = document.querySelector('.mm-hero'), list = store0(RECENT) || [];
+    var hero = document.querySelector('.mm-hero'), list = readStored(RECENT) || [];
     if (!hero || !document.querySelector('.shelves, .book-pile') || !list.length || document.querySelector('.continue-reading')) return;
     hero.insertAdjacentHTML('beforeend', '<div class="continue-reading"><p class="eyebrow">Continue Reading</p><div class="rels">' + list.slice(0, 5).map(function (x) {
-      return '<a class="rel" href="' + esc(x.u) + '">' + (x.i ? '<img class="rel-icon" src="' + esc(x.i) + '" alt="" width="24" height="24" loading="lazy">' : x.e ? '<span class="rel-icon" aria-hidden="true">' + esc(x.e) + '</span>' : '') + '<span>' + esc(x.t) + '</span></a>';
+      var icon = '';
+      if (x.i) icon = '<img class="rel-icon" src="' + esc(x.i) + '" alt="" width="24" height="24" loading="lazy">';
+      else if (x.e) icon = '<span class="rel-icon" aria-hidden="true">' + esc(x.e) + '</span>';
+      return '<a class="rel" href="' + esc(x.u) + '">' + icon + '<span>' + esc(x.t) + '</span></a>';
     }).join('') + '</div></div>');
   }
 
   // ------------------------------------------------------------------ the shelf's Guide Pages and Enchanted Tools books
   // Every guide page and every tool on one page each, grouped by grimoire (they're in each grimoire's intro too).
-  function grimoireOrder(keys) {
-    return keys.sort(function (a, b) { return a === 'begin-here' ? -1 : b === 'begin-here' ? 1 : (D.gt[a] || a).localeCompare(D.gt[b] || b); });
+  function grimoireOrder(keys) { // Begin Here first, then by name
+    return keys.sort(function (a, b) {
+      if (a === 'begin-here') return -1;
+      if (b === 'begin-here') return 1;
+      return (D.gt[a] || a).localeCompare(D.gt[b] || b);
+    });
   }
   function guideIndex(tool) {
     var by = {};
     Object.keys(D.gp || {}).forEach(function (g) { if (D.gp[g].length) by[g] = D.gp[g]; });
     D.p.forEach(function (p, i) { // a grimoire without a Guide Pages list (Begin Here): its guide pages as they are
       var g = D.g[p[0]];
-      if (!(g in (D.gp || {})) && p[4] && p[4].split('|').indexOf('Guide') !== -1) (by[g] = by[g] || []).push(i);
+      if (!(g in (D.gp || {})) && kindsOf(p).indexOf('Guide') !== -1) (by[g] = by[g] || []).push(i);
     });
     var total = 0;
     var html = grimoireOrder(Object.keys(by)).map(function (g) {
@@ -1096,7 +1126,7 @@
         + by[g].map(function (i) { var p = pg(i); return '<li><a href="' + esc(p.url) + '">' + esc(p.title) + '</a></li>'; }).join('') + '</ul></section>';
     }).join('');
     tool.className = 'pg pg-tool pg-index';
-    render(tool, '<header class="pg-head tool-head"><nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' + esc(ROOT) + '">Manuscript</a></li></ol></nav><h1>Guide Pages</h1>'
+    render(tool, '<header class="pg-head tool-head">' + crumbs('') + '<h1>Guide Pages</h1>'
       + '<p class="lede">All ' + total + ' guide pages, by grimoire. Each is also in its grimoire’s introduction.</p></header><div class="index-groups">' + html + '</div>', 'Guide Pages');
   }
   function toolIndex(tool) {
@@ -1105,7 +1135,7 @@
         + GRIMOIRE_TOOLS[g].map(function (t) { return '<li><a href="' + esc(url(t[0])) + '">' + esc(t[1]) + '</a></li>'; }).join('') + '</ul></section>';
     }).join('');
     tool.className = 'pg pg-tool pg-index';
-    render(tool, '<header class="pg-head tool-head"><nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' + esc(ROOT) + '">Manuscript</a></li></ol></nav><h1>Enchanted Tools</h1>'
+    render(tool, '<header class="pg-head tool-head">' + crumbs('') + '<h1>Enchanted Tools</h1>'
       + '<p class="lede">Every tool in the Manuscript, by grimoire. Each is also in its grimoire’s introduction.</p></header><div class="index-groups">' + html
       + '<section class="index-group"><h2>Everywhere</h2><ul class="index-list"><li><a href="' + esc(url('notes/')) + '">Your Notes</a></li><li><a href="' + esc(url('')) + '">Surprise me (on the Manuscript home)</a></li></ul></section></div>', 'Enchanted Tools');
   }
@@ -1128,7 +1158,9 @@
   function sabbatHtml(day, south) {
     var s = nextSabbat(day, south);
     if (!s) return '';
-    var when = s.days === 0 ? 'is today' : s.days === 1 ? 'is tomorrow' : 'in <strong>' + s.days + '</strong> days';
+    var when = 'in <strong>' + s.days + '</strong> days';
+    if (s.days === 0) when = 'is today';
+    else if (s.days === 1) when = 'is tomorrow';
     var name = s.page ? '<a href="' + esc(s.page.url) + '">' + esc(s.name) + '</a>' : esc(s.name);
     return '<p class="sabbat-count"><span aria-hidden="true">✦</span> ' + name + ' ' + when
       + ' <span class="sabbat-date">' + DAYS[s.date.getDay()].slice(0, 3) + ', ' + MONTHS[s.date.getMonth()] + ' ' + s.date.getDate() + '</span></p>';
@@ -1206,7 +1238,7 @@
   // another. The notes page (/notes) lists every note with its first lines; each opens in the pop-up.
   function pageTitle() {
     var h1 = document.querySelector('.mm-main h1'), t = document.title.split(' | ')[0];
-    if (h1) { var c = h1.cloneNode(true); c.querySelectorAll('.pg-icon').forEach(function (x) { x.remove(); }); t = c.textContent.trim() || t; }
+    if (h1) t = headingText(h1) || t;
     return t.replace(/\s+/g, ' ') || 'A note';
   }
   function noteDialog() {
@@ -1224,11 +1256,12 @@
     var title = d.querySelector('.note-title'), body = d.querySelector('.note-body'), status = d.querySelector('.notes-status');
     var cur = null, last = '', timer, busy = Promise.resolve(), changed = false;
     function snap() { return title.value + '\n' + body.value; }
+    function unchanged() { return snap() === last || (!cur && !body.value.trim()); } // nothing new, or a new note still empty
     function load(n) { cur = n || null; title.value = n ? n.title : def; body.value = n ? n.body : ''; last = snap(); status.textContent = ''; }
     function save() {
       clearTimeout(timer);
       busy = busy.then(function () {
-        if (snap() === last || (!cur && !body.value.trim())) return;
+        if (unchanged()) return;
         var sent = snap(), item = cur || { page: path, pageTitle: def };
         item.title = title.value.trim() || 'Untitled note'; item.body = body.value;
         status.textContent = 'Saving…';
@@ -1248,7 +1281,7 @@
     d.addEventListener('click', function (e) { if (e.target === d) close(); });
     d.querySelector('[data-note-new]').addEventListener('click', function () { save().then(function () { load(null); title.select(); title.focus(); }); });
     window.addEventListener('pagehide', function () {
-      if (snap() === last || (!cur && !body.value.trim())) return;
+      if (unchanged()) return;
       if (PREVIEW) { save(); return; }
       var f = new FormData(); f.append('csrf', CSRF); f.append('id', cur ? cur.id : ''); f.append('title', title.value); f.append('body', body.value);
       f.append('page', path); f.append('pageTitle', def);
@@ -1265,6 +1298,8 @@
       openNote: function (n) { load(n); show(); }
     };
   }
+  var pop = null; // the note pop-up, made the first time it's needed
+  function notePop() { return pop = pop || noteDialog(); }
   var notesCache = [];
   function notesPage(tool) {
     return Store.list('notes').then(function (list) {
@@ -1308,7 +1343,7 @@
     var m = /\/manuscript\/(correspondence|astrology)\/([^/]+)\/?$/.exec(location.pathname), head = document.querySelector('.pg-head .pg-title');
     if (!m || !head || document.querySelector('.tool-links')) return;
     var h1 = document.querySelector('.pg-head h1'), links = [], title = '';
-    if (h1) { var c = h1.cloneNode(true); c.querySelectorAll('.pg-icon').forEach(function (x) { x.remove(); }); title = c.textContent.trim(); }
+    if (h1) title = headingText(h1);
     if (m[1] === 'correspondence') links.push('<a class="link" href="' + esc(url('spell-builder/?i=' + encodeURIComponent(m[2]))) + '">✦ Build a spell for ' + esc(title) + '</a>');
     Object.keys(WHEELS).forEach(function (k) { if (m[1] === 'astrology' && WHEELS[k][3].indexOf(m[2]) !== -1) links.push('<a class="link" href="' + esc(url('wheel/?of=' + k + '&on=' + m[2])) + '">✺ See ' + esc(title) + ' on the wheel</a>'); });
     if (links.length) head.insertAdjacentHTML('afterend', '<p class="tool-links small">' + links.join('') + '</p>');
@@ -1324,14 +1359,13 @@
   calendarMoon();
   if (document.querySelector('.pg-head .crumbs') && /Tarot Spreads/.test(document.querySelector('.pg-head .crumbs').textContent)) data().then(spreadTool).catch(function () {});
   if (/\/manuscript\/(ritual|recipe)\/[^/]+\/?$/.test(location.pathname)) data().then(workingExtras).catch(function () {});
-  var pop = null;
   document.addEventListener('click', function (e) {
-    if (e.target.closest('[data-note-open]')) { e.preventDefault(); (pop = pop || noteDialog()).openHere(); return; }
+    if (e.target.closest('[data-note-open]')) { e.preventDefault(); notePop().openHere(); return; }
     var card = e.target.closest('a[data-note-id]');
     if (card) {
       e.preventDefault();
       var n = notesCache.filter(function (x) { return String(x.id) === card.getAttribute('data-note-id'); })[0];
-      if (n) (pop = pop || noteDialog()).openNote(n);
+      if (n) notePop().openNote(n);
       return;
     }
     var del = e.target.closest('[data-del-note]');
@@ -1352,7 +1386,7 @@
   var shelves = document.querySelector('.book-pile') || document.querySelector('.shelves');
   if (shelves && !document.querySelector('[data-static-tool]')) {
     var later = window.requestIdleCallback || function (f) { setTimeout(f, 300); };
-    later(function () { data().then(function () { homeToday(shelves); }).catch(function (e) { ; }); });
+    later(function () { data().then(function () { homeToday(shelves); }).catch(function () {}); });
   }
   var tool = document.querySelector('[data-static-tool]');
   if (!tool) return;
