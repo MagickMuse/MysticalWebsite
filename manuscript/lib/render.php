@@ -325,7 +325,7 @@ function layout(string $title, string $body, array $opt = []): void
   <?php foreach (['alegreya-400', 'cormorant-400', 'alegreya-500'] as $font): ?><link rel="preload" href="<?= e(site_url('fonts/' . $font . '.woff2')) ?>" as="font" type="font/woff2" crossorigin>
   <?php endforeach ?>  <script src="<?= e(site_url('prefs.js')) ?>"></script>
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=93">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=94">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#3d000c" media="(prefers-color-scheme: dark)">
   <script src="<?= e(url('assets/wiki.js')) ?>?v=79" defer></script>
