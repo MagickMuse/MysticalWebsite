@@ -23,6 +23,7 @@
   --accent-text: var(--accent);
   --line: #e0cfc4;
   --gold: #b8913f;        /* lines, stars and ornaments; never text (2.6:1) */
+  --gold-text: #7a5c1c;   /* gold for small icons and text on parchment (4.8:1); dark mode uses --gold */
   --btn: #7a1f2b;
   --on-btn: #f6efe8;
   --tint: #7a1f2b;        /* wash over grimoire photos */
@@ -40,20 +41,21 @@
 }
 /* Candlelight: oxblood with blush text, and the default. prefs.js (in every page's <head>) sets data-theme="dark"
    unless the arch toggle or Settings picked Light or "Match my device"; the media query below serves "Match my device"
-   and visitors without JavaScript. Contrast on --bg: ink 12.4:1, muted 7.6:1, accent 7.3:1, gold 7.6:1. */
+   and visitors without JavaScript. Secondary text is parchment cream and accents candlelight gold (pink on red read poorly).
+   Contrast on --bg: ink 12.4:1, muted (cream) 9.3:1, accent (gold) 8.5:1, gold 7.6:1. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #530011; --surface: #661322; --deep: #3d000c;
-    --ink: #ffe1e2; --muted: #dcaab0; --accent: #f59aa7; --accent-text: #f59aa7;
-    --line: #8a3644; --gold: #d9b260; --btn: #ffe1e2; --on-btn: #530011; --tint: #3d000c; --logo-color: #ffe1e2;
+    --ink: #ffe1e2; --muted: #dcc6b0; --accent: #e2bd6a; --accent-text: #e2bd6a;
+    --line: #8a3644; --gold: #d9b260; --gold-text: #e2bd6a; --btn: #ffe1e2; --on-btn: #530011; --tint: #3d000c; --logo-color: #ffe1e2;
     --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 0 0 0 0 0 .02 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23v)'/%3E%3C/svg%3E");
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #530011; --surface: #661322; --deep: #3d000c;
-  --ink: #ffe1e2; --muted: #dcaab0; --accent: #f59aa7; --accent-text: #f59aa7;
-  --line: #8a3644; --gold: #d9b260; --btn: #ffe1e2; --on-btn: #530011; --tint: #3d000c; --logo-color: #ffe1e2;
+  --ink: #ffe1e2; --muted: #dcc6b0; --accent: #e2bd6a; --accent-text: #e2bd6a;
+  --line: #8a3644; --gold: #d9b260; --gold-text: #e2bd6a; --btn: #ffe1e2; --on-btn: #530011; --tint: #3d000c; --logo-color: #ffe1e2;
   --texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 0 0 0 0 0 .02 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23v)'/%3E%3C/svg%3E");
   color-scheme: dark;
 }
@@ -260,11 +262,13 @@ header.site {
 /* ---------- praise: framed panels with an arch top, like windows in a nave ---------- */
 .praise { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.4rem, 3vw, 2.4rem); max-width: 1200px; margin-inline: auto; }
 .praise .quote {
-  display: flex; flex-direction: column; gap: 1rem; margin: 0; padding: clamp(3.4rem, 6vw, 4.6rem) clamp(1.4rem, 2.4vw, 2rem) 2rem;
-  border: 1px solid var(--gold); border-left-width: 1px; border-radius: 16rem 16rem 0 0; outline: 1px solid color-mix(in srgb, var(--gold) 45%, transparent); outline-offset: -9px;
+  /* A true half-circle top (radius = half the width). Percentage padding and margins are measured from the width,
+     so the text always starts below the point where the curve is narrower than the side padding. */
+  display: flex; flex-direction: column; gap: 1rem; margin: 0; padding: 11% 10% 2rem;
+  border: 1px solid var(--gold); border-radius: 999px 999px 0 0; outline: 1px solid color-mix(in srgb, var(--gold) 45%, transparent); outline-offset: -9px;
   background: var(--texture), var(--surface); font-family: var(--display); font-style: normal; font-size: 1.22rem; line-height: 1.45; text-align: center;
 }
-.praise .quote::before { content: ""; align-self: center; flex: none; width: .9rem; height: .9rem; background: var(--gold); -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
+.praise .quote::before { content: ""; align-self: center; flex: none; margin-bottom: 9%; width: .9rem; height: .9rem; background: var(--gold); -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
 .praise .quote cite { margin-top: auto; font-family: var(--body); font-style: italic; font-size: 1rem; letter-spacing: 0; text-transform: none; color: var(--muted); }
 .alt .praise .quote { background: var(--texture), var(--bg); }
 @media (max-width: 900px) { .praise { grid-template-columns: minmax(0, 1fr); max-width: 560px; } }
@@ -465,7 +469,7 @@ section.tight { padding-block: clamp(2.5rem, 5vw, 4rem); }
 .book .chapter, .book .chapter:nth-of-type(even) { grid-template-columns: minmax(0, 1fr); gap: 1.4rem; }
 .book .chapter:nth-of-type(even) .chapter-mark { order: 0; }
 .book .chapter-mark { aspect-ratio: auto; padding: 0; border: 0; border-radius: 0; background: none; gap: .3rem; }
-.book .numeral { font-style: normal; font-size: 1.4rem; color: var(--gold); letter-spacing: .1em; }
+.book .numeral { font-style: normal; font-size: 1.4rem; color: var(--gold-text); letter-spacing: .1em; }
 .book .chapter-mark h2 { font-size: clamp(2.2rem, 4vw, 3rem); }
 .book .chapter-text { gap: 1.1rem; }
 .book .chapter-break { padding-block: 2.6rem; }
@@ -518,7 +522,7 @@ section.tight { padding-block: clamp(2.5rem, 5vw, 4rem); }
 /* ---------- article layout ---------- */
 .crumbs { max-width: 1200px; margin: 0 auto 2.4rem; }
 .crumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: .2rem .7rem; list-style: none; margin: 0; padding: 0; font-size: 1rem; color: var(--muted); }
-.crumbs li + li::before { content: "\203A"; margin-right: .7rem; color: var(--gold); }
+.crumbs li + li::before { content: "\203A"; margin-right: .7rem; color: var(--gold-text); }
 .crumbs a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; }
 .crumbs a:hover { color: var(--accent-text); }
 .crumbs [aria-current] { color: var(--ink); }

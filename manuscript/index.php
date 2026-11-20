@@ -139,7 +139,7 @@ function view_gate(?array $locked = null): void
     record_view($locked ? 'route:members-only' : 'route:/manuscript/');
     layout($locked ? 'Members only' : 'The Magick Manuscript', <<<HTML
 <section class="mm-hero narrow gate">
-  <p class="eyebrow">Members only</p>
+  <p class="eyebrow">Members Only</p>
   <h1>$heading</h1>
   <p class="lede">{$count} cross-linked grimoires and {$total} pages of researched magick, open to members. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>
   <div class="actions"><a class="btn" href="{$join}">Become a Member</a></div>
@@ -190,7 +190,7 @@ function view_page(array $p): void
     $peek = !has_access() && ($sp = sneak_peek_page()) && $sp['id'] === $p['id'];
     if ($peek) {
         $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
-        $head = '<aside class="peek-note"><p class="eyebrow">A sneak peek</p>'
+        $head = '<aside class="peek-note"><p class="eyebrow">A Sneak Peek</p>'
             . '<p>You\'re reading one page of the Manuscript, just as members see it. Every connection on it leads to another page: there are ' . $total . ' in all, across ' . mb_strtolower(grimoire_count_word()) . ' grimoires.</p>'
             . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a Member</a></div></aside>' . $head;
     }
@@ -666,7 +666,7 @@ function view_welcome(): void
     $msg = $email
         ? '<p class="lede">Your membership is active and you are signed in as ' . e($email) . '. On another device, sign in with this email.</p><div class="actions"><a class="btn" href="' . e(url('begin-here')) . '">Begin Here</a><a class="link" href="' . e(url()) . '">All Grimoires</a></div>'
         : '<p class="lede">Thank you. If your access is not ready yet, <a href="' . e(url('login')) . '">sign in with the email you paid with</a>.</p>';
-    layout('Welcome', '<section class="mm-hero narrow"><p class="eyebrow">Welcome, seeker</p><h1>The Manuscript Is Open to You</h1>' . $msg . '</section>', ['private' => true]);
+    layout('Welcome', '<section class="mm-hero narrow"><p class="eyebrow">Welcome, Seeker</p><h1>The Manuscript Is Open to You</h1>' . $msg . '</section>', ['private' => true]);
 }
 
 /** Only same-site paths may be used as a post-login destination. */
@@ -684,7 +684,7 @@ function view_login(string $notice = '', ?string $next = null): void
     $nextAttr = e($next);
     layout('Sign in', <<<HTML
 <section class="mm-hero narrow">
-  <p class="eyebrow">Welcome back</p>
+  <p class="eyebrow">Welcome Back</p>
   <h1>Sign In</h1>
   $notice
   <div class="signin">

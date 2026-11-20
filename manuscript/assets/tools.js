@@ -1000,7 +1000,7 @@
       }
       var ruler = find('astrology', DAY_RULER[day.getDay()]), prev = new Date(day), nxt = new Date(day); prev.setDate(day.getDate() - 1); nxt.setDate(day.getDate() + 1);
       render(tool, head
-        + (current ? '<div class="hour-now"><p class="eyebrow">Right now</p><p class="hour-planet"><span aria-hidden="true">' + PLANET_GLYPH[current.planet] + '\uFE0E</span> '
+        + (current ? '<div class="hour-now"><p class="eyebrow">Right Now</p><p class="hour-planet"><span aria-hidden="true">' + PLANET_GLYPH[current.planet] + '\uFE0E</span> '
           + (current.pp ? '<a href="' + esc(current.pp.url) + '">' + esc(current.pp.title) + '</a>' : current.planet) + '</p><p class="small">until ' + clock(current.b) + '</p></div>' : '')
         + '<p class="lede">' + DAYS[day.getDay()] + ', ' + MONTHS[day.getMonth()] + ' ' + day.getDate() + (ruler ? ': a <a href="' + esc(ruler.url) + '">' + esc(ruler.title) + '</a> day' : '')
         + '. Sunrise ' + clock(r) + ', sunset ' + clock(s) + '.</p>'
@@ -1072,7 +1072,7 @@
   function continueReading() {
     var hero = document.querySelector('.mm-hero'), list = store0(RECENT) || [];
     if (!hero || !document.querySelector('.shelves, .book-pile') || !list.length || document.querySelector('.continue-reading')) return;
-    hero.insertAdjacentHTML('beforeend', '<div class="continue-reading"><p class="eyebrow">Continue reading</p><div class="rels">' + list.slice(0, 5).map(function (x) {
+    hero.insertAdjacentHTML('beforeend', '<div class="continue-reading"><p class="eyebrow">Continue Reading</p><div class="rels">' + list.slice(0, 5).map(function (x) {
       return '<a class="rel" href="' + esc(x.u) + '">' + (x.i ? '<img class="rel-icon" src="' + esc(x.i) + '" alt="" width="24" height="24" loading="lazy">' : x.e ? '<span class="rel-icon" aria-hidden="true">' + esc(x.e) + '</span>' : '') + '<span>' + esc(x.t) + '</span></a>';
     }).join('') + '</div></div>');
   }
@@ -1153,7 +1153,7 @@
     sel = sel || points[0] || null;
     var tabs = Object.keys(WHEELS).map(function (k) { return '<a class="fchip' + (k === of ? ' on' : '') + '" href="?of=' + k + '"' + (k === of ? ' aria-current="true"' : '') + '>' + WHEELS[k][0] + '</a>'; }).join('');
     tool.className = 'pg pg-tool pg-wheel';
-    render(tool, '<header class="pg-head tool-head">' + crumbs('astrology') + '<p class="eyebrow">Correspondence wheel</p><h1>The ' + w[0].replace(' Wheel', '') + ' Wheel</h1>'
+    render(tool, '<header class="pg-head tool-head">' + crumbs('astrology') + '<p class="eyebrow">Correspondence Wheel</p><h1>The ' + w[0].replace(' Wheel', '') + ' Wheel</h1>'
       + '<p class="lede">Choose a ' + w[2] + ' to light up everything tied to it: the intentions it rules, its herbs, stones, oils, deities and days.</p>'
       + '<nav class="fchips wheel-tabs" aria-label="Wheels">' + tabs + '</nav></header><div data-static-wheel>' + wheelBody(of, points, sel) + '</div>', w[0]);
   }

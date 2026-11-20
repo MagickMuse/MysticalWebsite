@@ -72,7 +72,7 @@ function join_popup(bool $onPeek): string
     $peek = !$onPeek && sneak_peek_page() ? '<a class="btn ghost" href="' . e(url('sneak-peek')) . '">Take a Sneak Peek</a>' : '';
     return '<dialog class="join-pop" id="join-pop" aria-labelledby="join-pop-h">'
         . '<button class="join-x" type="button" data-close aria-label="Close">&times;</button>'
-        . '<p class="eyebrow">Members only</p>'
+        . '<p class="eyebrow">Members Only</p>'
         . '<h2 id="join-pop-h">This Lives Inside the Manuscript</h2>'
         . '<p>' . grimoire_count_word() . ' cross-linked grimoires and ' . $total . ' pages of researched magick, open to members. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>'
         . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a Member</a>' . $peek . '</div>'
@@ -325,7 +325,7 @@ function layout(string $title, string $body, array $opt = []): void
   <?php foreach (['alegreya-400', 'cormorant-400', 'alegreya-500'] as $font): ?><link rel="preload" href="<?= e(site_url('fonts/' . $font . '.woff2')) ?>" as="font" type="font/woff2" crossorigin>
   <?php endforeach ?>  <script src="<?= e(site_url('prefs.js')) ?>"></script>
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=92">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=93">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#3d000c" media="(prefers-color-scheme: dark)">
   <script src="<?= e(url('assets/wiki.js')) ?>?v=79" defer></script>

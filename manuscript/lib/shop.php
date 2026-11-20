@@ -63,7 +63,8 @@ function price_label(array $p): string
 
 function product_image(array $p): string
 {
-    if (empty($p['image'])) return '<div class="frame arch shop-art"><i class="spark big" aria-hidden="true"></i></div>';
+    // No picture, no frame: an empty arch with a star looked like a missing image.
+    if (empty($p['image'])) return '';
     $src = preg_match('~^https?://~', $p['image']) ? $p['image'] : site_url($p['image']);
     return '<div class="frame arch shop-art"><img src="' . e($src) . '" alt="" loading="lazy"></div>';
 }
@@ -97,11 +98,11 @@ function view_shop(): void
     foreach (products() as $slug => $p) {
         $p['slug'] = $slug;
         if (!empty($p['hidden'])) continue;
-        $cards .= '<a class="card shop-card" href="' . e(site_url('market/' . $slug)) . '">' . product_image($p)
+        $cards .= '<a class="card shop-card" href="' . e(site_url('market/' . $slug)) . '">'
             . '<h3>' . e(short_name($p)) . '</h3><p>' . e($p['tagline'] ?? '') . '</p><p class="price">' . e(price_label($p)) . '</p></a>';
     }
     // The Manuscript itself leads the shop.
-    $ms = '<a class="card shop-card featured" href="' . e(url('join')) . '"><div class="frame arch shop-art"><i class="spark big" aria-hidden="true"></i></div>'
+    $ms = '<a class="card shop-card featured" href="' . e(url('join')) . '">'
         . '<h3>The Magick Manuscript</h3><p>15 cross-linked grimoires, 20,000+ pages, growing weekly.</p><p class="price">Membership</p></a>';
     layout('Market', <<<HTML
 <section class="mm-hero">
@@ -180,7 +181,7 @@ function do_claim(): void
     send_mail($email, 'Your ' . $nm . ' is here',
         "Thank you for picking up {$nm}.\n\nOpen your library to get it:\n$link\n\nThe link signs you in and works for 30 minutes. After that, sign in any time at " . site_url('market/library') . "\n\nThe Magick Muse",
         '<p>Thank you for picking up <strong>' . e($nm) . '</strong>.</p><p><a href="' . e($link) . '">Open your library</a> to get it.</p><p>The link signs you in and works for 30 minutes. After that, sign in any time at ' . e(site_url('market/library')) . '.</p><p>The Magick Muse</p>');
-    layout('Check your email', '<section class="mm-hero narrow"><p class="eyebrow">On its way</p><h1>Check Your Inbox</h1><p class="lede">We sent ' . e($nm) . ' to ' . e($email) . '. If it isn’t there in a few minutes, look in spam or promotions.</p></section>', ['private' => true]);
+    layout('Check your email', '<section class="mm-hero narrow"><p class="eyebrow">On Its Way</p><h1>Check Your Inbox</h1><p class="lede">We sent ' . e($nm) . ' to ' . e($email) . '. If it isn’t there in a few minutes, look in spam or promotions.</p></section>', ['private' => true]);
 }
 
 function view_shop_thanks(): void

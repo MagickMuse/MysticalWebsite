@@ -47,7 +47,7 @@ mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inhe
 .pg-cover img { width: 100%; height: 100%; max-height: 340px; object-fit: cover; }
 
 .crumbs ol { display: flex; flex-wrap: wrap; gap: .3rem .6rem; list-style: none; margin: 0; padding: 0; font-size: 1rem; }
-.crumbs li + li::before { content: "\203A"; color: var(--gold); margin-right: .6rem; }
+.crumbs li + li::before { content: "\203A"; color: var(--gold-text); margin-right: .6rem; }
 .crumbs a { text-decoration: none; color: var(--muted); }
 .crumbs a:hover { color: var(--accent-text); }
 
@@ -84,7 +84,7 @@ mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inhe
 details.toggle { border-top: 1px solid var(--line); padding-top: .8rem; }
 details.toggle > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: .7rem; font-weight: 400; }
 details.toggle > summary::-webkit-details-marker { display: none; }
-details.toggle > summary::before { content: "✦"; color: var(--gold); font-size: .75rem; transition: transform .25s; }
+details.toggle > summary::before { content: "✦"; color: var(--gold-text); font-size: .75rem; transition: transform .25s; }
 details.toggle[open] > summary::before { transform: rotate(45deg); }
 details.toggle > summary > h2, details.toggle > summary > h3, details.toggle > summary > h4 { margin: 0; display: inline; }
 details.toggle > :not(summary) { margin-top: 1rem; padding-left: 1.5rem; }
@@ -116,7 +116,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 
 /* Notion colors, softened to the brand palette */
 .c-red, .c-pink { color: var(--accent-text); }
-.c-brown, .c-orange, .c-yellow { color: var(--gold); }
+.c-brown, .c-orange, .c-yellow { color: var(--gold-text); }
 .c-gray { color: var(--muted); }
 .mm-callout.c-red_background, .mm-callout.c-pink_background, .mm-callout.c-brown_background, .mm-callout.c-orange_background,
 .mm-callout.c-yellow_background, .mm-callout.c-gray_background, .mm-callout.c-purple_background,
@@ -201,6 +201,8 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .price.big { font-size: 1.9rem; line-height: 1.1; }
 .product { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(2rem, 6vw, 5rem); align-items: start; max-width: 1100px; margin-inline: auto; }
 .product .shop-art { max-width: 420px; justify-self: center; }
+.product:not(:has(.shop-art)) { grid-template-columns: minmax(0, 1fr); max-width: 760px; }
+.shop-card { padding: 2.2rem 1.8rem; align-content: start; }
 .product-text { display: grid; gap: 1.2rem; }
 .product-text h1 { font-size: clamp(2.6rem, 6vw, 4.2rem); }
 .product .mm-prose { padding-top: 0; margin: 0; max-width: none; }
@@ -247,10 +249,10 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .dash-filter input { font: inherit; flex: 1; max-width: 320px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); padding: .6rem .9rem; }
 .dash-filter .btn { padding: .6rem 1.1rem; }
 
-/* charts: brand pair (light #9c3a45 / #a07a2c; dark rose #f59aa7 / gold #d9b260, 7.3:1 and 7.6:1 on oxblood) */
+/* charts: brand pair (light #9c3a45 / #a07a2c; dark blush #ffe1e2 / gold #e2bd6a, 12.4:1 and 8.5:1 on oxblood) */
 :root { --series-1: #9c3a45; --series-2: #a07a2c; --chart-grid: #e6d8ce; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --series-1: #f59aa7; --series-2: #d9b260; --chart-grid: #7d2a38; } }
-:root[data-theme="dark"] { --series-1: #f59aa7; --series-2: #d9b260; --chart-grid: #7d2a38; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --series-1: #ffe1e2; --series-2: #e2bd6a; --chart-grid: #7d2a38; } }
+:root[data-theme="dark"] { --series-1: #ffe1e2; --series-2: #e2bd6a; --chart-grid: #7d2a38; }
 .chart-wrap { position: relative; }
 .chart { width: 100%; height: auto; display: block; overflow: visible; }
 .chart .bar.series-1 { fill: var(--series-1); }
@@ -292,9 +294,9 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .save-btn { display: inline-flex; align-items: center; gap: .5rem; padding: .55rem 1.1rem; min-height: 44px; border: 1px solid var(--line); border-radius: 0; background: var(--bg); color: var(--ink); font: 500 .95rem/1 var(--body); text-transform: none; cursor: pointer; transition: border-color .2s, background .2s; }
 .save-btn:hover { border-color: var(--accent); }
 .save-btn[aria-pressed="true"] { border-color: var(--gold); background: var(--surface); }
-.save-star { font-size: 1.1rem; letter-spacing: 0; color: var(--gold); line-height: 1; }
+.save-star { font-size: 1.1rem; letter-spacing: 0; color: var(--gold-text); line-height: 1; }
 .mm-acct { display: flex; gap: .6rem; align-items: center; }
-.mm-acct .dot { color: var(--gold); }
+.mm-acct .dot { color: var(--gold-text); }
 .saved { max-width: 920px; margin-inline: auto; display: grid; gap: 1.6rem; }
 .saved h1 { font-size: clamp(2.6rem, 6vw, 4rem); }
 .saved-group h2 { font-size: 1.7rem; padding-bottom: .6rem; border-bottom: 1px solid var(--line); margin-bottom: .6rem; }
@@ -433,7 +435,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
 .col-filter > summary { list-style: none; display: inline-flex; align-items: center; gap: .5rem; padding: .5rem 1rem; min-height: 40px; border: 1px solid var(--line); border-radius: 0; background: var(--bg); cursor: pointer; font-size: .95rem; text-transform: none; color: var(--ink); user-select: none; }
 .col-filter > summary::-webkit-details-marker { display: none; }
 .col-filter > summary:hover, .col-filter[open] > summary { border-color: var(--accent); color: var(--accent-text); }
-.sf-icon { color: var(--gold); font-size: .95rem; letter-spacing: 0; }
+.sf-icon { color: var(--gold-text); font-size: .95rem; letter-spacing: 0; }
 .col-filter .col-views { margin: .8rem 0 0; padding: 1.1rem 1.2rem; border: 1px solid var(--gold); border-radius: 0; background: color-mix(in srgb, var(--surface) 55%, var(--bg)); }
 .atags { display: flex; flex-wrap: wrap; gap: .35rem; }
 .atag { display: inline-flex; align-items: center; gap: .45rem; padding: .2rem .8rem; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 1.1em 1.1em 0 0; font-size: .95rem; text-transform: none; text-decoration: none; color: var(--accent-text); line-height: 1.6; background: var(--bg); }
@@ -524,7 +526,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: 1rem; }
   font-size: min(18px, calc(var(--room) / (var(--n, 8) * 1.12))); }
 .bk-title.n3 { --n: 3; } .bk-title.n4 { --n: 4; } .bk-title.n5 { --n: 5; } .bk-title.n6 { --n: 6; } .bk-title.n7 { --n: 7; } .bk-title.n8 { --n: 8; } .bk-title.n9 { --n: 9; } .bk-title.n10 { --n: 10; } .bk-title.n11 { --n: 11; } .bk-title.n12 { --n: 12; } .bk-title.n13 { --n: 13; } .bk-title.n14 { --n: 14; } .bk-title.n15 { --n: 15; } .bk-title.n16 { --n: 16; }
 .bk-star { position: absolute; left: 50%; bottom: 28px; width: 14px; height: 14px; margin-left: -7px; background: var(--gold); -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
-svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -webkit-mask: none; mask: none; color: var(--gold); }
+svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -webkit-mask: none; mask: none; color: var(--gold-text); }
 .bk.t4 .band, .bk.t4 i.bk-star { background: #f3e2b4; }
 .bk.t4 svg.bk-star { color: #f3e2b4; }
 .bk.t5 svg.bk-star { color: #7a1f2b; }
@@ -585,7 +587,7 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .mm-hero .actions .btn + .btn { margin-left: .7rem; }
 .peek-note { margin: 0 0 1.6rem; padding: 1.2rem 1.4rem; border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent); border-radius: 0; background: var(--surface); text-align: center; }
 .peek-note p { margin: .3rem auto; color: var(--ink); }
-.peek-note .eyebrow { margin: 0; }
+.peek-note .eyebrow { margin: 0 auto; }
 .pg-head .eyebrow a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color .2s; }
 .pg-head .eyebrow a:hover, .pg-head .eyebrow a:focus-visible { border-bottom-color: currentColor; }
 .peek-note .actions { justify-content: center; margin-top: .8rem; }
@@ -826,7 +828,7 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .cal-ev, .cal-more { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--body); font-size: .74rem; line-height: 1.3; }
 .cal-ev i { font-style: normal; margin-right: .25rem; }
 .cal-more { color: var(--muted); font-size: .68rem; }
-.cal-days a[aria-current="date"] .cal-more { color: inherit; opacity: .8; }
+.cal-days a[aria-current="date"] :is(.cal-more, .cal-moon, .cal-ev) { color: var(--on-btn); opacity: 1; }
 @media (max-width: 640px) { .cal-n { font-size: 1rem; } .cal-ev { font-size: 0; } .cal-ev i { font-size: .8rem; margin: 0; } .cal-more { display: none; } } /* phones: just the emoji */
 
 /* the flat stacks now hold only books lying on their side (guides and tools): the top one is the smallest */
@@ -843,7 +845,7 @@ svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -
 .mm-prose .lead-in + h2, .mm-prose .ingredients + h2 { margin-top: 2rem; }
 .mm-prose .ingredients { padding-left: 1.2rem; }
 .mm-prose .ingredients li { padding-left: .2rem; }
-.mm-prose .ingredients li::marker { content: "✦  "; color: var(--gold); font-size: .8em; }
+.mm-prose .ingredients li::marker { content: "✦  "; color: var(--gold-text); font-size: .8em; }
 .mm-prose .steps { padding-left: 1.6rem; }
 .mm-prose .steps li { padding-left: .3rem; }
 .mm-prose .steps li + li, .mm-prose .ingredients li + li { margin-top: .45rem; }
@@ -885,7 +887,7 @@ details.toggle > summary > h5 { margin: 0; display: inline; }
   padding: .42rem .95rem .38rem; border: 1px solid var(--gold); border-radius: 0; background: color-mix(in srgb, #2e1f20 72%, transparent);
   font-family: var(--body); font-style: normal; font-size: 13px; letter-spacing: .14em; text-transform: lowercase; color: #f3e2b4;
   animation: dive-glow 2.8s ease-in-out infinite; transition: background .3s, color .3s; }
-.dive i { font-style: normal; font-size: 11px; color: var(--gold); display: inline-block; animation: dive-twinkle 2.8s ease-in-out infinite; }
+.dive i { font-style: normal; font-size: 11px; color: var(--gold-text); display: inline-block; animation: dive-twinkle 2.8s ease-in-out infinite; }
 .bk.faced:hover .dive, .bk.faced:focus-visible .dive, .bk.faced.open .dive { background: var(--gold); color: #2e1f20; }
 .bk.faced:hover .dive i, .bk.faced.open .dive i { color: #2e1f20; }
 @keyframes dive-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(243, 226, 180, 0); } 50% { box-shadow: 0 0 16px 3px rgba(243, 226, 180, .45); } }
@@ -1080,7 +1082,7 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .tool-section.two-col { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem 3rem; }
 .tool-section.two-col h2 { margin-bottom: .6rem; }
 .day-nav { display: flex; flex-wrap: wrap; gap: .4rem .8rem; align-items: center; }
-.day-nav span { color: var(--gold); }
+.day-nav span { color: var(--gold-text); }
 
 /* Today: four cards for the moon, the day, the sun and the season */
   border: 1px solid var(--line); border-radius: 160px 160px 0 0; background: var(--surface); }
@@ -1179,7 +1181,7 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .gal-pic img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .gal-card .gal-pic { aspect-ratio: 3 / 4; padding: .35rem; }
 .gal-pic.emoji { font-size: 2.8rem; line-height: 1; font-family: var(--emoji); font-variant-emoji: emoji; }
-.gal-pic.none::before { content: '✦'; color: var(--gold); opacity: .4; font-size: 1.5rem; }
+.gal-pic.none::before { content: '✦'; color: var(--gold-text); opacity: .4; font-size: 1.5rem; }
 .entry-grid.gallery a:hover .gal-pic img { transform: scale(1.04); }
 .gal-pic img { transition: transform .3s; }
 @media (max-width: 600px) { .entry-grid.gallery { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: .5rem; } }
@@ -1195,8 +1197,8 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 .mm-mine { grid-column: 1; grid-row: 1; justify-self: start; display: flex; gap: .5rem; align-items: center; margin: 0; font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
 .mm-mine a { text-decoration: none; }
 .mm-mine a:hover { color: var(--accent-text); }
-.mm-mine .dot { color: var(--gold); }
-.mm-mine span[aria-hidden] { color: var(--gold); letter-spacing: 0; }
+.mm-mine .dot { color: var(--gold-text); }
+.mm-mine span[aria-hidden] { color: var(--gold-text); letter-spacing: 0; }
 .mm-search { grid-row: 1; }
 .mm-acct { grid-row: 1; }
 @media (max-width: 860px) { .mm-mine { order: -2; } }
@@ -1209,7 +1211,7 @@ html.nav-fold .mm-mine { order: -2; }
 .note-form { display: grid; gap: .7rem; padding: 1.3rem 1.5rem 1.2rem; }
 .note-top { display: flex; align-items: center; justify-content: space-between; }
 .note-top .eyebrow { margin: 0; }
-.note-top .eyebrow span { color: var(--gold); letter-spacing: 0; margin-right: .2rem; }
+.note-top .eyebrow span { color: var(--gold-text); letter-spacing: 0; margin-right: .2rem; }
 .note-x { width: 36px; height: 36px; border: 0; border-radius: 0; background: none; color: var(--muted); font-size: 1.5rem; line-height: 1; cursor: pointer; }
 .note-x:hover { background: var(--bg); color: var(--accent-text); }
 .note-title { width: 100%; padding: .2rem 0 .35rem; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); font: 400 clamp(1.6rem, 4vw, 2rem)/1.15 var(--display); }
@@ -1360,7 +1362,7 @@ html.nav-fold .mm-mine { order: -2; }
 
 /* Today and the Manuscript home: the next sabbat */
 .sabbat-count { margin: .2rem 0 0; font-family: var(--display); font-size: 1.25rem; }
-.sabbat-count > span[aria-hidden] { color: var(--gold); font-size: .9rem; margin-right: .2rem; }
+.sabbat-count > span[aria-hidden] { color: var(--gold-text); font-size: .9rem; margin-right: .2rem; }
 .sabbat-count a { color: var(--accent-text); }
 .sabbat-count strong { font-weight: 600; }
 .sabbat-date { margin-left: .4rem; font-family: var(--display); font-style: italic; font-size: 1.05rem; text-transform: none; color: var(--muted); }
@@ -1406,13 +1408,13 @@ html.nav-fold .mm-mine { order: -2; }
 
 /* The beginner path (lib/path.php) */
 .path-invite { margin: .4rem 0 0; font-size: .95rem; color: var(--muted); }
-.path-invite > span { color: var(--gold); margin-right: .3rem; }
+.path-invite > span { color: var(--gold-text); margin-right: .3rem; }
 .path-list { list-style: none; margin: 1.4rem 0 0; padding: 0; display: grid; }
 .path-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem 1rem; padding: .7rem 0; border-bottom: 1px solid var(--line); }
 .path-list li a { font-family: var(--display); font-size: 1.3rem; }
 .path-list li small { flex-basis: 100%; padding-left: 2.6rem; color: var(--muted); }
 .path-n { flex: none; width: 1.6rem; text-align: right; font-size: .75rem; letter-spacing: .1em; color: var(--muted); }
-.path-list li.done .path-n::after { content: " ✓"; color: var(--gold); }
+.path-list li.done .path-n::after { content: " ✓"; color: var(--gold-text); }
 .path-list li.next { background: var(--surface); }
 .path-list li.next .path-n { color: var(--accent-text); font-weight: 600; }
 
@@ -1460,9 +1462,9 @@ html.nav-fold .mm-mine { order: -2; }
 .hour-now .small { margin: 0; color: var(--muted); }
 table.hours td.when { white-space: nowrap; color: var(--muted); }
 table.hours tr.now td { background: color-mix(in srgb, var(--gold) 16%, var(--bg)); }
-table.hours td.planet span { color: var(--gold); margin-right: .2rem; }
+table.hours td.planet span { color: var(--gold-text); margin-right: .2rem; }
 
-.cal-moon { display: block; margin-top: .15rem; font-size: .68rem; letter-spacing: .02em; color: var(--muted); white-space: nowrap; }
+.cal-moon { display: block; margin-top: .15rem; font-size: .8rem; letter-spacing: .02em; color: var(--muted); white-space: nowrap; }
 .cal-moon-list { margin-top: 2rem; }
 .cal-moon-list h2 { font-size: clamp(1.6rem, 3vw, 2rem); margin-bottom: .6rem; } .cal-moon-list h2 em { font-style: italic; }
 .cal-moon-list ul { list-style: none; margin: 0; padding: 0; display: grid; }

@@ -33,7 +33,7 @@ function dash_layout(string $active, string $title, string $body): void
         $cur = $k === $active ? ' aria-current="page"' : '';
         $tabs .= '<li><a href="' . e(url('dashboard' . ($k ? "/$k" : ''))) . "\"$cur>" . e($label) . '</a></li>';
     }
-    layout($title . ' · Dashboard', '<section class="dash"><header class="dash-head"><p class="eyebrow">Curator’s dashboard</p><h1>' . $title . '</h1>'
+    layout($title . ' · Dashboard', '<section class="dash"><header class="dash-head"><p class="eyebrow">Curator’s Dashboard</p><h1>' . $title . '</h1>'
         . '<nav class="dash-tabs" aria-label="Dashboard"><ul>' . $tabs . '</ul></nav></header>' . $body . '</section>', ['private' => true]);
 }
 
