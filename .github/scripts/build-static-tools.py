@@ -23,7 +23,7 @@ ROW = re.compile(r'<div class="prop-row( rel-row)?"[^>]*><div class="prop-name">
 LINK = re.compile(r'href="(?:\.\./)+manuscript/([a-z-]+)/([^/"#?]+)/"')
 PILL = re.compile(r'<(?:span|a) class="pill"[^>]*>(.*?)</(?:span|a)>', re.S)
 # Kinds of page the tools look for (an entry's Type)
-KINDS = {'Planets', 'Moon Phases', 'Western Zodiac', 'Days of the Week', 'Days of the Year', 'Holidays', 'Seasons', 'Time of Day', 'Color', 'Elder Futhark Runes'}
+KINDS = {'Planets', 'Moon Phases', 'Western Zodiac', 'Days of the Week', 'Days of the Year', 'Holidays', 'Seasons', 'Time of Day', 'Color', 'Elder Futhark Runes', "Witch's Runes"}
 SAFETY_FIELDS = ['Safety & Uses', 'Pregnancy', 'Drug Interactions', 'Notes/Warnings', 'Water Safe?', 'Sun Safe?']
 SAFETY_GRIMOIRES = ['plant', 'oil', 'mineral', 'material']
 MONTHS = 'january|february|march|april|may|june|july|august|september|october|november|december'

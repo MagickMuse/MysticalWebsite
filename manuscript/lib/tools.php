@@ -41,7 +41,7 @@ function view_tool_page(string $route): void
 // ------------------------------------------------------------------ the data tools.js works from
 
 /** Kinds of page the tools look for (an entry's Type), plus "Tarot" for a tarot card. */
-const TOOL_KINDS = ['Planets', 'Moon Phases', 'Western Zodiac', 'Days of the Week', 'Days of the Year', 'Holidays', 'Seasons', 'Time of Day', 'Color', 'Elder Futhark Runes'];
+const TOOL_KINDS = ['Planets', 'Moon Phases', 'Western Zodiac', 'Days of the Week', 'Days of the Year', 'Holidays', 'Seasons', 'Time of Day', 'Color', 'Elder Futhark Runes', "Witch's Runes"];
 
 /** The fields copied, word for word, for the safety notes on rituals and recipes, and the grimoires they come from. */
 const SAFETY_FIELDS = ['Safety & Uses', 'Pregnancy', 'Drug Interactions', 'Notes/Warnings', 'Water Safe?', 'Sun Safe?'];
@@ -52,7 +52,7 @@ function serve_tools_data(): void
 {
     if (!has_access()) { http_response_code(403); exit; }
     // The version changes when the data's shape does, so an older copy is never served.
-    $cache = config('data_dir') . '/tools-data-v6.json';
+    $cache = config('data_dir') . '/tools-data-v7.json';
     $content = config('data_dir') . '/content.sqlite';
     if (!is_file($cache) || filemtime($cache) < (int) @filemtime($content)) {
         file_put_contents($cache . '.tmp', json_encode(tools_data(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));

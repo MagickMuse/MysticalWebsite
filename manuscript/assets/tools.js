@@ -596,11 +596,17 @@
     return D.l[i].filter(function (j) { return D.g[D.p[j][0]] === 'correspondence'; })
       .sort(function (a, b) { return D.p[a][2].localeCompare(D.p[b][2]); }).map(pg);
   }
+  /** The rune sets to pull from: the address's ?set=, the kind of page in the Rune Grimoire, and its name. */
+  var RUNE_SETS = { elder: ['Elder Futhark Runes', 'Elder Futhark'], witch: ['Witch\'s Runes', 'Witch’s Runes'] };
   function runes(tool) {
-    var bag = []; D.p.forEach(function (p, i) { if (kindsOf(p).indexOf('Elder Futhark Runes') !== -1) bag.push(i); });
+    var set = params().get('set') === 'witch' ? 'witch' : 'elder', setName = RUNE_SETS[set][1];
+    var bag = []; D.p.forEach(function (p, i) { if (kindsOf(p).indexOf(RUNE_SETS[set][0]) !== -1) bag.push(i); });
     var hand = shuffled(bag).slice(0, 7);
     tool.className = 'pg pg-tool pg-runes';
-    render(tool, '<header class="pg-head tool-head">' + crumbs('rune') + '<h1>Pull a Rune</h1></header>'
+    var choose = '<p class="rune-sets">' + Object.keys(RUNE_SETS).map(function (k) {
+      return '<a class="link" href="?set=' + k + '"' + (k === set ? ' aria-current="true"' : '') + '>' + esc(RUNE_SETS[k][1]) + '</a>';
+    }).join('') + '</p>';
+    render(tool, '<header class="pg-head tool-head">' + crumbs('rune') + '<h1>Pull a Rune</h1>' + choose + '</header>'
       + '<div class="stones" role="group" aria-label="Seven face-down rune stones">' + hand.map(function (i, k) {
         return '<button class="stone st-' + k + '" type="button" data-pick="' + k + '" aria-label="Stone ' + (k + 1) + ' of 7"><span class="stone-face"></span></button>';
       }).join('') + '</div><div class="drawn drawn-rune" aria-live="polite"></div>', 'Pull a Rune');
@@ -608,7 +614,8 @@
     field.addEventListener('click', function (e) {
       var b = e.target.closest('[data-pick]');
       if (!b || field.classList.contains('picked')) return;
-      var k = +b.getAttribute('data-pick'), rune = pg(hand[k]), words = runeWords(hand[k]), glyph = RUNE_GLYPHS[rune.slug];
+      // every Witch's Rune has a picture; in the Elder Futhark, Wyrd (the blank rune) has none
+      var k = +b.getAttribute('data-pick'), rune = pg(hand[k]), words = runeWords(hand[k]), glyph = set === 'witch' || !!RUNE_GLYPHS[rune.slug];
       var quiet = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       field.classList.add('picked'); b.classList.add('chosen');
       setTimeout(function () {
@@ -617,13 +624,13 @@
           + '<span class="face front stone st-' + k + '"><span class="stone-face"></span>' + (glyph
             ? '<img class="rune-glyph" src="' + esc(runeImage(rune.slug)) + '" alt="" width="512" height="512">'
             : '<span class="rune-glyph blank" aria-hidden="true"></span>') + '</span></div></div>'
-          + '<div class="reading"><p class="eyebrow">Elder Futhark</p><h2>' + esc(rune.title) + '</h2>'
+          + '<div class="reading"><p class="eyebrow">' + esc(setName) + '</p><h2>' + esc(rune.title) + '</h2>'
           + (words.length ? '<div class="rels keywords">' + words.map(chip).join('') + '</div>' : '')
           + '<div class="actions"><a class="btn" href="' + esc(rune.url) + '">View More</a><button class="btn ghost" type="button" data-again>Pull Again</button></div></div>';
         turnOver(drawn.querySelector('.drawn-card'), quiet);
         drawn.querySelector('[data-again]').addEventListener('click', function () { runes(tool); window.scrollTo({ top: 0, behavior: quiet ? 'auto' : 'smooth' }); });
         var tone = getComputedStyle(drawn.querySelector('.front.stone')).getPropertyValue('--tone').trim();
-        shareButton(drawn.querySelector('.reading .actions'), prepareShare({ eyebrow: 'My rune', title: rune.title, state: 'Elder Futhark', card: null, glyphSrc: glyph ? runeImage(rune.slug) : null, tone: tone,
+        shareButton(drawn.querySelector('.reading .actions'), prepareShare({ eyebrow: 'My rune', title: rune.title, state: setName, card: null, glyphSrc: glyph ? runeImage(rune.slug) : null, tone: tone,
           words: titles(words) }, 'my-rune-' + rune.slug), 'I pulled ' + rune.title + ' ✦');
         saveToNotes(drawn.querySelector('.reading .actions'), function () {
           return { title: 'Rune: ' + rune.title + ' · ' + noteDate(), body: 'Pulled on ' + noteDate() + ', ' + moonNow() + '.\n'

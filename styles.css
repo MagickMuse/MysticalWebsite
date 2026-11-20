@@ -2458,6 +2458,9 @@ html.nav-fold .mm-acct { order: -1; margin-left: auto; }
 /* the rune, carved and gilded */
 .rune-glyph { position: absolute; inset: 0; display: grid; place-items: center; font: 400 clamp(5rem, 14vw, 7.5rem)/1 "Segoe UI Historic", "Noto Sans Runic", "Junicode", serif; color: #e3c27a;
   text-shadow: 0 2px 0 rgba(0, 0, 0, .45), 0 -1px 0 rgba(255, 240, 200, .35); }
+/* Pull a Rune: which set to pull from */
+.rune-sets { display: flex; justify-content: flex-start; flex-wrap: wrap; gap: .4rem 1.6rem; margin: var(--gap-text) 0 0; }
+.rune-sets a[aria-current] { color: var(--accent-text); text-decoration-thickness: 2px; }
 /* the rune's picture (assets/runes/): brightened to the stone's gold, with the same carved shadow */
 img.rune-glyph { inset: 24%; width: 52%; height: 52%; object-fit: contain; filter: brightness(1.32) saturate(.9) drop-shadow(0 2px 0 rgba(0, 0, 0, .45)); }
 .rune-glyph.blank::after { content: ""; width: 34%; height: 2px; background: color-mix(in srgb, #e3c27a 50%, transparent); border-radius: 2px; } /* Wyrd: the blank rune */
