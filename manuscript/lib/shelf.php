@@ -63,7 +63,7 @@ const SHELF_STACKS = [
         ['Guide Pages', 'route:guide-pages', 't1'],
         ['Enchanted Tools', 'route:enchanted-tools', 't3'],
         ['Calendar', 'route:calendar', 't4'],
-        ['The Library', 'route:library', 't2'],
+        ['Sources', 'route:library', 't2'],
     ]],
 ];
 

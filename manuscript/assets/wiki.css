@@ -1483,3 +1483,13 @@ table.hours td.planet span { color: var(--gold); margin-right: .2rem; }
 .index-group h2 small { font-family: var(--body); font-size: .75rem; color: var(--muted); }
 .index-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
 .index-list li a { display: inline-block; padding: .2rem 0; line-height: 1.4; }
+
+/* The homepage's look at the shelf (manuscript/?peek, in a frame): only the shelf, on a clear background, nothing to click */
+html.peek, html.peek body { background: transparent !important; min-height: 0; overflow: hidden; }
+html.peek body > :not(main) { display: none !important; }
+html.peek main { padding: 0 !important; margin: 0 !important; max-width: none; }
+html.peek main > :not(.shelves) { display: none !important; }
+html.peek .shelves { display: grid !important; padding: 8px 0 4px; }
+html.peek .book-pile, html.peek .car-btn { display: none !important; }
+html.peek * { pointer-events: none !important; }
+html.peek .car-track { overflow: hidden; }

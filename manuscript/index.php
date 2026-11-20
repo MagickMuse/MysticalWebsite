@@ -88,7 +88,7 @@ function view_home(): void
 {
     // Visitors see the same home, as a taste: any book they pick opens the join pop-up (assets/wiki.js).
     $member = has_access();
-    if (!$member) record_view('route:/manuscript/');
+    if (!$member && !isset($_GET['peek'])) record_view('route:/manuscript/'); // the homepage's shelf (?peek) isn't a visit
     $grimoires = db()->query("SELECT * FROM pages WHERE kind = 'grimoire'")->fetchAll();
     // Alphabetical by name; Begin Here is the way in, so it gets its own button instead of a card.
     $begin = null;

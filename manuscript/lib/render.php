@@ -290,7 +290,7 @@ function layout(string $title, string $body, array $opt = []): void
         . "; style-src 'self'; font-src 'self'; img-src 'self' data: https://images.pexels.com https://images.unsplash.com" . ($stripe ? ' https://*.stripe.com' : '')
         . "; connect-src 'self'" . ($stripe ? ' https://api.stripe.com https://checkout.stripe.com https://merchant-ui-api.stripe.com' : '')
         . ($stripe ? '; frame-src https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://checkout.stripe.com' : '')
-        . "; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'");
+        . "; form-action 'self'; frame-ancestors " . (isset($_GET['peek']) ? "'self'" : "'none'") . "; base-uri 'self'; object-src 'none'");
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     // Anything shown to a signed-in person must never be stored by a cache and shown to someone else.
@@ -325,7 +325,7 @@ function layout(string $title, string $body, array $opt = []): void
   <?php foreach (['alegreya-400', 'cormorant-400', 'alegreya-500'] as $font): ?><link rel="preload" href="<?= e(site_url('fonts/' . $font . '.woff2')) ?>" as="font" type="font/woff2" crossorigin>
   <?php endforeach ?>  <script src="<?= e(site_url('prefs.js')) ?>"></script>
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=91">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=92">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#3d000c" media="(prefers-color-scheme: dark)">
   <script src="<?= e(url('assets/wiki.js')) ?>?v=79" defer></script>

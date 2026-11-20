@@ -705,3 +705,9 @@ html.nav-fold .nav nav.open { display: flex; }
 html.nav-fold .nav ul { flex-direction: column; align-items: stretch; gap: 0; }
 html.nav-fold .nav li { display: block; }
 html.nav-fold .nav ul a { align-content: center; min-height: 52px; }
+
+/* The Manuscript's shelf on the homepage: the real shelf (manuscript/?peek) drawn at full width, shrunk to fit (site.js),
+   on a clear background, so it matches light or dark mode and changes whenever the shelf does. Nothing in it can be clicked. */
+.shelf-peek { position: relative; width: 100%; aspect-ratio: 1200 / 720; overflow: hidden; }
+.shelf-peek iframe { position: absolute; top: 0; left: 0; width: 1200px; height: 720px; border: 0; background: transparent; transform-origin: 0 0; pointer-events: none; color-scheme: normal; opacity: 0; transition: opacity .4s; }
+.shelf-peek iframe.ready { opacity: 1; }

@@ -200,4 +200,20 @@
     search.form.addEventListener('submit', function (e) { e.preventDefault(); });
     filter.addEventListener('change', apply);
   }
+  // The Manuscript's shelf on the homepage: drawn at full width inside its frame, shrunk to fit the space.
+  var peek = document.querySelector('.shelf-peek iframe');
+  if (peek) {
+    var box = peek.parentNode, W = 1200;
+    var fit = function () {
+      var doc = null; try { doc = peek.contentDocument; } catch (e) {}
+      var shelf = doc && doc.querySelector('.shelves');
+      var h = shelf ? Math.ceil(shelf.getBoundingClientRect().height) + 28 : 720, s = box.clientWidth / W;
+      peek.style.height = h + 'px';
+      peek.style.transform = 'scale(' + s + ')';
+      box.style.aspectRatio = W + ' / ' + h;
+      if (shelf) peek.classList.add('ready');
+    };
+    peek.addEventListener('load', function () { fit(); setTimeout(fit, 600); });
+    if ('ResizeObserver' in window) new ResizeObserver(fit).observe(box); else window.addEventListener('resize', fit);
+  }
 })();
