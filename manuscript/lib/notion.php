@@ -990,6 +990,7 @@ final class NotionImporter
      */
     private function transparent(?string $file): ?string
     {
+        if ($file && $this->grimoire === 'rune') return $this->goldInk($file);
         if (!$file || in_array($this->grimoire, array_merge(['card'], (array) config('keep_backgrounds', ['rune'])), true) || !function_exists('imagecreatefromstring')) return $file;
         $dir = config('data_dir') . '/media';
         $png = preg_replace('/\.[a-z0-9]+$/', '', $file) . '-t.png';
@@ -1031,6 +1032,39 @@ final class NotionImporter
             if ($clear[$i]) $alpha = 127;
             elseif (($x > 0 && $clear[$i - 1]) || ($x < $w - 1 && $clear[$i + 1]) || ($y > 0 && $clear[$i - $w]) || ($y < $h - 1 && $clear[$i + $w])) $alpha = 60; // soft edge
             imagesetpixel($out, $x, $y, imagecolorallocatealpha($out, $r, $g, $b, $alpha));
+        }
+        imagepng($out, "$dir/$png", 6);
+        return $png;
+    }
+
+    /**
+     * Rune pictures drawn in black ink (on white or on a clear background) become gold ink on a clear background, the
+     * site's rune colour: black lines would vanish in dark mode, and a white box looks pasted on. The ink's darkness
+     * becomes its opacity, so soft edges stay soft. Pictures with colour in them are left as they are.
+     * Returns the file to use (a PNG ending in -gold.png).
+     */
+    private function goldInk(string $file): string
+    {
+        $dir = config('data_dir') . '/media';
+        $png = preg_replace('/\.[a-z0-9]+$/', '', $file) . '-gold.png';
+        if (is_file("$dir/$png")) return $png;
+        if (str_ends_with($file, '.svg') || !function_exists('imagecreatefromstring')) return $file;
+        $im = @imagecreatefromstring((string) @file_get_contents("$dir/$file"));
+        if (!$im) return $file;
+        imagepalettetotruecolor($im);
+        $w = imagesx($im); $h = imagesy($im);
+        // ink only: no pixel that shows is noticeably coloured
+        for ($y = 0; $y < $h; $y += max(1, intdiv($h, 48))) for ($x = 0; $x < $w; $x += max(1, intdiv($w, 48))) {
+            $c = imagecolorat($im, $x, $y);
+            $r = ($c >> 16) & 255; $g = ($c >> 8) & 255; $b = $c & 255; $a = ($c >> 24) & 127;
+            if ($a < 100 && max($r, $g, $b) - min($r, $g, $b) > 40) return $file;
+        }
+        $out = imagecreatetruecolor($w, $h); imagealphablending($out, false); imagesavealpha($out, true);
+        for ($y = 0; $y < $h; $y++) for ($x = 0; $x < $w; $x++) {
+            $c = imagecolorat($im, $x, $y);
+            $lum = (int) round(0.299 * (($c >> 16) & 255) + 0.587 * (($c >> 8) & 255) + 0.114 * ($c & 255));
+            $opacity = (1 - ((($c >> 24) & 127) / 127)) * (1 - $lum / 255); // 0 clear … 1 solid ink
+            imagesetpixel($out, $x, $y, imagecolorallocatealpha($out, 184, 145, 63, 127 - (int) round($opacity * 127)));
         }
         imagepng($out, "$dir/$png", 6);
         return $png;
