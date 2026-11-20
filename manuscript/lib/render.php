@@ -7,6 +7,15 @@ function site_url(string $path = ''): string
     return $site . '/' . ltrim($path, '/');
 }
 
+/**
+ * A stylesheet or script's address with its version: the time the file last changed, so browsers fetch a new copy
+ * after every upload without anyone bumping a number. $file is relative to the website's root folder.
+ */
+function asset_url(string $url, string $file): string
+{
+    return $url . '?v=' . (int) @filemtime(dirname(MM_ROOT) . '/' . $file);
+}
+
 /** "What's inside" for a grimoire card: its "Within These Pages:" line from Notion, or its first sentence. */
 function grimoire_summary(array $g): string
 {
@@ -318,14 +327,14 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <?php // The fonts load "optional": fetched first thing, they're ready in time; otherwise a reload could fall back to the browser's own, bigger serif. ?>
   <?php foreach (['alegreya-400', 'cormorant-400', 'cormorant-400-italic', 'alegreya-500'] as $font): ?><link rel="preload" href="<?= e(site_url('fonts/' . $font . '.woff2')) ?>" as="font" type="font/woff2" crossorigin>
-  <?php endforeach ?>  <script src="<?= e(site_url('prefs.js')) ?>?v=3"></script>
-  <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>?v=10">
+  <?php endforeach ?>  <script src="<?= e(asset_url(site_url('prefs.js'), 'prefs.js')) ?>"></script>
+  <link rel="stylesheet" href="<?= e(asset_url(site_url('styles.css'), 'styles.css')) ?>">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#3d000c" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=82" defer></script>
+  <script src="<?= e(asset_url(url('assets/wiki.js'), 'manuscript/assets/wiki.js')) ?>" data-tools="<?= e(asset_url(url('assets/tools.js'), 'manuscript/assets/tools.js')) ?>" defer></script>
 <?php if ($stripe): ?>
   <script src="https://js.stripe.com/dahlia/stripe.js" defer></script>
-  <script src="<?= e(url('assets/checkout.js')) ?>?v=2" defer></script>
+  <script src="<?= e(asset_url(url('assets/checkout.js'), 'manuscript/assets/checkout.js')) ?>" defer></script>
 <?php endif; ?>
 </head>
 <?php $visitor = !has_access(); $openUrls = $visitor ? array_merge([url('sneak-peek')], array_map('page_url', open_pages())) : []; ?>

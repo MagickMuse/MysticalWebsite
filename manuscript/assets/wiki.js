@@ -3,7 +3,8 @@
   var self = document.currentScript;
   if (self && self.src) {
     var tools = document.createElement('script');
-    tools.src = new URL('tools.js?v=28', self.src).toString();
+    // The live site gives tools.js's own versioned address (data-tools); the preview just loads it beside this file.
+    tools.src = self.getAttribute('data-tools') || new URL('tools.js', self.src).toString();
     tools.defer = true;
     document.head.appendChild(tools);
   }
