@@ -78,14 +78,20 @@ function join_popup(bool $onPeek): string
 {
     $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
     $next = (string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
-    $peek = !$onPeek && sneak_peek_page() ? '<a class="btn ghost" href="' . e(url('sneak-peek')) . '">Take a Sneak Peek</a>' : '';
+    $general = grimoire_count_word() . ' cross-linked grimoires and ' . $total . ' pages of researched magick, open to members. '
+        . 'Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.';
+    // When a visitor taps a named page (Rose Quartz on Today, a connection), wiki.js names it in the heading and uses
+    // data-named for the text ({total} is filled in here); anything else keeps the general wording.
+    $named = 'It’s one of ' . $total . ' pages of researched magick in the Manuscript, each linked to everything it’s used with. Become a member to read it.';
+    $peek = !$onPeek && sneak_peek_page() ? 'Read a page first: <a href="' . e(url('sneak-peek')) . '">the sneak peek</a>. ' : '';
     return '<dialog class="join-pop" id="join-pop" aria-labelledby="join-pop-h">'
         . '<button class="join-x" type="button" data-close aria-label="Close">&times;</button>'
         . '<p class="eyebrow">Members Only</p>'
-        . '<h2 id="join-pop-h">This Lives Inside the Manuscript</h2>'
-        . '<p>' . grimoire_count_word() . ' cross-linked grimoires and ' . $total . ' pages of researched magick, open to members. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>'
-        . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a Member</a>' . $peek . '</div>'
-        . (current_email() ? '' : '<p class="small">Already a member? <a href="' . e(url('login') . '?next=' . rawurlencode($next)) . '">Sign In</a></p>')
+        . '<h2 id="join-pop-h" data-general="This Lives Inside the Manuscript">This Lives Inside the Manuscript</h2>'
+        . '<p id="join-pop-text" data-general="' . e($general) . '" data-named="' . e($named) . '">' . e($general) . '</p>'
+        . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">See What’s Inside</a>'
+        . '<button class="btn ghost" type="button" data-close>Keep Exploring</button></div>'
+        . '<p class="small">' . $peek . (current_email() ? '' : 'Already a member? <a href="' . e(url('login') . '?next=' . rawurlencode($next)) . '">Sign In</a>') . '</p>'
         . '</dialog>';
 }
 

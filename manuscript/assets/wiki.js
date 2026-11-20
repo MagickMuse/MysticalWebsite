@@ -654,11 +654,28 @@
       var first = path.slice(base.length + 1).split('/')[0];
       return first !== '' && free.indexOf(first) === -1 && open.indexOf(path) === -1;
     }
-    window.mmJoinPop = function () { if (!pop.open) pop.showModal(); };
+    var head = document.getElementById('join-pop-h'), text = document.getElementById('join-pop-text');
+    /** The name of the page a link leads to, from its words (not its icon or extra notes), if it reads as a name. */
+    function pageName(a) {
+      if (a.closest('.bk, .slab, .shelves, .book-pile')) return ''; // the books on the shelf: the general wording
+      var c = a.cloneNode(true);
+      c.querySelectorAll('small, .sr-only, img, svg, [aria-hidden="true"]').forEach(function (x) { x.remove(); });
+      var name = c.textContent.replace(/\s+/g, ' ').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N})]+$/gu, '').trim();
+      return name.length >= 2 && name.length <= 60 && /\p{L}/u.test(name) ? name : '';
+    }
+    // Name what they tapped ("Rose Quartz Is in the Manuscript"); anything else keeps the general wording.
+    window.mmJoinPop = function (a) {
+      var name = a ? pageName(a) : '';
+      if (head && text) {
+        head.textContent = name ? name + ' Is in the Manuscript' : head.getAttribute('data-general');
+        text.textContent = text.getAttribute(name ? 'data-named' : 'data-general');
+      }
+      if (!pop.open) pop.showModal();
+    };
     document.addEventListener('click', function (e) {
       var a = e.target.closest && e.target.closest('a[href]');
       if (!a || !locked(a)) return;
-      e.preventDefault(); e.stopImmediatePropagation(); window.mmJoinPop();
+      e.preventDefault(); e.stopImmediatePropagation(); window.mmJoinPop(a);
     }, true);
     pop.addEventListener('click', function (e) { if (e.target === pop || e.target.closest('[data-close]')) pop.close(); });
   })();
