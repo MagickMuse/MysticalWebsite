@@ -160,45 +160,24 @@
     });
   });
 
-  // Blog search and topic filter
+  // Blog search: filters the posts as you type (title, summary, topics and keywords)
   var search = document.getElementById('post-search');
-  var filter = document.getElementById('post-topic');
-  if (search && filter) {
+  if (search) {
     var cards = Array.prototype.slice.call(document.querySelectorAll('#post-grid .post'));
     var empty = document.getElementById('post-empty');
-    var topics = [];
-    // A card can sit under several topics (data-topics, primary first); its eyebrow shows the primary one
-    var topicsOf = function (card) {
-      return card.dataset.topics ? card.dataset.topics.split('|') : [card.querySelector('.eyebrow').textContent.trim()];
-    };
-    cards.forEach(function (card) {
-      topicsOf(card).forEach(function (topic) {
-        if (topics.indexOf(topic) === -1) topics.push(topic);
-      });
-    });
-    topics.sort().forEach(function (topic) {
-      var option = document.createElement('option');
-      option.value = option.textContent = topic;
-      filter.appendChild(option);
-    });
     var apply = function () {
       var q = search.value.trim().toLowerCase();
       var visible = 0;
       cards.forEach(function (card) {
         var text = (card.textContent + ' ' + (card.dataset.keywords || '') + ' ' + (card.dataset.topics || '')).toLowerCase();
-        var show = (!q || text.indexOf(q) !== -1) && (!filter.value || topicsOf(card).indexOf(filter.value) !== -1);
-        card.hidden = !show;
-        if (show) visible++;
+        card.hidden = !!q && text.indexOf(q) === -1;
+        if (!card.hidden) visible++;
       });
-      empty.textContent = filter.value
-        ? 'No ' + filter.value + ' posts match that search. Try All Topics.'
-        : 'No posts containing those keywords exist at the moment.';
       empty.hidden = visible > 0;
     };
     search.addEventListener('input', apply);
     // Results filter as you type, so Enter shouldn't submit the form and reload the page
     search.form.addEventListener('submit', function (e) { e.preventDefault(); });
-    filter.addEventListener('change', apply);
   }
   // The Manuscript's shelf on the homepage: drawn at full width inside its frame, shrunk to fit the space.
   var peek = document.querySelector('.shelf-peek iframe');

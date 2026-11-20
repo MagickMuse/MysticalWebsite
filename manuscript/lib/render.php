@@ -303,6 +303,7 @@ function layout(string $title, string $body, array $opt = []): void
         ? '<a href="' . e(url('account')) . '">Account</a>'
         : '<a href="' . e(url('login')) . '">Sign In</a>';
     $q = e($_GET['q'] ?? '');
+    $section = $opt['section'] ?? 'manuscript'; // which main-menu item is marked as the current page
     $robots = !empty($opt['index']) ? 'index, follow' : 'noindex, nofollow';
     ?>
 <!doctype html>
@@ -336,12 +337,12 @@ function layout(string $title, string $body, array $opt = []): void
     <button class="menu" type="button" aria-expanded="false" aria-controls="site-menu">Menu</button>
     <nav id="site-menu" aria-label="Main">
       <ul class="left">
-        <li><a href="<?= e(url()) ?>" aria-current="page"><span>Manuscript</span><small>the grimoire</small></a></li>
+        <li><a href="<?= e(url()) ?>"<?= $section === 'manuscript' ? ' aria-current="page"' : '' ?>><span>Manuscript</span><small>the grimoire</small></a></li>
         <li><a href="<?= e(site_url('muses')) ?>"><span>Muses</span><small>the coven</small></a></li>
       </ul>
       <ul class="right">
         <li><a href="<?= e(site_url('mastery')) ?>"><span>Mastery</span><small>guides &amp; courses</small></a></li>
-        <li><a href="<?= e(site_url('market/')) ?>"><span>Market</span><small>the shop</small></a></li>
+        <li><a href="<?= e(site_url('market/')) ?>"<?= $section === 'market' ? ' aria-current="page"' : '' ?>><span>Market</span><small>the shop</small></a></li>
         <li><a href="<?= e(site_url('mythos')) ?>"><span>Mythos</span><small>our story</small></a></li>
       </ul>
     </nav>

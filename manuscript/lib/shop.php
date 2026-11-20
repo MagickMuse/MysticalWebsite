@@ -110,7 +110,7 @@ function view_shop(): void
   <p class="lede">Courses, grimoire templates and the Manuscript. Everything you buy stays in your library, ready whenever you are.</p>
 </section>
 <section class="cards shop-grid">$ms$cards</section>
-HTML, ['index' => true, 'description' => 'Witchcraft courses, grimoire templates and The Magick Manuscript from The Magick Muse.']);
+HTML, ['index' => true, 'section' => 'market', 'description' => 'Witchcraft courses, grimoire templates and The Magick Manuscript from The Magick Muse.']);
 }
 
 function view_product(array $p): void
@@ -150,7 +150,7 @@ function view_product(array $p): void
         . '<h1>' . e(short_name($p)) . '</h1>' . $full . '<p class="price big">' . e(price_label($p)) . '</p>'
         . $includes . $action . $refund
         . '<div class="mm-prose product-desc">' . $desc . '</div>' . community_links() . '</div></article>',
-        ['index' => true, 'description' => $p['tagline'] ?? '']);
+        ['index' => true, 'section' => 'market', 'description' => $p['tagline'] ?? '']);
 }
 
 function do_buy(): void
@@ -241,7 +241,7 @@ function view_library(): void
         ? '<ul class="library">' . $items . '</ul>'
         : '<p class="lede">Nothing here yet. <a href="' . e(site_url('market')) . '">Visit the shop</a>.</p>';
     layout('Your library', '<section class="lib"><p class="eyebrow">' . e($email) . '</p><h1>Your Library</h1>' . $thanks . $body
-        . '<p class="small"><a href="' . e(url('account')) . '">Account &amp; billing</a></p></section>', ['private' => true]);
+        . '<p class="small"><a href="' . e(url('account')) . '">Account &amp; billing</a></p></section>', ['private' => true, 'section' => 'market']);
 }
 
 function shop_download(string $slug, string $file): void
