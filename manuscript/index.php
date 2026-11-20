@@ -33,7 +33,7 @@ try {
 } catch (Throwable $ex) {
     error_log('[manuscript] ' . $ex);
     http_response_code(500);
-    layout('Something went wrong', '<section class="mm-empty"><h1>Something went <em>astray</em></h1><p class="lede">Please try again in a moment.</p></section>');
+    layout('Something went wrong', '<section class="mm-empty"><h1>Something Went Astray</h1><p class="lede">Please try again in a moment.</p></section>');
 }
 
 function route(array $parts, string $method): void
@@ -106,18 +106,17 @@ function view_home(): void
     if (!$grimoires) {
         $cards = '<p class="lede">Nothing has been moved over yet. Run the importer (see README) to bring grimoires in from Notion.</p>';
     }
-    $join = $begin ? '<div class="actions"><a class="btn" href="' . e(page_url($begin)) . '">Begin here</a></div>' : '';
+    $join = $begin ? '<div class="actions"><a class="btn" href="' . e(page_url($begin)) . '">Begin Here</a></div>' : '';
     if ($member) $join .= path_home_line();
     if (!$member) {
-        $join = '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a>'
-            . (sneak_peek_page() ? '<a class="btn ghost" href="' . e(url('sneak-peek')) . '">Take a sneak peek</a>' : '') . '</div>'
+        $join = '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a Member</a>'
+            . (sneak_peek_page() ? '<a class="btn ghost" href="' . e(url('sneak-peek')) . '">Take a Sneak Peek</a>' : '') . '</div>'
             . (current_email() ? '<p class="small">Signed in as ' . e(current_email()) . ', but this email has no active membership. <a href="' . e(url('account')) . '">See your account</a></p>'
-                : '<p class="small">Already a member? <a href="' . e(url('login')) . '">Sign in</a></p>');
+                : '<p class="small">Already a member? <a href="' . e(url('login')) . '">Sign In</a></p>');
     }
     layout('The Magick Manuscript', <<<HTML
 <section class="mm-hero">
-  <p class="eyebrow labelled">A Living Digital Grimoire</p>
-  <h1>The Magick <em>Manuscript</em></h1>
+  <h1>The Magick Manuscript</h1>
   <p class="lede">{$count} cross-linked grimoires. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three. <span class="count-line">{$total} pages inscribed so far.</span></p>
   $join
 </section>
@@ -132,7 +131,7 @@ function view_gate(?array $locked = null): void
     $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
     $signin = current_email()
         ? '<p class="small">Signed in as ' . e(current_email()) . ', but this email has no active membership. <a href="' . e(url('account')) . '">See your account</a></p>'
-        : '<p class="small">Already a member? <a href="' . e(url('login') . '?next=' . rawurlencode((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH))) . '">Sign in</a></p>';
+        : '<p class="small">Already a member? <a href="' . e(url('login') . '?next=' . rawurlencode((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH))) . '">Sign In</a></p>';
     $join = e(url('join'));
     $count = grimoire_count_word();
     $heading = $locked ? 'This page lives inside <em>the Manuscript</em>' : 'The Magick <em>Manuscript</em>';
@@ -140,10 +139,10 @@ function view_gate(?array $locked = null): void
     record_view($locked ? 'route:members-only' : 'route:/manuscript/');
     layout($locked ? 'Members only' : 'The Magick Manuscript', <<<HTML
 <section class="mm-hero narrow gate">
-  <p class="eyebrow labelled">Members only</p>
+  <p class="eyebrow">Members only</p>
   <h1>$heading</h1>
   <p class="lede">{$count} cross-linked grimoires and {$total} pages of researched magick, open to members. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>
-  <div class="actions"><a class="btn" href="{$join}">Become a member</a></div>
+  <div class="actions"><a class="btn" href="{$join}">Become a Member</a></div>
   $signin
 </section>
 HTML, ['index' => !$locked, 'description' => 'The Magick Manuscript: a members-only, cross-linked digital grimoire by The Magick Muse.']);
@@ -191,9 +190,9 @@ function view_page(array $p): void
     $peek = !has_access() && ($sp = sneak_peek_page()) && $sp['id'] === $p['id'];
     if ($peek) {
         $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
-        $head = '<aside class="peek-note"><p class="eyebrow labelled">A sneak peek</p>'
+        $head = '<aside class="peek-note"><p class="eyebrow">A sneak peek</p>'
             . '<p>You\'re reading one page of the Manuscript, just as members see it. Every connection on it leads to another page: there are ' . $total . ' in all, across ' . mb_strtolower(grimoire_count_word()) . ' grimoires.</p>'
-            . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a></div></aside>' . $head;
+            . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a Member</a></div></aside>' . $head;
     }
 
     // Grimoires without pictures (the Entity Grimoire): nothing to show, even before the next import takes them off.
@@ -379,7 +378,7 @@ function picture_credits_html(array $credits, callable $href): string
             . '<span class="lib-author">' . e($c['artist']) . '</span>'
             . '<span class="credit-meta">' . $lic . ' · <a href="' . e($c['source']) . '" rel="noopener">Wikimedia Commons</a></span></li>';
     }
-    return '<header class="pg-head"><p class="eyebrow">Sources</p><h1>Picture credits</h1>'
+    return '<header class="pg-head"><p class="eyebrow">Sources</p><h1>Picture Credits</h1>'
         . '<p class="lede small">Many of the mineral and plant photos in the Manuscript come from Wikimedia Commons, shared under free licences by the photographers below. Thank you to each of them.</p></header>'
         . '<ol class="library">' . $rows . '</ol>';
 }
@@ -504,7 +503,7 @@ function view_search(string $q): void
     }
     $count = count($rows);
     $shown = $count >= 100 ? '100+' : (string) $count;
-    $body = '<section class="mm-results"><p class="eyebrow">Search</p><h1>' . ($count ? $shown . ($count === 1 ? ' result' : ' results') . ' for <em>' . e($q) . '</em>' : 'Nothing found for <em>' . e($q) . '</em>') . '</h1>'
+    $body = '<section class="mm-results"><p class="eyebrow">Search</p><h1>' . ($count ? $shown . ($count === 1 ? ' result' : ' results') . ' for ' . e($q) . '' : 'Nothing found for ' . e($q) . '') . '</h1>'
         . $note . $chips
         . ($count ? '<ol class="results">' . $list . '</ol>' : '<p class="lede">Try another spelling, a shorter word, or a related term.</p>')
         . '</section>';
@@ -616,13 +615,13 @@ function view_join(): void
     $community = community_links();
     layout('Join the Manuscript', <<<HTML
 <section class="mm-hero narrow">
-  <p class="eyebrow labelled">Membership</p>
-  <h1>The Magick <em>Manuscript</em></h1>
+  <p class="eyebrow">Membership</p>
+  <h1>The Magick Manuscript</h1>
   <p class="lede">20,000+ entries · 15 cross-linked grimoires · an interactive digital grimoire that never stops growing.</p>
   $note
 </section>
 <section class="cards plans $planClass">$plans</section>
-<p class="center small">Secure checkout by Stripe. After paying you're signed in straight away. Already a member? <a href="$login">Sign in</a></p>
+<p class="center small">Secure checkout by Stripe. After paying you're signed in straight away. Already a member? <a href="$login">Sign In</a></p>
 <section class="join-copy">
   <div class="mm-prose">$desc</div>
   <ul class="highlights">$highlights</ul>
@@ -665,9 +664,9 @@ function view_welcome(): void
         }
     }
     $msg = $email
-        ? '<p class="lede">Your membership is active and you are signed in as ' . e($email) . '. On another device, sign in with this email.</p><div class="actions"><a class="btn" href="' . e(url('begin-here')) . '">Begin here</a><a class="link" href="' . e(url()) . '">All grimoires</a></div>'
+        ? '<p class="lede">Your membership is active and you are signed in as ' . e($email) . '. On another device, sign in with this email.</p><div class="actions"><a class="btn" href="' . e(url('begin-here')) . '">Begin Here</a><a class="link" href="' . e(url()) . '">All Grimoires</a></div>'
         : '<p class="lede">Thank you. If your access is not ready yet, <a href="' . e(url('login')) . '">sign in with the email you paid with</a>.</p>';
-    layout('Welcome', '<section class="mm-hero narrow"><p class="eyebrow labelled">Welcome, seeker</p><h1>The Manuscript <em>is open to you</em></h1>' . $msg . '</section>', ['private' => true]);
+    layout('Welcome', '<section class="mm-hero narrow"><p class="eyebrow">Welcome, seeker</p><h1>The Manuscript Is Open to You</h1>' . $msg . '</section>', ['private' => true]);
 }
 
 /** Only same-site paths may be used as a post-login destination. */
@@ -685,8 +684,8 @@ function view_login(string $notice = '', ?string $next = null): void
     $nextAttr = e($next);
     layout('Sign in', <<<HTML
 <section class="mm-hero narrow">
-  <p class="eyebrow labelled">Welcome back</p>
-  <h1>Sign <em>in</em></h1>
+  <p class="eyebrow">Welcome back</p>
+  <h1>Sign In</h1>
   $notice
   <div class="signin">
   <form class="mm-form" method="post" action="$action">
@@ -694,7 +693,7 @@ function view_login(string $notice = '', ?string $next = null): void
     <input type="hidden" name="next" value="$nextAttr">
     <label for="email">Your email</label>
     <input id="email" name="email" type="email" autocomplete="email" required>
-    <button class="btn" type="submit">Email me a sign-in link</button>
+    <button class="btn" type="submit">Email Me a Sign-In Link</button>
     <p class="small">No password needed. Use the email you bought with. The link works once and expires in 30 minutes.</p>
   </form>
   </div>
@@ -715,7 +714,7 @@ function do_login(): void
         $link = url('auth?token=' . issue_login_token($email) . '&next=' . rawurlencode($next));
         send_mail($email, 'Your sign-in link for The Magick Muse',
             "Open this link to sign in:\n\n$link\n\nIt works once and expires in 30 minutes. If you didn't ask for it, ignore this email.",
-            '<p>Open this link to sign in to The Magick Muse:</p><p><a href="' . e($link) . '">Sign in</a></p><p>It works once and expires in 30 minutes. If you didn’t ask for it, ignore this email.</p>');
+            '<p>Open this link to sign in to The Magick Muse:</p><p><a href="' . e($link) . '">Sign In</a></p><p>It works once and expires in 30 minutes. If you didn’t ask for it, ignore this email.</p>');
     }
     view_login($ok, $next);
 }
@@ -740,7 +739,7 @@ function view_account(): void
         !$m => 'No membership on this email',
         // A refunded or revoked lifetime/comp member keeps the plan name but not the access.
         $m['plan'] === 'lifetime' && $m['status'] === 'active' => 'Member: full Manuscript access',
-        $m['status'] === 'disputed' => 'Access paused: your bank is disputing the payment. Access comes back if the dispute is withdrawn or settled in our favour.',
+        $m['status'] === 'disputed' => 'Access paused: your bank is disputing the payment. Access comes back if the dispute is withdrawn or settled in our favor.',
         $m['plan'] === 'comp' && $m['status'] === 'active' => 'Member (complimentary)',
         in_array($m['plan'], ['lifetime', 'comp'], true) => 'Membership ended',
         $m['status'] === 'active' => 'Monthly member, renews ' . e(substr((string) $m['paid_through'], 0, 10)),
@@ -748,25 +747,25 @@ function view_account(): void
     };
     // Billing management is only for subscriptions; lifetime buyers get their Stripe receipt by email.
     $billing = $m && $m['stripe_customer'] && $m['plan'] === 'monthly' && $m['status'] !== 'canceled'
-        ? '<form method="post" action="' . e(url('account')) . '"><input type="hidden" name="csrf" value="' . $csrf . '"><button class="btn ghost" type="submit">Manage billing</button></form>' : '';
-    $join = has_access() ? '' : '<a class="btn" href="' . e(url('join')) . '">Become a member</a>';
+        ? '<form method="post" action="' . e(url('account')) . '"><input type="hidden" name="csrf" value="' . $csrf . '"><button class="btn ghost" type="submit">Manage Billing</button></form>' : '';
+    $join = has_access() ? '' : '<a class="btn" href="' . e(url('join')) . '">Become a Member</a>';
     $logout = e(url('logout'));
     $email = e($email);
     $admin = is_admin(current_email()) ? '<a class="link" href="' . e(url('dashboard')) . '">Dashboard</a>' : '';
-    $library = '<a class="link" href="' . e(site_url('market/library')) . '">Your library</a>';
+    $library = '<a class="link" href="' . e(site_url('market/library')) . '">Your Library</a>';
     // Display & accessibility: kept in the browser by prefs.js, the same panel as the website's /settings page.
     $prefs = (string) @file_get_contents(__DIR__ . '/lib/prefs-panel.html');
     layout('Account', <<<HTML
 <section class="mm-hero narrow">
-  <p class="eyebrow labelled">Account</p>
-  <h1><em>{$email}</em></h1>
+  <p class="eyebrow">Account</p>
+  <h1>{$email}</h1>
   <p class="lede">$status</p>
   <div class="actions">$join $billing $library $admin
-    <form method="post" action="$logout"><input type="hidden" name="csrf" value="$csrf"><button class="link as-button" type="submit">Sign out</button></form>
+    <form method="post" action="$logout"><input type="hidden" name="csrf" value="$csrf"><button class="link as-button" type="submit">Sign Out</button></form>
   </div>
 </section>
 <section class="account-prefs" id="settings" aria-labelledby="prefs-title">
-  <h2 id="prefs-title">Display &amp; accessibility</h2>
+  <h2 id="prefs-title">Display &amp; Accessibility</h2>
   <p class="lede small">Dark mode, an easier-to-read font, larger text, more spacing, fewer animations. Changes show straight away.</p>
   $prefs
 </section>

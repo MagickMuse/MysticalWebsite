@@ -108,7 +108,7 @@
     return out;
   }
   var PARTS = [
-    ['when', 'When to work', 8, 3], ['colours', 'Colours', 6, 2], ['plants', 'Herbs & plants', 10, 3], ['stones', 'Crystals & stones', 8, 2],
+    ['when', 'When to work', 8, 3], ['colours', 'Colors', 6, 2], ['plants', 'Herbs & plants', 10, 3], ['stones', 'Crystals & stones', 8, 2],
     ['oils', 'Oils', 6, 2], ['deities', 'Deities & spirits', 8, 0], ['runes', 'Runes', 4, 0], ['tarot', 'Tarot', 4, 0], ['recipes', 'Recipes', 6, 0], ['rituals', 'Rituals to adapt', 8, 1]
   ];
   var PART = {}; PARTS.forEach(function (p) { PART[p[0]] = p; });
@@ -175,7 +175,7 @@
   function addDays(day, n) { var d = new Date(day); d.setDate(d.getDate() + n); return d; }
 
   // ------------------------------------------------------------------ Today
-  /** What a day holds: its moon, weekday and ruling planet, the Sun's sign, the season, and the intentions they favour. */
+  /** What a day holds: its moon, weekday and ruling planet, the Sun's sign, the season, and the intentions they favor. */
   function dayReading(day, south) {
     var age = moonAge(day), ph = moonPhase(age), phases = ofKind('astrology', 'Moon Phases'), planets = ofKind('astrology', 'Planets'), signs = ofKind('astrology', 'Western Zodiac');
     var weekday = find('timing', DAYS[day.getDay()].toLowerCase()), dayPage = find('timing', daySlug(day)), seas = find('timing', season(day, south));
@@ -244,17 +244,17 @@
     }
     var h = south ? '&h=s' : '', prev = addDays(day, -1), next = addDays(day, 1);
     tool.className = 'pg pg-tool pg-today';
-    render(tool, '<header class="pg-head tool-head">' + crumbs('timing') + '<p class="eyebrow labelled">Today in the Manuscript</p>'
-      + '<h1>' + DAYS[day.getDay()] + ', <em>' + MONTHS[day.getMonth()] + ' ' + day.getDate() + '</em></h1>'
+    render(tool, '<header class="pg-head tool-head">' + crumbs('timing') + '<p class="eyebrow">Today in the Manuscript</p>'
+      + '<h1>' + DAYS[day.getDay()] + ', ' + MONTHS[day.getMonth()] + ' ' + day.getDate() + '</h1>'
       + (R.lede ? '<p class="lede">' + esc(R.lede) + '</p>' : '') + sabbatHtml(day, south)
       + '<p class="small day-nav"><a class="link" href="?d=' + iso(prev) + h + '">‹ ' + short(prev) + '</a><span aria-hidden="true">·</span>'
       + '<a class="link" href="?d=' + iso(day) + (south ? '' : '&h=s') + '">' + (south ? 'Use the northern hemisphere' : 'Use the southern hemisphere') + '</a><span aria-hidden="true">·</span>'
       + '<a class="link" href="?d=' + iso(next) + h + '">' + short(next) + ' ›</a></p></header>'
       + cards
-      + (favours ? '<section class="tool-section"><h2>Today <em>favours</em></h2><p class="small">Intentions tied to more than one of today’s influences. Choose one to build a spell for it.</p><div class="favs">' + favours + '</div></section>' : '')
-      + (work ? '<section class="tool-section"><h2>Work <em>with today</em></h2><p class="small">Tied to the most of today’s moon, day, sign and season.</p><div class="work-parts">' + work + '</div></section>' : '')
-      + '<section class="tool-section two-col">' + (onDay ? '<div><h2>On <em>this day</em></h2>' + onDay + '</div>' : '')
-      + (soon.length ? '<div><h2>Coming <em>up</em></h2><ul class="soon">' + soon.join('') + '</ul><p class="small"><a class="link" href="' + esc(url('calendar/')) + '">The full calendar</a></p></div>' : '') + '</section>', 'Today');
+      + (favours ? '<section class="tool-section"><h2>Today Favors</h2><p class="small">Intentions tied to more than one of today’s influences. Choose one to build a spell for it.</p><div class="favs">' + favours + '</div></section>' : '')
+      + (work ? '<section class="tool-section"><h2>Work with Today</h2><p class="small">Tied to the most of today’s moon, day, sign and season.</p><div class="work-parts">' + work + '</div></section>' : '')
+      + '<section class="tool-section two-col">' + (onDay ? '<div><h2>On This Day</h2>' + onDay + '</div>' : '')
+      + (soon.length ? '<div><h2>Coming Up</h2><ul class="soon">' + soon.join('') + '</ul><p class="small"><a class="link" href="' + esc(url('calendar/')) + '">The Full Calendar</a></p></div>' : '') + '</section>', 'Today');
   }
 
   /**
@@ -276,11 +276,11 @@
     var box = document.createElement('section');
     box.className = 'today-glance';
     box.setAttribute('aria-labelledby', 'glance-h');
-    box.innerHTML = '<header class="glance-head"><p class="eyebrow labelled">Today in the Manuscript</p>'
-      + '<h2 id="glance-h">' + DAYS[day.getDay()] + ', <em>' + MONTHS[day.getMonth()] + ' ' + day.getDate() + '</em></h2>'
+    box.innerHTML = '<header class="glance-head"><p class="eyebrow">Today in the Manuscript</p>'
+      + '<h2 id="glance-h">' + DAYS[day.getDay()] + ', ' + MONTHS[day.getMonth()] + ' ' + day.getDate() + '</h2>'
       + (R.lede ? '<p class="lede">' + esc(R.lede) + '</p>' : '') + sabbatHtml(day, false) + '</header>'
       + influenceCards(R)
-      + (R.intents.length ? '<div class="glance-favs"><p class="eyebrow">Today favours</p><div class="favs">' + R.intents.slice(0, 6).map(function (x) { return favourLink(x, true); }).join('') + '</div></div>' : '')
+      + (R.intents.length ? '<div class="glance-favs"><p class="eyebrow">Today Favors</p><div class="favs">' + R.intents.slice(0, 6).map(function (x) { return favourLink(x, true); }).join('') + '</div></div>' : '')
       + '<p class="glance-more"><a class="btn ghost" href="' + esc(url('today/')) + '">Open Today</a></p>';
     after.after(box);
   }
@@ -322,7 +322,7 @@
       starters = ['protection', 'love', 'money', 'healing', 'banishing', 'luck', 'cleansing', 'divination', 'courage', 'peace', 'success', 'wisdom']
         .map(function (s) { return find('correspondence', s); }).filter(Boolean)
         .map(function (p) { return '<a class="fav" href="' + esc(withSlugs([p.slug])) + '">' + iconHtml(p.icon, 'rel-icon') + esc(p.title) + '</a>'; }).join('');
-      if (starters) starters = '<section class="tool-section"><h2>Or start <em>with one of these</em></h2><div class="favs">' + starters + '</div></section>';
+      if (starters) starters = '<section class="tool-section"><h2>Or Start with One of These</h2><div class="favs">' + starters + '</div></section>';
     }
     var result = '';
     if (chosen.length) {
@@ -337,16 +337,16 @@
       }).join('');
       var title = 'A working for ' + chosen.map(function (p) { return p.title; }).join(' & ');
       result = rows
-        ? '<form class="spell-form" data-spell-save><p class="small">The best-connected matches come first' + (n > 1 ? ', and those tied to all ' + n + ' intentions before the rest' : '') + '. Tick what you’ll use, then save it as a working.</p>'
-          + '<div class="spell-parts">' + rows + '</div><div class="spell-save"><h2>Keep <em>this working</em></h2>'
+        ? '<form class="spell-form" data-spell-save><p class="small">The best-connected matches come first' + (n > 1 ? ', and those tied to all ' + n + ' intentions before the rest' : '') + '. Check what you’ll use, then save it as a working.</p>'
+          + '<div class="spell-parts">' + rows + '</div><div class="spell-save"><h2>Keep This Working</h2>'
           + '<label for="w-title">Name</label><input id="w-title" name="title" maxlength="120" value="' + esc(title) + '">'
           + '<label for="w-notes">Your notes <small>(optional)</small></label><textarea id="w-notes" name="notes" rows="4" maxlength="5000" placeholder="What you’ll do, when, and anything you want to remember."></textarea>'
-          + '<button class="btn" type="submit">Save the working</button><p class="small">Saved workings are listed at the end of this page.</p></div></form>'
+          + '<button class="btn" type="submit">Save the Working</button><p class="small">Saved workings are listed at the end of this page.</p></div></form>'
         : '<p class="lede">Nothing in the Manuscript is tied to this yet. Try a broader intention.</p>';
     }
     tool.className = 'pg pg-tool pg-spell';
-    render(tool, '<header class="pg-head tool-head">' + crumbs('ritual') + '<p class="eyebrow labelled">Spell Builder</p><h1>Build <em>a working</em></h1>'
-      + '<p class="lede">Choose what the spell is for. The Manuscript gathers the days, colours, herbs, stones, oils, deities and rituals tied to it.</p></header>'
+    render(tool, '<header class="pg-head tool-head">' + crumbs('ritual') + '<p class="eyebrow">Spell Builder</p><h1>Build a Working</h1>'
+      + '<p class="lede">Choose what the spell is for. The Manuscript gathers the days, colors, herbs, stones, oils, deities and rituals tied to it.</p></header>'
       + (chips ? '<div class="intents">' + chips + '</div>' : '') + box + starters + result, 'Spell Builder');
     var save = tool.querySelector('[data-spell-save]');
     if (save) save.addEventListener('submit', function (e) {
@@ -370,7 +370,7 @@
     }).catch(function () {});
   }
   function workingsHtml(list) {
-    return '<section class="tool-section workings" id="workings"><h2>Your <em>workings</em></h2>'
+    return '<section class="tool-section workings" id="workings"><h2>Your Workings</h2>'
       + (PREVIEW ? '<p class="small">On this preview, workings are kept in this browser.</p>' : '') + list.map(function (w) {
       var groups = {};
       w.items.forEach(function (it) { var p = find(it[0], it[1]); if (p) (groups[p.part || 'other'] = groups[p.part || 'other'] || []).push(p); });
@@ -378,9 +378,9 @@
         return '<div class="work-part"><h3>' + esc(pt[1]) + '</h3><div class="rels">' + groups[pt[0]].map(chip).join('') + '</div></div>';
       }).join('');
       return '<details class="toggle working"><summary>' + esc(w.title) + ' <small>' + esc(w.created) + '</small></summary>'
-        + '<div class="work-parts">' + (parts || '<p class="small">Nothing was ticked.</p>') + '</div>'
+        + '<div class="work-parts">' + (parts || '<p class="small">Nothing was checked.</p>') + '</div>'
         + (w.notes ? '<p class="note-card-snip working-notes">' + esc(w.notes) + '</p>' : '')
-        + '<p class="small"><a class="link" href="?i=' + encodeURIComponent(w.intents.join(',')) + '">Open in the spell builder</a> · '
+        + '<p class="small"><a class="link" href="?i=' + encodeURIComponent(w.intents.join(',')) + '">Open in the Spell Builder</a> · '
         + '<button class="link as-button" type="button" data-del-working="' + w.id + '">Delete</button></p></details>';
     }).join('') + '</section>';
   }
@@ -520,7 +520,7 @@
   function tarot(tool) {
     var deck = D.t.filter(function (c) { return isTarotCard(D.p[c[0]][1], D.p[c[0]][4].split('|')); }), hand = shuffled(deck).slice(0, 7);
     tool.className = 'pg pg-tool pg-tarot';
-    render(tool, '<header class="pg-head tool-head">' + crumbs('card') + '<h1>Draw <em>a card</em></h1></header>'
+    render(tool, '<header class="pg-head tool-head">' + crumbs('card') + '<h1>Draw a Card</h1></header>'
       + '<div class="spread" role="group" aria-label="Seven face-down cards">' + hand.map(function (c, k) {
         return '<button class="tarot-back fan-' + k + '" type="button" data-pick="' + k + '" aria-label="Card ' + (k + 1) + ' of 7"><span class="back-art" aria-hidden="true"></span></button>';
       }).join('') + '</div><div class="drawn" aria-live="polite"></div>', 'Draw a Card');
@@ -537,7 +537,7 @@
           + '<span class="face front">' + (c[1] ? '<img src="' + esc(url((c[1].indexOf('a:') === 0 ? 'assets/' : 'media/') + c[1].slice(2))) + '" alt="' + esc(card.title + (rev ? ', reversed' : '')) + '">' : '<span class="front-name">' + esc(card.title) + '</span>') + '</span></div></div>'
           + '<div class="reading"><p class="eyebrow">' + (rev ? 'Reversed' : 'Upright') + '</p><h2>' + esc(card.title) + '</h2>'
           + (words.length ? '<p class="small">' + (rev ? 'Reversed, it speaks of' : 'It speaks of') + '</p><div class="rels keywords">' + words.map(chip).join('') + '</div>' : '')
-          + '<div class="actions"><a class="btn" href="' + esc(card.url) + '">View more</a><button class="btn ghost" type="button" data-again>Draw again</button></div></div>';
+          + '<div class="actions"><a class="btn" href="' + esc(card.url) + '">View More</a><button class="btn ghost" type="button" data-again>Draw Again</button></div></div>';
         var flip = drawn.querySelector('.drawn-card');
         if (quiet) flip.classList.add('turned'); else requestAnimationFrame(function () { requestAnimationFrame(function () { flip.classList.add('turned'); }); });
         drawn.querySelector('[data-again]').addEventListener('click', function () { tarot(tool); window.scrollTo({ top: 0, behavior: quiet ? 'auto' : 'smooth' }); });
@@ -567,7 +567,7 @@
     var bag = []; D.p.forEach(function (p, i) { if (p[4] && p[4].split('|').indexOf('Elder Futhark Runes') !== -1) bag.push(i); });
     var hand = shuffled(bag).slice(0, 7);
     tool.className = 'pg pg-tool pg-runes';
-    render(tool, '<header class="pg-head tool-head">' + crumbs('rune') + '<h1>Pull <em>a rune</em></h1></header>'
+    render(tool, '<header class="pg-head tool-head">' + crumbs('rune') + '<h1>Pull a Rune</h1></header>'
       + '<div class="stones" role="group" aria-label="Seven face-down rune stones">' + hand.map(function (i, k) {
         return '<button class="stone st-' + k + '" type="button" data-pick="' + k + '" aria-label="Stone ' + (k + 1) + ' of 7"><span class="stone-face"></span></button>';
       }).join('') + '</div><div class="drawn drawn-rune" aria-live="polite"></div>', 'Pull a Rune');
@@ -584,7 +584,7 @@
           + '<span class="face front stone st-' + k + '"><span class="stone-face"></span><span class="rune-glyph' + (glyph ? '' : ' blank') + '" aria-hidden="true">' + (glyph || '') + '</span></span></div></div>'
           + '<div class="reading"><p class="eyebrow">Elder Futhark</p><h2>' + esc(rune.title) + '</h2>'
           + (words.length ? '<div class="rels keywords">' + words.map(chip).join('') + '</div>' : '')
-          + '<div class="actions"><a class="btn" href="' + esc(rune.url) + '">View more</a><button class="btn ghost" type="button" data-again>Pull again</button></div></div>';
+          + '<div class="actions"><a class="btn" href="' + esc(rune.url) + '">View More</a><button class="btn ghost" type="button" data-again>Pull Again</button></div></div>';
         var flip = drawn.querySelector('.drawn-card');
         if (quiet) flip.classList.add('turned'); else requestAnimationFrame(function () { requestAnimationFrame(function () { flip.classList.add('turned'); }); });
         drawn.querySelector('[data-again]').addEventListener('click', function () { runes(tool); window.scrollTo({ top: 0, behavior: quiet ? 'auto' : 'smooth' }); });
@@ -755,13 +755,13 @@
       var hand = shuffled(deck).slice(0, n).map(function (c) { return { c: c, rev: Math.random() < REVERSED_CHANCE }; });
       var box = document.createElement('section');
       box.className = 'spread-reading';
-      box.innerHTML = '<header class="spread-head"><h2>Your <em>reading</em></h2><p class="small">Turn the cards over one at a time, in order.'
+      box.innerHTML = '<header class="spread-head"><h2>Your Reading</h2><p class="small">Turn the cards over one at a time, in order.'
         + (layout ? ' The numbers match the layout.' : '') + '</p></header>'
         + (layout ? '<figure class="spread-layout"><img src="' + esc(layout.src) + '" alt="' + esc(spreadName) + ' layout"></figure>' : '')
         + '<ol class="spread-cards">' + hand.map(function (h, k) {
           return '<li class="spread-slot"><button class="spread-card" type="button" data-turn="' + k + '" aria-label="Card ' + (k + 1) + ', face down"><span class="slot-n">' + (k + 1) + '</span><span class="tarot-back"><span class="back-art"></span></span></button>'
             + '<div class="slot-pos">' + (details[k + 1] ? esc(details[k + 1]) : 'Card ' + (k + 1)) + '</div><div class="slot-read" hidden></div></li>';
-        }).join('') + '</ol><div class="actions spread-actions"><button class="btn ghost" type="button" data-turn-all>Turn them all</button><button class="btn ghost" type="button" data-redeal>Deal again</button></div>';
+        }).join('') + '</ol><div class="actions spread-actions"><button class="btn ghost" type="button" data-turn-all>Turn Them All</button><button class="btn ghost" type="button" data-redeal>Deal Again</button></div>';
       document.querySelector('.pg-head').after(box);
       var turn = function (k) {
         var slot = box.querySelectorAll('.spread-slot')[k], btn = slot.querySelector('.spread-card');
@@ -899,9 +899,9 @@
   }
   function dreamDecoder(tool) {
     tool.className = 'pg pg-tool pg-dream';
-    render(tool, '<header class="pg-head tool-head">' + crumbs('dream') + '<h1>Dream <em>decoder</em></h1>'
+    render(tool, '<header class="pg-head tool-head">' + crumbs('dream') + '<h1>Dream Decoder</h1>'
       + '<p class="lede">Write down your dream. The symbols the Dream Grimoire knows will light up, with what each one means.</p></header>'
-      + '<form class="dream-form"><label class="sr-only" for="dream-text">Your dream</label><textarea id="dream-text" rows="7" placeholder="I was walking by the ocean at night, and a black cat followed me…"></textarea>'
+      + '<form class="dream-form"><label class="sr-only" for="dream-text">Your Dream</label><textarea id="dream-text" rows="7" placeholder="I was walking by the ocean at night, and a black cat followed me…"></textarea>'
       + '<div class="actions"><button class="btn" type="submit">Decode</button></div></form><div class="dream-result" aria-live="polite"></div>', 'Dream Decoder');
     var form = tool.querySelector('.dream-form'), box = tool.querySelector('#dream-text'), out = tool.querySelector('.dream-result');
     form.addEventListener('submit', function (e) {
@@ -911,8 +911,8 @@
       found.forEach(function (f) { marked += esc(text.slice(last, f.start)) + '<mark' + (f.near ? ' title="Read as ' + esc(D.p[f.i][2].replace(/^Dreaming of /i, '')) + '"' : '') + '>' + esc(text.slice(f.start, f.end)) + '</mark>'; last = f.end; });
       marked += esc(text.slice(last));
       var symbols = found.filter(function (f) { return f.first; }).map(function (f) { return pg(f.i); });
-      out.innerHTML = '<section class="tool-section"><h2>Your <em>dream</em></h2><p class="dream-marked">' + marked.replace(/\n/g, '<br>') + '</p></section>'
-        + (symbols.length ? '<section class="tool-section"><h2>The <em>symbols</em> <small>' + symbols.length + '</small></h2><ul class="dream-symbols">'
+      out.innerHTML = '<section class="tool-section"><h2>Your Dream</h2><p class="dream-marked">' + marked.replace(/\n/g, '<br>') + '</p></section>'
+        + (symbols.length ? '<section class="tool-section"><h2>The Symbols <small>' + symbols.length + '</small></h2><ul class="dream-symbols">'
           + symbols.map(function (p, k) { return '<li><details class="toggle" data-sym="' + k + '"><summary><span class="sym-name">' + esc(p.title.replace(/^Dreaming of /i, '')) + '</span></summary><div class="sym-read"><p class="small">Opening…</p></div></details></li>'; }).join('')
           + '</ul></section>' : '<p class="lede">None of the Dream Grimoire’s symbols came up. Try naming the things, places, animals and people in it.</p>')
         + '<div class="actions dream-actions"></div>';
@@ -959,10 +959,10 @@
     tool.className = 'pg pg-tool pg-hours';
     var saved = store0('mm-place'), q = params(), m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(q.get('d') || '');
     var day = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(); day.setHours(0, 0, 0, 0);
-    var head = '<header class="pg-head tool-head">' + crumbs('timing') + '<h1>Planetary <em>hours</em></h1></header>';
+    var head = '<header class="pg-head tool-head">' + crumbs('timing') + '<h1>Planetary Hours</h1></header>';
     var placeForm = '<form class="mm-form inline place-form"><p class="lede">Planetary hours follow your sunrise and sunset, so they need to know roughly where you are. It stays in this browser.</p>'
-      + '<div class="actions"><button class="btn" type="button" data-locate>Use my location</button></div>'
-      + '<details class="toggle"><summary>Or enter it yourself</summary><div class="place-row"><label>Latitude <input name="lat" inputmode="decimal" placeholder="40.71"></label><label>Longitude <input name="lon" inputmode="decimal" placeholder="-74.01"></label><button class="btn ghost" type="submit">Use these</button></div>'
+      + '<div class="actions"><button class="btn" type="button" data-locate>Use My Location</button></div>'
+      + '<details class="toggle"><summary>Or enter it yourself</summary><div class="place-row"><label>Latitude <input name="lat" inputmode="decimal" placeholder="40.71"></label><label>Longitude <input name="lon" inputmode="decimal" placeholder="-74.01"></label><button class="btn ghost" type="submit">Use These</button></div>'
       + '<p class="small">Find yours by searching your town and “latitude longitude”. West and south are negative.</p></details><p class="small place-error" hidden></p></form>';
     if (!saved) {
       render(tool, head + placeForm, 'Planetary Hours');
@@ -1005,7 +1005,7 @@
         + '<p class="lede">' + DAYS[day.getDay()] + ', ' + MONTHS[day.getMonth()] + ' ' + day.getDate() + (ruler ? ': a <a href="' + esc(ruler.url) + '">' + esc(ruler.title) + '</a> day' : '')
         + '. Sunrise ' + clock(r) + ', sunset ' + clock(s) + '.</p>'
         + '<p class="small day-nav"><a class="link" href="?d=' + iso(prev) + '">‹ ' + short(prev) + '</a><span aria-hidden="true">·</span><a class="link" href="?d=' + iso(nxt) + '">' + short(nxt) + ' ›</a>'
-        + '<span aria-hidden="true">·</span><button class="link as-button" type="button" data-forget>Change location</button></p>'
+        + '<span aria-hidden="true">·</span><button class="link as-button" type="button" data-forget>Change Location</button></p>'
         + '<div class="table-wrap"><table class="hours"><thead><tr><th>Hour</th><th>Time</th><th>Planet</th></tr></thead><tbody>' + rows + '</tbody></table></div>', 'Planetary Hours');
       tool.querySelector('[data-forget]').addEventListener('click', function () { try { localStorage.removeItem('mm-place'); } catch (e) {} planetaryHours(tool); });
     }).catch(function () { render(tool, head + '<p class="lede">The hours couldn’t be worked out. Refresh the page to try again.</p>', 'Planetary Hours'); });
@@ -1045,7 +1045,7 @@
       while (q && q.time.date < endM) { events.push([q.time.date, names[q.quarter], find('astrology', slugs[q.quarter])]); q = A.NextMoonQuarter(q); }
       events.sort(function (x, y) { return x[0] - y[0]; });
       var list = cal.querySelector('.cal-moon-list'); if (!list) { list = document.createElement('section'); list.className = 'cal-moon-list'; cal.appendChild(list); }
-      list.innerHTML = '<h2>The moon in <em>' + MONTHS[month] + '</em></h2><ul>' + events.map(function (e) {
+      list.innerHTML = '<h2>The Moon in ' + MONTHS[month] + '</h2><ul>' + events.map(function (e) {
         return '<li><time datetime="' + e[0].toISOString() + '">' + MONTHS[e[0].getMonth()].slice(0, 3) + ' ' + e[0].getDate() + ', ' + clock(e[0]) + '</time>'
           + (e[2] ? '<a href="' + esc(e[2].url) + '">' + esc(e[1]) + '</a>' : '<span>' + esc(e[1]) + '</span>') + '</li>';
       }).join('') + '</ul><p class="small">Times are your local time. The sign shown on each day is the moon’s sign at noon.</p>';
@@ -1096,7 +1096,7 @@
         + by[g].map(function (i) { var p = pg(i); return '<li><a href="' + esc(p.url) + '">' + esc(p.title) + '</a></li>'; }).join('') + '</ul></section>';
     }).join('');
     tool.className = 'pg pg-tool pg-index';
-    render(tool, '<header class="pg-head tool-head"><nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' + esc(ROOT) + '">Manuscript</a></li></ol></nav><h1>Guide <em>pages</em></h1>'
+    render(tool, '<header class="pg-head tool-head"><nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' + esc(ROOT) + '">Manuscript</a></li></ol></nav><h1>Guide Pages</h1>'
       + '<p class="lede">All ' + total + ' guide pages, by grimoire. Each is also in its grimoire’s introduction.</p></header><div class="index-groups">' + html + '</div>', 'Guide Pages');
   }
   function toolIndex(tool) {
@@ -1105,9 +1105,9 @@
         + GRIMOIRE_TOOLS[g].map(function (t) { return '<li><a href="' + esc(url(t[0])) + '">' + esc(t[1]) + '</a></li>'; }).join('') + '</ul></section>';
     }).join('');
     tool.className = 'pg pg-tool pg-index';
-    render(tool, '<header class="pg-head tool-head"><nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' + esc(ROOT) + '">Manuscript</a></li></ol></nav><h1>Enchanted <em>tools</em></h1>'
+    render(tool, '<header class="pg-head tool-head"><nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="' + esc(ROOT) + '">Manuscript</a></li></ol></nav><h1>Enchanted Tools</h1>'
       + '<p class="lede">Every tool in the Manuscript, by grimoire. Each is also in its grimoire’s introduction.</p></header><div class="index-groups">' + html
-      + '<section class="index-group"><h2>Everywhere</h2><ul class="index-list"><li><a href="' + esc(url('notes/')) + '">Your notes</a></li><li><a href="' + esc(url('')) + '">Surprise me (on the Manuscript home)</a></li></ul></section></div>', 'Enchanted Tools');
+      + '<section class="index-group"><h2>Everywhere</h2><ul class="index-list"><li><a href="' + esc(url('notes/')) + '">Your Notes</a></li><li><a href="' + esc(url('')) + '">Surprise me (on the Manuscript home)</a></li></ul></section></div>', 'Enchanted Tools');
   }
 
   // ------------------------------------------------------------------ the next sabbat
@@ -1153,7 +1153,7 @@
     sel = sel || points[0] || null;
     var tabs = Object.keys(WHEELS).map(function (k) { return '<a class="fchip' + (k === of ? ' on' : '') + '" href="?of=' + k + '"' + (k === of ? ' aria-current="true"' : '') + '>' + WHEELS[k][0] + '</a>'; }).join('');
     tool.className = 'pg pg-tool pg-wheel';
-    render(tool, '<header class="pg-head tool-head">' + crumbs('astrology') + '<p class="eyebrow labelled">Correspondence wheel</p><h1>The ' + w[0].replace(' Wheel', '') + ' <em>Wheel</em></h1>'
+    render(tool, '<header class="pg-head tool-head">' + crumbs('astrology') + '<p class="eyebrow">Correspondence wheel</p><h1>The ' + w[0].replace(' Wheel', '') + ' Wheel</h1>'
       + '<p class="lede">Choose a ' + w[2] + ' to light up everything tied to it: the intentions it rules, its herbs, stones, oils, deities and days.</p>'
       + '<nav class="fchips wheel-tabs" aria-label="Wheels">' + tabs + '</nav></header><div data-static-wheel>' + wheelBody(of, points, sel) + '</div>', w[0]);
   }
@@ -1218,7 +1218,7 @@
       + '<label class="sr-only" for="note-title">Note title</label><input class="note-title" id="note-title" maxlength="160" placeholder="Name this note">'
       + '<label class="sr-only" for="note-body">Note</label><textarea class="note-body" id="note-body" rows="9" maxlength="20000" placeholder="Write in the margin… only you can see this."></textarea>'
       + '<div class="note-foot"><button class="btn" type="submit">Save</button><span class="notes-status" role="status"></span>'
-      + '<span class="note-links"><button class="link as-button" type="button" data-note-new>New note</button><a class="link" href="' + esc(url('notes/')) + '">All notes</a></span></div>'
+      + '<span class="note-links"><button class="link as-button" type="button" data-note-new>New Note</button><a class="link" href="' + esc(url('notes/')) + '">All Notes</a></span></div>'
       + (PREVIEW ? '<p class="small">On this preview, notes are kept in this browser only.</p>' : '') + '</form>';
     document.body.appendChild(d);
     var title = d.querySelector('.note-title'), body = d.querySelector('.note-body'), status = d.querySelector('.notes-status');
@@ -1270,7 +1270,7 @@
     return Store.list('notes').then(function (list) {
       notesCache = list.sort(function (a, b) { return String(b.updated || '').localeCompare(String(a.updated || '')); });
       tool.className = 'saved notes-page';
-      render(tool, '<p class="eyebrow labelled">Your Manuscript</p><h1>Your <em>notes</em></h1>'
+      render(tool, '<p class="eyebrow">Your Manuscript</p><h1>Your Notes</h1>'
         + '<p class="small">Only you can see these. Each one opens to read, rename or change it.' + (PREVIEW ? ' On this preview they’re kept in this browser.' : '') + '</p>'
         + (list.length ? '<ul class="note-cards">' + list.map(function (n) {
           var snip = (n.body || '').replace(/\s+/g, ' ').trim(), when = new Date(String(n.updated || n.created).replace(' ', 'T'));
@@ -1342,7 +1342,7 @@
   // The Manuscript home: "Surprise me" beside "Begin here" opens a random well-filled page from a random grimoire.
   var begin = document.querySelector('.mm-hero .actions a.btn[href*="begin-here"]');
   if (begin && !document.querySelector('[data-surprise]')) {
-    begin.insertAdjacentHTML('afterend', '<button class="btn ghost" type="button" data-surprise>Surprise me</button>');
+    begin.insertAdjacentHTML('afterend', '<button class="btn ghost" type="button" data-surprise>Surprise Me</button>');
     document.querySelector('[data-surprise]').addEventListener('click', function () {
       var btn = this; btn.disabled = true;
       data().then(function () { location.href = surprise().url; }).catch(function () { btn.disabled = false; });

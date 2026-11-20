@@ -69,14 +69,14 @@ function join_popup(bool $onPeek): string
 {
     $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
     $next = (string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
-    $peek = !$onPeek && sneak_peek_page() ? '<a class="btn ghost" href="' . e(url('sneak-peek')) . '">Take a sneak peek</a>' : '';
+    $peek = !$onPeek && sneak_peek_page() ? '<a class="btn ghost" href="' . e(url('sneak-peek')) . '">Take a Sneak Peek</a>' : '';
     return '<dialog class="join-pop" id="join-pop" aria-labelledby="join-pop-h">'
         . '<button class="join-x" type="button" data-close aria-label="Close">&times;</button>'
-        . '<p class="eyebrow labelled">Members only</p>'
-        . '<h2 id="join-pop-h">This lives inside <em>the Manuscript</em></h2>'
+        . '<p class="eyebrow">Members only</p>'
+        . '<h2 id="join-pop-h">This Lives Inside the Manuscript</h2>'
         . '<p>' . grimoire_count_word() . ' cross-linked grimoires and ' . $total . ' pages of researched magick, open to members. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>'
-        . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a member</a>' . $peek . '</div>'
-        . (current_email() ? '' : '<p class="small">Already a member? <a href="' . e(url('login') . '?next=' . rawurlencode($next)) . '">Sign in</a></p>')
+        . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a Member</a>' . $peek . '</div>'
+        . (current_email() ? '' : '<p class="small">Already a member? <a href="' . e(url('login') . '?next=' . rawurlencode($next)) . '">Sign In</a></p>')
         . '</dialog>';
 }
 
@@ -301,7 +301,7 @@ function layout(string $title, string $body, array $opt = []): void
     $email = current_email();
     $acct = $email
         ? '<a href="' . e(url('account')) . '">Account</a>'
-        : '<a href="' . e(url('login')) . '">Sign in</a>';
+        : '<a href="' . e(url('login')) . '">Sign In</a>';
     $q = e($_GET['q'] ?? '');
     // Members: their saved pages, their notes and Today, at the top left. "Notes" opens the note pop-up (tools.js); without JavaScript it's the list.
     $mine = $email && has_access()
@@ -322,13 +322,13 @@ function layout(string $title, string $body, array $opt = []): void
   <link rel="icon" href="<?= e(site_url('favicon.ico')) ?>" sizes="48x48">
   <link rel="apple-touch-icon" href="<?= e(site_url('apple-touch-icon.png')) ?>">
   <?php // The fonts load "optional": fetched first thing, they're ready in time; otherwise a reload could fall back to the browser's own, bigger serif. ?>
-  <?php foreach (['jost-300', 'cormorant-400', 'cormorant-400-italic', 'jost-400'] as $font): ?><link rel="preload" href="<?= e(site_url('fonts/' . $font . '.woff2')) ?>" as="font" type="font/woff2" crossorigin>
+  <?php foreach (['alegreya-400', 'cormorant-400', 'alegreya-500'] as $font): ?><link rel="preload" href="<?= e(site_url('fonts/' . $font . '.woff2')) ?>" as="font" type="font/woff2" crossorigin>
   <?php endforeach ?>  <script src="<?= e(site_url('prefs.js')) ?>"></script>
   <link rel="stylesheet" href="<?= e(site_url('styles.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=90">
+  <link rel="stylesheet" href="<?= e(url('assets/wiki.css')) ?>?v=91">
   <meta name="theme-color" content="#f6efe8" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#1c1415" media="(prefers-color-scheme: dark)">
-  <script src="<?= e(url('assets/wiki.js')) ?>?v=78" defer></script>
+  <meta name="theme-color" content="#3d000c" media="(prefers-color-scheme: dark)">
+  <script src="<?= e(url('assets/wiki.js')) ?>?v=79" defer></script>
 <?php if ($stripe): ?>
   <script src="https://js.stripe.com/dahlia/stripe.js" defer></script>
   <script src="<?= e(url('assets/checkout.js')) ?>?v=2" defer></script>
@@ -385,7 +385,7 @@ function layout(string $title, string $body, array $opt = []): void
 function not_found(): void
 {
     http_response_code(404);
-    layout('Not found', '<section class="mm-empty"><h1>This page is <em>not in the Manuscript</em></h1><p class="lede">It may not have been moved over from Notion yet, or the link has changed.</p><p><a class="link" href="' . e(url()) . '">Back to the Manuscript</a></p></section>');
+    layout('Not found', '<section class="mm-empty"><h1>This Page Is Not in the Manuscript</h1><p class="lede">It may not have been moved over from Notion yet, or the link has changed.</p><p><a class="link" href="' . e(url()) . '">Back to the Manuscript</a></p></section>');
 }
 
 function redirect(string $to, int $code = 303): never

@@ -33,7 +33,7 @@ function dash_layout(string $active, string $title, string $body): void
         $cur = $k === $active ? ' aria-current="page"' : '';
         $tabs .= '<li><a href="' . e(url('dashboard' . ($k ? "/$k" : ''))) . "\"$cur>" . e($label) . '</a></li>';
     }
-    layout($title . ' · Dashboard', '<section class="dash"><header class="dash-head"><p class="eyebrow labelled">Curator’s dashboard</p><h1>' . $title . '</h1>'
+    layout($title . ' · Dashboard', '<section class="dash"><header class="dash-head"><p class="eyebrow">Curator’s dashboard</p><h1>' . $title . '</h1>'
         . '<nav class="dash-tabs" aria-label="Dashboard"><ul>' . $tabs . '</ul></nav></header>' . $body . '</section>', ['private' => true]);
 }
 
@@ -148,8 +148,8 @@ function dash_overview(): void
 
     dash_layout('', 'Overview', $tiles
         . '<div class="dash-grid">'
-        . '<div class="dash-card wide"><h2>Revenue by month</h2>' . revenue_chart($months) . '</div>'
-        . '<div class="dash-card"><h2>New members by month</h2>' . members_chart($months) . '</div>'
+        . '<div class="dash-card wide"><h2>Revenue by Month</h2>' . revenue_chart($months) . '</div>'
+        . '<div class="dash-card"><h2>New Members by Month</h2>' . members_chart($months) . '</div>'
         . $top
         . $popularCard
         . '<div class="dash-card wide"><h2>Latest sales <a class="small" href="' . e(url('dashboard/sales')) . '">See all</a></h2>' . $recent . '</div>'
@@ -314,7 +314,7 @@ function dash_members(string $notice = ''): void
   <p class="small">“Export” downloads that member’s notes, saved workings and saved pages as a text file to send them. Members whose access ended more than 90 days ago have theirs cleared automatically.</p>
 </div>
 <div class="dash-card">
-  <h2>Give or remove access</h2>
+  <h2>Give or Remove Access</h2>
   <form class="mm-form" method="post" action="$action">
     <input type="hidden" name="csrf" value="$csrf">
     <label for="emails">Emails, one per line</label>

@@ -129,11 +129,11 @@ function create_product_checkout(string $slug, ?int $amountCents, ?string $email
 function show_checkout(array $session, string $title, string $back): void
 {
     if (empty($session['client_secret'])) { redirect((string) $session['url']); return; }
-    layout('Checkout', '<section class="pay"><p class="eyebrow labelled">Secure checkout</p><h1>' . e($title) . '</h1>'
+    layout('Checkout', '<section class="pay"><p class="eyebrow">Secure checkout</p><h1>' . e($title) . '</h1>'
         . '<div class="pay-frame"><div id="checkout-form" data-pk="' . e((string) config('stripe_publishable_key')) . '" data-secret="' . e($session['client_secret']) . '">'
         . '<p class="pay-loading">Opening the secure payment form…</p></div></div>'
         . '<noscript><p class="lede">The payment form needs JavaScript. Please turn it on and reload this page.</p></noscript>'
-        . '<p class="small pay-note">Payments are processed by Stripe; your card details never touch this site. <a class="link" href="' . e($back) . '">Go back</a></p></section>',
+        . '<p class="small pay-note">Payments are processed by Stripe; your card details never touch this site. <a class="link" href="' . e($back) . '">Go Back</a></p></section>',
         ['private' => true, 'stripe' => true]);
 }
 

@@ -288,7 +288,7 @@ function collection_html(array $v, bool $withHeading): string
         if (COLLECTION_PAGE * $state['page'] < $total) {
             $next = view_link($v, ['page' => $state['page'] + 1]);
             $part = preg_replace('/#.*$/', '', $next);
-            $list .= '<p class="col-more"><a class="btn ghost" href="' . e($next) . '" data-more-list="' . e($part . (str_contains($part, '?') ? '&' : '?') . 'part=1') . '">Show more</a></p>';
+            $list .= '<p class="col-more"><a class="btn ghost" href="' . e($next) . '" data-more-list="' . e($part . (str_contains($part, '?') ? '&' : '?') . 'part=1') . '">Show More</a></p>';
         }
     }
     if (!$rows) $list = '<p class="lede">No entries match. <a href="' . e($link(['filters' => [], 'letter' => '', 'q' => '', 'saved' => false])) . '">Clear the filters</a>.</p>';

@@ -144,9 +144,9 @@ function route_path(array $parts, string $method): void
             $st->execute([now(), $t]);
             $ok = true;
         }
-        layout('Beginner path', '<section class="mm-hero narrow"><p class="eyebrow labelled">The beginner path</p><h1>' . ($ok ? 'No more <em>emails</em>' : 'That link <em>has expired</em>') . '</h1>'
+        layout('Beginner path', '<section class="mm-hero narrow"><p class="eyebrow">The Beginner Path</p><h1>' . ($ok ? 'No more emails' : 'That link has expired') . '</h1>'
             . '<p class="lede">' . ($ok ? 'You won’t get any more beginner path emails. You can still follow the path at your own pace in the Manuscript.' : 'Sign in and open the beginner path to stop the emails.') . '</p>'
-            . '<div class="actions"><a class="btn" href="' . e(url('path')) . '">The beginner path</a></div></section>', ['private' => true]);
+            . '<div class="actions"><a class="btn" href="' . e(url('path')) . '">The Beginner Path</a></div></section>', ['private' => true]);
         return;
     }
     $email = current_email();
@@ -191,11 +191,11 @@ function view_path(?array $row): void
             . ($try ? '<small>Try it: <a href="' . e(url($try)) . '">' . e(PATH_TOOLS[$try]) . '</a></small>' : '') . '</li>';
     }
     $status = !$row ? '<p class="lede">One page of the Manuscript a day for ' . $total . ' days, by email at 11:11 each morning, from the basics to working with deities and spirits. Read along here at your own pace, or have each day sent to you.</p>'
-        . '<form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="start"><input type="hidden" name="tz" value="" data-tz><button class="btn" type="submit">Start the emails</button></form>'
-        : ($row['stopped_at'] ? '<p class="lede">The emails are stopped. You’re on day ' . $done . ' of ' . $total . '.</p><form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="start"><input type="hidden" name="tz" value="" data-tz><button class="btn" type="submit">Start them again</button></form>'
+        . '<form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="start"><input type="hidden" name="tz" value="" data-tz><button class="btn" type="submit">Start the Emails</button></form>'
+        : ($row['stopped_at'] ? '<p class="lede">The emails are stopped. You’re on day ' . $done . ' of ' . $total . '.</p><form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="start"><input type="hidden" name="tz" value="" data-tz><button class="btn" type="submit">Start Them Again</button></form>'
         : ($done >= $total ? '<p class="lede">You’ve finished the path. Every page is still here whenever you want it.</p>'
-        : '<p class="lede">Day ' . $done . ' of ' . $total . '. The next page arrives by email tomorrow at 11:11.</p><form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="stop"><button class="link as-button" type="submit">Stop the emails</button></form>'));
-    layout('The beginner path', '<section class="saved path-page"><p class="eyebrow labelled">Your Manuscript</p><h1>The beginner <em>path</em></h1>' . $status
+        : '<p class="lede">Day ' . $done . ' of ' . $total . '. The next page arrives by email tomorrow at 11:11.</p><form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="stop"><button class="link as-button" type="submit">Stop the Emails</button></form>'));
+    layout('The beginner path', '<section class="saved path-page"><p class="eyebrow">Your Manuscript</p><h1>The Beginner Path</h1>' . $status
         . '<ol class="path-list">' . $list . '</ol></section>', ['private' => true]);
 }
 

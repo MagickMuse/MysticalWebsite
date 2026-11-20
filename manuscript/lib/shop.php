@@ -38,8 +38,8 @@ function safe_html(string $html): string
 function community_links(): string
 {
     $discord = (string) config('discord_url', 'https://discord.com/invite/PBr2BtCpxk');
-    return '<div class="actions community"><a class="link" href="' . e($discord) . '" target="_blank" rel="noopener">Join our Discord coven</a>'
-        . '<a class="link" href="' . e(site_url('mythos')) . '">Curious about the Curator?</a></div>';
+    return '<div class="actions community"><a class="link" href="' . e($discord) . '" target="_blank" rel="noopener">Join Our Discord Coven</a>'
+        . '<a class="link" href="' . e(site_url('mythos')) . '">Curious About the Curator?</a></div>';
 }
 
 function product(string $slug): ?array
@@ -105,8 +105,7 @@ function view_shop(): void
         . '<h3>The Magick Manuscript</h3><p>15 cross-linked grimoires, 20,000+ pages, growing weekly.</p><p class="price">Membership</p></a>';
     layout('Market', <<<HTML
 <section class="mm-hero">
-  <p class="eyebrow labelled">The Magick Muse</p>
-  <h1>The <em>Market</em></h1>
+  <h1>The Market</h1>
   <p class="lede">Courses, grimoire templates and the Manuscript. Everything you buy stays in your library, ready whenever you are.</p>
 </section>
 <section class="cards shop-grid">$ms$cards</section>
@@ -132,7 +131,7 @@ function view_product(array $p): void
         $action = '<form class="mm-form buy" method="post" action="' . e(site_url('market/claim')) . '">'
             . "<input type=\"hidden\" name=\"csrf\" value=\"$csrf\"><input type=\"hidden\" name=\"product\" value=\"$slug\">"
             . '<label for="claim-email">Where should we send it?</label><input id="claim-email" type="email" name="email" autocomplete="email" required value="' . e($email) . '">'
-            . '<button class="btn" type="submit">Send it to me free</button><p class="small">You’ll also hear from The Magick Muse now and then. Unsubscribe anytime.</p></form>';
+            . '<button class="btn" type="submit">Send It to Me Free</button><p class="small">You’ll also hear from The Magick Muse now and then. Unsubscribe anytime.</p></form>';
     } else {
         $min = (int) $p['price_cents'];
         $amount = !empty($p['pay_what_you_want'])
@@ -141,7 +140,7 @@ function view_product(array $p): void
         $action = '<form class="mm-form buy" method="post" action="' . e(site_url('market/buy')) . '">'
             . "<input type=\"hidden\" name=\"csrf\" value=\"$csrf\"><input type=\"hidden\" name=\"product\" value=\"$slug\"><input type=\"hidden\" name=\"code\" value=\"" . e($code) . '">'
             . ($code ? '<p class="notice">Code <strong>' . e($code) . '</strong> will be applied at checkout.</p>' : '')
-            . $amount . '<button class="btn" type="submit">' . (!empty($p['pay_what_you_want']) ? 'Buy now' : 'Buy for ' . e(price_label($p))) . '</button>'
+            . $amount . '<button class="btn" type="submit">' . (!empty($p['pay_what_you_want']) ? 'Buy Now' : 'Buy for ' . e(price_label($p))) . '</button>'
             . '<p class="small">Secure checkout by Stripe. Discount code? Enter it at checkout.</p></form>';
     }
     $refund = !empty($p['refund_policy']) ? '<p class="small refund">' . e($p['refund_policy']) . '</p>' : '';
@@ -171,7 +170,7 @@ function do_claim(): void
     $email = strtolower(trim((string) ($_POST['email'] ?? '')));
     if (!$p || empty($p['free'])) { not_found(); return; }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { view_product($p); return; }
-    if (!throttle('claim', 5, 900) || too_many_links($email)) { layout('Slow down', '<section class="mm-empty"><h1>Too many tries</h1><p class="lede">Please wait a few minutes.</p></section>'); return; }
+    if (!throttle('claim', 5, 900) || too_many_links($email)) { layout('Slow down', '<section class="mm-empty"><h1>Too Many Tries</h1><p class="lede">Please wait a few minutes.</p></section>'); return; }
 
     db()->prepare('INSERT OR IGNORE INTO leads (email, product, created_at) VALUES (?, ?, ?)')->execute([$email, $p['slug'], now()]);
     grant($email, $p['slug'], 'free');
@@ -181,7 +180,7 @@ function do_claim(): void
     send_mail($email, 'Your ' . $nm . ' is here',
         "Thank you for picking up {$nm}.\n\nOpen your library to get it:\n$link\n\nThe link signs you in and works for 30 minutes. After that, sign in any time at " . site_url('market/library') . "\n\nThe Magick Muse",
         '<p>Thank you for picking up <strong>' . e($nm) . '</strong>.</p><p><a href="' . e($link) . '">Open your library</a> to get it.</p><p>The link signs you in and works for 30 minutes. After that, sign in any time at ' . e(site_url('market/library')) . '.</p><p>The Magick Muse</p>');
-    layout('Check your email', '<section class="mm-hero narrow"><p class="eyebrow labelled">On its way</p><h1>Check your <em>inbox</em></h1><p class="lede">We sent ' . e($nm) . ' to ' . e($email) . '. If it isn’t there in a few minutes, look in spam or promotions.</p></section>', ['private' => true]);
+    layout('Check your email', '<section class="mm-hero narrow"><p class="eyebrow">On its way</p><h1>Check Your Inbox</h1><p class="lede">We sent ' . e($nm) . ' to ' . e($email) . '. If it isn’t there in a few minutes, look in spam or promotions.</p></section>', ['private' => true]);
 }
 
 function view_shop_thanks(): void
@@ -240,7 +239,7 @@ function view_library(): void
     $body = $items
         ? '<ul class="library">' . $items . '</ul>'
         : '<p class="lede">Nothing here yet. <a href="' . e(site_url('market')) . '">Visit the shop</a>.</p>';
-    layout('Your library', '<section class="lib"><p class="eyebrow labelled">' . e($email) . '</p><h1>Your <em>library</em></h1>' . $thanks . $body
+    layout('Your library', '<section class="lib"><p class="eyebrow">' . e($email) . '</p><h1>Your Library</h1>' . $thanks . $body
         . '<p class="small"><a href="' . e(url('account')) . '">Account &amp; billing</a></p></section>', ['private' => true]);
 }
 

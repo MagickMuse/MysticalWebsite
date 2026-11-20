@@ -3,7 +3,7 @@
   var self = document.currentScript;
   if (self && self.src) {
     var tools = document.createElement('script');
-    tools.src = new URL('tools.js?v=25', self.src).toString();
+    tools.src = new URL('tools.js?v=26', self.src).toString();
     tools.defer = true;
     document.head.appendChild(tools);
   }
