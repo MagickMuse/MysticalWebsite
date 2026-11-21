@@ -60,6 +60,9 @@ ServerSignature Off
   # Sections renamed to match the menu: Muses (was /meetup) and Mythos (was /story)
   RewriteRule ^meetup(?:\.html)?/?$ /muses [R=301,L]
   RewriteRule ^story(?:\.html)?/?$ /mythos [R=301,L]
+  # Older addresses: /link (now /links) and the Manuscript's old sales page (now /grimoires)
+  RewriteRule ^link(?:\.html)?/?$ /links [R=301,L]
+  RewriteRule ^manuscript\.html$ /grimoires [R=301,L]
   # The blog's list of posts is the Mastery page
   RewriteRule ^blog/?$ /mastery [R=301,L]
   # /index.html → /, and any other /page.html → /page (only when asked for directly, not after a rewrite below)
