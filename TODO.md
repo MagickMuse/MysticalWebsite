@@ -6,12 +6,10 @@ in any session. Tick a box by changing `[ ]` to `[x]`, or ask Claude to.
 _Last updated: November 21, 2026_
 
 ## Before launch
-- [ ] **Stripe secret key:** put the live secret key (or a restricted `rk_live_` key) in the live settings file and paste
-      the whole file into the GitHub secret `MANUSCRIPT_CONFIG_LIVE`. Everything else in Stripe is ready (account
-      approved, webhook complete, $333 and $33-a-month prices, cancel page). Steps in [STRIPE_INTEGRATION_TODO.md](STRIPE_INTEGRATION_TODO.md).
-- [ ] **Sales tax:** Stripe has no tax registrations yet, so it collects no tax. Ask your accountant where you must
-      collect (US states once you pass their thresholds; EU VAT from the first sale), then add each in Stripe →
-      Settings → Tax → Registrations.
+- [x] **Stripe secret key:** saved as the repository secret `STRIPE_SECRET_KEY`; the live upload puts it in place.
+      Everything else in Stripe is ready (account approved, webhook complete, $333 and $33-a-month prices, cancel page).
+- [ ] **The live settings secret `MANUSCRIPT_CONFIG_LIVE`:** still needed for the rest of the private settings (email,
+      webhook signing secret, app secret). If it isn't in the repository's secrets yet, ask Claude to make the file.
 - [ ] **Email settings:** put your Hostinger mailbox login in the private settings (`smtp_host` = smtp.hostinger.com,
       `smtp_user`, `smtp_pass`, and `mail_from`). Sign-in links and the beginner path emails need it.
 - [ ] **Daily backups on Hostinger:** included on the Business plan; a small add-on on Premium. Members' notes live on the site.
@@ -29,6 +27,8 @@ _Last updated: November 21, 2026_
 - [ ] **Review the beginner path's 30 days:** `manuscript/beginner-path.php`, one line per day; reorder or swap freely.
 
 ## After launch
+- [ ] **Sales tax, when Stripe says so:** none to collect yet (far below every state's threshold; California doesn't tax
+      software used online). Stripe warns in the Dashboard if you near a threshold; add that registration then.
 - [ ] **Google Search Console:** resubmit `sitemap.xml` so Google picks up the new addresses (/muses, /mythos, /market,
       /manuscript/today). Search Console also shows which searches already find you.
 - [ ] **Bing Webmaster Tools:** add the site and submit `sitemap.xml` (Bing also feeds ChatGPT's and DuckDuckGo's search).

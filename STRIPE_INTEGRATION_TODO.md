@@ -17,10 +17,11 @@ Done:
   service for personal use; the courses are `txcd_20060058`, self-study web-based training.
 
 Blocking live checkout:
-- **Tax registrations.** None yet: add one for each place you must collect tax (Settings → Tax → Registrations),
-  or Stripe Tax collects nothing.
-- **Secret key** in config.live.php (`sk_live_CHANGE-ME`): paste it there yourself, then put the whole file in the
-  GitHub secret `MANUSCRIPT_CONFIG_LIVE`.
+- **Tax registrations.** None, by choice: sales are far below every US state's threshold, and California doesn't tax
+  software used online. Stripe Tax watches the thresholds and warns in the Dashboard; add a registration then
+  (Settings → Tax → Registrations) and tax is charged from that sale on.
+- **Secret key:** saved as the repository secret `STRIPE_SECRET_KEY` (a restricted `rk_live_` key). The live upload
+  writes it into the server's settings, replacing the placeholder in config.live.php, so it never goes in that file.
 
 ## Values to Replace
 
