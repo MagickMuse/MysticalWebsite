@@ -26,10 +26,7 @@ _Last updated: November 21, 2026_
       of the less certain alphabets). Say which should get one and which are meant to stay blank.
 - [ ] **Review the beginner path's 30 days:** `manuscript/beginner-path.php`, one line per day; reorder or swap freely.
 
-- [ ] **Discord daily post:** in Discord, Server Settings → Integrations → Webhooks → New Webhook → choose the channel
-      (and a name/picture if you like) → Copy Webhook URL. Then GitHub → Settings → Secrets and variables → Actions →
-      New repository secret named `DISCORD_WEBHOOK_URL` with that address. Test it: Actions → “Discord daily
-      correspondences” → Run workflow. After that it posts by itself at 11:11 every morning (Pacific).
+- [x] **Discord daily post:** webhook saved as `DISCORD_WEBHOOK_URL`; it posts at 11:11 every morning (Pacific).
 
 ## After launch
 - [ ] **Sales tax, when Stripe says so:** none to collect yet (far below every state's threshold; California doesn't tax
