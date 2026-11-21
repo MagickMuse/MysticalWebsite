@@ -1569,7 +1569,8 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 /* each grimoire its own thickness and height, like a real shelf (classes set in lib/shelf.php) */
 .bk.wa { --sw: 46px; } .bk.wb { --sw: 54px; } .bk.wc { --sw: 62px; } .bk.wd { --sw: 72px; }
 .bk.ha { --sh: 262px; } .bk.hb { --sh: 280px; } .bk.hc { --sh: 298px; } .bk.hd { --sh: 314px; }
-.bk.t1 { --bc: #7a1f2b; } .bk.t2 { --bc: #9c4a4f; } .bk.t3 { --bc: #2e1f20; } .bk.t4 { --bc: #2f4a3a; } .bk.t5 { --bc: #c99a92; --ink-on: #3a2224; }
+/* the books' colours: red, blackish grey, parchment, pink (shelf_tone() in lib/shelf.php) */
+.bk.t1 { --bc: #7a1f2b; } .bk.t3 { --bc: #2e1f20; } .bk.t4 { --bc: #e4d6bc; --ink-on: #3a2224; } .bk.t5 { --bc: #c99a92; --ink-on: #3a2224; }
 .bk .spine { position: absolute; inset: 0; transition: opacity .3s; box-shadow: var(--worn);
   background: var(--leather), linear-gradient(90deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,0) 14%, rgba(255,255,255,.16) 32%, rgba(0,0,0,0) 52%, rgba(0,0,0,.08) 86%, rgba(0,0,0,.3) 100%), var(--bc); }
 .band { position: absolute; left: 0; right: 0; height: 2px; background: var(--gold); opacity: .85; }
@@ -1586,7 +1587,8 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
   -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat;
 }
 svg.bk-star { width: 22px; height: 22px; margin-left: -11px; background: none; -webkit-mask: none; mask: none; color: var(--gold-text); }
-.bk.t5 svg.bk-star { color: #7a1f2b; }
+.bk.t4 svg.bk-star, .bk.t5 svg.bk-star { color: #7a1f2b; }
+.bk.t4 .band, .bk.t4 i.bk-star { background: #9c4a4f; } /* gold is lost on parchment: the bands in red */
 
 /* the front cover, shown on hover */
 .bk .cover { position: absolute; inset: 0; width: 220px; opacity: 0; transition: opacity .35s .05s; background: var(--leather), var(--bc); }
@@ -1650,7 +1652,7 @@ html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone
   border-left: 6px solid color-mix(in srgb, #000 18%, var(--bc)); }
 .slab.s1 { width: 290px; margin-left: 14px; }
 .slab.s2 { width: 330px; height: 42px; margin-right: 8px; }
-.slab.t1 { --bc: #7a1f2b; } .slab.t2 { --bc: #9c4a4f; } .slab.t3 { --bc: #2e1f20; } .slab.t4 { --bc: #2f4a3a; } .slab.t5 { --bc: #c99a92; }
+.slab.t1 { --bc: #7a1f2b; } .slab.t3 { --bc: #2e1f20; } .slab.t4 { --bc: #e4d6bc; } .slab.t5 { --bc: #c99a92; }
 /* lifted out and turned upright: the spine lettering turns with it */
 .b3d.lying .b3d-spine .t { text-orientation: mixed; }
 @media (max-width: 640px) { .shelves { gap: 1.6rem; } .bk.lying, .bk.lying.open, .bk.lying:focus-visible { width: 250px; height: 50px; } .bk.lying .bk-title { font-size: 12px; left: 60px; right: 28px; letter-spacing: .08em; } .slab.s1 { width: 226px; } .slab.s2 { width: 258px; height: 36px; } }
@@ -1908,7 +1910,7 @@ html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone
 .slab.titled::before { left: 16px; box-shadow: 6px 0 0 -0.5px color-mix(in srgb, var(--gold) 55%, transparent); }
 .slab.titled::after { right: 18px; box-shadow: -6px 0 0 -0.5px color-mix(in srgb, var(--gold) 55%, transparent); }
 .slab-title { font-family: var(--display); font-weight: 600; font-size: 14.5px; letter-spacing: .14em; text-transform: uppercase; }
-.slab.t5 .slab-title { color: #3a2224; }
+.slab.t4 .slab-title, .slab.t5 .slab-title { color: #3a2224; }
 .slab.titled:hover { filter: brightness(1.15); }
 .slab.titled:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 @media (max-width: 640px) { .slab-title { font-size: 12px; letter-spacing: .1em; } }

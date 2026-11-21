@@ -31,12 +31,18 @@ const SPINE_SIZES = [
     'recipe' => 'wc ha', 'ritual' => 'wa hc', 'rune' => 'wd hb', 'symbol' => 'wb hd', 'timing' => 'wc hc',
 ];
 
+/** The books' colours, in turn: red, pink, blackish grey, parchment (the two light ones never side by side). */
+function shelf_tone(int $i): string
+{
+    return ['t1', 't5', 't3', 't4'][$i % 4];
+}
+
 function real_book(array $g, int $n, int $i): string
 {
     $label = grimoire_label($g);
     $inside = grimoire_summary($g);
     $photo = grimoire_photo($g['grimoire'], 440, 600);
-    $tone = 't' . (1 + $i % 5); // burgundy, rose, ink, gold, blush, in turn
+    $tone = shelf_tone($i);
     $len = ' n' . max(3, min(16, mb_strlen($label))); // letters on the spine, so the title can size itself to fit
     // One grimoire stands face out, its cover showing, with an "Open me" seal: it shows at a glance that the books open.
     $faced = $g['grimoire'] === (string) config('shelf_facing', 'correspondence');
@@ -62,8 +68,8 @@ const SHELF_STACKS = [
     'bottom' => ['candles' => false, 'books' => [
         ['Guide Pages', 'route:guide-pages', 't1'],
         ['Enchanted Tools', 'route:enchanted-tools', 't3'],
-        ['Calendar', 'route:calendar', 't4'],
-        ['Sources', 'route:library', 't2'],
+        ['Calendar', 'route:calendar', 't5'],
+        ['Sources', 'route:library', 't4'],
     ]],
 ];
 
@@ -124,7 +130,7 @@ function pile_book(array $g, int $n, int $i): string
     $label = grimoire_label($g);
     $inside = grimoire_summary($g);
     $photo = grimoire_photo($g['grimoire'], 440, 600);
-    return '<a class="bk lying t' . (1 + $i % 5) . '" href="' . e(page_url($g)) . '"'
+    return '<a class="bk lying ' . shelf_tone($i) . '" href="' . e(page_url($g)) . '"'
         . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '') . ($n ? ' (' . number_format($n) . ' entries)' : '')) . '"'
         . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'
         . '<span class="spine" aria-hidden="true"><i class="band left"></i>' . (grimoire_glyph($g['grimoire'], 'bk-star') ?: '<i class="bk-star"></i>')
