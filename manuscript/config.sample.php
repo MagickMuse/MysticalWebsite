@@ -57,8 +57,8 @@ return [
     'plans' => [
         // amount_label is only what the page shows; the real price is the Stripe price.
         'lifetime' => ['price' => 'price_yyy', 'label' => 'Manuscript access', 'amount_label' => '$333', 'blurb' => 'One payment. Every update ever made, and every one to come.', 'mode' => 'payment'],
-        // A monthly plan could be added later, e.g.:
-        // 'monthly' => ['price' => 'price_…', 'label' => 'Monthly', 'amount_label' => '$__/month', 'blurb' => 'Full access, cancel anytime.', 'mode' => 'subscription'],
+        // The live prices, lifetime ($333) and monthly ($33), are built in (membership_plans() in lib/stripe.php).
+        // List a plan here only to change it: with a test key, give each plan its test price; 'price' => '' hides a plan.
     ],
 
     // ---------- Shop (replaces Gumroad) ----------

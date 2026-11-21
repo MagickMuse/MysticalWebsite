@@ -6,8 +6,12 @@ in any session. Tick a box by changing `[ ]` to `[x]`, or ask Claude to.
 _Last updated: November 21, 2026_
 
 ## Before launch
-- [ ] **Stripe:** the four things blocking live checkout: dispute events on the webhook, Stripe's account review, tax
-      registrations, and the live secret key. Steps in [STRIPE_INTEGRATION_TODO.md](STRIPE_INTEGRATION_TODO.md).
+- [ ] **Stripe secret key:** put the live secret key (or a restricted `rk_live_` key) in the live settings file and paste
+      the whole file into the GitHub secret `MANUSCRIPT_CONFIG_LIVE`. Everything else in Stripe is ready (account
+      approved, webhook complete, $333 and $33-a-month prices, cancel page). Steps in [STRIPE_INTEGRATION_TODO.md](STRIPE_INTEGRATION_TODO.md).
+- [ ] **Sales tax:** Stripe has no tax registrations yet, so it collects no tax. Ask your accountant where you must
+      collect (US states once you pass their thresholds; EU VAT from the first sale), then add each in Stripe →
+      Settings → Tax → Registrations.
 - [ ] **Email settings:** put your Hostinger mailbox login in the private settings (`smtp_host` = smtp.hostinger.com,
       `smtp_user`, `smtp_pass`, and `mail_from`). Sign-in links and the beginner path emails need it.
 - [ ] **Daily backups on Hostinger:** included on the Business plan; a small add-on on Premium. Members' notes live on the site.
@@ -18,7 +22,7 @@ _Last updated: November 21, 2026_
 - [ ] **Try the new tools on the preview:** Do this spread (any tarot spread page), the Dream Decoder (Dreams), Planetary
       Hours (Timing; it asks for your location once), the moon on the Calendar, and Save to notes after a pull.
 - [ ] **Product pictures (optional):** a picture for each Market product (Witchcraft 101 and 111, the Blank Grimoire, the
-      Crystal Grimoire). Shared links and Google show the Manuscript picture until then, and Google Shopping needs one.
+      Crystal Grimoire; the Manuscript has its shelf and Protection page pictures). Shared links and Google show the Manuscript picture until then, and Google Shopping needs one.
       Send them to Claude to add.
 - [ ] **Rune pictures:** 18 runes still have no picture (Erda, Sol, Ul, Ziu, Hulinhjalmur, Wolfsangel and some letters
       of the less certain alphabets). Say which should get one and which are meant to stay blank.
@@ -35,8 +39,6 @@ _Last updated: November 21, 2026_
 - [ ] **Delete the preview copy:** once the live site works, the GitHub Pages preview (the `manuscript/*/` and `market/`
       copies) can go. Ask Claude.
 - [ ] **Social bios:** change any `/shop` links to `/market` (the old ones still forward).
-- [ ] **Monthly plan:** decide whether to offer it. If yes: make a monthly price in Stripe and add it to the settings
-      (Claude can do the settings part). Cancellations remove access automatically at the end of the paid month.
 - [ ] **Making the repository private:** on GitHub's free plan, the GitHub Pages preview switches off for private repositories.
 
 ## Fix in Notion (the site shows what's there)

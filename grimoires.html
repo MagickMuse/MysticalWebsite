@@ -29,18 +29,39 @@
     "@type": "Product",
     "name": "The Magick Manuscript",
     "description": "20,000 pages of witchcraft research in one online grimoire: 15 cross-linked grimoires sourced from published books. Every future update included.",
-    "image": "https://magickmuse.com/assets/og-manuscript.jpg",
+    "image": [
+      "https://magickmuse.com/assets/og-manuscript.jpg",
+      "https://magickmuse.com/assets/manuscript-protection.jpg"
+    ],
     "brand": {
       "@type": "Brand",
       "name": "The Magick Muse"
     },
-    "offers": {
-      "@type": "Offer",
-      "price": "333",
-      "priceCurrency": "USD",
-      "availability": "https://schema.org/InStock",
-      "url": "https://magickmuse.com/manuscript/join"
-    }
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Lifetime access",
+        "price": "333",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "url": "https://magickmuse.com/manuscript/join"
+      },
+      {
+        "@type": "Offer",
+        "name": "Monthly access",
+        "price": "33",
+        "priceCurrency": "USD",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "33",
+          "priceCurrency": "USD",
+          "billingDuration": 1,
+          "unitCode": "MON"
+        },
+        "availability": "https://schema.org/InStock",
+        "url": "https://magickmuse.com/manuscript/join"
+      }
+    ]
   }
   </script>
   <link rel="icon" href="favicon.ico" sizes="48x48">

@@ -73,9 +73,27 @@ function open_checkout(array $params): array
     return ['url' => $s['url'] ?? null, 'client_secret' => $s['client_secret'] ?? null];
 }
 
+/**
+ * The membership plans on the Join page. They're built in here (Stripe price IDs aren't secret), so a new plan needs no
+ * change to the private settings; 'plans' in the settings can still change one, or hide it with 'price' => ''.
+ * The price IDs are the live Stripe account's, so with a test key only the settings' own (test) prices are used.
+ */
+function membership_plans(): array
+{
+    $live = (bool) preg_match('/^(sk|rk)_live_/', (string) config('stripe_secret_key'));
+    $plans = [
+        'lifetime' => ['price' => $live ? 'price_1UcdYXD79698XBfZonGEOVnY' : '', 'label' => 'Manuscript access', 'amount_label' => '$333', 'amount' => 333,
+            'blurb' => 'One payment. Every update ever made, and every one to come.', 'mode' => 'payment'],
+        'monthly' => ['price' => $live ? 'price_1Ue3oeD79698XBfZezUUsLg4' : '', 'label' => 'Monthly access', 'amount_label' => '$33 a month', 'amount' => 33,
+            'blurb' => 'Everything in the Manuscript, every update included. Cancel anytime.', 'mode' => 'subscription'],
+    ];
+    foreach (config('plans', []) as $key => $over) $plans[$key] = array_merge($plans[$key] ?? [], $over);
+    return $plans;
+}
+
 function create_checkout(string $planKey, ?string $email, string $code = ''): array
 {
-    $plan = config('plans')[$planKey] ?? null;
+    $plan = membership_plans()[$planKey] ?? null;
     if (!$plan || empty($plan['price'])) throw new InvalidArgumentException('Unknown plan');
     $params = [
         'mode' => $plan['mode'],

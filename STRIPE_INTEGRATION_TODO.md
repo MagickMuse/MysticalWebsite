@@ -8,14 +8,14 @@ Checkout for The Magick Manuscript ($333 access) and the shop (courses, Notion t
 Done:
 - Fixed **$333** price on The Magick Manuscript: `price_1UcdYXD79698XBfZonGEOVnY` (lookup key `manuscript_access`), set in config.live.php.
 - **SEEKER10**: promotion code for a 10% coupon (`FaWP0Gr4`, once, The Magick Manuscript only).
-- **Webhook** `we_1UcwtxD79698XBfZHD0Mgb1a` → `https://magickmuse.com/manuscript/stripe-webhook`, 6 events (add the 2 dispute events below: see "Blocking live checkout"), API `2026-03-25.dahlia`; its signing secret is in config.live.php.
+- **$33 a month** price on The Magick Manuscript - Monthly Access: `price_1Ue3oeD79698XBfZezUUsLg4`. Both live prices are
+  built into the code (`membership_plans()` in lib/stripe.php), so the Join page offers both with a live key.
+- **Webhook** `we_1UcwtxD79698XBfZHD0Mgb1a` → `https://magickmuse.com/manuscript/stripe-webhook`, all 8 events including the two dispute events (added November 21, 2026), API `2026-03-25.dahlia`; its signing secret is in config.live.php.
+- **Account review:** approved; card, Apple Pay, Google Pay, Link, Klarna and others are on.
+- **Customer portal:** on; monthly members can cancel (at the end of the paid month), change their card and see invoices.
 - Stripe Tax: active, head office address set. Products carry tax code `txcd_20060058`.
 
 Blocking live checkout:
-- **Dispute events on the webhook.** Workbench → Webhooks → the magickmuse.com endpoint → Edit destination → add
-  `charge.dispute.created` and `charge.dispute.closed`, then Save. Without them a chargeback doesn't pause access.
-- **Account review.** Payments aren't enabled yet, so Stripe has no payment methods to offer
-  ("No valid payment method types"). Once approved, check Settings → Payment methods.
 - **Tax registrations.** None yet: add one for each place you must collect tax (Settings → Tax → Registrations),
   or Stripe Tax collects nothing.
 - **Secret key** in config.live.php (`sk_live_CHANGE-ME`): paste it there yourself, then put the whole file in the
@@ -31,7 +31,7 @@ The following values are placeholders and must be updated before going live.
 
 | Field | Current Value | What to Set |
 |-------|--------------|-------------|
-| mode | payment (Manuscript access, shop) / subscription (optional monthly plan, switched off) | Already correct: "payment" for one-time charges, "subscription" for recurring billing. |
+| mode | payment (lifetime access, shop) / subscription (monthly access) | Already correct: "payment" for one-time charges, "subscription" for recurring billing. |
 | line_items[].price (Manuscript access, `plans.lifetime.price`) | price_1UcdYXD79698XBfZonGEOVnY (set) | The live Price ID of a **fixed $333** price on The Magick Manuscript product ([Dashboard → Prices](https://dashboard.stripe.com/prices)). In test mode it's `price_1UcdUBDhYa4oIVD7NZpMDlIQ`. A "customer chooses the amount" price does not work with discount codes. |
 | line_items[].price_data (shop products) | built from [manuscript/products.php](manuscript/products.php) | Already real: name, price in cents and `tax_code` per product. |
 | stripe_secret_key | sk_live_CHANGE-ME | Live secret key, or better a restricted key (`rk_live_…`), from [Dashboard → API keys](https://dashboard.stripe.com/apikeys). |

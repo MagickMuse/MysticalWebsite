@@ -16,7 +16,7 @@ function view_join(): void
     $code = preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($_GET['code'] ?? ''));
     $csrf = e(csrf_token());
     $plans = '';
-    foreach (config('plans', []) as $key => $plan) {
+    foreach (membership_plans() as $key => $plan) {
         if (empty($plan['price'])) continue;
         $plans .= '<form class="card plan" method="post" action="' . e(url('checkout')) . '">'
             . '<input type="hidden" name="csrf" value="' . $csrf . '"><input type="hidden" name="plan" value="' . e($key) . '"><input type="hidden" name="code" value="' . e($code) . '">'
@@ -52,7 +52,25 @@ function view_join(): void
   $community
   <details class="terms" id="terms"><summary>Terms of Access</summary><div class="mm-prose">$terms</div></details>
 </section>
-HTML, ['index' => true, 'description' => 'Join The Magick Manuscript: 20,000+ pages of cross-linked, sourced witchcraft reference across 15 grimoires.']);
+HTML, ['index' => true, 'description' => 'Join The Magick Manuscript: 20,000+ pages of cross-linked, sourced witchcraft reference across 15 grimoires.',
+        'ld' => [membership_ld()]]);
+}
+
+/** The membership as Google reads it (schema.org Product): its pictures and each plan's price. */
+function membership_ld(): array
+{
+    $offers = [];
+    foreach (membership_plans() as $plan) {
+        if (empty($plan['price']) || empty($plan['amount'])) continue;
+        $o = ['@type' => 'Offer', 'name' => $plan['label'], 'price' => (string) $plan['amount'], 'priceCurrency' => 'USD',
+            'availability' => 'https://schema.org/InStock', 'url' => url('join')];
+        if ($plan['mode'] === 'subscription') $o['priceSpecification'] = ['@type' => 'UnitPriceSpecification', 'price' => (string) $plan['amount'],
+            'priceCurrency' => 'USD', 'billingDuration' => 1, 'unitCode' => 'MON'];
+        $offers[] = $o;
+    }
+    return ['@type' => 'Product', 'name' => 'The Magick Manuscript', 'brand' => ['@type' => 'Brand', 'name' => 'The Magick Muse'],
+        'description' => '20,000+ pages of witchcraft research in one online grimoire: 15 cross-linked grimoires sourced from published books.',
+        'image' => [site_url('assets/og-manuscript.jpg'), site_url('assets/manuscript-protection.jpg')], 'offers' => $offers];
 }
 
 function do_checkout(): void
@@ -60,8 +78,8 @@ function do_checkout(): void
     check_csrf();
     if (empty($_POST['agree'])) redirect(url('join') . '#terms');
     $plan = (string) ($_POST['plan'] ?? '');
-    if (empty(config('plans', [])[$plan]['price'])) { not_found(); return; }
-    show_checkout(create_checkout($plan, current_email(), (string) ($_POST['code'] ?? '')), config('plans')[$plan]['label'] ?? 'The Magick Manuscript', url('join'));
+    if (empty(membership_plans()[$plan]['price'])) { not_found(); return; }
+    show_checkout(create_checkout($plan, current_email(), (string) ($_POST['code'] ?? '')), membership_plans()[$plan]['label'] ?? 'The Magick Manuscript', url('join'));
 }
 
 function view_welcome(): void
