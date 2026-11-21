@@ -1359,7 +1359,7 @@
     return Store.list('notes').then(function (list) {
       notesCache = list.sort(function (a, b) { return String(b.updated || '').localeCompare(String(a.updated || '')); });
       tool.className = 'saved notes-page';
-      render(tool, '<header class="pg-head tool-head"><p class="eyebrow">My Profile</p><h1>My Notes</h1>'
+      render(tool, '<header class="pg-head tool-head"><p class="eyebrow">My Account</p><h1>My Notes</h1>'
         + '<p class="small">Only you can see these. Each one opens to read, rename or change it.' + (PREVIEW ? ' On this preview they’re kept in this browser.' : '') + '</p></header>'
         + (list.length ? '<ul class="note-cards">' + list.map(function (n) {
           var snip = (n.body || '').replace(/\s+/g, ' ').trim(), when = new Date(String(n.updated || n.created).replace(' ', 'T'));

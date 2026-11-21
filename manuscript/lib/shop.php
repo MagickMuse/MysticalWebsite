@@ -112,7 +112,7 @@ function view_shop(): void
     layout('Market', <<<HTML
 <section class="mm-hero">
   <h1>The Market</h1>
-  <p class="lede">Courses, grimoire templates and the Manuscript. Everything you buy stays in your library, ready whenever you are.</p>
+  <p class="lede">Courses, grimoire templates and the Manuscript. Everything you buy waits for you in My Resources, ready whenever you are.</p>
 </section>
 <section class="cards shop-grid">$ms$cards</section>
 HTML, ['index' => true, 'section' => 'market', 'description' => 'Witchcraft courses, grimoire templates and The Magick Manuscript from The Magick Muse.',
@@ -133,7 +133,7 @@ function view_product(array $p): void
 
     $code = preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($_GET['code'] ?? ''));
     if ($email && owns($email, $p['slug'])) {
-        $action = '<p class="notice">You own this. <a href="' . e(site_url('market/library')) . '">Open your library</a></p>';
+        $action = '<p class="notice">You own this. <a href="' . e(site_url('market/library')) . '">Open My Resources</a></p>';
     } elseif (!empty($p['free'])) {
         $action = '<form class="mm-form buy" method="post" action="' . e(site_url('market/claim')) . '">'
             . "<input type=\"hidden\" name=\"csrf\" value=\"$csrf\"><input type=\"hidden\" name=\"product\" value=\"$slug\">"
@@ -210,8 +210,8 @@ function do_claim(): void
     $link = url('auth?token=' . issue_login_token($email) . '&next=' . rawurlencode('/market/library'));
     $nm = short_name($p);
     send_mail($email, 'Your ' . $nm . ' is here',
-        "Thank you for picking up {$nm}.\n\nOpen your library to get it:\n$link\n\nThe link signs you in and works for 30 minutes. After that, sign in any time at " . site_url('market/library') . "\n\nThe Magick Muse",
-        '<p>Thank you for picking up <strong>' . e($nm) . '</strong>.</p><p><a href="' . e($link) . '">Open your library</a> to get it.</p><p>The link signs you in and works for 30 minutes. After that, sign in any time at ' . e(site_url('market/library')) . '.</p><p>The Magick Muse</p>');
+        "Thank you for picking up {$nm}.\n\nOpen My Resources to get it:\n$link\n\nThe link signs you in and works for 30 minutes. After that, sign in any time at " . site_url('market/library') . "\n\nThe Magick Muse",
+        '<p>Thank you for picking up <strong>' . e($nm) . '</strong>.</p><p><a href="' . e($link) . '">Open My Resources</a> to get it.</p><p>The link signs you in and works for 30 minutes. After that, sign in any time at ' . e(site_url('market/library')) . '.</p><p>The Magick Muse</p>');
     layout('Check Your Email', '<section class="mm-hero narrow"><p class="eyebrow">On Its Way</p><h1>Check Your Inbox</h1><p class="lede">We sent ' . e($nm) . ' to ' . e($email) . '. If it isn’t there in a few minutes, look in spam or promotions.</p></section>', ['private' => true]);
 }
 
@@ -240,7 +240,7 @@ function view_library(): void
 {
     $email = current_email();
     if (!$email) {
-        view_login('<p class="notice">Sign in with the email you bought with to open your library.</p>', '/market/library');
+        view_login('<p class="notice">Sign in with the email you bought with to open My Resources.</p>', '/market/library');
         return;
     }
     $st = db()->prepare('SELECT product, created_at FROM purchases WHERE email = ? ORDER BY created_at DESC');
@@ -270,9 +270,9 @@ function view_library(): void
     $thanks = $new ? '<p class="notice">Thank you! Your purchase is below, and a receipt from Stripe is in your email.</p>' : '';
     $body = $items
         ? '<ul class="library">' . $items . '</ul>'
-        : '<p class="lede">Nothing here yet. <a href="' . e(site_url('market')) . '">Visit the shop</a>.</p>';
-    layout('My Library', '<section class="lib"><p class="eyebrow">' . e($email) . '</p><h1>My Library</h1>' . $thanks . $body
-        . '<p class="small"><a href="' . e(url('account')) . '">Account &amp; billing</a></p></section>', ['private' => true, 'section' => 'market']);
+        : '<p class="lede">Nothing here yet. <a href="' . e(site_url('market')) . '">Visit the Market</a>.</p>';
+    layout('My Resources', '<section class="lib"><p class="eyebrow">' . e($email) . '</p><h1>My Resources</h1>' . $thanks . $body
+        . '<p class="small"><a href="' . e(url('account')) . '">My Account</a></p></section>', ['private' => true, 'section' => 'market']);
 }
 
 function shop_download(string $slug, string $file): void

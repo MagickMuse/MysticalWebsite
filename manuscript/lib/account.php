@@ -211,35 +211,28 @@ function view_account(): void
         $m['status'] === 'active' => 'Monthly member, renews ' . e(substr((string) $m['paid_through'], 0, 10)),
         default => 'Membership ' . e($m['status']) . ($m['paid_through'] ? ', access until ' . e(substr($m['paid_through'], 0, 10)) : ''),
     };
-    // My Profile: one square card for each place a member goes from here.
-    $card = fn(string $icon, string $label, string $href) => '<a class="profile-card" href="' . e($href) . '"><span class="prop-glyph pi-' . $icon . '" aria-hidden="true"></span>' . e($label) . '</a>';
+    // My Account: one square card for each place a member goes from here.
+    $card = fn(string $icon, string $label, string $href) => '<a class="account-card" href="' . e($href) . '"><span class="prop-glyph pi-' . $icon . '" aria-hidden="true"></span>' . e($label) . '</a>';
     $button = fn(string $icon, string $label, string $action) => '<form method="post" action="' . e($action) . '"><input type="hidden" name="csrf" value="' . $csrf . '">'
-        . '<button class="profile-card" type="submit"><span class="prop-glyph pi-' . $icon . '" aria-hidden="true"></span>' . e($label) . '</button></form>';
+        . '<button class="account-card" type="submit"><span class="prop-glyph pi-' . $icon . '" aria-hidden="true"></span>' . e($label) . '</button></form>';
     $cards = '';
     if (has_access()) $cards .= $card('star-four', 'Saved Pages', url('saved')) . $card('note-pencil', 'My Notes', url('notes/'));
-    $cards .= $card('text-aa', 'Display & Accessibility', '#settings');
-    $cards .= $card('book-open-text', 'My Library', site_url('market/library'));
+    $cards .= $card('text-aa', 'Display & Accessibility', site_url('settings'));
+    $cards .= $card('book-open-text', 'My Resources', site_url('market/library'));
     // Billing (change card, invoices, cancel) is only for subscriptions; lifetime buyers get their Stripe receipt by email.
     if ($m && $m['stripe_customer'] && $m['plan'] === 'monthly' && $m['status'] !== 'canceled') $cards .= $button('arrows-clockwise', 'Manage Billing', url('account'));
     if (is_admin($email)) $cards .= $card('chart-bar', 'Dashboard', url('dashboard'));
     $cards .= $button('door-open', 'Sign Out', url('logout'));
     $join = has_access() ? '' : '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a Member</a></div>';
     $email = e($email);
-    // Display & accessibility: kept in the browser by prefs.js, the same panel as the website's /settings page.
-    $prefs = (string) @file_get_contents(__DIR__ . '/prefs-panel.html');
-    layout('My Profile', <<<HTML
+    layout('My Account', <<<HTML
 <section class="mm-hero narrow">
-  <p class="eyebrow">My Profile</p>
+  <p class="eyebrow">My Account</p>
   <h1>{$email}</h1>
   <p class="lede">$status</p>
   $join
 </section>
-<nav class="profile-grid" aria-label="My Profile">$cards</nav>
-<section class="account-prefs" id="settings" aria-labelledby="prefs-title">
-  <h2 id="prefs-title">Display &amp; Accessibility</h2>
-  <p class="lede small">Dark mode, an easier-to-read font, larger text, more spacing, fewer animations. Changes show straight away.</p>
-  $prefs
-</section>
+<nav class="account-grid" aria-label="My Account">$cards</nav>
 HTML, ['private' => true]);
 }
 

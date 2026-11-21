@@ -319,9 +319,9 @@ function layout(string $title, string $body, array $opt = []): void
     header('Vary: Cookie');
 
     $email = current_email();
-    // Signed in: My Profile (its page has everything: saved pages, notes, display, signing out). Signed out: Login.
+    // Signed in: My Account (its page has everything: saved pages, notes, display, signing out). Signed out: Login.
     $acct = $email
-        ? '<a class="acct-link" href="' . e(url('account')) . '">My Profile</a>'
+        ? '<a class="acct-link" href="' . e(url('account')) . '">My Account</a>'
         : '<a class="acct-login" href="' . e(url('login')) . '">Login</a>';
     $q = e($_GET['q'] ?? '');
     $section = $opt['section'] ?? 'manuscript'; // which main-menu item is marked as the current page

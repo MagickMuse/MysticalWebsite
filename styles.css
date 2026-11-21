@@ -811,8 +811,8 @@ html.nav-fold .nav ul a { align-content: center; min-height: 52px; }
 .small { font-size: .85rem; color: var(--muted); }
 .center { text-align: center; margin-inline: auto; }
 
-/* ---------- the Manuscript's header tools: search, My Profile ---------- */
-/* On the right of the header row: a small search box (members, on the Manuscript's pages), My Profile (a little menu)
+/* ---------- the Manuscript's header tools: search, My Account ---------- */
+/* On the right of the header row: a small search box (members, on the Manuscript's pages), My Account (a little menu)
    or Login, then the theme toggle. Folded (phones, or when the row doesn't fit), the search gets its own slim row. */
 .nav-tools { grid-column: 3; grid-row: 1; justify-self: end; display: flex; align-items: center; gap: 1rem; }
 /* The search: a magnifying glass; its box opens under the header, across from the right edge. */
@@ -830,17 +830,17 @@ html.nav-fold .nav ul a { align-content: center; min-height: 52px; }
 .mm-acct a { text-decoration: none; }
 .mm-acct a:hover { color: var(--accent-text); }
 
-/* My Profile: a square card for each place to go (account.php view_account()) */
-.profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; max-width: 860px; margin: 0 auto var(--gap-intro); }
-.profile-grid form { margin: 0; display: grid; }
-.mm-main .profile-card, .profile-card {
+/* My Account: a square card for each place to go (account.php view_account()) */
+.account-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; max-width: 860px; margin: 0 auto var(--gap-intro); }
+.account-grid form { margin: 0; display: grid; }
+.mm-main .account-card, .account-card {
   aspect-ratio: 1; display: grid; align-content: center; justify-items: center; gap: .8rem; padding: 1rem; text-align: center;
   border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-decoration: none; cursor: pointer;
   font-family: var(--display); font-size: 1.25rem; line-height: 1.2; transition: border-color .2s, transform .2s;
 }
-.profile-card .prop-glyph { width: 2rem; height: 2rem; }
-.profile-card:hover, .profile-card:focus-visible { border-color: var(--gold); color: var(--accent-text); transform: translateY(-2px); }
-@media (prefers-reduced-motion: reduce) { .profile-card:hover, .profile-card:focus-visible { transform: none; } }
+.account-card .prop-glyph { width: 2rem; height: 2rem; }
+.account-card:hover, .account-card:focus-visible { border-color: var(--gold); color: var(--accent-text); transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) { .account-card:hover, .account-card:focus-visible { transform: none; } }
 
 /* ---------- hero / landing ---------- */
 .mm-hero { display: grid; justify-items: center; text-align: center; margin-bottom: var(--gap-intro); }
@@ -2073,9 +2073,6 @@ details.toggle > summary > h5 { margin: 0; display: inline; }
 .book-pile .slab.s2, .book-pile .slab.s3, .book-pile .slab.s4 { width: min(310px, 90vw); height: 52px; }
 .book-pile .slab.s3 { width: min(318px, 92vw); } .book-pile .slab.s4 { width: min(326px, 93vw); height: 54px; }
 /* Account: display & accessibility settings (the panel's own styles are in styles.css) */
-.account-prefs { max-width: 760px; margin: 3.5rem auto 0; padding-top: 2rem; border-top: 1px solid var(--line); }
-.account-prefs h2 { font-family: var(--display); font-weight: 400; font-size: 2rem; margin: 0 0 .4rem; }
-.account-prefs .lede { margin: 0 0 1.6rem; }
 /* The bookshelf is a picture of real books: its lettering keeps the house fonts and fixed sizes whatever the
    reading settings (the books' names are in their labels for screen readers). */
 .shelves, .book-pile { --display: "Cormorant", "Cormorant Garamond", Georgia, serif; --body: "Jost", "Helvetica Neue", Arial, sans-serif; }
