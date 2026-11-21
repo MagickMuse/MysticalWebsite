@@ -13,7 +13,8 @@ Done:
 - **Webhook** `we_1UcwtxD79698XBfZHD0Mgb1a` → `https://magickmuse.com/manuscript/stripe-webhook`, all 8 events including the two dispute events (added November 21, 2026), API `2026-03-25.dahlia`; its signing secret is in config.live.php.
 - **Account review:** approved; card, Apple Pay, Google Pay, Link, Klarna and others are on.
 - **Customer portal:** on; monthly members can cancel (at the end of the paid month), change their card and see invoices.
-- Stripe Tax: active, head office address set. Products carry tax code `txcd_20060058`.
+- Stripe Tax: active, head office address set. The Manuscript (lifetime and monthly) is `txcd_10103000`, software as a
+  service for personal use; the courses are `txcd_20060058`, self-study web-based training.
 
 Blocking live checkout:
 - **Tax registrations.** None yet: add one for each place you must collect tax (Settings → Tax → Registrations),
