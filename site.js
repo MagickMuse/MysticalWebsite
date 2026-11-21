@@ -218,5 +218,39 @@
     };
     peek.addEventListener('load', function () { fit(); setTimeout(fit, 600); });
     if ('ResizeObserver' in window) new ResizeObserver(fit).observe(box); else window.addEventListener('resize', fit);
+
+    // Clicking the shelf: members go into the Manuscript, to the book they clicked. Visitors get the Manuscript's own
+    // join pop-up, copied from the shelf's page (which knows whether this person is a member) and counted the same way.
+    var gtagEvent = function (name) {
+      if (typeof window.gtag === 'function') window.gtag('event', name, { page_name: '(home page shelf)', page_path: location.pathname });
+    };
+    var openShelf = function (e) {
+      var doc = null; try { doc = peek.contentDocument; } catch (err) {}
+      var home = peek.src.replace(/[?#].*$/, ''), book = null;
+      if (doc && e && e.clientX !== undefined) {
+        var r = box.getBoundingClientRect(), s = box.clientWidth / W;
+        var x = (e.clientX - r.left) / s, y = (e.clientY - r.top) / s;
+        // The books ignore the mouse in this view, so find the one under the click by where it sits.
+        doc.querySelectorAll('.shelves a[href]').forEach(function (a) {
+          var b = a.getBoundingClientRect();
+          if (x >= b.left && x <= b.right && y >= b.top && y <= b.bottom) book = a;
+        });
+      }
+      var source = doc && doc.body && doc.body.hasAttribute('data-visitor') ? doc.getElementById('join-pop') : null;
+      if (!source || !source.showModal) { location.href = book ? book.href : home; return; }
+      var pop = document.getElementById('join-pop');
+      if (!pop) {
+        pop = document.importNode(source, true);
+        pop.querySelectorAll('a[href*="peek"]').forEach(function (a) { a.href = a.href.replace(/(%3F|\?)peek(%3D|=)1/i, ''); });
+        document.body.appendChild(pop);
+        pop.addEventListener('click', function (ev) { if (ev.target === pop || ev.target.closest('[data-close]')) pop.close(); });
+        var inside = pop.querySelector('.actions a.btn');
+        if (inside) inside.addEventListener('click', function () { gtagEvent('join_popup_click'); });
+      }
+      pop.showModal();
+      gtagEvent('join_popup_shown');
+    };
+    box.addEventListener('click', openShelf);
+    box.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openShelf(); } });
   }
 })();

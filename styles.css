@@ -760,8 +760,10 @@ html.nav-fold .nav li { display: block; }
 html.nav-fold .nav ul a { align-content: center; min-height: 52px; }
 
 /* The Manuscript's shelf on the homepage: the real shelf (manuscript/?peek) drawn at full width, shrunk to fit (site.js),
-   on a clear background, so it matches light or dark mode and changes whenever the shelf does. Nothing in it can be clicked. */
-.shelf-peek { position: relative; width: 100%; aspect-ratio: 1200 / 720; overflow: hidden; }
+   on a clear background, so it matches light or dark mode and changes whenever the shelf does. The frame itself takes the
+   click (site.js): members go in, visitors get the join pop-up. */
+.shelf-peek { position: relative; width: 100%; aspect-ratio: 1200 / 720; overflow: hidden; cursor: pointer; }
+.shelf-peek:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .shelf-peek iframe {
   position: absolute; top: 0; left: 0; width: 1200px; height: 720px; border: 0; background: transparent;
   transform-origin: 0 0; pointer-events: none; opacity: 0; transition: opacity .4s;
