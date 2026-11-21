@@ -3,7 +3,7 @@
 Things only you can do (accounts, Notion, decisions). Claude keeps this list up to date: say “add it to my to-do list”
 in any session. Tick a box by changing `[ ]` to `[x]`, or ask Claude to.
 
-_Last updated: November 20, 2026_
+_Last updated: November 21, 2026_
 
 ## Before launch
 - [ ] **Stripe:** the four things blocking live checkout: dispute events on the webhook, Stripe's account review, tax
@@ -17,10 +17,23 @@ _Last updated: November 20, 2026_
 - [ ] **Try Share on your phone:** Draw a Card or Pull a Rune → Share should open your phone's share menu with the picture.
 - [ ] **Try the new tools on the preview:** Do this spread (any tarot spread page), the Dream Decoder (Dreams), Planetary
       Hours (Timing; it asks for your location once), the moon on the Calendar, and Save to notes after a pull.
+- [ ] **Product pictures (optional):** a picture for each Market product (Witchcraft 101 and 111, the Blank Grimoire, the
+      Crystal Grimoire). Shared links and Google show the Manuscript picture until then, and Google Shopping needs one.
+      Send them to Claude to add.
+- [ ] **Rune pictures:** 18 runes still have no picture (Erda, Sol, Ul, Ziu, Hulinhjalmur, Wolfsangel and some letters
+      of the less certain alphabets). Say which should get one and which are meant to stay blank.
 - [ ] **Review the beginner path's 30 days:** `manuscript/beginner-path.php`, one line per day; reorder or swap freely.
 
 ## After launch
-- [ ] **Google Search Console:** resubmit `sitemap.xml` so Google picks up the new addresses (/muses, /mythos, /market).
+- [ ] **Google Search Console:** resubmit `sitemap.xml` so Google picks up the new addresses (/muses, /mythos, /market,
+      /manuscript/today). Search Console also shows which searches already find you.
+- [ ] **Bing Webmaster Tools:** add the site and submit `sitemap.xml` (Bing also feeds ChatGPT's and DuckDuckGo's search).
+- [ ] **Check the shop prices for Google:** paste a Market product link into search.google.com/test/rich-results;
+      it should find a “Product” with its price.
+- [ ] **Try the calendar feed:** on the Calendar, Add to Your Calendar → Google, then on your phone → Apple. Festivals
+      and moon phases should appear and update by themselves.
+- [ ] **Delete the preview copy:** once the live site works, the GitHub Pages preview (the `manuscript/*/` and `market/`
+      copies) can go. Ask Claude.
 - [ ] **Social bios:** change any `/shop` links to `/market` (the old ones still forward).
 - [ ] **Monthly plan:** decide whether to offer it. If yes: make a monthly price in Stripe and add it to the settings
       (Claude can do the settings part). Cancellations remove access automatically at the end of the paid month.
@@ -47,7 +60,9 @@ _Last updated: November 20, 2026_
 - Give the Manuscript as a gift (worth doing before Yule, December 21)
 - Your birthday in the Manuscript (sun and moon sign, birthstone, Celtic tree, the day's profile)
 - Referral codes, guest passes for a friend, coven (group) plans
-- Free public daily pages: today's moon, a card of the day, the sabbat countdown
+- Free public daily pages: a card of the day, the sabbat countdown (Today’s Correspondences is already public)
 - A weekly email: the week's moon phases, festivals and a featured page
 - The full book of shadows (entries, @mentions of Manuscript pages, backlinks)
-- Public previews of Manuscript entries for Google
+- Public previews of Manuscript entries for Google (the biggest discoverability win: name, picture and a few
+  correspondences, the rest for members), and festival pages that answer “when is Samhain 2026”
+- Pinterest: a tall 2:3 pin picture for each blog post
