@@ -26,7 +26,6 @@ function view_join(): void
             . '<label class="agree"><input type="checkbox" name="agree" value="1" required> I agree to the <a href="#terms">Terms of Access</a></label>'
             . '<button class="btn" type="submit">' . e($plan['button'] ?? 'Get access') . '</button></form>';
     }
-    $planClass = substr_count($plans, '<form') > 1 ? 'pairs' : 'single';
     $highlights = '';
     foreach ($copy['highlights'] as [$title, $text]) {
         $highlights .= '<li><strong>' . e($title) . '</strong> ' . e($text) . '</li>';
@@ -43,15 +42,20 @@ function view_join(): void
   <h1>The Magick Manuscript</h1>
   <p class="lede">20,000+ entries · 15 cross-linked grimoires · an interactive digital grimoire that never stops growing.</p>
   $note
+  <p class="join-jump"><a class="btn ghost" href="#plans">See Plans</a></p>
 </section>
-<section class="cards plans $planClass">$plans</section>
-<p class="center small">Secure checkout by Stripe. After paying you're signed in straight away. Already a member? <a href="$login">Sign In</a></p>
-<section class="join-copy">
-  <div class="mm-prose">$desc</div>
-  <ul class="highlights">$highlights</ul>
-  $community
-  <details class="terms" id="terms"><summary>Terms of Access</summary><div class="mm-prose">$terms</div></details>
-</section>
+<div class="join-layout">
+  <section class="join-copy">
+    <div class="mm-prose">$desc</div>
+    <ul class="highlights">$highlights</ul>
+    $community
+    <details class="terms" id="terms"><summary>Terms of Access</summary><div class="mm-prose">$terms</div></details>
+  </section>
+  <aside class="join-plans" id="plans" aria-label="Membership plans">
+    <section class="cards pairs plans stack">$plans</section>
+    <p class="center small">Secure checkout by Stripe. After paying you're signed in straight away. Already a member? <a href="$login">Sign In</a></p>
+  </aside>
+</div>
 HTML, ['index' => true, 'description' => 'Join The Magick Manuscript: 20,000+ pages of cross-linked, sourced witchcraft reference across 15 grimoires.',
         'ld' => [membership_ld()]]);
 }

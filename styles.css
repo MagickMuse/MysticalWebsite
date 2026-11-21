@@ -1167,7 +1167,31 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 .terms .mm-prose { margin-top: var(--gap-text); font-size: .92rem; color: var(--muted); }
 .community { gap: 1.6rem; }
 .refund { margin-top: -.4rem; }
-.plans.single { grid-template-columns: minmax(0, 420px); justify-content: center; }
+/* The Join page: the description on the left, the plans beside it, staying in view while the description scrolls.
+   Narrow screens: one column, the plans after the description, with a "See Plans" button at the top to jump to them. */
+.join-layout {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 360px); gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start; max-width: 1160px; margin: clamp(1.5rem, 4vw, 3rem) auto 0;
+}
+.join-layout .join-copy { margin: 0; max-width: 760px; }
+.join-plans { display: grid; gap: .9rem; }
+.cards.plans.stack { grid-template-columns: 1fr; gap: 1.2rem; max-width: none; margin: 0; }
+.join-plans { scroll-margin-top: calc(var(--site-head, 92px) + 1rem); }
+.cards.pairs.plans.stack .card { padding: 1.2rem 1.3rem 1.3rem; gap: .45rem; outline-offset: -7px; }
+.plans.stack .card h3 { font-size: 1.45rem; margin: 0; }
+.plans.stack .price.big { font-size: 1.55rem; margin: 0; }
+.plans.stack .card > p { font-size: .92rem; line-height: 1.45; margin: 0; }
+.plans.stack .agree { margin: .2rem 0; }
+.plans.stack .btn { padding: .6rem 1.4rem; }
+.join-plans > .small { margin: 0; }
+.join-jump { display: none; margin: var(--gap-text) 0 0; }
+@media (min-width: 901px) and (min-height: 700px) {
+  .join-plans { position: sticky; top: calc(var(--site-head, 92px) + 1.2rem); }
+}
+@media (max-width: 900px) {
+  .join-layout { grid-template-columns: minmax(0, 1fr); }
+  .join-jump { display: block; }
+}
 
 /* ---------- save / saved pages ---------- */
 .pg-title { display: flex; flex-wrap: wrap; gap: .8rem 1.4rem; align-items: center; justify-content: space-between; }
