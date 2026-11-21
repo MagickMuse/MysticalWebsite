@@ -2433,10 +2433,6 @@ details.toggle > summary > h5 { margin: 0; display: inline; }
 }
 .mm-main .entry-grid.gallery a:hover > span:not(.gal-pic) { text-decoration-color: currentColor; }
 .gal-mineral .gal-pic:not(.none) { background: none; }
-/* Plants mix full photographs with cut-outs on no background. Every picture is set the same way, so they
-   read as one series: a print on a mat, inside an arch with a gold line, whatever the source. */
-.gal-plant .gal-pic { border-radius: 50% 50% 0 0 / 30% 30% 0 0; padding: 9%; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 55%, transparent); }
-.gal-plant .gal-pic img { object-fit: cover; border-radius: 50% 50% 0 0 / 30% 30% 0 0; }
 
 /* ---------- the note pop-up; the notes page ---------- */
 
