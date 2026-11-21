@@ -18,4 +18,10 @@ export default [
       'no-unused-vars': ['error', { caughtErrors: 'none' }],
     },
   },
+  {
+    // Scripts the GitHub workflows run with Node (e.g. the daily Discord post).
+    files: ['.github/scripts/*.js'],
+    languageOptions: { ecmaVersion: 2022, sourceType: 'commonjs', globals: { ...globals.node } },
+    rules: { 'no-unused-vars': ['error', { caughtErrors: 'none' }] },
+  },
 ];

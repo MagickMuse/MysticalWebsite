@@ -42,3 +42,7 @@ Every push runs `.github/workflows/checks.yml`: ESLint on the scripts, PHP synta
 From the Actions tab: **Deploy test site** or **Deploy live site** uploads the site to Hostinger over FTP, with the
 private settings from the repository's secrets. **Import from Notion** brings the Manuscript's pages over from
 Notion into the server's database. Setup details are in `manuscript/README.md`.
+
+**Discord daily correspondences** posts Today's Correspondences to the Discord server at 11:11 Pacific every morning
+(`.github/scripts/discord-today.js`), through the webhook in the repository secret `DISCORD_WEBHOOK_URL`. Run it by
+hand from the Actions tab to post straight away.
