@@ -8,10 +8,13 @@ _Last updated: November 21, 2026_
 ## Before launch
 - [x] **Stripe secret key:** saved as the repository secret `STRIPE_SECRET_KEY`; the live upload puts it in place.
       Everything else in Stripe is ready (account approved, webhook complete, $333 and $33-a-month prices, cancel page).
-- [ ] **The live settings secret `MANUSCRIPT_CONFIG_LIVE`:** still needed for the rest of the private settings (email,
-      webhook signing secret, app secret). If it isn't in the repository's secrets yet, ask Claude to make the file.
-- [ ] **Email settings:** put your Hostinger mailbox login in the private settings (`smtp_host` = smtp.hostinger.com,
-      `smtp_user`, `smtp_pass`, and `mail_from`). Sign-in links and the beginner path emails need it.
+- [x] **Key secrets:** `STRIPE_WEBHOOK_SECRET` and `SMTP_PASSWORD` saved; the upload fills them in by itself.
+- [ ] **Gmail app password:** the `SMTP_PASSWORD` secret must be a Google *app password*, not your Gmail password.
+      myaccount.google.com/apppasswords (needs 2-Step Verification on) → name it “website” → copy the 16 letters →
+      GitHub → Settings → Secrets and variables → Actions → `SMTP_PASSWORD` → Update.
+- [ ] **Course and template links:** send Claude the four delivery links (Witchcraft 101 and 111 Classroom links, the
+      Blank Grimoire and Crystal Grimoire Notion links). Claude then gives you the settings to paste into one last
+      secret, `MANUSCRIPT_CONFIG_LIVE`.
 - [ ] **Daily backups on Hostinger:** included on the Business plan; a small add-on on Premium. Members' notes live on the site.
 - [ ] **First upload:** GitHub → Actions → “Deploy live site” → Run workflow (Claude can walk you through it).
 - [ ] **Beginner path at 11:11:** hPanel → Advanced → Cron Jobs → Custom: minute `11,26,41,56`, everything else `*`, command
