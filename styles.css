@@ -239,6 +239,16 @@ header.site {
   font-family: var(--display); font-style: italic; font-weight: 400; font-size: 1rem; letter-spacing: 0;
   text-transform: none; color: var(--muted); line-height: 1.1;
 }
+/* In the header row, each section's little description shows only while it's hovered (or tabbed to), just below it.
+   In the folded Menu (phones), where there's no hovering, they show under each name as before. */
+.nav ul a { position: relative; }
+.nav ul a small {
+  position: absolute; top: 100%; left: 50%; transform: translate(-50%, -2px); white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity .2s, transform .2s;
+}
+.nav ul a:hover small, .nav ul a:focus-visible small { opacity: 1; transform: translate(-50%, 2px); }
+@media (max-width: 980px) { .nav ul a small { position: static; transform: none; opacity: 1; } }
+html.nav-fold .nav ul a small { position: static; transform: none; opacity: 1; }
 .nav ul a:hover, .nav ul a[aria-current="page"] { color: var(--accent-text); }
 .menu {
   display: none; grid-column: 2; grid-row: 1; justify-self: end; min-width: 44px; min-height: 44px; padding: .5rem .9rem;
