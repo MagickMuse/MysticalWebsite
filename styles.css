@@ -425,7 +425,7 @@ html.nav-fold .nav ul a small { position: static; transform: none; opacity: 1; }
 .quote p { max-width: none; }
 .quote cite { display: block; font-family: var(--body); font-style: italic; font-size: 1rem; color: var(--muted); margin-top: var(--gap-h3); }
 .alt .quote cite { color: var(--ink); }
-@media (max-width: 860px) { .feature-grid { grid-template-columns: 1fr; } }
+@media (max-width: 860px) { .feature-grid { grid-template-columns: 1fr; } .feature-text { text-align: center; justify-items: center; } .feature-text p { margin-inline: auto; } }
 
 /* ---------- card grids ---------- */
 .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.4rem; }
