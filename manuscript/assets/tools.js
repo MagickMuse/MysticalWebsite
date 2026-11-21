@@ -202,7 +202,7 @@
     });
     if (weekday) Object.keys(planets).forEach(function (k) { if (!ruler && D.l[weekday.i].indexOf(planets[k].i) !== -1) ruler = planets[k]; });
     var infl = [];
-    if (moon) infl.push(['The moon', moon, fullName ? 'Tonight’s full moon is the ' + fullName.title + '.' : (ph[2] ? 'Waxing: a time to draw things in and build.' : 'Waning: a time to release, banish and clear.'), fullName]);
+    if (moon) infl.push(['The moon', moon, fullName ? 'Tonight’s full moon is the ' + fullName.title + '.' : (ph[2] ? 'The moon is waxing, a time to draw things in and build.' : 'The moon is waning, a time to release, banish and clear.'), fullName]);
     if (weekday) infl.push(['The day', weekday, ruler ? weekday.title + ' belongs to ' + ruler.title + '.' : '', ruler]);
     if (sign) infl.push(['The sun', sign, 'The Sun is in ' + sign.title + '.', null]);
     if (seas) infl.push(['The season', seas, south ? 'Southern hemisphere.' : 'Northern hemisphere.', null]);
@@ -752,7 +752,7 @@
     var plural = function (n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); };
     var html = '';
     if (subs.length) html += fold('substitutions', 'Substitutions', 'for ' + plural(subs.length, 'ingredient'),
-      '<p class="small extras-note">Out of something? These carry the same correspondences in this working. They match in meaning, not in physical effect: check a swap’s own page before it goes on skin or into food.</p><ul class="extras-list subs">' + subs.join('') + '</ul>');
+      '<p class="small extras-note">Out of something? These carry the same correspondences in this working. They match in meaning, not in physical effect. Check a swap’s own page before it goes on skin or into food.</p><ul class="extras-list subs">' + subs.join('') + '</ul>');
     if (why.length) html += fold('why', 'Why these ingredients', plural(why.length, 'ingredient'),
       '<p class="small extras-note">What each one brings to this working, from its correspondences.</p><ul class="extras-list why">' + why.join('') + '</ul>');
     if (fire || warn.length) {

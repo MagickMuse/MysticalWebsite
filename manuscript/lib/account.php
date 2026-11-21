@@ -88,7 +88,7 @@ function join_copy_html(array $c): string
     // A look inside: the Protection page as members see it, leading to the free sneak peek of it.
     if (is_file(dirname(MM_ROOT) . '/assets/manuscript-protection.jpg')) {
         $peek = sneak_peek_page() ? url('sneak-peek') : '';
-        $img = '<img src="' . e(asset_url(site_url('assets/manuscript-protection.jpg'), 'assets/manuscript-protection.jpg')) . '" alt="The Protection page in the Manuscript: its connections to animals, astrology and dreams beside its guide to protective magick" width="1600" height="1200" loading="lazy">';
+        $img = '<img src="' . e(asset_url(site_url('assets/manuscript-protection.jpg'), 'assets/manuscript-protection.jpg')) . '" alt="The Protection page in the Manuscript, with its connections to animals, astrology and dreams beside its guide to protective magick" width="1600" height="1200" loading="lazy">';
         $html .= '<figure class="jc-peek">' . ($peek ? '<a href="' . e($peek) . '">' . $img . '</a>' : $img)
             . '<figcaption><span class="eyebrow">A Look Inside</span> The Protection page, exactly as members see it.'
             . ($peek ? ' <a class="link" href="' . e($peek) . '">Read it free</a>' : '') . '</figcaption></figure>';
@@ -205,7 +205,7 @@ function view_account(): void
         !$m => 'No membership on this email',
         // A refunded or revoked lifetime/comp member keeps the plan name but not the access.
         $m['plan'] === 'lifetime' && $m['status'] === 'active' => 'Member: full Manuscript access',
-        $m['status'] === 'disputed' => 'Access paused: your bank is disputing the payment. Access comes back if the dispute is withdrawn or settled in our favor.',
+        $m['status'] === 'disputed' => 'Access is paused while your bank disputes the payment. Access comes back if the dispute is withdrawn or settled in our favor.',
         $m['plan'] === 'comp' && $m['status'] === 'active' => 'Member (complimentary)',
         in_array($m['plan'], ['lifetime', 'comp'], true) => 'Membership ended',
         $m['status'] === 'active' => 'Monthly member, renews ' . e(substr((string) $m['paid_through'], 0, 10)),

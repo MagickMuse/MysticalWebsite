@@ -164,7 +164,7 @@ function show_checkout(array $session, string $title, string $back): void
         . '<div class="pay-frame"><div id="checkout-form" data-pk="' . e((string) config('stripe_publishable_key')) . '" data-secret="' . e($session['client_secret']) . '">'
         . '<p class="pay-loading">Opening the secure payment form…</p></div></div>'
         . '<noscript><p class="lede">The payment form needs JavaScript. Please turn it on and reload this page.</p></noscript>'
-        . '<p class="small pay-note">Payments are processed by Stripe; your card details never touch this site. <a class="link" href="' . e($back) . '">Go Back</a></p></section>',
+        . '<p class="small pay-note">Payments are processed by Stripe, so your card details never touch this site. <a class="link" href="' . e($back) . '">Go Back</a></p></section>',
         ['private' => true, 'stripe' => true]);
 }
 

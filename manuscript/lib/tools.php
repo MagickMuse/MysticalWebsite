@@ -26,7 +26,7 @@ const TOOL_PAGES = [
 ];
 
 /** What Today is, for search engines and before the page fills in. */
-const TODAY_DESCRIPTION = 'Today’s magickal correspondences: the moon phase, the planet that rules the day, the Sun’s sign and the season, '
+const TODAY_DESCRIPTION = 'Today’s magickal correspondences, from the moon phase and the planet that rules the day to the Sun’s sign and the season, '
     . 'with the herbs, crystals, colors, oils and spells that suit them. Updated every day.';
 
 /** Tools anyone can open (they read /tools/today.json, which holds no page's content). */

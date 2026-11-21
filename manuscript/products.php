@@ -33,7 +33,7 @@ HTML,
         'short_name' => 'Witchcraft 111',
         'kind' => 'Course',
         'tax_code' => 'txcd_20060358', // on-demand online course, written material
-        'tagline' => 'Seven units: divination, astrology, herbalism, ancestors, deities, runes and crystals.',
+        'tagline' => 'Seven units on divination, astrology, herbalism, ancestors, deities, runes and crystals.',
         'price_cents' => 2000,
         'pay_what_you_want' => true,
         'includes' => ['7 units', 'Readings, key terms & homework', 'Self-paced in Google Classroom'],

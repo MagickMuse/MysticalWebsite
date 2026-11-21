@@ -392,7 +392,7 @@ function layout(string $title, string $body, array $opt = []): void
         <summary aria-label="Search the Manuscript" title="Search the Manuscript"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></summary>
         <form class="mm-search" action="<?= e(url('search')) ?>" method="get" role="search">
           <label class="sr-only" for="mm-q">Search the Manuscript</label>
-          <input id="mm-q" type="search" name="q" value="<?= $q ?>" placeholder="Search the Manuscript: protection, rose quartz, Hekate…">
+          <input id="mm-q" type="search" name="q" value="<?= $q ?>" placeholder="Search for protection, rose quartz, Hekate…">
           <button class="btn" type="submit">Search</button>
         </form>
       </details>

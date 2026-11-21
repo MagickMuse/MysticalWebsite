@@ -48,7 +48,7 @@ $cards
 $guide
 $yours
 HTML, $member ? ['private' => true, 'protect' => true]
-    : ['index' => true, 'protect' => true, 'description' => 'The Magick Manuscript: a members-only, cross-linked digital grimoire by The Magick Muse.']);
+    : ['index' => true, 'protect' => true, 'description' => 'The Magick Manuscript is a members-only, cross-linked digital grimoire by The Magick Muse.']);
 }
 
 /** What non-members see in place of the Manuscript: no titles, lists or previews. */
@@ -71,7 +71,7 @@ function view_gate(?array $locked = null): void
   <div class="actions"><a class="btn" href="{$join}">Become a Member</a></div>
   $signin
 </section>
-HTML, ['index' => !$locked, 'description' => 'The Magick Manuscript: a members-only, cross-linked digital grimoire by The Magick Muse.']);
+HTML, ['index' => !$locked, 'description' => 'The Magick Manuscript is a members-only, cross-linked digital grimoire by The Magick Muse.']);
 }
 
 /** Pages listed in config "public_pages", and the sneak peek page, can be read by anyone. */
@@ -117,7 +117,7 @@ function view_page(array $p): void
     if ($peek) {
         $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
         $head = '<aside class="peek-note"><p class="eyebrow">A Sneak Peek</p>'
-            . '<p>You\'re reading one page of the Manuscript, just as members see it. Every connection on it leads to another page: there are ' . $total . ' in all, across ' . mb_strtolower(grimoire_count_word()) . ' grimoires.</p>'
+            . '<p>You\'re reading one page of the Manuscript, just as members see it. Every connection on it leads to another page, and there are ' . $total . ' in all, across ' . mb_strtolower(grimoire_count_word()) . ' grimoires.</p>'
             . '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a Member</a></div></aside>' . $head;
     }
 
@@ -273,7 +273,7 @@ function calendar_html(array $days, callable $href, ?callable $events = null): s
         $html .= '</ol></section>';
     }
     return '<section class="calendar" data-calendar><header class="pg-head"><p class="eyebrow">Timing Grimoire</p><h1>Calendar</h1>'
-        . '<p class="lede small">Every day of the year has its own page: its correspondences, the spirits and festivals tied to it, and the rituals for it.</p></header>'
+        . '<p class="lede small">Every day of the year has its own page, with its correspondences, the spirits and festivals tied to it, and the rituals for it.</p></header>'
         . '<nav class="cal-nav" hidden><button class="cal-btn" type="button" data-cal="-1" aria-label="Previous month">‹</button>'
         . '<p class="cal-title" aria-live="polite"></p><button class="cal-btn" type="button" data-cal="1" aria-label="Next month">›</button>'
         . '<button class="link as-button cal-today" type="button" data-cal="0">Today</button></nav>'
