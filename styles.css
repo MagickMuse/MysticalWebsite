@@ -2637,6 +2637,7 @@ table.hours td.planet span { color: var(--gold-text); margin-right: .2rem; }
 .index-group h2 a:hover { color: var(--accent-text); }
 .index-group h2 small { font-family: var(--body); font-size: .75rem; color: var(--muted); }
 .index-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
+.tool-note { color: var(--muted); font-style: italic; }
 .index-list li a { display: inline-block; padding: .2rem 0; line-height: 1.4; }
 
 /* The homepage's look at the shelf (manuscript/?peek, in a frame): only the shelf, on a clear background, nothing to click */

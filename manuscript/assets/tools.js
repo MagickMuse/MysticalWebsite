@@ -1186,7 +1186,7 @@
   function toolIndex(tool) {
     var html = grimoireOrder(Object.keys(GRIMOIRE_TOOLS)).map(function (g) {
       return '<section class="index-group"><h2><a href="' + esc(url(g + '/')) + '">' + esc(D.gt[g] || g) + '</a></h2><ul class="index-list">'
-        + GRIMOIRE_TOOLS[g].map(function (t) { return '<li><a href="' + esc(url(t[0])) + '">' + esc(t[1]) + '</a></li>'; }).join('') + '</ul></section>';
+        + GRIMOIRE_TOOLS[g].map(function (t) { return '<li><a href="' + esc(url(t[0])) + '">' + esc(t[1]) + '</a>' + toolNote(t) + '</li>'; }).join('') + '</ul></section>';
     }).join('');
     tool.className = 'pg pg-tool pg-index';
     render(tool, '<header class="pg-head tool-head">' + crumbs('') + '<h1>Enchanted Tools</h1>'
@@ -1378,16 +1378,18 @@
     astrology: [['wheel/?of=planets', 'Planet Wheel'], ['wheel/?of=signs', 'Zodiac Wheel'], ['wheel/?of=moon', 'Moon Phase Wheel']],
     timing: [['today/', 'Today’s Correspondences'], ['calendar/', 'Calendar'], ['planetary-hours/', 'Planetary Hours']],
     dream: [['dream-decoder/', 'Dream Decoder']],
-    card: [['draw-a-card/', 'Draw a Card']],
+    // A tool that lives on many pages links to their list, with a note saying where to find it.
+    card: [['draw-a-card/', 'Draw a Card'], ['card/tarot-spreads/', 'Do This Spread', 'built into every tarot spread']],
     rune: [['pull-a-rune/', 'Pull a Rune']]
   };
+  function toolNote(t) { return t[2] ? ' <small class="tool-note">(' + esc(t[2]) + ')</small>' : ''; }
   function grimoireTools() {
     var art = document.querySelector('article.pg-grimoire'), m = /\/manuscript\/([a-z-]+)\/?$/.exec(location.pathname);
     if (!art || !m || !GRIMOIRE_TOOLS[m[1]] || art.querySelector('.tools-toggle')) return;
     var box = document.createElement('details');
     box.className = 'toggle tools-toggle';
     box.innerHTML = '<summary>Enchanted Tools</summary><div class="link-flow">' + GRIMOIRE_TOOLS[m[1]].map(function (t) {
-      return '<p class="page-link tool-page"><a href="' + esc(url(t[0])) + '">' + t[1] + '</a></p>';
+      return '<p class="page-link tool-page"><a href="' + esc(url(t[0])) + '">' + t[1] + '</a>' + toolNote(t) + '</p>';
     }).join('') + '</div>';
     var guide = [].filter.call(art.querySelectorAll('.mm-callout details.toggle'), function (d) { return /Guide Pages/.test(d.querySelector('summary').textContent); })[0];
     if (guide) guide.after(box);
