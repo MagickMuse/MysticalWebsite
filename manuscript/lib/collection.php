@@ -191,7 +191,7 @@ function collection_part(array $v): bool
     if (empty($_GET['part']) || ($v['listKey'] !== '' && ($_GET['list'] ?? '') !== $v['listKey'])) return false;
     header('Content-Type: text/html; charset=utf-8');
     $offset = ($v['state']['page'] - 1) * COLLECTION_PAGE;
-    echo collection_items(array_slice($v['rows'], $offset, COLLECTION_PAGE), $v['state']['sort'], $v['metric']);
+    echo collection_items(array_slice($v['rows'], $offset, COLLECTION_PAGE), $v['state']['sort'], $v['metric'], list_is_gallery($v['c']));
     // The next batch's address, without the #anchor, so "&part=1" can be added to it.
     if ($offset + COLLECTION_PAGE < count($v['rows'])) echo '<li class="more-row" data-next="' . e(preg_replace('/#.*$/', '', view_link($v, ['page' => $v['state']['page'] + 1]))) . '"></li>';
     return true;
@@ -274,10 +274,10 @@ function collection_html(array $v, bool $withHeading): string
             $name = str_starts_with($val, 'No ') ? '<span class="pill">' . e($val) . '</span>'
                 : '<a class="pill" href="' . e($link(['filters' => $f, 'group' => ''])) . '" title="Only ' . e($val) . '">' . e($val) . '</a>';
             $list .= '<section class="col-group"><h3>' . $name . ' <small>' . count($items) . '</small></h3>'
-                . '<ul class="entry-grid' . gallery_class($v['c']) . '">' . collection_items(array_slice($items, 0, GROUP_PREVIEW), $state['sort'], $metric) . '</ul>' . $more . '</section>';
+                . '<ul class="entry-grid' . gallery_class($v['c']) . '">' . collection_items(array_slice($items, 0, GROUP_PREVIEW), $state['sort'], $metric, list_is_gallery($v['c'])) . '</ul>' . $more . '</section>';
         }
     } else {
-        $list = '<ul class="entry-grid' . gallery_class($v['c']) . '" data-col-list>' . collection_items(array_slice($rows, 0, COLLECTION_PAGE * $state['page']), $state['sort'], $metric) . '</ul>';
+        $list = '<ul class="entry-grid' . gallery_class($v['c']) . '" data-col-list>' . collection_items(array_slice($rows, 0, COLLECTION_PAGE * $state['page']), $state['sort'], $metric, list_is_gallery($v['c'])) . '</ul>';
         if (COLLECTION_PAGE * $state['page'] < $total) {
             $next = view_link($v, ['page' => $state['page'] + 1]);
             $part = preg_replace('/#.*$/', '', $next);
@@ -301,7 +301,7 @@ function view_collection(array $c): void
     layout($c['title'], $html, ['private' => true, 'protect' => true]);
 }
 
-function collection_items(array $rows, string $sort, array $metric): string
+function collection_items(array $rows, string $sort, array $metric, bool $gallery): string
 {
     $out = '';
     foreach ($rows as $e) {
@@ -310,7 +310,7 @@ function collection_items(array $rows, string $sort, array $metric): string
             'popular' => isset($metric[$e['id']]) ? '<small class="metric">' . $metric[$e['id']] . ' views</small>' : '',
             default => '',
         };
-        $out .= '<li><a href="' . e(page_url($e)) . '">' . (is_gallery($e['grimoire']) ? gallery_pic($e) : entry_icon($e)) . '<span>' . e($e['title']) . '</span>' . $badge . '</a></li>';
+        $out .= '<li><a href="' . e(page_url($e)) . '">' . ($gallery ? gallery_pic($e) : entry_icon($e)) . '<span>' . e($e['title']) . '</span>' . $badge . '</a></li>';
     }
     return $out;
 }
@@ -353,9 +353,18 @@ function is_gallery(string $grimoire): bool
     return in_array($grimoire, (array) config('gallery_grimoires', ['plant', 'mineral', 'rune', 'symbol', 'card']), true);
 }
 
+/**
+ * Whether a list shows its entries as pictures: lists in a gallery grimoire, except spreads (Tarot Spreads, Lenormand
+ * Spreads…), whose pictures are big layouts that only make sense on the spread's own page.
+ */
+function list_is_gallery(array $c): bool
+{
+    return is_gallery((string) $c['grimoire']) && !preg_match('/\bspreads?\b/i', (string) ($c['title'] ?? ''));
+}
+
 function gallery_class(array $c): string
 {
-    return is_gallery((string) $c['grimoire']) ? ' gallery gal-' . e((string) $c['grimoire']) : '';
+    return list_is_gallery($c) ? ' gallery gal-' . e((string) $c['grimoire']) : '';
 }
 
 /** The entry's gallery picture: its preview (made on import from the cover), else its picture icon or emoji, else a ✦. */
