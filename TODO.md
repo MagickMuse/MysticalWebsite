@@ -21,9 +21,7 @@ _Last updated: November 21, 2026_
 - [ ] **Try Share on your phone:** Draw a Card or Pull a Rune → Share should open your phone's share menu with the picture.
 - [ ] **Try the new tools on the preview:** Do this spread (any tarot spread page), the Dream Decoder (Dreams), Planetary
       Hours (Timing; it asks for your location once), the moon on the Calendar, and Save to notes after a pull.
-- [ ] **Product pictures (optional):** a picture for each Market product (Witchcraft 101 and 111, the Blank Grimoire, the
-      Crystal Grimoire; the Manuscript has its shelf and Protection page pictures). Shared links and Google show the Manuscript picture until then, and Google Shopping needs one.
-      Send them to Claude to add.
+- [x] **Product pictures:** all five Market products have theirs (from Stripe and Gumroad).
 - [ ] **Rune pictures:** 18 runes still have no picture (Erda, Sol, Ul, Ziu, Hulinhjalmur, Wolfsangel and some letters
       of the less certain alphabets). Say which should get one and which are meant to stay blank.
 - [ ] **Review the beginner path's 30 days:** `manuscript/beginner-path.php`, one line per day; reorder or swap freely.

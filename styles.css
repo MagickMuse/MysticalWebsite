@@ -186,9 +186,9 @@ main:not(.mm-main) > section + section { border-top: var(--leaded); }
 .arch.gilt { box-shadow: inset 0 0 0 1px var(--gold); }
 /* Photos: one burgundy duotone everywhere, so every picture looks printed in the same ink.
    Grayscale first, then burgundy multiplied over it (::before; the gilt line stays on ::after, above it).
-   Market product pictures (.shop-art) keep their real colors: they show the template itself. */
-.frame:not(.shop-art) img { filter: grayscale(1) contrast(1.04) brightness(1.18); }
-.frame:not(.shop-art):has(img)::before {
+   Market product pictures (.shop-pic) aren't in frames, so they keep their real colors. */
+.frame img { filter: grayscale(1) contrast(1.04) brightness(1.18); }
+.frame:has(img)::before {
   content: ""; position: absolute; inset: 0; z-index: 1; background: #7a1f2b; opacity: .46; mix-blend-mode: multiply;
   pointer-events: none; border-radius: inherit;
 }
@@ -1012,16 +1012,20 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 .shop-card { text-align: center; justify-items: center; transition: border-color .3s; }
 .shop-card:hover { border-color: var(--gold); }
 .shop-card.featured { border-color: var(--gold); }
-.shop-art { width: 100%; max-width: 240px; aspect-ratio: 4 / 5; }
-.shop-card .shop-art:not(:has(img)) { max-width: 150px; aspect-ratio: 3 / 4; }
-.shop-art .spark { font-size: 2.4rem; background: var(--gold); }
+/* Product pictures show whole, whatever their shape: full width across the top of the card or product page. */
+.shop-pic { margin: 0; width: 100%; }
+.shop-pic img { display: block; width: 100%; height: auto; }
+.shop-card .shop-pic { margin: -2.2rem -1.8rem .4rem; width: calc(100% + 3.6rem); border-bottom: 1px solid var(--line); }
+.shop-card .shop-pic img { aspect-ratio: 12 / 5; object-fit: cover; object-position: top; }
+.shop-card .shop-pic.wide img { object-position: center; } /* a banner keeps its middle, where its title is */
 .price.big { font-size: 1.9rem; line-height: 1.1; }
 .product {
   display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(2rem, 6vw, 5rem);
   align-items: start; max-width: 1100px; margin-inline: auto;
 }
-.product .shop-art { max-width: 420px; justify-self: center; }
-.product:not(:has(.shop-art)) { grid-template-columns: minmax(0, 1fr); max-width: 760px; }
+.product:has(.shop-pic) { grid-template-columns: minmax(0, 1fr); max-width: 820px; }
+.product .shop-pic img { max-height: 560px; width: auto; max-width: 100%; margin-inline: auto; border: 1px solid var(--line); }
+.product:not(:has(.shop-pic)) { grid-template-columns: minmax(0, 1fr); max-width: 760px; }
 .shop-card { padding: 2.2rem 1.8rem; align-content: start; }
 .product-text { display: grid; gap: 1.2rem; }
 .product-text h1 { font-size: clamp(2.6rem, 6vw, 4.2rem); }

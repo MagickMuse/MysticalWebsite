@@ -63,10 +63,15 @@ function price_label(array $p): string
 
 function product_image(array $p): string
 {
-    // No picture, no frame: an empty arch with a star looked like a missing image.
+    // No picture, no frame: an empty frame looked like a missing image.
     if (empty($p['image'])) return '';
-    $src = preg_match('~^https?://~', $p['image']) ? $p['image'] : site_url($p['image']);
-    return '<div class="frame arch shop-art"><img src="' . e($src) . '" alt="" loading="lazy"></div>';
+    if (preg_match('~^https?://~', $p['image'])) return '<figure class="shop-pic"><img src="' . e($p['image']) . '" alt="" loading="lazy"></figure>';
+    // A picture of ours: its size (so the page doesn't jump as it loads) and its version, from the file itself.
+    [$w, $h] = @getimagesize(dirname(MM_ROOT) . '/' . $p['image']) ?: [0, 0];
+    // A banner (much wider than tall) is cropped to its middle in the Market's cards, where its title is; others to their top.
+    $wide = $w && $w > 2 * $h ? ' wide' : '';
+    return '<figure class="shop-pic' . $wide . '"><img src="' . e(asset_url(site_url($p['image']), $p['image'])) . '" alt=""'
+        . ($w ? ' width="' . $w . '" height="' . $h . '"' : '') . ' loading="lazy"></figure>';
 }
 
 function product_files(string $slug): array
@@ -98,11 +103,11 @@ function view_shop(): void
     foreach (products() as $slug => $p) {
         $p['slug'] = $slug;
         if (!empty($p['hidden'])) continue;
-        $cards .= '<a class="card shop-card" href="' . e(site_url('market/' . $slug)) . '">'
+        $cards .= '<a class="card shop-card" href="' . e(site_url('market/' . $slug)) . '">' . product_image($p)
             . '<h3>' . e(short_name($p)) . '</h3><p>' . e($p['tagline'] ?? '') . '</p><p class="price">' . e(price_label($p)) . '</p></a>';
     }
     // The Manuscript itself leads the shop.
-    $ms = '<a class="card shop-card featured" href="' . e(url('join')) . '">'
+    $ms = '<a class="card shop-card featured" href="' . e(url('join')) . '">' . product_image(['image' => 'assets/products/manuscript.webp'])
         . '<h3>The Magick Manuscript</h3><p>15 cross-linked grimoires, 20,000+ pages, growing weekly.</p><p class="price">Membership</p></a>';
     layout('Market', <<<HTML
 <section class="mm-hero">
@@ -151,7 +156,8 @@ function view_product(array $p): void
         . '<h1>' . e(short_name($p)) . '</h1>' . $full . '<p class="price big">' . e(price_label($p)) . '</p>'
         . $includes . $action . $refund
         . '<div class="mm-prose product-desc">' . $desc . '</div>' . community_links() . '</div></article>',
-        ['index' => true, 'section' => 'market', 'description' => $p['tagline'] ?? '', 'ld' => [product_ld($p)]]);
+        ['index' => true, 'section' => 'market', 'description' => $p['tagline'] ?? '', 'ld' => [product_ld($p)],
+            'image' => !empty($p['image']) ? (preg_match('~^https?://~', $p['image']) ? $p['image'] : site_url($p['image'])) : null]);
 }
 
 /**

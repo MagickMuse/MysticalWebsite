@@ -1,7 +1,8 @@
 <?php
 /*
  * The shop's product catalog: names, prices and descriptions shown publicly on /market.
- * Imported from the Gumroad listings. Edit freely. Prices are in cents.
+ * Imported from the Gumroad listings. Edit freely. Prices are in cents. Pictures are in assets/products/ (any shape:
+ * they show whole, full width, at the top of the product's card and page).
  *
  * Delivery links (Google Classroom, Notion duplicate links) are NOT kept here, because this
  * repository is public. They go in the private config file under 'product_links'.
@@ -11,6 +12,7 @@
  */
 return [
     'witchcraft-101' => [
+        'image' => 'assets/products/witchcraft-101.webp',
         'name' => 'Witchcraft 101: Foundations of Magick ✧ Self-Paced Beginner Course',
         'short_name' => 'Witchcraft 101',
         'kind' => 'Course',
@@ -26,6 +28,7 @@ return [
 HTML,
     ],
     'witchcraft-111' => [
+        'image' => 'assets/products/witchcraft-111.webp',
         'name' => 'Witchcraft 111: Intro to Magickal Practices ✧ Self-Paced Beginner Course',
         'short_name' => 'Witchcraft 111',
         'kind' => 'Course',
@@ -41,6 +44,7 @@ HTML,
 HTML,
     ],
     'blank-grimoire' => [
+        'image' => 'assets/products/blank-grimoire.webp',
         'name' => 'Blank Interconnected 14 Grimoires ✧ Notion Template Framework',
         'short_name' => 'The Blank Grimoire',
         'kind' => 'Notion template',
@@ -56,6 +60,7 @@ HTML,
 HTML,
     ],
     'crystal-grimoire' => [
+        'image' => 'assets/products/crystal-grimoire.webp',
         'name' => 'Free Blank Crystal Grimoire ✧ Notion Starter Database',
         'short_name' => 'Blank Crystal Grimoire',
         'kind' => 'Free Notion template',
