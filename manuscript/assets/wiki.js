@@ -638,6 +638,24 @@
     if (wide.addEventListener) wide.addEventListener('change', apply);
   })();
 
+  // The header's search (the magnifying glass) and My Profile menu: one open at a time; they close on a click anywhere
+  // else, or Escape. The search box is ready to type in as soon as it opens.
+  var hdrMenus = document.querySelectorAll('.search-menu, .acct-menu');
+  hdrMenus.forEach(function (d) {
+    d.addEventListener('toggle', function () {
+      if (!d.open) return;
+      hdrMenus.forEach(function (o) { if (o !== d) o.open = false; });
+      var q = d.querySelector('input[type="search"]'); if (q) q.focus();
+    });
+  });
+  if (hdrMenus.length) {
+    document.addEventListener('click', function (e) { hdrMenus.forEach(function (d) { if (d.open && !d.contains(e.target)) d.open = false; }); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      hdrMenus.forEach(function (d) { if (d.open) { d.open = false; d.querySelector('summary').focus(); } });
+    });
+  }
+
   // Visitors: anything inside the Manuscript (a book, a connection, a link) opens the join pop-up,
   // except the pages anyone can read. Runs first (capture), so the book animation never starts for them.
   (function () {

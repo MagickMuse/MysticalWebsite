@@ -319,12 +319,17 @@ function layout(string $title, string $body, array $opt = []): void
     header('Vary: Cookie');
 
     $email = current_email();
-    // Signed in: their profile, and signing out (a form, so a link elsewhere can't sign anyone out). Otherwise: Login.
+    // Signed in: "My Profile", opening a little menu (signing out is a form, so a link elsewhere can't sign anyone out).
+    // Signed out: Login.
     $acct = $email
-        ? '<a href="' . e(url('account')) . '">My Profile</a><span class="dot" aria-hidden="true">·</span>'
-            . '<form method="post" action="' . e(url('logout')) . '"><input type="hidden" name="csrf" value="' . e(csrf_token()) . '">'
-            . '<button class="as-link" type="submit">Sign Out</button></form>'
-        : '<a href="' . e(url('login')) . '">Login</a>';
+        ? '<details class="acct-menu"><summary>My Profile</summary><ul>'
+            . '<li><a href="' . e(url('account')) . '">My Profile</a></li>'
+            . '<li><a href="' . e(url('saved')) . '">Saved Pages</a></li>'
+            . '<li><a href="' . e(url('notes/')) . '">My Notes</a></li>'
+            . '<li><a href="' . e(site_url('settings')) . '">Display</a></li>'
+            . '<li><form method="post" action="' . e(url('logout')) . '"><input type="hidden" name="csrf" value="' . e(csrf_token()) . '">'
+            . '<button type="submit">Sign Out</button></form></li></ul></details>'
+        : '<a class="acct-login" href="' . e(url('login')) . '">Login</a>';
     $q = e($_GET['q'] ?? '');
     $section = $opt['section'] ?? 'manuscript'; // which main-menu item is marked as the current page
     $robots = !empty($opt['index']) ? 'index, follow' : 'noindex, nofollow';
@@ -388,16 +393,19 @@ function layout(string $title, string $body, array $opt = []): void
         <li><a href="<?= e(site_url('mythos')) ?>"><span>Mythos</span><small>our story</small></a></li>
       </ul>
     </nav>
-  </div>
-  <div class="wrap mm-bar">
-    <?php if (has_access() && $section === 'manuscript'): // the search is for the Manuscript's own pages ?>
-    <form class="mm-search" action="<?= e(url('search')) ?>" method="get" role="search">
-      <label class="sr-only" for="mm-q">Search the Manuscript</label>
-      <input id="mm-q" type="search" name="q" value="<?= $q ?>" placeholder="Search the Manuscript: protection, rose quartz, Hekate…">
-      <button class="btn" type="submit">Search</button>
-    </form>
-    <?php endif ?>
-    <div class="mm-acct"><?= $acct ?></div>
+    <div class="nav-tools">
+      <?php if (has_access() && $section === 'manuscript'): // the search is for the Manuscript's own pages: a magnifying glass that opens it ?>
+      <details class="search-menu">
+        <summary aria-label="Search the Manuscript" title="Search the Manuscript"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></summary>
+        <form class="mm-search" action="<?= e(url('search')) ?>" method="get" role="search">
+          <label class="sr-only" for="mm-q">Search the Manuscript</label>
+          <input id="mm-q" type="search" name="q" value="<?= $q ?>" placeholder="Search the Manuscript: protection, rose quartz, Hekate…">
+          <button class="btn" type="submit">Search</button>
+        </form>
+      </details>
+      <?php endif ?>
+      <div class="mm-acct"><?= $acct ?></div>
+    </div>
   </div>
 </header>
 <main id="main" class="wrap mm-main">

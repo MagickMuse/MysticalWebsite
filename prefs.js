@@ -119,7 +119,7 @@
       var r = document.querySelector('form[data-prefs] input[name="theme"][value="' + p.theme + '"]');
       if (r) r.checked = true;
     });
-    bar.appendChild(btn);
+    (bar.querySelector('.nav-tools') || bar).appendChild(btn); // the Manuscript's header: after the search and profile
     if (darkQuery && darkQuery.addEventListener) darkQuery.addEventListener('change', function () { syncToggle(btn); themeColor(); });
     document.addEventListener('change', function (e) { if (e.target && e.target.name === 'theme') syncToggle(btn); });
   }
