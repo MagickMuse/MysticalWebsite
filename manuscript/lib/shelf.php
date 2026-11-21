@@ -45,7 +45,7 @@ function real_book(array $g, int $n, int $i): string
     $tone = shelf_tone($i);
     $len = ' n' . max(3, min(16, mb_strlen($label))); // letters on the spine, so the title can size itself to fit
     // One grimoire stands face out, its cover showing, with an "Open me" seal: it shows at a glance that the books open.
-    $faced = $g['grimoire'] === (string) config('shelf_facing', 'correspondence');
+    $faced = $g['grimoire'] === (string) config('shelf_facing', ''); // none by default: every book shows its spine
     $size = isset(SPINE_SIZES[$g['grimoire']]) ? ' ' . SPINE_SIZES[$g['grimoire']] : '';
     return '<a class="bk ' . $tone . $size . ($faced ? ' faced' : '') . '" href="' . e(page_url($g)) . '"'
         . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '')) . '"'
@@ -98,23 +98,20 @@ function stack_html(array $stack, string $side): string
     return $html . '</div>';
 }
 
-/** The grimoires standing on two shelves in alphabetical order, with a flat stack at the end of each; shelves scroll on narrow screens. */
+/**
+ * The grimoires standing on one long shelf in alphabetical order: the flat stack of guide books at the start, the
+ * candles at the end. On a screen too narrow for all of it, it is drawn a little smaller (assets/wiki.js), then scrolls.
+ */
 function bookshelf_html(array $grimoires, array $counts): string
 {
-    $up = [];
-    foreach (array_values($grimoires) as $i => $g) $up[] = real_book($g, $counts[$g['grimoire']] ?? 0, $i);
-    $half = (int) ceil(count($up) / 2);
-    $rows = [array_slice($up, 0, $half), array_slice($up, $half)];
-    $rows[0][] = stack_html(SHELF_STACKS['top'], 'at-end');
-    array_unshift($rows[1], stack_html(SHELF_STACKS['bottom'], 'at-start'));
-    $html = '';
-    foreach ($rows as $k => $row) {
-        $html .= '<section class="carousel" aria-label="' . ($k === 0 ? 'Top shelf' : 'Bottom shelf') . '">'
-            . '<button class="car-btn prev" type="button" aria-label="Previous grimoires" data-car="-1">‹</button>'
-            . '<div class="car-track" data-carousel>' . implode('', $row) . '</div>'
-            . '<button class="car-btn next" type="button" aria-label="More grimoires" data-car="1">›</button>'
-            . '<div class="ledge" aria-hidden="true"></div></section>';
-    }
+    $row = [stack_html(SHELF_STACKS['bottom'], 'at-start')];
+    foreach (array_values($grimoires) as $i => $g) $row[] = real_book($g, $counts[$g['grimoire']] ?? 0, $i);
+    $row[] = stack_html(SHELF_STACKS['top'], 'at-end');
+    $html = '<section class="carousel one-shelf" aria-label="The shelf">'
+        . '<button class="car-btn prev" type="button" aria-label="Previous grimoires" data-car="-1">‹</button>'
+        . '<div class="car-track" data-carousel>' . implode('', $row) . '</div>'
+        . '<button class="car-btn next" type="button" aria-label="More grimoires" data-car="1">›</button>'
+        . '<div class="ledge" aria-hidden="true"></div></section>';
     // Phones: every grimoire lying flat in one alphabetical pile, the candles on top and the titled stack books at the base.
     $pile = '';
     foreach (array_values($grimoires) as $i => $g) $pile .= pile_book($g, $counts[$g['grimoire']] ?? 0, $i);

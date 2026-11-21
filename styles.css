@@ -1551,6 +1551,10 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 
 /* ---------- the Manuscript home: the grimoire spines on two shelves, in the site's colours ---------- */
 .carousel { position: relative; max-width: 1200px; margin: 0 auto; padding: 0 2.6rem; }
+.carousel.one-shelf { max-width: none; } /* one long shelf: the page's full width (wiki.js draws it smaller if it still doesn't fit) */
+/* "Need some guidance?" under the shelf, leading to Begin Here */
+.shelf-guide { text-align: center; max-width: none; margin: 1.4rem auto 0; font-family: var(--display); font-style: italic; font-size: 1.3rem; color: var(--muted); }
+.shelf-guide a { color: var(--accent-text); text-decoration-color: var(--gold); text-underline-offset: .2em; }
 .car-track {
   display: flex; align-items: flex-end; gap: 6px; justify-content: safe center; height: 340px; padding: 24px 4px 0;
   overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth; overscroll-behavior-x: contain;

@@ -20,16 +20,15 @@ function view_home(): void
         return true;
     }));
     usort($grimoires, fn($a, $b) => strnatcasecmp($a['title'], $b['title']));
-    $count = grimoire_count_word();
-    $total = number_format((int) db()->query("SELECT COUNT(*) FROM pages WHERE kind IN ('entry', 'guide')")->fetchColumn());
-
-    // The grimoires as books on one row (a carousel).
+    // The grimoires as books on one long shelf.
     $counts = db()->query("SELECT grimoire, COUNT(*) FROM pages WHERE kind = 'entry' GROUP BY grimoire")->fetchAll(PDO::FETCH_KEY_PAIR);
     $cards = bookshelf_html($grimoires, $counts);
     if (!$grimoires) {
         $cards = '<p class="lede">Nothing has been moved over yet. Run the importer (see README) to bring grimoires in from Notion.</p>';
     }
-    $join = $begin ? '<div class="actions"><a class="btn" href="' . e(page_url($begin)) . '">Begin Here</a></div>' : '';
+    $join = '';
+    // Under the shelf, a quiet way in for anyone unsure where to start.
+    $guide = $begin ? '<p class="shelf-guide">Need some <a href="' . e(page_url($begin)) . '">guidance</a>?</p>' : '';
     // A member's own reading (beginner path, continue reading, a random page) sits under the shelf, not above it:
     // above the shelf there is only the title, one sentence and the way in.
     $yours = $member ? '<section class="mm-yours" aria-label="Your reading">' . path_home_line() . '</section>' : '';
@@ -42,10 +41,11 @@ function view_home(): void
     layout('The Magick Manuscript', <<<HTML
 <section class="mm-hero">
   <h1>The Magick Manuscript</h1>
-  <p class="lede">{$count} cross-linked grimoires and {$total} pages. Follow a thread from a deity to the herb to the day of the week to the ritual that uses all three.</p>
+  <p class="lede">Choose a book from the shelf, and let your journey begin.</p>
   $join
 </section>
 $cards
+$guide
 $yours
 HTML, $member ? ['private' => true, 'protect' => true]
     : ['index' => true, 'protect' => true, 'description' => 'The Magick Manuscript: a members-only, cross-linked digital grimoire by The Magick Muse.']);

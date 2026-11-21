@@ -299,7 +299,7 @@
       + influenceCards(R)
       + (R.intents.length ? '<div class="glance-favs"><p class="eyebrow">Today Favors</p><div class="favs">' + R.intents.slice(0, 6).map(function (x) { return favourLink(x, true); }).join('') + '</div></div>' : '')
       + '<p class="glance-more"><a class="btn ghost" href="' + esc(url('today/')) + '">See Today’s Correspondences</a></p>';
-    after.after(box);
+    (document.querySelector('.shelf-guide') || after).after(box); // below "Need some guidance?", which stays right under the shelf
   }
 
   // ------------------------------------------------------------------ Spell Builder

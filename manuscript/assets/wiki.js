@@ -716,8 +716,26 @@
       c.classList.toggle('fits', track.scrollWidth <= track.clientWidth + 2 + 170);
       btns.forEach(function (b) { b.disabled = b.getAttribute('data-car') === '-1' ? track.scrollLeft <= 2 : track.scrollLeft >= max; });
     }
+    // The one long shelf: on a screen too narrow for all of it, draw it a little smaller (down to 64%), so the whole
+    // shelf shows at once; past that it scrolls. Measured with every book closed.
+    function fit() {
+      if (!c.classList.contains('one-shelf')) return;
+      track.style.zoom = '';
+      var need = 8;
+      [].forEach.call(track.children, function (k) { need += k.getBoundingClientRect().width + 6; });
+      var z = Math.max(0.64, Math.min(1, (track.clientWidth - 4) / need));
+      // Then trim until nothing spills over (the flat stack's books reach a little past their box).
+      for (var tries = 0; z < 1 && tries < 4; tries++) {
+        track.style.zoom = String(Math.floor(z * 1000) / 1000);
+        if (track.scrollWidth <= track.clientWidth + 1) break;
+        z = Math.max(0.64, z * (track.clientWidth / track.scrollWidth) - 0.005);
+      }
+      if (z >= 1) track.style.zoom = '';
+    }
+    fit();
     btns.forEach(function (b) { b.addEventListener('click', function () { track.scrollBy({ left: +b.getAttribute('data-car') * track.clientWidth * 0.8, behavior: 'smooth' }); }); });
-    track.addEventListener('scroll', sync, { passive: true }); track.addEventListener('transitionend', sync); window.addEventListener('resize', sync); sync();
+    track.addEventListener('scroll', sync, { passive: true }); track.addEventListener('transitionend', sync);
+    window.addEventListener('resize', function () { fit(); sync(); }); sync();
 
     // Hover opens a book to its cover. If that cover would be cut off at the edge of the row, the row glides
     // just far enough to show all of it. While the row is moving, covers stay as they are (no flicker).
