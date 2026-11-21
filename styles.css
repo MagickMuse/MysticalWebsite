@@ -578,6 +578,9 @@ mark {
   font-weight: 400; padding-inline: .05em;
 }
 .stars { list-style: none; padding-left: 0; }
+/* The Manuscript's tools on the Grimoires page: two columns where there's room. */
+.tool-list { max-width: 1000px; margin-inline: auto; columns: 2 22rem; column-gap: 3rem; }
+.tool-list li { break-inside: avoid; margin-bottom: .9rem; }
 .prose .stars { padding-left: 0; }
 .stars li { position: relative; padding-left: 1.8rem; }
 .stars li::before {
