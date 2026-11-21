@@ -26,16 +26,11 @@ function view_join(): void
             . '<label class="agree"><input type="checkbox" name="agree" value="1" required> I agree to the <a href="#terms">Terms of Access</a></label>'
             . '<button class="btn" type="submit">' . e($plan['button'] ?? 'Get access') . '</button></form>';
     }
-    $highlights = '';
-    foreach ($copy['highlights'] as [$title, $text]) {
-        $highlights .= '<li><strong>' . e($title) . '</strong> ' . e($text) . '</li>';
-    }
     $login = e(url('login'));
     $note = has_access() ? '<p class="notice">You already have full access. <a href="' . e(url()) . '">Open the Manuscript</a>.</p>' : '';
     // A code from a link (e.g. the SEEKER10 pop-up) is applied quietly at checkout; no note on the page.
-    $desc = safe_html($copy['description_html']);
+    $desc = join_copy_html($copy);
     $terms = safe_html($copy['terms_html']);
-    $community = community_links();
     layout('Join the Manuscript', <<<HTML
 <section class="mm-hero narrow">
   <p class="eyebrow">Membership</p>
@@ -46,9 +41,7 @@ function view_join(): void
 </section>
 <div class="join-layout">
   <section class="join-copy">
-    <div class="mm-prose">$desc</div>
-    <ul class="highlights">$highlights</ul>
-    $community
+    $desc
     <details class="terms" id="terms"><summary>Terms of Access</summary><div class="mm-prose">$terms</div></details>
   </section>
   <aside class="join-plans" id="plans" aria-label="Membership plans">
@@ -75,6 +68,39 @@ function membership_ld(): array
     return ['@type' => 'Product', 'name' => 'The Magick Manuscript', 'brand' => ['@type' => 'Brand', 'name' => 'The Magick Muse'],
         'description' => '20,000+ pages of witchcraft research in one online grimoire: 15 cross-linked grimoires sourced from published books.',
         'image' => [site_url('assets/og-manuscript.jpg'), site_url('assets/manuscript-protection.jpg')], 'offers' => $offers];
+}
+
+/** Copy text: escaped, with *stars* around words turned into gold highlights. */
+function copy_text(string $t): string
+{
+    return preg_replace('/\*([^*]+)\*/u', '<strong class="gold">$1</strong>', e($t));
+}
+
+/** The join page's description (manuscript-copy.php), each part in its own design. */
+function join_copy_html(array $c): string
+{
+    $o = $c['opening'];
+    $html = '<div class="jc-open"><p class="jc-quote">' . copy_text($o['quote']) . '</p><p>' . copy_text($o['text']) . '</p>'
+        . '<p class="jc-reveal">' . copy_text($o['reveal']) . '</p></div>';
+    $html .= '<dl class="jc-stats">' . implode('', array_map(fn($s) => '<div><dt>' . e($s[0]) . '</dt><dd>' . e($s[1]) . '</dd></div>', $c['stats'])) . '</dl>';
+    $html .= '<p class="jc-about">' . copy_text($c['about']) . '</p>';
+    $html .= '<ul class="jc-grimoires" aria-label="The fifteen grimoires">' . implode('', array_map(fn($g) => '<li>' . e($g) . '</li>', $c['grimoires'])) . '</ul>';
+    // A look inside: the Protection page as members see it, leading to the free sneak peek of it.
+    if (is_file(dirname(MM_ROOT) . '/assets/manuscript-protection.jpg')) {
+        $peek = sneak_peek_page() ? url('sneak-peek') : '';
+        $img = '<img src="' . e(asset_url(site_url('assets/manuscript-protection.jpg'), 'assets/manuscript-protection.jpg')) . '" alt="The Protection page in the Manuscript: its connections to animals, astrology and dreams beside its guide to protective magick" width="1600" height="1200" loading="lazy">';
+        $html .= '<figure class="jc-peek">' . ($peek ? '<a href="' . e($peek) . '">' . $img . '</a>' : $img)
+            . '<figcaption><span class="eyebrow">A Look Inside</span> The Protection page, exactly as members see it.'
+            . ($peek ? ' <a class="link" href="' . e($peek) . '">Read it free</a>' : '') . '</figcaption></figure>';
+    }
+    $html .= '<section class="jc-tools"><h2>' . copy_text($c['tools_heading']) . '</h2><p class="jc-lead">' . copy_text($c['tools_intro']) . '</p><ul>'
+        . implode('', array_map(fn($t) => '<li><span class="prop-glyph pi-' . e($t[0]) . '" aria-hidden="true"></span><h3>' . e($t[1]) . '</h3><p>' . copy_text($t[2]) . '</p></li>', $c['tools']))
+        . '</ul></section>';
+    $html .= '<section class="jc-gets"><h2>What You Get</h2><ul>' . implode('', array_map(fn($g) => '<li>' . copy_text($g) . '</li>', $c['gets'])) . '</ul></section>';
+    $html .= '<section class="jc-why"><h2>Why It’s Different</h2><ul>'
+        . implode('', array_map(fn($h) => '<li><h3>' . e($h[0]) . '</h3><p>' . copy_text($h[1]) . '</p></li>', $c['highlights'])) . '</ul></section>';
+    $html .= '<aside class="jc-closing"><p>' . copy_text($c['closing']) . '</p><p class="jc-urgent">' . copy_text($c['closing_note']) . '</p></aside>';
+    return $html;
 }
 
 function do_checkout(): void

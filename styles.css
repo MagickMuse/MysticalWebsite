@@ -1157,16 +1157,61 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 .product-desc > h3 { margin-top: var(--gap-h3-before); }
 .product-desc > h2 + * { margin-top: var(--gap-head); }
 .product-desc > h3 + * { margin-top: var(--gap-h3); }
-.highlights { list-style: none; margin: 0; padding: 1.6rem; display: grid; gap: .8rem; border: 1px solid var(--line); background: var(--surface); }
-.highlights li { padding-left: 1.4rem; position: relative; }
-.highlights li::before {
-  content: ""; position: absolute; left: 0; top: .45rem; width: .7rem; height: .7rem; background: var(--gold);
-  -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat;
-}
 .terms summary { cursor: pointer; font-size: .95rem; text-transform: none; }
 .terms .mm-prose { margin-top: var(--gap-text); font-size: .92rem; color: var(--muted); }
 .community { gap: 1.6rem; }
 .refund { margin-top: -.4rem; }
+/* The Join page's description (join_copy_html() in account.php): each part in its own design. */
+.join-copy { gap: clamp(2.2rem, 4vw, 3rem); }
+.join-copy strong.gold { color: var(--gold-text); font-weight: 600; }
+.jc-open p { font-size: 1.08rem; line-height: 1.75; margin: 0; }
+.jc-open .jc-quote { font-family: var(--display); font-style: italic; font-size: clamp(1.9rem, 3.4vw, 2.6rem); line-height: 1.2; margin-bottom: 1rem; }
+.jc-open .jc-reveal { font-family: var(--display); font-size: 1.7rem; line-height: 1.3; color: var(--gold-text); margin-top: 1.2rem; padding-left: 1rem; border-left: 2px solid var(--gold); }
+.jc-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; border-block: 1px solid var(--line); }
+.jc-stats div { padding: 1.3rem .6rem; text-align: center; }
+.jc-stats div + div { border-left: 1px solid var(--line); }
+@media (max-width: 600px) { /* two by two */
+  .jc-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .jc-stats div:nth-child(odd) { border-left: 0; }
+  .jc-stats div:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+.jc-stats dt { font-family: var(--display); font-size: clamp(2rem, 3.4vw, 2.7rem); line-height: 1; color: var(--gold-text); }
+.jc-stats dd { margin: .4rem 0 0; font-family: var(--display); font-style: italic; font-size: 1.05rem; color: var(--muted); }
+.jc-about { font-size: 1.05rem; line-height: 1.75; margin: 0; }
+.jc-grimoires { list-style: none; display: flex; flex-wrap: wrap; gap: .45rem; padding: 0; margin: -1.2rem 0 0; }
+.jc-grimoires li { border: 1px solid var(--line); background: var(--surface); padding: .25rem .75rem; font-size: .85rem; }
+.jc-peek { margin: 0; display: grid; gap: .7rem; }
+.jc-peek img { display: block; width: 100%; height: auto; border: 1px solid var(--gold); outline: 1px solid color-mix(in srgb, var(--gold) 45%, transparent); outline-offset: 5px; box-shadow: 0 18px 40px rgba(0, 0, 0, .3); }
+.jc-peek a:hover img { border-color: var(--accent); }
+.jc-peek figcaption { font-size: .95rem; color: var(--muted); }
+.jc-peek figcaption .eyebrow { display: block; margin-bottom: .1rem; }
+.join-copy h2 { font-family: var(--display); font-weight: 400; font-size: clamp(1.8rem, 3vw, 2.3rem); line-height: 1.2; margin: 0 0 .5rem; }
+.jc-lead { font-family: var(--display); font-style: italic; font-size: 1.2rem; color: var(--muted); margin: 0; }
+.jc-tools ul { list-style: none; padding: 0; margin: 1.4rem 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; }
+.jc-tools li { display: grid; grid-template-columns: auto 1fr; column-gap: .7rem; row-gap: .35rem; align-content: start; padding: 1.1rem 1.2rem; border: 1px solid var(--line); background: var(--surface); }
+.jc-tools li .prop-glyph { width: 1.4rem; height: 1.4rem; align-self: center; }
+.jc-tools li h3 { font-family: var(--display); font-weight: 400; font-size: 1.3rem; line-height: 1.2; margin: 0; align-self: center; }
+.jc-tools li p { grid-column: 1 / -1; margin: 0; font-size: .93rem; line-height: 1.55; }
+/* the calendar leads: wide, framed in gold */
+.jc-tools li:first-child { grid-column: 1 / -1; border-color: var(--gold); padding: 1.4rem 1.5rem; background: var(--texture), var(--bg); }
+.jc-tools li:first-child h3 { font-size: 1.6rem; color: var(--gold-text); }
+.jc-tools li:first-child p { font-size: 1rem; }
+.join-copy .jc-gets { padding: 1.6rem 1.8rem 1.8rem; border: 1px solid var(--gold); outline: 1px solid color-mix(in srgb, var(--gold) 45%, transparent); outline-offset: -8px; background: var(--texture), var(--bg); }
+.jc-gets ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
+.jc-gets li { position: relative; padding-left: 1.7rem; line-height: 1.55; }
+.jc-gets li::before, .jc-why li::before {
+  content: ""; position: absolute; left: 0; top: .38em; width: .85rem; height: .85rem; background: var(--gold);
+  -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat;
+}
+.jc-why ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1.4rem 1.8rem; }
+.jc-why li { position: relative; padding-top: .9rem; border-top: 2px solid var(--gold); }
+.jc-why li::before { top: -.5rem; left: 50%; transform: translateX(-50%); width: 1rem; height: 1rem; outline: 4px solid var(--bg); background: var(--gold); }
+.jc-why h3 { font-family: var(--display); font-weight: 400; font-size: 1.3rem; margin: 0 0 .3rem; }
+.jc-why p { margin: 0; font-size: .93rem; line-height: 1.55; color: var(--muted); }
+.jc-closing { text-align: center; padding: 2rem clamp(1.2rem, 4vw, 2.4rem); border: 1px solid var(--line); background: var(--surface); }
+.jc-closing p { margin: 0; line-height: 1.7; }
+.jc-closing .jc-urgent { font-family: var(--display); font-style: italic; font-size: 1.5rem; line-height: 1.3; color: var(--gold-text); margin-top: .8rem; }
+
 /* The Join page: the description on the left, the plans beside it, staying in view while the description scrolls.
    Narrow screens: one column, the plans after the description, with a "See Plans" button at the top to jump to them. */
 .join-layout {
