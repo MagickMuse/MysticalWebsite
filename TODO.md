@@ -11,9 +11,9 @@ _Last updated: November 21, 2026_
 - [x] **Key secrets:** `STRIPE_WEBHOOK_SECRET` and `SMTP_PASSWORD` saved; the upload fills them in by itself.
 - [ ] **Paste the settings:** GitHub → Settings → Secrets and variables → Actions → New repository secret, named
       `MANUSCRIPT_CONFIG_LIVE`, with the whole settings text Claude gave you (November 21).
-- [ ] **Website mailbox (your husband, in Hostinger):** hPanel → Emails → create `hello@magickmuse.com` (optionally
-      forward it to your Gmail), then put its password in the `SMTP_PASSWORD` secret instead of the Gmail one. Until
-      then sign-in emails still go out through Hostinger's own sending, just more likely to land in spam.
+- [x] **Website mailbox:** `hello@magickmuse.com` made in Hostinger.
+- [ ] **Its password in GitHub:** Settings → Secrets and variables → Actions → `SMTP_PASSWORD` → Update, with the
+      hello@magickmuse.com password (replacing the Gmail one). Optional: forward the mailbox to your Gmail in hPanel → Emails.
 - [ ] **Daily backups on Hostinger:** included on the Business plan; a small add-on on Premium. Members' notes live on the site.
 - [ ] **First upload:** GitHub → Actions → “Deploy live site” → Run workflow (Claude can walk you through it).
 - [ ] **Beginner path at 11:11:** hPanel → Advanced → Cron Jobs → Custom: minute `11,26,41,56`, everything else `*`, command
