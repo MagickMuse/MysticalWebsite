@@ -266,9 +266,10 @@ function calendar_html(array $days, callable $href, ?callable $events = null): s
             $ev = $p && $events ? $events($p) : [];
             $list = '';
             foreach (array_slice($ev, 0, 2) as [$icon, $name]) $list .= '<span class="cal-ev">' . ($icon ? '<i aria-hidden="true">' . e($icon) . '</i>' : '') . e($name) . '</span>';
-            if (count($ev) > 2) $list .= '<span class="cal-more">+' . (count($ev) - 2) . ' more</span>';
-            $label = $p ? $p['title'] . ($ev ? ': ' . implode(', ', array_column($ev, 1)) : '') : '';
-            $html .= '<li data-day="' . $d . '">' . ($p ? '<a href="' . e($href($p)) . '" aria-label="' . e($label) . '"><span class="cal-n">' . $d . '</span>' . $list . '</a>' : '<span><span class="cal-n">' . $d . '</span></span>') . '</li>';
+            // The link's name is what it shows (so voice control can say it), with the month and any hidden festivals added unseen.
+            if (count($ev) > 2) $list .= '<span class="cal-more">+' . (count($ev) - 2) . ' more<span class="sr-only">: ' . e(implode(', ', array_column(array_slice($ev, 2), 1))) . '</span></span>';
+            $month = date('F', mktime(0, 0, 0, $m, 1, 2024));
+            $html .= '<li data-day="' . $d . '">' . ($p ? '<a href="' . e($href($p)) . '"><span class="sr-only">' . $month . ' </span><span class="cal-n">' . $d . '</span>' . $list . '</a>' : '<span><span class="cal-n">' . $d . '</span></span>') . '</li>';
         }
         $html .= '</ol></section>';
     }

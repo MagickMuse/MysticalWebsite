@@ -193,6 +193,9 @@ main:not(.mm-main) > section + section { border-top: var(--leaded); }
   pointer-events: none; border-radius: inherit;
 }
 .grimoire .frame::before { display: none; }
+/* Night photographs (.night) are near-black; on parchment they read as a dark hole, so by day their blacks are lifted */
+:root[data-theme="light"] .frame.night img { filter: grayscale(1) contrast(.6) brightness(1.45); }
+@media (prefers-color-scheme: light) { :root:not([data-theme]) .frame.night img { filter: grayscale(1) contrast(.6) brightness(1.45); } }
 /* a closer crop, from the centre (the home page photo) */
 .frame.zoom img { transform: scale(1.2); }
 /* moved 8% left and 10% up; the photo has the arch's own shape, so it is enlarged to 120% (the least that keeps every edge filled) */
@@ -227,10 +230,10 @@ header.site {
 .nav nav { grid-column: 2; grid-row: 1; display: flex; justify-content: center; align-items: center; gap: clamp(1.2rem, 2.4vw, 2.4rem); }
 .nav ul { display: flex; align-items: center; gap: clamp(1.2rem, 2.4vw, 2.4rem); list-style: none; margin: 0; padding: 0; }
 .nav li { display: flex; align-items: center; }
-/* Header labels are set in lowercase, lightly tracked (wide tracking is for capitals) */
+/* Header labels in Title Case, as written, like the footer and the buttons; lightly tracked */
 .nav ul a {
   display: grid; justify-items: center; text-decoration: none; font-family: var(--body); font-size: .95rem;
-  letter-spacing: .04em; text-transform: lowercase; font-weight: 500; white-space: nowrap; line-height: 1.5;
+  letter-spacing: .04em; font-weight: 500; white-space: nowrap; line-height: 1.5;
   padding-inline: .2rem;
 }
 /* The footer's menu is names only: the header already says what each one is. */
@@ -253,7 +256,7 @@ html.nav-fold .nav ul a small { position: static; transform: none; opacity: 1; }
 .menu {
   display: none; grid-column: 2; grid-row: 1; justify-self: end; min-width: 44px; min-height: 44px; padding: .5rem .9rem;
   border: 1px solid var(--line); background: none; color: var(--ink); cursor: pointer;
-  font-family: var(--body); font-size: .95rem; letter-spacing: .04em; text-transform: lowercase; font-weight: 500;
+  font-family: var(--body); font-size: .95rem; letter-spacing: .04em; font-weight: 500;
 }
 /* Theme toggle: a pointed arch from the logo with a little sun in its window by day and a crescent moon by candlelight. */
 .theme-toggle {
@@ -304,11 +307,12 @@ html.nav-fold .nav ul a small { position: static; transform: none; opacity: 1; }
 }
 /* the one orchestrated moment: the arch opens, then the page inks in, line by line */
 @media (prefers-reduced-motion: no-preference) {
-  :root:not([data-motion="reduce"]) .opening-art .frame { animation: arch-open 1.2s cubic-bezier(.65, 0, .35, 1) both; }
-  :root:not([data-motion="reduce"]) .opening-page > * { animation: ink-in .9s ease both; }
-  :root:not([data-motion="reduce"]) .opening-page > :nth-child(1) { animation-delay: .55s; }
-  :root:not([data-motion="reduce"]) .opening-page > :nth-child(2) { animation-delay: .75s; }
-  :root:not([data-motion="reduce"]) .opening-page > :nth-child(3) { animation-delay: .95s; }
+  /* quick enough that the page's button is ready to tap within a second */
+  :root:not([data-motion="reduce"]) .opening-art .frame { animation: arch-open 1s cubic-bezier(.65, 0, .35, 1) both; }
+  :root:not([data-motion="reduce"]) .opening-page > * { animation: ink-in .6s ease both; }
+  :root:not([data-motion="reduce"]) .opening-page > :nth-child(1) { animation-delay: .1s; }
+  :root:not([data-motion="reduce"]) .opening-page > :nth-child(2) { animation-delay: .22s; }
+  :root:not([data-motion="reduce"]) .opening-page > :nth-child(3) { animation-delay: .34s; }
 }
 @keyframes arch-open { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes ink-in { from { opacity: 0; } to { opacity: 1; } }
@@ -331,6 +335,9 @@ html.nav-fold .nav ul a small { position: static; transform: none; opacity: 1; }
   margin-top: auto; font-family: var(--body); font-style: italic; font-size: 1rem; letter-spacing: 0;
   text-transform: none; color: var(--muted);
 }
+/* a short quote sits in the middle of its window rather than at the top with a gap below it */
+.praise .quote p { margin-block: auto; }
+.praise .quote p + cite { margin-top: 0; }
 .alt .praise .quote { background: var(--texture), var(--bg); }
 @media (max-width: 900px) { .praise { grid-template-columns: minmax(0, 1fr); max-width: 560px; } }
 
@@ -430,7 +437,7 @@ html.nav-fold .nav ul a small { position: static; transform: none; opacity: 1; }
 /* ---------- card grids ---------- */
 .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.4rem; }
 .card { display: grid; gap: .9rem; align-content: start; padding: var(--pad-panel); border: 1px solid var(--line); text-decoration: none; }
-.card h3 { font-size: 1.7rem; }
+.card h3, .shop-card h2 { font-size: 1.7rem; }
 .card p { color: var(--ink); }
 .alt .card p { color: var(--ink); }
 a.card { transition: border-color .3s; }
@@ -473,12 +480,14 @@ a.grimoire:hover .frame, a.grimoire:focus-visible .frame { outline-color: var(--
 /* ---------- journal posts ---------- */
 .posts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.4rem; }
 /* Cards are rectangles with a thin border, like the Market's: the photo fills the top, the text sits inside. */
-.post { display: grid; gap: .9rem; align-content: start; border: 1px solid var(--line); padding-bottom: 1.6rem; }
+.post { display: flex; flex-direction: column; gap: .9rem; border: 1px solid var(--line); padding-bottom: 1.6rem; }
+/* "Read More" sits at the foot of every card, level across a row whatever the title's length */
+.post > .link:last-child { margin-top: auto; }
 .post > :not(.frame) { margin-inline: 1.4rem; }
 .post .frame { aspect-ratio: 4 / 3; }
 .post h3 { font-size: 1.6rem; }
 .post p { color: var(--ink); }
-.post .link { justify-self: start; }
+.post .link { align-self: flex-start; }
 @media (max-width: 860px) { .posts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .posts { grid-template-columns: 1fr; } }
 
@@ -834,8 +843,8 @@ html.nav-fold .nav ul a { align-content: center; min-height: 52px; }
 }
 .mm-search input { flex: 1; min-width: 0; font: inherit; font-size: .95rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-right: 0; padding: .6rem .9rem; }
 .mm-search .btn { padding: .6rem 1.1rem; }
-.mm-acct { margin: 0; font-size: .9rem; letter-spacing: .04em; text-transform: lowercase; white-space: nowrap; }
-.mm-acct a { text-decoration: none; }
+.mm-acct { margin: 0; font-size: .9rem; letter-spacing: .04em; white-space: nowrap; }
+.mm-acct a { text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; padding-inline: .25rem; }
 .mm-acct a:hover { color: var(--accent-text); }
 
 /* My Account: a square card for each place to go (account.php view_account()) */
@@ -1045,7 +1054,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 }
 .suggest a:hover, .suggest a[aria-selected="true"] { background: var(--surface); color: var(--accent-text); }
 .suggest .all a { font-size: .95rem; text-transform: none; border-top: 1px solid var(--line); }
-/* The suggestions now open from the header, whose menu styles (a row of centred, lowercase links) mustn't reach them. */
+/* The suggestions now open from the header, whose menu styles (a row of centred links) mustn't reach them. */
 .nav .suggest:not([hidden]) { display: block; }
 .nav .suggest li { display: block; }
 .nav .suggest a { display: flex; padding: .55rem 1rem; justify-items: normal; text-align: left; white-space: normal; text-transform: none; letter-spacing: normal; font-weight: 400; font-size: 1rem; min-height: 0; line-height: 1.4; }
@@ -1056,7 +1065,11 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 .results .aka-s { text-transform: none; letter-spacing: 0; font-style: italic; font-family: var(--display); font-size: .95rem; }
 
 /* ---------- shop ---------- */
-.shop-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 300px)); justify-content: center; gap: 1.6rem; }
+/* wrapping rows that centre, so a short last row sits in the middle rather than alone on the left */
+.shop-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.6rem; }
+.shop-grid > .shop-card { flex: 0 1 300px; min-width: min(240px, 100%); display: grid; grid-template-rows: auto auto 1fr auto; }
+.shop-grid > .shop-card .price { align-self: end; }
+@media (max-width: 640px) { .shop-grid > .shop-card { flex-basis: 100%; } } /* phones: the page's full width, like every other page */
 .shop-card { text-align: center; justify-items: center; transition: border-color .3s; }
 .shop-card:hover { border-color: var(--gold); }
 .shop-card.featured { border-color: var(--gold); }
@@ -1075,7 +1088,15 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 .product .shop-pic img { max-height: 560px; width: auto; max-width: 100%; margin-inline: auto; border: 1px solid var(--line); }
 .product:not(:has(.shop-pic)) { grid-template-columns: minmax(0, 1fr); max-width: 760px; }
 .shop-card { padding: 2.2rem 1.8rem; align-content: start; }
-.product-text { display: grid; gap: 1.2rem; }
+.product-text, .product-buy, .product-more { display: grid; gap: 1.2rem; align-content: start; }
+/* wide screens: the picture across the top, then what it costs on the left (staying in view) and what it is on the right */
+@media (min-width: 1000px) {
+  .product:has(.shop-pic) { max-width: 1180px; }
+  .product .shop-pic img { width: 100%; max-height: none; }
+  .product-text { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); column-gap: clamp(3rem, 5vw, 5rem); }
+  .product-buy { position: sticky; top: 6rem; }
+  .product-more .product-desc > :first-child { margin-top: 0; }
+}
 .product-text h1 { font-size: clamp(2.6rem, 6vw, 4.2rem); }
 .product .mm-prose { padding-top: 0; margin: 0; max-width: none; }
 .includes { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
@@ -1161,8 +1182,22 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 @media (forced-colors: active) { .chart .bar { fill: CanvasText; } .chart .bar.series-2 { fill: GrayText; } }
 
 /* join page + product copy */
-.agree { display: flex; gap: .5rem; align-items: baseline; font-size: .85rem; color: var(--muted); }
-.agree input { accent-color: var(--accent); }
+.agree { display: flex; gap: .6rem; align-items: center; min-height: 44px; font-size: .85rem; color: var(--muted); cursor: pointer; }
+.agree a { padding-block: .7rem; margin-left: -.3rem; }
+/* the "I agree" box in the brand's colours: a gold-edged square that fills with a burgundy (gold by candlelight) tick */
+.agree input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none; flex: none; display: grid; place-content: center;
+  width: 1.5rem; height: 1.5rem; margin: 0; border: 1px solid var(--gold); background: var(--bg); cursor: pointer;
+}
+.agree input[type="checkbox"]::before {
+  content: ""; width: .9rem; height: .9rem; background: var(--accent); transform: scale(0); transition: transform .15s;
+  clip-path: polygon(14% 44%, 0 59%, 39% 98%, 100% 21%, 85% 7%, 38% 67%);
+}
+.agree input[type="checkbox"]:checked::before { transform: scale(1); }
+.agree input[type="checkbox"]:checked { border-color: var(--accent); }
+@media (forced-colors: active) { .agree input[type="checkbox"]::before { background: CanvasText; } }
+/* small links beside text: a taller tap area without moving the text */
+.center.small a, .lib-foot a { display: inline-block; padding-block: .6rem; margin-block: -.6rem; }
 .join-copy { max-width: 760px; margin: clamp(3rem, 7vw, 5rem) auto 0; display: grid; gap: 2rem; }
 .join-copy .mm-prose, .product-desc { padding-top: 0; margin: 0; max-width: none; }
 /* a product's description is long text: the same scale as the blog and the Manuscript */
@@ -1383,8 +1418,8 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 }
 .tool.search { flex: 1 1 260px; }
 .tool.search input { width: 100%; max-width: 420px; }
-.tool.check { letter-spacing: .08em; cursor: pointer; }
-.tool.check input { accent-color: var(--accent); }
+.tool.check { letter-spacing: .08em; cursor: pointer; display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; }
+.tool.check input { accent-color: var(--accent); width: 1.5rem; height: 1.5rem; margin: 0; flex: none; }
 .facets { display: grid; gap: .5rem; }
 .facet { display: grid; grid-template-columns: minmax(6rem, 9rem) minmax(0, 1fr); gap: .5rem; align-items: start; }
 .facet-name { font-family: var(--display); font-style: italic; font-size: 1.05rem; text-transform: none; color: var(--muted); padding-top: .3rem; }
@@ -1392,7 +1427,7 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 .facet-vals .fchip { color: var(--ink); }
 .facet-vals .fchip:hover, .facet-vals .fchip.on { color: var(--accent-text); }
 .fchip {
-  display: inline-flex; align-items: center; gap: .6rem; padding: .1rem 0; font-size: .88rem; text-decoration: none;
+  display: inline-flex; align-items: center; gap: .6rem; padding: .1rem 0; min-height: 28px; min-width: 24px; font-size: .88rem; text-decoration: none;
   color: var(--ink); line-height: 1.6;
 }
 .fchip small { color: var(--muted); font-size: .72rem; margin-left: -.3rem; }
@@ -1410,8 +1445,6 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 .col-count { font-size: .8rem; color: var(--muted); }
 .col-count a { color: var(--accent-text); }
 .col-group { margin-top: var(--gap-h3-before); }
-.col-group h2 { font-size: 1.2rem; font-family: var(--body); font-weight: 400; display: flex; align-items: center; gap: .6rem; margin-bottom: var(--gap-h3); }
-.col-group h2 small { font-size: .8rem; color: var(--muted); }
 .col-more { text-align: center; margin-top: var(--gap-actions); max-width: none; }
 .entry-grid .metric { margin-left: auto; font-size: .72rem; color: var(--muted); white-space: nowrap; }
 @media (max-width: 640px) { .facet { grid-template-columns: 1fr; } }
@@ -1459,13 +1492,13 @@ details.toggle > :not(summary) + :not(summary) { margin-top: var(--gap-text); }
 .atag span { color: var(--muted); }
 .atag:hover span { color: var(--accent-text); }
 .col-bar .col-count { margin-left: auto; }
-.col-group h3 {
+.col-group :is(h2, h3) {
   font-size: 1.05rem; font-family: var(--body); font-weight: 400; display: flex; align-items: center; gap: .6rem;
   margin: var(--gap-h3-before) 0 var(--gap-h3);
 }
-.col-group h3 small { font-size: .8rem; color: var(--muted); }
-.col-group h3 .pill { font-family: var(--display); font-size: 1.45rem; font-weight: 500; }
-.col-group h3 .pill::before {
+.col-group :is(h2, h3) small { font-size: .8rem; color: var(--muted); }
+.col-group :is(h2, h3) .pill { font-family: var(--display); font-size: 1.45rem; font-weight: 500; }
+.col-group :is(h2, h3) .pill::before {
   content: ""; flex: none; width: .6rem; height: .6rem; background: var(--gold);
   -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat;
 }
@@ -1916,7 +1949,7 @@ html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone
   .tools-aside .facet-vals { gap: .1rem .5rem; font-size: .9rem; }
   .tools-aside .letters { padding-top: .7rem; border-top: 1px solid var(--line); }
   .tools-aside .col-group:first-of-type, .tools-aside > .entry-grid:first-of-type { margin-top: 0; }
-  .tools-aside .col-group h3:first-child { margin-top: 0; }
+  .tools-aside .col-group :is(h2, h3):first-child { margin-top: 0; }
 }
 
 /* a plain book in a stack that carries a title and leads to a page (Shadow Work, under Correspondences) */
@@ -1981,11 +2014,16 @@ html.duo .bk .cover img, html.duo .b3d-front .face img { filter: url(#mm-duotone
   font-family: var(--display); font-size: 1.2rem; line-height: 1; color: var(--ink); background: color-mix(in srgb, var(--surface) 40%, var(--bg)); }
 .cal-days > li > span { color: var(--muted); }
 .cal-days > li > a:hover { border-color: var(--accent); color: var(--accent-text); background: var(--bg); }
+/* only the day's number is underlined, so every cell reads the same whatever else it holds */
+.cal-days > li > a { text-decoration: none; }
+.cal-days > li > a .cal-n { text-decoration: underline; text-decoration-color: var(--gold); text-decoration-thickness: 1px; text-underline-offset: .2em; }
 .cal-days a[aria-current="date"] { background: var(--btn); border-color: var(--btn); color: var(--on-btn); text-decoration-color: currentColor; }
 @media (max-width: 640px) {
   .cal-week, .cal-days { gap: 3px; }
   .cal-days > li > a, .cal-days > li > span { aspect-ratio: 1; padding: .3rem .35rem; font-size: 1rem; }
-  .cal-week span { font-size: .55rem; letter-spacing: .06em; }
+  .cal-week span { font-size: .78rem; letter-spacing: 0; }
+  .cal-moon { font-size: .78rem; letter-spacing: 0; }
+  .cal-moon-to { display: none; } /* the day the moon changes sign: the list below the month gives the time */
   .cal-today { margin-left: 0; }
 }
 /* the festivals on a day, under its number */
@@ -2226,10 +2264,11 @@ details.toggle > summary > h5 { margin: 0; display: inline; }
 .gi-rune { --pi: url("manuscript/assets/glyphs/rune.svg"); }
 .gi-symbol { --pi: url("manuscript/assets/glyphs/symbol.svg"); }
 .gi-timing { --pi: url("manuscript/assets/glyphs/timing.svg"); }
-/* Grimoire intro: tiny twinkling four-pointed stars around "Guide Pages" while it's closed, so it reads as something to open */
+/* Grimoire intro: tiny twinkling four-pointed stars just after "Guide Pages" while it's closed, so it reads as something to
+   open. They keep to a small patch to the right of the words, clear of the text and of the rule above. */
 .pg-grimoire .mm-callout details.toggle > summary { position: relative; width: max-content; }
 .pg-grimoire .mm-callout details.toggle:not([open]) > summary::after {
-  content: ""; position: absolute; left: -.7rem; right: -1.6rem; top: -.75rem; bottom: -.7rem; pointer-events: none; background: var(--gold);
+  content: ""; position: absolute; left: calc(100% + .35rem); width: 1.6rem; top: -.3rem; bottom: -.3rem; pointer-events: none; background: var(--gold);
   -webkit-mask: var(--star) 96% 6% / 9px 9px no-repeat, var(--star) 0% 92% / 6px 6px no-repeat, var(--star) 55% 0% / 5px 5px no-repeat, var(--star) 74% 100% / 7px 7px no-repeat;
   mask: var(--star) 96% 6% / 9px 9px no-repeat, var(--star) 0% 92% / 6px 6px no-repeat, var(--star) 55% 0% / 5px 5px no-repeat, var(--star) 74% 100% / 7px 7px no-repeat;
   animation: guide-sparkle 3.6s ease-in-out infinite; }
@@ -2265,6 +2304,9 @@ details.toggle > summary > h5 { margin: 0; display: inline; }
 .favs { display: flex; flex-wrap: wrap; gap: .5rem; }
 .fav { display: inline-flex; align-items: center; gap: .45rem; padding: .45rem .9rem .45rem .7rem; border: 1px solid var(--line); border-radius: 1.1em 1.1em 0 0; background: var(--bg);
   color: var(--ink); text-decoration: none; font-size: .92rem; transition: border-color .2s, background .2s; }
+.fav::before { content: ""; flex: none; width: .7rem; height: .7rem; background: var(--gold);
+  -webkit-mask: var(--star) center / contain no-repeat; mask: var(--star) center / contain no-repeat; }
+@media (forced-colors: active) { .fav::before { background: CanvasText; } }
 .fav small { color: var(--muted); font-size: .7rem; letter-spacing: .04em; margin-left: .2rem; }
 .fav:hover { border-color: var(--gold); background: var(--surface); }
 .work-parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.4rem 2.4rem; }
@@ -2391,6 +2433,10 @@ details.toggle > summary > h5 { margin: 0; display: inline; }
 }
 .mm-main .entry-grid.gallery a:hover > span:not(.gal-pic) { text-decoration-color: currentColor; }
 .gal-mineral .gal-pic:not(.none) { background: none; }
+/* Plants mix full photographs with cut-outs on no background. Every picture is set the same way, so they
+   read as one series: a print on a mat, inside an arch with a gold line, whatever the source. */
+.gal-plant .gal-pic { border-radius: 50% 50% 0 0 / 30% 30% 0 0; padding: 9%; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 55%, transparent); }
+.gal-plant .gal-pic img { object-fit: cover; border-radius: 50% 50% 0 0 / 30% 30% 0 0; }
 
 /* ---------- the note pop-up; the notes page ---------- */
 

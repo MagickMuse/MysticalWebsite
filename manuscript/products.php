@@ -3,6 +3,8 @@
  * The shop's product catalog: names, prices and descriptions shown publicly on /market.
  * Imported from the Gumroad listings. Edit freely. Prices are in cents. Pictures are in assets/products/ (any shape:
  * they show whole, full width, at the top of the product's card and page).
+ * 'card_image' (optional) is shown on the Market card instead, so every card can carry a matching title banner
+ * while the product page keeps the picture of what's inside.
  *
  * Delivery links (Google Classroom, Notion duplicate links) are NOT kept here, because this
  * repository is public. They go in the private config file under 'product_links'.
@@ -45,6 +47,7 @@ HTML,
     ],
     'blank-grimoire' => [
         'image' => 'assets/products/blank-grimoire.webp',
+        'card_image' => 'assets/products/blank-grimoire-banner.webp', // the Market card: a title banner like the courses'
         'name' => 'Blank Interconnected 14 Grimoires ✧ Notion Template Framework',
         'short_name' => 'The Blank Grimoire',
         'kind' => 'Notion template',
@@ -61,6 +64,7 @@ HTML,
     ],
     'crystal-grimoire' => [
         'image' => 'assets/products/crystal-grimoire.webp',
+        'card_image' => 'assets/products/crystal-grimoire-banner.webp', // the Market card: a title banner like the courses'
         'name' => 'Free Blank Crystal Grimoire ✧ Notion Starter Database',
         'short_name' => 'Blank Crystal Grimoire',
         'kind' => 'Free Notion template',

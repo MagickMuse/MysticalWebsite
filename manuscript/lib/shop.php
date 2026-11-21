@@ -38,7 +38,7 @@ function safe_html(string $html): string
 function community_links(): string
 {
     $discord = (string) config('discord_url', 'https://discord.com/invite/PBr2BtCpxk');
-    return '<div class="actions community"><a class="link" href="' . e($discord) . '" target="_blank" rel="noopener">Join Our Discord Coven</a>'
+    return '<div class="actions community"><a class="link" href="' . e($discord) . '" target="_blank" rel="noopener">Join the Muses on Discord</a>'
         . '<a class="link" href="' . e(site_url('mythos')) . '">Curious About the Curator?</a></div>';
 }
 
@@ -103,12 +103,12 @@ function view_shop(): void
     foreach (products() as $slug => $p) {
         $p['slug'] = $slug;
         if (!empty($p['hidden'])) continue;
-        $cards .= '<a class="card shop-card" href="' . e(site_url('market/' . $slug)) . '">' . product_image($p)
-            . '<h3>' . e(short_name($p)) . '</h3><p>' . e($p['tagline'] ?? '') . '</p><p class="price">' . e(price_label($p)) . '</p></a>';
+        $cards .= '<a class="card shop-card" href="' . e(site_url('market/' . $slug)) . '">' . product_image(empty($p['card_image']) ? $p : ['image' => $p['card_image']])
+            . '<h2>' . e(short_name($p)) . '</h2><p>' . e($p['tagline'] ?? '') . '</p><p class="price">' . e(price_label($p)) . '</p></a>';
     }
     // The Manuscript itself leads the shop.
     $ms = '<a class="card shop-card featured" href="' . e(url('join')) . '">' . product_image(['image' => 'assets/products/manuscript.webp'])
-        . '<h3>The Magick Manuscript</h3><p>15 cross-linked grimoires, 20,000+ pages, growing weekly.</p><p class="price">Membership</p></a>';
+        . '<h2>The Magick Manuscript</h2><p>15 cross-linked grimoires, 20,000+ pages, growing weekly.</p><p class="price">Membership</p></a>';
     layout('Market', <<<HTML
 <section class="mm-hero">
   <h1>The Market</h1>
@@ -126,6 +126,8 @@ function view_product(array $p): void
     $csrf = e(csrf_token());
     $slug = e($p['slug']);
     $desc = safe_html((string) ($p['description_html'] ?? ''));
+    // The page's title is the h1, so a description written with only h3 headings is moved up a level (no gap in the outline).
+    if (!str_contains($desc, '<h2>')) $desc = str_replace(['<h3>', '</h3>'], ['<h2>', '</h2>'], $desc);
     $includes = '';
     if (!empty($p['includes'])) {
         $includes = '<ul class="includes">' . implode('', array_map(fn($i) => '<li class="inline-star">' . e($i) . '</li>', $p['includes'])) . '</ul>';
@@ -152,10 +154,10 @@ function view_product(array $p): void
     }
     $refund = !empty($p['refund_policy']) ? '<p class="small refund">' . e($p['refund_policy']) . '</p>' : '';
     $full = $p['name'] !== short_name($p) ? '<p class="aka">' . e(trim(preg_replace('/^[^:✧]*[:✧]/u', '', $p['name']))) . '</p>' : '';
-    layout(short_name($p), '<article class="product">' . product_image($p) . '<div class="product-text"><p class="eyebrow">' . e($p['kind'] ?? 'The Magick Muse') . '</p>'
+    layout(short_name($p), '<article class="product">' . product_image($p) . '<div class="product-text"><div class="product-buy"><p class="eyebrow">' . e($p['kind'] ?? 'The Magick Muse') . '</p>'
         . '<h1>' . e(short_name($p)) . '</h1>' . $full . '<p class="price big">' . e(price_label($p)) . '</p>'
-        . $includes . $action . $refund
-        . '<div class="mm-prose product-desc">' . $desc . '</div>' . community_links() . '</div></article>',
+        . $includes . $action . $refund . '</div>'
+        . '<div class="product-more"><div class="mm-prose product-desc">' . $desc . '</div>' . community_links() . '</div></div></article>',
         ['index' => true, 'section' => 'market', 'description' => $p['tagline'] ?? '', 'ld' => [product_ld($p)],
             'image' => !empty($p['image']) ? (preg_match('~^https?://~', $p['image']) ? $p['image'] : site_url($p['image'])) : null]);
 }

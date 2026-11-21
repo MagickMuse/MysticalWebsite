@@ -4,7 +4,7 @@
  *   "grimoire/slug" => picture address (Unsplash and Pexels are allowed by the site's security rules)
  */
 return [
-    'begin-here/journal-prompts' => 'https://images.unsplash.com/photo-1681396059172-7532b1ef8b47?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D',
+    'begin-here/journal-prompts' => 'asset:covers/journal-prompts-1600.webp', // from images.unsplash.com/photo-1681396059172-7532b1ef8b47
     // Mineral photos from Wikimedia Commons (credits: assets/minerals/credits.json, shown at /picture-credits)
     'mineral/actinolite' => 'asset:minerals/actinolite-cut.webp',
     'mineral/adamite' => 'asset:minerals/adamite-cut.webp',

@@ -273,7 +273,9 @@ function collection_html(array $v, bool $withHeading): string
             // The group's name leads to just that group, as one list (not for the "No …" group).
             $name = str_starts_with($val, 'No ') ? '<span class="pill">' . e($val) . '</span>'
                 : '<a class="pill" href="' . e($link(['filters' => $f, 'group' => ''])) . '" title="Only ' . e($val) . '">' . e($val) . '</a>';
-            $list .= '<section class="col-group"><h3>' . $name . ' <small>' . count($items) . '</small></h3>'
+            // One level below the list's own heading, or below the page's h1 when the list has none.
+            $hx = $withHeading ? 'h3' : 'h2';
+            $list .= '<section class="col-group"><' . $hx . '>' . $name . ' <small>' . count($items) . '</small></' . $hx . '>'
                 . '<ul class="entry-grid' . gallery_class($v['c']) . '">' . collection_items(array_slice($items, 0, GROUP_PREVIEW), $state['sort'], $metric, list_is_gallery($v['c'])) . '</ul>' . $more . '</section>';
         }
     } else {

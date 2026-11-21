@@ -226,8 +226,9 @@
         + '<span class="today-name">' + esc(x[1].title) + '</span>' + (sub ? '<span class="today-sub">' + esc(sub) + '</span>' : '') + '</a>';
     }).join('') + '</div>';
   }
+  // Each intention gets the site's gold star (styles.css .fav::before) rather than its Notion emoji, to sit with the line icons around it.
   function favourLink(x, plain) {
-    return '<a class="fav" href="' + esc(url('spell-builder/?i=' + encodeURIComponent(x[0].slug))) + '">' + iconHtml(x[0].icon, 'rel-icon') + esc(x[0].title) + (plain ? '' : '<small>' + x[1] + ' of today’s influences</small>') + '</a>';
+    return '<a class="fav" href="' + esc(url('spell-builder/?i=' + encodeURIComponent(x[0].slug))) + '">' + esc(x[0].title) + (plain ? '' : '<small>' + x[1] + ' of today’s influences</small>') + '</a>';
   }
 
   function today(tool) {
@@ -1089,12 +1090,15 @@
         var start = new Date(year, month, d, 0, 0), noon = new Date(year, month, d, 12, 0), end = new Date(year, month, d + 1, 0, 0);
         var s0 = signOf(A, start), s1 = signOf(A, end), sn = signOf(A, noon);
         var tag = document.createElement('span'); tag.className = 'cal-moon';
+        tag.setAttribute('aria-hidden', 'true'); // shown as a glyph; the list below the month says it in words
         tag.textContent = '☽ ' + SIGN_GLYPH[sn] + '\uFE0E';
         tag.title = 'Moon in ' + SIGNS[sn];
         if (s0 !== s1) { // the moon changes sign today: find when
           var lo = start.getTime(), hi = end.getTime();
           while (hi - lo > 60000) { var mid = (lo + hi) / 2; if (signOf(A, new Date(mid)) === s0) lo = mid; else hi = mid; }
-          tag.textContent = '☽ → ' + SIGN_GLYPH[s1] + '\uFE0E'; tag.title = 'Moon enters ' + SIGNS[s1] + ' at ' + clock(new Date(hi));
+          tag.textContent = '☽ ';
+          var to = document.createElement('span'); to.className = 'cal-moon-to'; to.textContent = '→ '; // hidden on phones, where the cell is too narrow
+          tag.appendChild(to); tag.appendChild(document.createTextNode(SIGN_GLYPH[s1] + '\uFE0E')); tag.title = 'Moon enters ' + SIGNS[s1] + ' at ' + clock(new Date(hi));
           events.push([new Date(hi), 'Moon enters ' + SIGNS[s1], find('astrology', 'moon-in-' + SIGNS[s1].toLowerCase())]);
         }
         a.appendChild(tag);

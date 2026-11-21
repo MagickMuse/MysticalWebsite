@@ -3,6 +3,8 @@
  * Each grimoire's photo: the same pictures as the arch frames on the website's Grimoires page
  * (grimoires.html). Used on the grimoire cards and at the top of each grimoire's page.
  * slug (as in grimoires.php) => photo address without a size; the size is added where it's shown.
+ * Copies at the two sizes the pages use (1600x640 banner, 440x600 card) are kept in assets/grimoires/ and served
+ * from there; these addresses record where each came from and are only used if a copy is missing.
  */
 return [
     'animal' => 'https://images.pexels.com/photos/11236317/pexels-photo-11236317.jpeg?auto=compress&cs=tinysrgb&fit=crop',

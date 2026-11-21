@@ -48,7 +48,7 @@ function real_book(array $g, int $n, int $i): string
     $faced = $g['grimoire'] === (string) config('shelf_facing', ''); // none by default: every book shows its spine
     $size = isset(SPINE_SIZES[$g['grimoire']]) ? ' ' . SPINE_SIZES[$g['grimoire']] : '';
     return '<a class="bk ' . $tone . $size . ($faced ? ' faced' : '') . '" href="' . e(page_url($g)) . '"'
-        . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '')) . '"'
+        . ' aria-label="' . e($label . ', ' . $g['title'] . ($inside ? ': ' . $inside : '')) . '"' // starts with the name on the spine, for voice control
         . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'
         . '<span class="spine" aria-hidden="true"><i class="band top"></i><span class="bk-title' . $len . '">' . e($label) . '</span>' . (grimoire_glyph($g['grimoire'], 'bk-star') ?: '<i class="bk-star"></i>') . '<i class="band bottom"></i></span>'
         . '<span class="cover" aria-hidden="true">' . ($photo ? '<img src="' . e($photo) . '" alt="" loading="lazy">' : '')
@@ -128,7 +128,7 @@ function pile_book(array $g, int $n, int $i): string
     $inside = grimoire_summary($g);
     $photo = grimoire_photo($g['grimoire'], 440, 600);
     return '<a class="bk lying ' . shelf_tone($i) . '" href="' . e(page_url($g)) . '"'
-        . ' aria-label="' . e($g['title'] . ($inside ? ': ' . $inside : '') . ($n ? ' (' . number_format($n) . ' entries)' : '')) . '"'
+        . ' aria-label="' . e($label . ', ' . $g['title'] . ($inside ? ': ' . $inside : '') . ($n ? ' (' . number_format($n) . ' entries)' : '')) . '"'
         . ' data-title="' . e($g['title']) . '" data-label="' . e($label) . '"' . ($photo ? ' data-photo="' . e($photo) . '"' : '') . '>'
         . '<span class="spine" aria-hidden="true"><i class="band left"></i>' . (grimoire_glyph($g['grimoire'], 'bk-star') ?: '<i class="bk-star"></i>')
         . '<span class="bk-title">' . e($label) . '</span><i class="band right"></i></span></a>';

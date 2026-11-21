@@ -30,6 +30,9 @@ function grimoire_photo(string $slug, int $w, int $h): ?string
 {
     static $photos = null;
     $photos ??= is_file(MM_ROOT . '/grimoire-photos.php') ? require MM_ROOT . '/grimoire-photos.php' : [];
+    // Kept with the site in assets/grimoires/ at the sizes the pages use; the source address is the fallback.
+    $local = "grimoires/$slug-{$w}x$h.webp";
+    if (is_file(MM_ROOT . '/assets/' . $local)) return url('assets/' . $local);
     if (empty($photos[$slug])) return null;
     $u = $photos[$slug];
     return $u . (str_contains($u, '?') ? '&' : '?') . "w=$w&h=$h";
