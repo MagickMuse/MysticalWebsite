@@ -203,7 +203,7 @@ function route_member_store(string $what, string $method): void
     if (!has_access()) { view_gate(['locked' => true]); return; }
     if ($method !== 'POST' && !isset($_GET['json'])) {
         if ($what === 'workings') redirect(url('spell-builder') . '#workings'); // workings are listed in the Spell Builder
-        layout('Your notes', '<article class="saved notes-page" data-static-tool="notes"><p class="lede">Opening your notes…</p>'
+        layout('My Notes', '<article class="saved notes-page" data-static-tool="notes"><p class="lede">Opening your notes…</p>'
             . '<noscript><p class="notice">Your notes need JavaScript turned on.</p></noscript></article>', ['private' => true]);
         return;
     }

@@ -1149,7 +1149,7 @@
     if (!list.length || document.querySelector('.continue-reading')) return;
     var box = yourReading();
     if (!box) return;
-    box.insertAdjacentHTML('afterbegin', '<div class="continue-reading"><h2>Continue reading</h2><div class="rels">' + list.slice(0, 5).map(function (x) {
+    box.insertAdjacentHTML('afterbegin', '<div class="continue-reading"><h2>Continue Reading</h2><div class="rels">' + list.slice(0, 5).map(function (x) {
       var icon = '';
       if (x.i) icon = '<img class="rel-icon" src="' + esc(x.i) + '" alt="" width="24" height="24" loading="lazy">';
       else if (x.e) icon = '<span class="rel-icon" aria-hidden="true">' + esc(x.e) + '</span>';
@@ -1191,7 +1191,7 @@
     tool.className = 'pg pg-tool pg-index';
     render(tool, '<header class="pg-head tool-head">' + crumbs('') + '<h1>Enchanted Tools</h1>'
       + '<p class="lede">Every tool in the Manuscript, by grimoire. Each is also in its grimoire’s introduction.</p></header><div class="index-groups">' + html
-      + '<section class="index-group"><h2>Everywhere</h2><ul class="index-list"><li><a href="' + esc(url('notes/')) + '">Your Notes</a></li><li><a href="' + esc(url('')) + '">Surprise me (on the Manuscript home)</a></li></ul></section></div>', 'Enchanted Tools');
+      + '<section class="index-group"><h2>Everywhere</h2><ul class="index-list"><li><a href="' + esc(url('notes/')) + '">My Notes</a></li><li><a href="' + esc(url('')) + '">Surprise me (on the Manuscript home)</a></li></ul></section></div>', 'Enchanted Tools');
   }
 
   // ------------------------------------------------------------------ the next sabbat
@@ -1359,7 +1359,7 @@
     return Store.list('notes').then(function (list) {
       notesCache = list.sort(function (a, b) { return String(b.updated || '').localeCompare(String(a.updated || '')); });
       tool.className = 'saved notes-page';
-      render(tool, '<header class="pg-head tool-head"><p class="eyebrow">Your Manuscript</p><h1>Your Notes</h1>'
+      render(tool, '<header class="pg-head tool-head"><p class="eyebrow">My Profile</p><h1>My Notes</h1>'
         + '<p class="small">Only you can see these. Each one opens to read, rename or change it.' + (PREVIEW ? ' On this preview they’re kept in this browser.' : '') + '</p></header>'
         + (list.length ? '<ul class="note-cards">' + list.map(function (n) {
           var snip = (n.body || '').replace(/\s+/g, ' ').trim(), when = new Date(String(n.updated || n.created).replace(' ', 'T'));
@@ -1368,7 +1368,7 @@
             + '<p class="note-card-meta">' + esc(isNaN(when) ? '' : when.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }))
             + (n.page ? ' · from <a href="' + esc(n.page) + '">' + esc(n.pageTitle || 'this page') + '</a>' : '')
             + ' · <button class="link as-button" type="button" data-del-note="' + n.id + '">Delete</button></p></li>';
-        }).join('') + '</ul>' : '<p class="lede">No notes yet. Tap <strong>✎ Notes</strong> at the top of any page to write one.</p>'), 'Your notes');
+        }).join('') + '</ul>' : '<p class="lede">No notes yet. Tap <strong>✎ Notes</strong> at the top of any page to write one.</p>'), 'My Notes');
     }).catch(function () { tool.innerHTML = '<p class="lede">Your notes couldn’t load. Refresh the page to try again.</p>'; });
   }
 

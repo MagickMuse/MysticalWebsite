@@ -319,16 +319,9 @@ function layout(string $title, string $body, array $opt = []): void
     header('Vary: Cookie');
 
     $email = current_email();
-    // Signed in: "My Profile", opening a little menu (signing out is a form, so a link elsewhere can't sign anyone out).
-    // Signed out: Login.
+    // Signed in: My Profile (its page has everything: saved pages, notes, display, signing out). Signed out: Login.
     $acct = $email
-        ? '<details class="acct-menu"><summary>My Profile</summary><ul>'
-            . '<li><a href="' . e(url('account')) . '">My Profile</a></li>'
-            . '<li><a href="' . e(url('saved')) . '">Saved Pages</a></li>'
-            . '<li><a href="' . e(url('notes/')) . '">My Notes</a></li>'
-            . '<li><a href="' . e(site_url('settings')) . '">Display</a></li>'
-            . '<li><form method="post" action="' . e(url('logout')) . '"><input type="hidden" name="csrf" value="' . e(csrf_token()) . '">'
-            . '<button type="submit">Sign Out</button></form></li></ul></details>'
+        ? '<a class="acct-link" href="' . e(url('account')) . '">My Profile</a>'
         : '<a class="acct-login" href="' . e(url('login')) . '">Login</a>';
     $q = e($_GET['q'] ?? '');
     $section = $opt['section'] ?? 'manuscript'; // which main-menu item is marked as the current page
@@ -427,7 +420,7 @@ function layout(string $title, string $body, array $opt = []): void
 function not_found(): void
 {
     http_response_code(404);
-    layout('Not found', '<section class="mm-empty"><h1>This Page Is Not in the Manuscript</h1><p class="lede">It may not have been moved over from Notion yet, or the link has changed.</p><p><a class="link" href="' . e(url()) . '">Back to the Manuscript</a></p></section>');
+    layout('Not Found', '<section class="mm-empty"><h1>This Page Is Not in the Manuscript</h1><p class="lede">It may not have been moved over from Notion yet, or the link has changed.</p><p><a class="link" href="' . e(url()) . '">Back to the Manuscript</a></p></section>');
 }
 
 function redirect(string $to, int $code = 303): never

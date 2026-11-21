@@ -638,9 +638,9 @@
     if (wide.addEventListener) wide.addEventListener('change', apply);
   })();
 
-  // The header's search (the magnifying glass) and My Profile menu: one open at a time; they close on a click anywhere
-  // else, or Escape. The search box is ready to type in as soon as it opens.
-  var hdrMenus = document.querySelectorAll('.search-menu, .acct-menu');
+  // The header's search (the magnifying glass): closes on a click anywhere else, or Escape. The search box is ready to
+  // type in as soon as it opens.
+  var hdrMenus = document.querySelectorAll('.search-menu');
   hdrMenus.forEach(function (d) {
     d.addEventListener('toggle', function () {
       if (!d.open) return;

@@ -142,7 +142,7 @@ function route_path(array $parts, string $method): void
             $st->execute([now(), $t]);
             $ok = true;
         }
-        layout('Beginner path', '<section class="mm-hero narrow"><p class="eyebrow">The Beginner Path</p><h1>' . ($ok ? 'No more emails' : 'That link has expired') . '</h1>'
+        layout('Beginner Path', '<section class="mm-hero narrow"><p class="eyebrow">The Beginner Path</p><h1>' . ($ok ? 'No more emails' : 'That link has expired') . '</h1>'
             . '<p class="lede">' . ($ok ? 'You won’t get any more beginner path emails. You can still follow the path at your own pace in the Manuscript.' : 'Sign in and open the beginner path to stop the emails.') . '</p>'
             . '<div class="actions"><a class="btn" href="' . e(url('path')) . '">The Beginner Path</a></div></section>', ['private' => true]);
         return;
@@ -202,7 +202,7 @@ function view_path(?array $row): void
     } else {
         $status = '<p class="lede">Day ' . $done . ' of ' . $total . '. The next page arrives by email tomorrow at 11:11.</p><form method="post" action="' . e(url('path')) . '">' . $csrf . '<input type="hidden" name="do" value="stop"><button class="link as-button" type="submit">Stop the Emails</button></form>';
     }
-    layout('The beginner path', '<section class="saved path-page"><p class="eyebrow">Your Manuscript</p><h1>The Beginner Path</h1>' . $status
+    layout('The Beginner Path', '<section class="saved path-page"><p class="eyebrow">The Manuscript</p><h1>The Beginner Path</h1>' . $status
         . '<ol class="path-list">' . $list . '</ol></section>', ['private' => true]);
 }
 

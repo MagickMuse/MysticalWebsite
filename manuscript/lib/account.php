@@ -148,7 +148,7 @@ function view_login(string $notice = '', ?string $next = null): void
     $csrf = e(csrf_token());
     $action = e(url('login'));
     $nextAttr = e($next);
-    layout('Sign in', <<<HTML
+    layout('Sign In', <<<HTML
 <section class="mm-hero narrow">
   <p class="eyebrow">Welcome Back</p>
   <h1>Sign In</h1>
@@ -211,27 +211,30 @@ function view_account(): void
         $m['status'] === 'active' => 'Monthly member, renews ' . e(substr((string) $m['paid_through'], 0, 10)),
         default => 'Membership ' . e($m['status']) . ($m['paid_through'] ? ', access until ' . e(substr($m['paid_through'], 0, 10)) : ''),
     };
-    // Billing management is only for subscriptions; lifetime buyers get their Stripe receipt by email.
-    $billing = $m && $m['stripe_customer'] && $m['plan'] === 'monthly' && $m['status'] !== 'canceled'
-        ? '<form method="post" action="' . e(url('account')) . '"><input type="hidden" name="csrf" value="' . $csrf . '"><button class="btn ghost" type="submit">Manage Billing</button></form>' : '';
-    $join = has_access() ? '' : '<a class="btn" href="' . e(url('join')) . '">Become a Member</a>';
-    $logout = e(url('logout'));
+    // My Profile: one square card for each place a member goes from here.
+    $card = fn(string $icon, string $label, string $href) => '<a class="profile-card" href="' . e($href) . '"><span class="prop-glyph pi-' . $icon . '" aria-hidden="true"></span>' . e($label) . '</a>';
+    $button = fn(string $icon, string $label, string $action) => '<form method="post" action="' . e($action) . '"><input type="hidden" name="csrf" value="' . $csrf . '">'
+        . '<button class="profile-card" type="submit"><span class="prop-glyph pi-' . $icon . '" aria-hidden="true"></span>' . e($label) . '</button></form>';
+    $cards = '';
+    if (has_access()) $cards .= $card('star-four', 'Saved Pages', url('saved')) . $card('note-pencil', 'My Notes', url('notes/'));
+    $cards .= $card('text-aa', 'Display & Accessibility', '#settings');
+    $cards .= $card('book-open-text', 'My Library', site_url('market/library'));
+    // Billing (change card, invoices, cancel) is only for subscriptions; lifetime buyers get their Stripe receipt by email.
+    if ($m && $m['stripe_customer'] && $m['plan'] === 'monthly' && $m['status'] !== 'canceled') $cards .= $button('arrows-clockwise', 'Manage Billing', url('account'));
+    if (is_admin($email)) $cards .= $card('chart-bar', 'Dashboard', url('dashboard'));
+    $cards .= $button('door-open', 'Sign Out', url('logout'));
+    $join = has_access() ? '' : '<div class="actions"><a class="btn" href="' . e(url('join')) . '">Become a Member</a></div>';
     $email = e($email);
-    $admin = is_admin(current_email()) ? '<a class="link" href="' . e(url('dashboard')) . '">Dashboard</a>' : '';
-    $library = '<a class="link" href="' . e(site_url('market/library')) . '">Your Library</a>';
-    // A member's saved pages and notes live here rather than in the header.
-    $mine = has_access() ? '<a class="link" href="' . e(url('saved')) . '">Saved Pages</a><a class="link" href="' . e(url('notes')) . '">Your Notes</a>' : '';
     // Display & accessibility: kept in the browser by prefs.js, the same panel as the website's /settings page.
     $prefs = (string) @file_get_contents(__DIR__ . '/prefs-panel.html');
-    layout('Account', <<<HTML
+    layout('My Profile', <<<HTML
 <section class="mm-hero narrow">
-  <p class="eyebrow">Account</p>
+  <p class="eyebrow">My Profile</p>
   <h1>{$email}</h1>
   <p class="lede">$status</p>
-  <div class="actions">$join $billing $mine $library $admin
-    <form method="post" action="$logout"><input type="hidden" name="csrf" value="$csrf"><button class="link as-button" type="submit">Sign Out</button></form>
-  </div>
+  $join
 </section>
+<nav class="profile-grid" aria-label="My Profile">$cards</nav>
 <section class="account-prefs" id="settings" aria-labelledby="prefs-title">
   <h2 id="prefs-title">Display &amp; Accessibility</h2>
   <p class="lede small">Dark mode, an easier-to-read font, larger text, more spacing, fewer animations. Changes show straight away.</p>

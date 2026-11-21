@@ -166,7 +166,7 @@ def write_today(d):
         'planetary-hours': ('Planetary Hours', 'hours'),
         'guide-pages': ('Guide Pages', 'guides'),
         'enchanted-tools': ('Enchanted Tools', 'tools'),
-        'notes': ('Your notes', 'notes'),
+        'notes': ('My Notes', 'notes'),
     }
     for folder, (title, tool) in shells.items():
         page = re.sub(r'<title>[^<]*</title>', f'<title>{title} | The Magick Manuscript</title>', frame, count=1)

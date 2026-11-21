@@ -202,7 +202,7 @@ function do_claim(): void
     $email = strtolower(trim((string) ($_POST['email'] ?? '')));
     if (!$p || empty($p['free'])) { not_found(); return; }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { view_product($p); return; }
-    if (!throttle('claim', 5, 900) || too_many_links($email)) { layout('Slow down', '<section class="mm-empty"><h1>Too Many Tries</h1><p class="lede">Please wait a few minutes.</p></section>'); return; }
+    if (!throttle('claim', 5, 900) || too_many_links($email)) { layout('Slow Down', '<section class="mm-empty"><h1>Too Many Tries</h1><p class="lede">Please wait a few minutes.</p></section>'); return; }
 
     db()->prepare('INSERT OR IGNORE INTO leads (email, product, created_at) VALUES (?, ?, ?)')->execute([$email, $p['slug'], now()]);
     grant($email, $p['slug'], 'free');
@@ -212,7 +212,7 @@ function do_claim(): void
     send_mail($email, 'Your ' . $nm . ' is here',
         "Thank you for picking up {$nm}.\n\nOpen your library to get it:\n$link\n\nThe link signs you in and works for 30 minutes. After that, sign in any time at " . site_url('market/library') . "\n\nThe Magick Muse",
         '<p>Thank you for picking up <strong>' . e($nm) . '</strong>.</p><p><a href="' . e($link) . '">Open your library</a> to get it.</p><p>The link signs you in and works for 30 minutes. After that, sign in any time at ' . e(site_url('market/library')) . '.</p><p>The Magick Muse</p>');
-    layout('Check your email', '<section class="mm-hero narrow"><p class="eyebrow">On Its Way</p><h1>Check Your Inbox</h1><p class="lede">We sent ' . e($nm) . ' to ' . e($email) . '. If it isn’t there in a few minutes, look in spam or promotions.</p></section>', ['private' => true]);
+    layout('Check Your Email', '<section class="mm-hero narrow"><p class="eyebrow">On Its Way</p><h1>Check Your Inbox</h1><p class="lede">We sent ' . e($nm) . ' to ' . e($email) . '. If it isn’t there in a few minutes, look in spam or promotions.</p></section>', ['private' => true]);
 }
 
 function view_shop_thanks(): void
@@ -271,7 +271,7 @@ function view_library(): void
     $body = $items
         ? '<ul class="library">' . $items . '</ul>'
         : '<p class="lede">Nothing here yet. <a href="' . e(site_url('market')) . '">Visit the shop</a>.</p>';
-    layout('Your library', '<section class="lib"><p class="eyebrow">' . e($email) . '</p><h1>Your Library</h1>' . $thanks . $body
+    layout('My Library', '<section class="lib"><p class="eyebrow">' . e($email) . '</p><h1>My Library</h1>' . $thanks . $body
         . '<p class="small"><a href="' . e(url('account')) . '">Account &amp; billing</a></p></section>', ['private' => true, 'section' => 'market']);
 }
 

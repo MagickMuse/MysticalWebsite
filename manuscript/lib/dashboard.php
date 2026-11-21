@@ -364,7 +364,7 @@ function dash_leads(): void
         $names = implode(', ', array_map('product_name', explode(', ', $r['products'])));
         $tr .= '<tr><td>' . e($r['email']) . '</td><td>' . e($names) . '</td><td>' . e(substr($r['first'], 0, 10)) . '</td></tr>';
     }
-    dash_layout('emails', 'Email sign-ups', '<p class="dash-actions"><a class="btn ghost" href="' . e(url('dashboard/export/emails.csv')) . '">Download CSV</a> <span class="small">People who picked up a free download. Import the CSV into your email tool to write to them.</span></p>'
+    dash_layout('emails', 'Email Sign-Ups', '<p class="dash-actions"><a class="btn ghost" href="' . e(url('dashboard/export/emails.csv')) . '">Download CSV</a> <span class="small">People who picked up a free download. Import the CSV into your email tool to write to them.</span></p>'
         . '<div class="dash-card wide">' . ($tr ? '<div class="table-wrap"><table><tr><th>Email</th><th>Downloaded</th><th>First seen</th></tr>' . $tr . '</table></div>' : '<p class="small">No sign-ups yet.</p>') . '</div>');
 }
 

@@ -327,7 +327,7 @@ function view_picture_credits(): void
     foreach (['minerals', 'plants'] as $kind) {
         $credits = array_merge($credits, json_decode((string) @file_get_contents(MM_ROOT . "/assets/$kind/credits.json"), true) ?: []);
     }
-    layout('Picture credits', '<article class="pg pg-library">' . picture_credits_html($credits, fn($path) => url($path)) . '</article>');
+    layout('Picture Credits', '<article class="pg pg-library">' . picture_credits_html($credits, fn($path) => url($path)) . '</article>');
 }
 
 function picture_credits_html(array $credits, callable $href): string

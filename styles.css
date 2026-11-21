@@ -828,23 +828,19 @@ html.nav-fold .nav ul a { align-content: center; min-height: 52px; }
 .mm-search .btn { padding: .6rem 1.1rem; }
 .mm-acct { margin: 0; font-size: .9rem; letter-spacing: .04em; text-transform: lowercase; white-space: nowrap; }
 .mm-acct a { text-decoration: none; }
-.mm-acct a:hover, .acct-menu > summary:hover { color: var(--accent-text); }
-.acct-menu { position: relative; }
-.acct-menu > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: .35rem; min-height: 44px; }
-.acct-menu > summary::-webkit-details-marker { display: none; }
-.acct-menu > summary::after { content: "▾"; font-size: .7rem; color: var(--gold-text); }
-.nav .acct-menu ul {
-  display: block; gap: 0; position: absolute; right: 0; top: 100%; z-index: 40; min-width: 12rem; margin: .2rem 0 0; padding: .35rem 0; list-style: none;
-  background: var(--surface); border: 1px solid var(--line); box-shadow: 0 12px 28px rgba(0, 0, 0, .25);
+.mm-acct a:hover { color: var(--accent-text); }
+
+/* My Profile: a square card for each place to go (account.php view_account()) */
+.profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; max-width: 860px; margin: 0 auto var(--gap-intro); }
+.profile-grid form { margin: 0; display: grid; }
+.mm-main .profile-card, .profile-card {
+  aspect-ratio: 1; display: grid; align-content: center; justify-items: center; gap: .8rem; padding: 1rem; text-align: center;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-decoration: none; cursor: pointer;
+  font-family: var(--display); font-size: 1.25rem; line-height: 1.2; transition: border-color .2s, transform .2s;
 }
-.nav .acct-menu li { display: block; }
-.acct-menu li a, .acct-menu li button {
-  display: block; width: 100%; padding: .6rem 1.1rem; text-align: left; text-decoration: none; color: var(--ink);
-  background: none; border: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer;
-}
-.acct-menu li a:hover, .acct-menu li button:hover { background: var(--bg); color: var(--accent-text); }
-.acct-menu form { margin: 0; }
-.acct-menu li + li:last-child { border-top: 1px solid var(--line); margin-top: .3rem; padding-top: .3rem; }
+.profile-card .prop-glyph { width: 2rem; height: 2rem; }
+.profile-card:hover, .profile-card:focus-visible { border-color: var(--gold); color: var(--accent-text); transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) { .profile-card:hover, .profile-card:focus-visible { transform: none; } }
 
 /* ---------- hero / landing ---------- */
 .mm-hero { display: grid; justify-items: center; text-align: center; margin-bottom: var(--gap-intro); }
