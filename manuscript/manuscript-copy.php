@@ -14,15 +14,15 @@ return [
     ],
     // The numbers, as a row of figures.
     'stats' => [['20,000+', 'pages'], ['15', 'cross-linked grimoires'], ['170+', 'guide pages'], ['209,000+', 'additions and edits in the first year']],
-    'about' => 'A living grimoire built from years of research across *hundreds of published witchcraft books*. Every single entry is cross-linked to every related entry across every other grimoire. Nothing exists in isolation here.',
+    'about' => 'A living grimoire built from years of research across *hundreds of published witchcraft books*. Every single entry is cross-linked to every related entry across every other grimoire, so nothing exists in isolation.',
     // The fifteen grimoires, as little labels.
     'grimoires' => ['Rituals & Spells', 'Deities & Spirits', 'Plants', 'Minerals', 'Oils', 'Recipes', 'Animals', 'Correspondences', 'Symbols', 'Runes', 'Tarot & Cards', 'Astrology', 'Timing', 'Dreams', 'Ritual Materials'],
     // The tools: [icon (an assets/icons name), name, what it does].
-    'tools_heading' => 'It doesn’t just sit there. It works with you.',
+    'tools_heading' => 'It Works With You, Every Day',
     'tools_intro' => 'The Manuscript comes with tools that put all of that research to use in your actual practice, every single day.',
     'tools' => [
-        ['calendar-dots', 'The Calendar, in your own calendar', 'Add it to Google, Apple or Outlook in one tap. It brings every festival of the year and every new, quarter and full moon, at the exact moment in *your own time zone*. Each event links straight to its page, and it keeps itself up to date.'],
-        ['sun', 'Today’s Correspondences', 'The moon phase, the planet that rules the day, the Sun’s sign and the season, with the herbs, crystals, colors, oils and spells that suit them. Worked out fresh every day.'],
+        ['calendar-dots', 'The Calendar, in your own calendar', 'Add it to Google, Apple or Outlook in one tap to get every festival of the year and every new, quarter and full moon at the exact moment in *your own time zone*. Each event links straight to its page, and it keeps itself up to date.'],
+        ['sun', 'Today’s Correspondences', 'The moon phase, the planet that rules the day, the Sun’s sign and the season, with the herbs, crystals, colors, oils and spells that suit them, worked out fresh every day.'],
         ['cards', 'Draw a Card', 'Pull your daily tarot card from a face-down fan. It lands upright or reversed and takes you straight to that card’s meanings, keywords and interpretations.'],
         ['layout', '300+ Tarot Spreads', 'Deal any spread digitally and turn the cards over one by one, or follow its layout with your own deck at your altar.'],
         ['sparkle', 'Dream Decoder', 'Write down your dream and the symbols in it light up, each with what it means.'],
@@ -51,7 +51,7 @@ return [
         ['Join the Community', 'Over 950 witches in our Discord coven use this as the basis of their craft.'],
     ],
     // The closing callout.
-    'closing' => 'It is always being added to. In its first year, over *209,000 additions and edits* were made across all 15 grimoires, and that number grows every week.',
+    'closing' => 'The Manuscript is always being added to, with over *209,000 additions and edits* across all 15 grimoires in its first year and more every week.',
     'closing_note' => 'Pricing will increase as the Manuscript continues to grow. Lock in the current price while it lasts.',
     'terms_html' => <<<'HTML'
 <p>Terms of Access</p><p>This work is the property of the creator, Avelynn of The Magick Muse.</p><p>Lifetime access lasts for the life of the Manuscript itself, not a fixed term. Monthly access lasts while your subscription is active. Cancel anytime from your account, and you keep access until the end of the month you have paid for. Access is to read only. You may read, reference, and discuss the content. You may not duplicate, copy, export, screenshot for redistribution, share your sign-in, or reproduce any part of this manuscript elsewhere, in whole or in part, without express written permission.</p><p>Access is to the live, continuously updated Manuscript. It grows and changes over time, and your access reflects its current and future state for as long as it remains active, not a fixed copy.</p><p>All sales are final. The Manuscript is a digital product and access is granted immediately after payment, so no refunds are given.</p><p>Violating these terms (including unauthorized copying, sharing access, or redistributing content) will result in immediate loss of access without refund, and may result in legal action.</p>
