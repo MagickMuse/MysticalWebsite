@@ -41,6 +41,11 @@ _Last updated: November 21, 2026_
 - [ ] **Social bios:** change any `/shop` links to `/market` (the old ones still forward).
 - [ ] **Making the repository private:** on GitHub's free plan, the GitHub Pages preview switches off for private repositories.
 
+## Taxes
+- [ ] **2026 income tax:** over $5,000 from the shop this year, so it goes on your return (in the US, Schedule C and
+      self-employment tax). Gather Gumroad's sales export and Stripe's (Stripe → Reports), plus receipts for costs you
+      can deduct: Hostinger, the domain, Notion, research books, Gumroad and Stripe fees.
+
 ## Fix in Notion (the site shows what's there)
 - [ ] **Hellebore:** its notes say “Substitution: Magickal Uses or Nettle”. Probably meant “For magickal uses: Nettle”.
 - [ ] **Mugwort** and **Wormwood:** each has an empty “Substitution:” line.
