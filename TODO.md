@@ -63,6 +63,4 @@ _Last updated: November 21, 2026_
 - Free public daily pages: a card of the day, the sabbat countdown (Today’s Correspondences is already public)
 - A weekly email: the week's moon phases, festivals and a featured page
 - The full book of shadows (entries, @mentions of Manuscript pages, backlinks)
-- Public previews of Manuscript entries for Google (the biggest discoverability win: name, picture and a few
-  correspondences, the rest for members), and festival pages that answer “when is Samhain 2026”
 - Pinterest: a tall 2:3 pin picture for each blog post
