@@ -220,7 +220,40 @@ final class NotionImporter
             [$g, $slug] = array_pad(explode('/', $ref, 2), 2, '');
             $setCover->execute([$src, $g, $slug]);
         }
+        $this->borrowedPictures();
         ($this->log)("Site rules: pictures taken off $n page(s); " . count($icons) . ' icons set by the site.');
+    }
+
+    /**
+     * Pages that show another page's picture (after the site's own covers are in place):
+     *  - an oil, the photo of the plant it comes from (its first Plant connection with a picture);
+     *  - a dream ("Dreaming of Crows"), the picture of the page it's about, when the dream links to it (Crows).
+     */
+    private function borrowedPictures(): void
+    {
+        db()->exec("UPDATE pages SET cover = (SELECT pl.cover FROM relations r JOIN pages pl ON pl.id = r.to_id
+                WHERE r.from_id = pages.id AND r.prop = 'Plant' AND pl.cover IS NOT NULL ORDER BY r.sort LIMIT 1)
+            WHERE grimoire = 'oil' AND kind = 'entry'
+            AND EXISTS (SELECT 1 FROM relations r JOIN pages pl ON pl.id = r.to_id WHERE r.from_id = pages.id AND r.prop = 'Plant' AND pl.cover IS NOT NULL)");
+        $rows = db()->query("SELECT d.id, d.title, i.title AS item, i.cover, i.icon FROM pages d
+            JOIN relations r ON r.from_id = d.id JOIN pages i ON i.id = r.to_id
+            WHERE d.grimoire = 'dream' AND d.kind = 'entry' AND i.grimoire <> 'dream' AND i.kind = 'entry' AND i.cover IS NOT NULL
+            ORDER BY d.id, r.sort")->fetchAll();
+        $set = db()->prepare("UPDATE pages SET cover = ?, icon = CASE WHEN ? <> '' THEN ? ELSE icon END WHERE id = ?");
+        $norm = fn(string $t) => preg_replace('/^(a|an|the)\s+/', '', mb_strtolower(trim($t)));
+        $done = [];
+        foreach ($rows as $r) {
+            if (isset($done[$r['id']]) || !preg_match('/^dreaming (?:of|about)\s+(.+)$/iu', trim($r['title']), $m)) continue;
+            $subject = $norm($m[1]);
+            // "Crows" is about "Crow"/"Crows"; "Berries" about "Berry"; "Boxes" about "Box".
+            $forms = array_unique([$subject, preg_replace('/s$/u', '', $subject), preg_replace('/es$/u', '', $subject), preg_replace('/ies$/u', 'y', $subject)]);
+            $item = $norm($r['item']);
+            if (!in_array($item, $forms, true) && !in_array(preg_replace('/s$/u', '', $item), $forms, true)) continue;
+            $icon = preg_match('/^(file|asset):/', (string) $r['icon']) ? (string) $r['icon'] : '';
+            $set->execute([$r['cover'], $icon, $icon, $r['id']]);
+            $done[$r['id']] = true;
+        }
+        ($this->log)('Borrowed pictures: oils from their plants; ' . count($done) . ' dream page(s) from what they are about.');
     }
 
     /**
