@@ -40,7 +40,8 @@ bye
 LFTP
 }
 
-# Writes the private settings from the secret, plus where the data folder is relative to manuscript/.
+# Writes the private settings from the secret. Keys kept in their own secrets (the live workflows pass STRIPE_SECRET_KEY,
+# STRIPE_WEBHOOK_SECRET, SMTP_PASSWORD, NOTION_TOKEN) replace the matching settings, so the file never needs them.
 write_settings() {
   local target="$1"
   printf '%s\n' "$MANUSCRIPT_CONFIG" > "$target"
@@ -48,4 +49,5 @@ write_settings() {
     echo "::error::The settings secret (MANUSCRIPT_CONFIG_TEST or _LIVE) isn't a valid settings file (a quote or comma is probably missing). Compare it with the file you were given."
     exit 1
   fi
+  TARGET="$target" php "$(dirname "${BASH_SOURCE[0]}")/secret-settings.php"
 }

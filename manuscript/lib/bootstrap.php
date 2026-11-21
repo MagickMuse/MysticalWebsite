@@ -3,6 +3,17 @@ declare(strict_types=1);
 
 define('MM_ROOT', dirname(__DIR__));
 
+function stored_app_secret(string $dir): string
+{
+    $file = $dir . '/app-secret.txt';
+    if (!is_file($file)) {
+        if (!is_dir($dir)) mkdir($dir, 0700, true);
+        file_put_contents($file, bin2hex(random_bytes(32)), LOCK_EX);
+        chmod($file, 0600);
+    }
+    return trim((string) file_get_contents($file));
+}
+
 function config(?string $key = null, $default = null)
 {
     static $cfg = null;
@@ -30,6 +41,8 @@ function config(?string $key = null, $default = null)
         $cfg['data_dir'] = rtrim(getenv('MM_DATA_DIR') ?: ($cfg['data_dir'] ?? (dirname(MM_ROOT, 2) . '/manuscript-data')), '/');
         // A relative data_dir is relative to the manuscript/ folder, e.g. '../../../manuscript-data-test'.
         if ($cfg['data_dir'] !== '' && $cfg['data_dir'][0] !== '/') $cfg['data_dir'] = MM_ROOT . '/' . $cfg['data_dir'];
+        // The secret that signs sign-in links: made once on the server and kept in the data folder, unless the settings give one.
+        if (in_array($cfg['app_secret'] ?? '', ['', 'CHANGE-ME'], true)) $cfg['app_secret'] = stored_app_secret($cfg['data_dir']);
         // Safety: the database and paid images must never sit inside the public website folder.
         // (realpath('') is the current folder, so an empty DOCUMENT_ROOT, as on the command line, means "no web folder".)
         $docRoot = (string) ($_SERVER['DOCUMENT_ROOT'] ?? '');

@@ -25,6 +25,8 @@ jobs:
       FTP_DIR: ${{ secrets.FTP_LIVE_DIR }}
       FTP_DATA_DIR: ${{ secrets.FTP_LIVE_DATA_DIR }}
       MANUSCRIPT_CONFIG: ${{ secrets.MANUSCRIPT_CONFIG_LIVE }}
+      # Optional: the Notion token in its own secret (.github/scripts/secret-settings.php).
+      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
       FTP_VERIFY_CERT: ${{ vars.FTP_VERIFY_CERT }}
     steps:
       - uses: actions/checkout@v4

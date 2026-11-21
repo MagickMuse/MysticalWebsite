@@ -70,7 +70,7 @@ Upload `manuscript/config.sample.php` there, rename it to **`manuscript-config.p
 
 | Setting | Where to get it |
 |---|---|
-| `app_secret` | Any long random text. Over SSH: `php -r "echo bin2hex(random_bytes(32));"` |
+| `app_secret` | Leave it as `CHANGE-ME`: the site makes one on its first run and keeps it in the data folder (`app-secret.txt`). |
 | `notion_token` | notion.so/profile/integrations → **New integration** (internal) → copy the secret. Then in Notion open **The Magick Manuscript** → ••• → **Connections** → add the integration. |
 | grimoires | Listed in `manuscript/grimoires.php` (not the settings). Uncomment a line to bring that grimoire over. |
 | `stripe_secret_key` | Stripe Dashboard → Developers → API keys. Start with the **test** key (`sk_test_…`). |
@@ -79,6 +79,12 @@ Upload `manuscript/config.sample.php` there, rename it to **`manuscript-config.p
 | `products` | Already filled in with the four Gumroad products. Replace each `REPLACE-ME` link with the real Notion/course link, and check prices. Files to deliver (PDFs etc.) go on the server in `manuscript-data/products/<product-slug>/`. |
 | `mail_from`, `smtp_*` | A Hostinger email account (e.g. hello@magickmuse.com). Host `smtp.hostinger.com`, port `465`, the mailbox's address and password. |
 | `admins` | The email(s) that can open the dashboard. Nobody else can see it. |
+
+
+**Uploading from GitHub instead:** the settings file goes in the repository secret `MANUSCRIPT_CONFIG_LIVE`, and these
+keys can each be their own repository secret instead of sitting in it: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+`SMTP_PASSWORD` and `NOTION_TOKEN`. The live upload and the live Notion import put them into the settings
+(`.github/scripts/secret-settings.php`). With a Gmail mailbox, `SMTP_PASSWORD` must be a Google app password.
 
 
 ### 3. Import from Notion
