@@ -22,12 +22,11 @@ function send_mail(string $to, string $subject, string $text, string $html): boo
         file_put_contents(config('mail_log'), "To: $to\nSubject: $subject\n\n$text\n\n----\n", FILE_APPEND);
         return true;
     }
-    if (!config('smtp_host')) {
-        $h = '';
-        foreach ($headers as $k => $v) $h .= "$k: $v\r\n";
-        return mail($to, $subject, $body, $h);
-    }
-    return smtp_send($to, $subject, $headers, $body);
+    if (config('smtp_host') && smtp_send($to, $subject, $headers, $body)) return true;
+    // No mailbox set up, or it refused (say, a wrong password): the server's own sending, so sign-in links still go out.
+    $h = '';
+    foreach ($headers as $k => $v) $h .= "$k: $v\r\n";
+    return mail($to, $subject, $body, $h);
 }
 
 function smtp_send(string $to, string $subject, array $headers, string $body): bool
