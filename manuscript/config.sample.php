@@ -55,10 +55,10 @@ return [
     'stripe_webhook_secret' => 'whsec_xxx',
     // The Manuscript is sold as lifetime access for $333 (Stripe → Product catalog → one-time price).
     'plans' => [
-        // amount_label is only what the page shows; the real price is the Stripe price.
-        'lifetime' => ['price' => 'price_yyy', 'label' => 'Manuscript access', 'amount_label' => '$333', 'blurb' => 'One payment. Every update ever made, and every one to come.', 'mode' => 'payment'],
+        'lifetime' => ['price' => 'price_yyy'],
         // The live prices, lifetime ($333) and monthly ($33), are built in (membership_plans() in lib/stripe.php).
-        // List a plan here only to change it: with a test key, give each plan its test price; 'price' => '' hides a plan.
+        // List a plan here only to change its price: with a test key, give each plan its test price; 'price' => '' hides it.
+        // The cards' wording is in the code.
     ],
 
     // ---------- Shop (replaces Gumroad) ----------

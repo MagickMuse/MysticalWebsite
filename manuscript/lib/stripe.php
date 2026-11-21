@@ -75,19 +75,20 @@ function open_checkout(array $params): array
 
 /**
  * The membership plans on the Join page. They're built in here (Stripe price IDs aren't secret), so a new plan needs no
- * change to the private settings; 'plans' in the settings can still change one, or hide it with 'price' => ''.
+ * change to the private settings. 'plans' in the settings can only set a plan's Stripe price (a test price, or '' to
+ * hide the plan); the wording on the cards always comes from here.
  * The price IDs are the live Stripe account's, so with a test key only the settings' own (test) prices are used.
  */
 function membership_plans(): array
 {
     $live = (bool) preg_match('/^(sk|rk)_live_/', (string) config('stripe_secret_key'));
     $plans = [
-        'lifetime' => ['price' => $live ? 'price_1UcdYXD79698XBfZonGEOVnY' : '', 'label' => 'Manuscript access', 'amount_label' => '$333', 'amount' => 333,
+        'lifetime' => ['price' => $live ? 'price_1UcdYXD79698XBfZonGEOVnY' : '', 'label' => 'Lifetime access', 'amount_label' => '$333', 'amount' => 333,
             'blurb' => 'One payment. Every update ever made, and every one to come.', 'mode' => 'payment'],
         'monthly' => ['price' => $live ? 'price_1Ue3oeD79698XBfZezUUsLg4' : '', 'label' => 'Monthly access', 'amount_label' => '$33 a month', 'amount' => 33,
             'blurb' => 'Everything in the Manuscript, every update included. Cancel anytime.', 'mode' => 'subscription'],
     ];
-    foreach (config('plans', []) as $key => $over) $plans[$key] = array_merge($plans[$key] ?? [], $over);
+    foreach (config('plans', []) as $key => $over) if (isset($plans[$key], $over['price'])) $plans[$key]['price'] = $over['price'];
     return $plans;
 }
 
