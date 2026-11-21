@@ -80,8 +80,25 @@ def llms_txt():
     return partial('llms.txt') + '\n\n## Blog\n\n' + '\n'.join(posts) + '\n'
 
 
+def css_problem(path):
+    """A stray or missing brace in a stylesheet makes browsers skip the rule after it, silently: find one."""
+    with open(os.path.join(ROOT, path), encoding='utf-8') as f:
+        text = re.sub(r'/\*.*?\*/', lambda m: re.sub(r'[^\n]', ' ', m.group(0)), f.read(), flags=re.S)
+    depth = 0
+    for i, ch in enumerate(text):
+        depth += ch == '{'
+        depth -= ch == '}'
+        if depth < 0:
+            return '%s line %d: a "}" with no "{" before it' % (path, text.count('\n', 0, i) + 1)
+    return '%s: %d "{" never closed' % (path, depth) if depth else None
+
+
 def main():
     check = '--check' in sys.argv
+    problem = css_problem('styles.css')
+    if problem:
+        print('Stylesheet error: ' + problem)
+        sys.exit(1)
     header, footer = partial('header.html'), partial('footer.html')
     versions = {a: fingerprint(a) for a in ASSETS}
     stale = []

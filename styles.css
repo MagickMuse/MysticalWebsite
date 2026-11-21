@@ -835,7 +835,6 @@ html.nav-fold .nav ul a { align-content: center; min-height: 52px; }
 .acct-menu li a:hover, .acct-menu li button:hover { background: var(--bg); color: var(--accent-text); }
 .acct-menu form { margin: 0; }
 .acct-menu li + li:last-child { border-top: 1px solid var(--line); margin-top: .3rem; padding-top: .3rem; }
-}
 
 /* ---------- hero / landing ---------- */
 .mm-hero { display: grid; justify-items: center; text-align: center; margin-bottom: var(--gap-intro); }
