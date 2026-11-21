@@ -319,9 +319,12 @@ function layout(string $title, string $body, array $opt = []): void
     header('Vary: Cookie');
 
     $email = current_email();
+    // Signed in: their profile, and signing out (a form, so a link elsewhere can't sign anyone out). Otherwise: Login.
     $acct = $email
-        ? '<a href="' . e(url('account')) . '">Account</a>'
-        : '<a href="' . e(url('login')) . '">Sign In</a>';
+        ? '<a href="' . e(url('account')) . '">My Profile</a><span class="dot" aria-hidden="true">·</span>'
+            . '<form method="post" action="' . e(url('logout')) . '"><input type="hidden" name="csrf" value="' . e(csrf_token()) . '">'
+            . '<button class="as-link" type="submit">Sign Out</button></form>'
+        : '<a href="' . e(url('login')) . '">Login</a>';
     $q = e($_GET['q'] ?? '');
     $section = $opt['section'] ?? 'manuscript'; // which main-menu item is marked as the current page
     $robots = !empty($opt['index']) ? 'index, follow' : 'noindex, nofollow';
@@ -387,14 +390,14 @@ function layout(string $title, string $body, array $opt = []): void
     </nav>
   </div>
   <div class="wrap mm-bar">
-    <?php if (has_access()): ?>
+    <?php if (has_access() && $section === 'manuscript'): // the search is for the Manuscript's own pages ?>
     <form class="mm-search" action="<?= e(url('search')) ?>" method="get" role="search">
       <label class="sr-only" for="mm-q">Search the Manuscript</label>
       <input id="mm-q" type="search" name="q" value="<?= $q ?>" placeholder="Search the Manuscript: protection, rose quartz, Hekate…">
       <button class="btn" type="submit">Search</button>
     </form>
     <?php endif ?>
-    <p class="mm-acct"><?= $acct ?></p>
+    <div class="mm-acct"><?= $acct ?></div>
   </div>
 </header>
 <main id="main" class="wrap mm-main">
