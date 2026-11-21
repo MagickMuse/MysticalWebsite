@@ -9,7 +9,7 @@ _Last updated: November 21, 2026_
 - [x] **Stripe secret key:** saved as the repository secret `STRIPE_SECRET_KEY`; the live upload puts it in place.
       Everything else in Stripe is ready (account approved, webhook complete, $333 and $33-a-month prices, cancel page).
 - [x] **Key secrets:** `STRIPE_WEBHOOK_SECRET` and `SMTP_PASSWORD` saved; the upload fills them in by itself.
-- [ ] **Paste the settings:** GitHub → Settings → Secrets and variables → Actions → New repository secret, named
+- [x] **Paste the settings:** GitHub → Settings → Secrets and variables → Actions → New repository secret, named
       `MANUSCRIPT_CONFIG_LIVE`, with the whole settings text Claude gave you (November 21).
 - [x] **Website mailbox:** `hello@magickmuse.com` made in Hostinger.
 - [ ] **Its password in GitHub:** Settings → Secrets and variables → Actions → `SMTP_PASSWORD` → Update, with the
