@@ -15,7 +15,7 @@ const path = require('path');
 
 const SITE = 'https://magickmuse.com/manuscript/';
 const TODAY_PAGE = SITE + 'today';
-const ZONE = 'America/Los_Angeles'; // whose "today" it is
+const ZONE = 'America/New_York'; // whose "today" it is, and whose 11:11 the post goes out at
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const SYNODIC = 29.530588853;
@@ -141,7 +141,7 @@ function message(R, day) {
 }
 
 /**
- * GitHub runs schedules in UTC, so the workflow is scheduled at both 18:11 and 19:11 UTC and only the one that is
+ * GitHub runs schedules in UTC, so the workflow is scheduled at both 15:11 and 16:11 UTC and only the one that is
  * 11:11 in ZONE today posts (summer and winter time). Judged by the scheduled time, not the clock, as GitHub
  * sometimes starts a run late.
  */

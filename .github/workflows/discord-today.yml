@@ -1,4 +1,4 @@
-# Posts Today's Correspondences to the Discord server every morning at 11:11 Pacific time
+# Posts Today's Correspondences to the Discord server every morning at 11:11 Eastern time (8:11 Pacific)
 # (.github/scripts/discord-today.js). Needs the repository secret DISCORD_WEBHOOK_URL:
 # Discord → Server Settings → Integrations → Webhooks → New Webhook → pick the channel → Copy Webhook URL.
 # Run it by hand from the Actions tab to post straight away.
@@ -6,9 +6,9 @@ name: Discord daily correspondences
 
 on:
   schedule:
-    # 11:11 Pacific is 19:11 UTC in winter and 18:11 UTC in summer; the script posts only from the right one.
-    - cron: '11 18 * * *'
-    - cron: '11 19 * * *'
+    # 11:11 Eastern is 16:11 UTC in winter and 15:11 UTC in summer; the script posts only from the right one.
+    - cron: '11 15 * * *'
+    - cron: '11 16 * * *'
   workflow_dispatch:
 
 permissions:

@@ -26,7 +26,7 @@ _Last updated: November 21, 2026_
       of the less certain alphabets). Say which should get one and which are meant to stay blank.
 - [ ] **Review the beginner path's 30 days:** `manuscript/beginner-path.php`, one line per day; reorder or swap freely.
 
-- [x] **Discord daily post:** webhook saved as `DISCORD_WEBHOOK_URL`; it posts at 11:11 every morning (Pacific).
+- [x] **Discord daily post:** webhook saved as `DISCORD_WEBHOOK_URL`; it posts at 11:11 every morning Eastern (8:11 Pacific).
 
 ## After launch
 - [ ] **Sales tax, when Stripe says so:** none to collect yet (far below every state's threshold; California doesn't tax
