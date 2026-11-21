@@ -590,6 +590,23 @@ section.tight { padding-block: clamp(2.5rem, 5vw, 4rem); }
 .prose > h2 + * { margin-top: var(--gap-head); }
 .prose > h3 + * { margin-top: var(--gap-h3); }
 .signature { font-family: var(--display); font-style: italic; font-size: 1.4rem; }
+/* The Mythos page: the story told with a lead line, pull quotes, callouts and a figure. */
+.chapter-text .gold { color: var(--gold-text); }
+.chapter-text strong.gold { font-weight: 600; }
+.chapter-text em.gold { font-style: italic; font-weight: 600; }
+.story-lead { font-family: var(--display); font-size: clamp(1.7rem, 3vw, 2.2rem); line-height: 1.25; color: var(--accent-text); }
+.story-quote { margin-inline: 0; padding: .3rem 0 .3rem 1.4rem; border-left: 2px solid var(--gold); }
+.story-quote p { font-family: var(--display); font-style: italic; font-size: clamp(1.45rem, 2.6vw, 1.8rem); line-height: 1.35; margin: 0; }
+.story-quote.closing { border-left: 0; padding: 0; text-align: center; }
+.story-quote.closing p { color: var(--gold-text); }
+.story-callout { padding: 1.3rem 1.5rem; border: 1px solid var(--line); background: var(--surface); }
+.story-callout .eyebrow { margin: 0 0 .3rem; }
+.story-callout p:last-child { margin: 0; }
+.story-callout.gilt { border-color: var(--gold); outline: 1px solid color-mix(in srgb, var(--gold) 45%, transparent); outline-offset: -7px; background: var(--texture), var(--bg); padding: 1.6rem 1.7rem; }
+.story-figure { max-width: none; display: grid; justify-items: center; text-align: center; font-family: var(--display); font-style: italic; font-size: 1.15rem; color: var(--muted); padding-block: .6rem; border-block: 1px solid var(--line); }
+.story-figure span { font-style: normal; font-size: clamp(2.6rem, 5vw, 3.4rem); line-height: 1.05; color: var(--gold-text); }
+.chapter-text kbd { font-family: var(--body); font-size: .85em; padding: .05em .4em; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; background: var(--surface); }
+.signature span { color: var(--gold-text); }
 mark {
   background: linear-gradient(transparent 62%, color-mix(in srgb, var(--gold) 30%, transparent) 62%); color: inherit;
   font-weight: 400; padding-inline: .05em;
